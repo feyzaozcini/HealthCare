@@ -1,12 +1,46 @@
 /* Getting-Started */
-.card-bg-image {
-    position: absolute;
-    width: 630px;
-    height: auto;
-    bottom: 0;
-    right: 0;
-    z-index: 1;
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 600px; /* Butonlar arasý boþluk */
+    margin-top: 20px; /* Üstten boþluk */
 }
+
+.image-button {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.button-image {
+    width: 150px; /* Resim geniþliði */
+    height: auto;
+    border-radius: 8px; /* Köþeleri yuvarlama */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Gölge efekti */
+    margin-bottom: 8px; /* Resim ve metin arasý boþluk */
+}
+
+.image-button span {
+    font-size: 16px;
+    color: #333;
+}
+
+.demoFont {
+    font-family: Tahoma, Geneva, sans-serif;
+    font-size: 30px;
+    letter-spacing: 0px;
+    word-spacing: 0px;
+    color: #000000;
+    font-weight: 700;
+    text-decoration: none solid rgb(68, 68, 68);
+    font-style: normal;
+    font-variant: normal;
+    text-transform: uppercase;
+}
+
 /* Getting-Started End */
 
 /* Write here your styles for the Index page */
