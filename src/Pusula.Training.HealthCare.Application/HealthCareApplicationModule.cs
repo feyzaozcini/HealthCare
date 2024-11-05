@@ -51,6 +51,12 @@ public class HealthCareApplicationModule : AbpModule
     {
         var configuration = context.Services.GetConfiguration();
 
+        Configure<AbpExceptionHandlingOptions>(options =>
+        {
+            options.SendExceptionsDetailsToClients = true; // Hata detaylarını gönder
+            options.SendStackTraceToClients = true; // Stack trace gönder
+        });
+
         Configure<AbpDistributedCacheOptions>(options =>
         {
             options.KeyPrefix = "PTH:";

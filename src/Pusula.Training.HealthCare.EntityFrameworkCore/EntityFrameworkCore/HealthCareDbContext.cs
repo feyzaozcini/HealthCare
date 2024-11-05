@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Protocols;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -33,6 +34,9 @@ public class HealthCareDbContext :
     public DbSet<Protocol> Protocols { get; set; } = null!;
     public DbSet<Patient> Patients { get; set; } = null!;
     public DbSet<Country> Countries { get; set; } = null!;
+
+    public DbSet<PatientCompany> PatientCompanies { get; set; } = null!;
+
 
 
     #region Entities from the modules
@@ -134,6 +138,13 @@ public class HealthCareDbContext :
                 b.Property(x => x.EndTime).HasColumnName(nameof(Protocol.EndTime));
                 b.HasOne<Patient>().WithMany().IsRequired().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne<Department>().WithMany().IsRequired().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            builder.Entity<PatientCompany>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "PatientCompanies", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(PatientCompany.Name)).IsRequired().HasMaxLength(PatientCompanyConsts.NameMaxLength);
             });
         }
 
