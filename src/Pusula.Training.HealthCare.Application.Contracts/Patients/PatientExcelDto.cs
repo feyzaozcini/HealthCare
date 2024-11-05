@@ -8,8 +8,10 @@ public class PatientExcelDto
     public string LastName { get; set; } = null!;
     public DateTime BirthDate { get; set; }
     public string IdentityNumber { get; set; } = null!;
-    public string EmailAddress { get; set; } = null!;
+    public string Email { get; set; } = null!;
     public string MobilePhoneNumber { get; set; } = null!;
-    public string? HomePhoneNumber { get; set; }
-    public int Gender { get; set; }
+    public Gender Gender { get; set; }
+    public Type type { get; set; }
+    public string? PatientCompany { get; set; }
+    public string? PatientCountry { get; set; }
 }
