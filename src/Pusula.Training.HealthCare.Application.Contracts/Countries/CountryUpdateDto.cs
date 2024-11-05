@@ -8,7 +8,7 @@ using Volo.Abp.Domain.Entities;
 
 namespace Pusula.Training.HealthCare.Countries;
 
-public class CountryUpdateDto : IHasConcurrencyStamp
+public class CountryUpdateDto
 {
     public Guid Id { get; set; }
 
@@ -17,5 +17,4 @@ public class CountryUpdateDto : IHasConcurrencyStamp
     [Required]
     public string Code { get; set; } = null!;
 
-    public string ConcurrencyStamp { get; set; } = null!;
 }

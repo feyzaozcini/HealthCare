@@ -47,6 +47,5 @@ public class CountryController(ICountriesAppService countriesAppService)
     public Task<PagedResultDto<CountryDto>> GetListAsync(GetCountriesInput input) => countriesAppService.GetListAsync(input);
 
     [HttpPut]
-    [Route("{id}")]
     public Task<CountryDto> UpdateAsync(CountryUpdateDto input) => countriesAppService.UpdateAsync(input);
 }
