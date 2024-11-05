@@ -32,6 +32,11 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         departmentPermission.AddChild(HealthCarePermissions.Departments.Edit, L("Permission:Edit"));
         departmentPermission.AddChild(HealthCarePermissions.Departments.Delete, L("Permission:Delete"));
 
+        var patientCompanyPermission = myGroup.AddPermission(HealthCarePermissions.PatientCompanies.Default, L("Permission:PatientCompanies"));
+        patientCompanyPermission.AddChild(HealthCarePermissions.PatientCompanies.Create, L("Permission:Create"));
+        patientCompanyPermission.AddChild(HealthCarePermissions.PatientCompanies.Edit, L("Permission:Edit"));
+        patientCompanyPermission.AddChild(HealthCarePermissions.PatientCompanies.Delete, L("Permission:Delete"));
+
         var countryPermission = myGroup.AddPermission(HealthCarePermissions.Countries.Default, L("Permission:Countries"));
         countryPermission.AddChild(HealthCarePermissions.Countries.Create, L("Permission:Create"));
         countryPermission.AddChild(HealthCarePermissions.Countries.Edit, L("Permission:Edit"));
