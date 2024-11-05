@@ -21,6 +21,8 @@ using Volo.Abp.BackgroundWorkers;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Pusula.Training.HealthCare.Workers;
+using Pusula.Training.HealthCare.Countries;
+using Volo.Abp.AspNetCore.ExceptionHandling;
 
 namespace Pusula.Training.HealthCare;
 
@@ -65,6 +67,13 @@ public class HealthCareApplicationModule : AbpModule
         {
             options.DefaultFirstWaitDuration = 10;
             options.DefaultTimeout = 86400;
+        });
+
+        //Detaylı hata yakalama
+        Configure<AbpExceptionHandlingOptions>(options =>
+        {
+            options.SendExceptionsDetailsToClients = true; 
+            options.SendStackTraceToClients = true; 
         });
 
         var redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]!);
