@@ -21,6 +21,8 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Patient, PatientExcelDto>();
         CreateMap<PatientDto, PatientUpdateDto>();
         CreateMap<Patient, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.FirstName));
+        CreateMap<PatientWithNavigationProperties, PatientWithNavigationPropertiesDto>();
+        CreateMap<Patient, PatientWithNavigationPropertiesDto>();
 
         CreateMap<Protocol, ProtocolDto>();
         CreateMap<Protocol, ProtocolExcelDto>();
@@ -38,11 +40,14 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<CountryDto, CountryCreateDto>();
         CreateMap<Country, CountryUpdateDto>();
         CreateMap<CountryDto, CountryUpdateDto>();
+        CreateMap<Country, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+
 
         CreateMap<PatientCompany, PatientCompanyDto>();
         CreateMap<PatientCompany, PatientCompanyExcelDto>();
         CreateMap<PatientCompanyDto, PatientCompanyUpdateDto>();
-      
-        
+        CreateMap<PatientCompany, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+
+
     }
 }

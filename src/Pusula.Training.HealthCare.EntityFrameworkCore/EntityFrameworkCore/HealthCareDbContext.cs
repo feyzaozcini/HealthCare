@@ -110,8 +110,8 @@ public class HealthCareDbContext :
                 b.Property(x => x.FatherName).HasColumnName(nameof(Patient.FatherName));
                 b.Property(x => x.BloodType).HasColumnName(nameof(Patient.BloodType));
                 b.Property(x => x.Type).HasColumnName(nameof(Patient.Type)).IsRequired();
-                //b.HasOne<PatientCompany>().WithMany().IsRequired().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.NoAction);
-                //b.HasOne<Country>().WithMany().IsRequired().HasForeignKey(x => x.CountryId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<PatientCompany>().WithMany().IsRequired().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Country>().WithMany().IsRequired().HasForeignKey(x => x.CountryId).OnDelete(DeleteBehavior.NoAction);
             });
 
             builder.Entity<Department>(b =>

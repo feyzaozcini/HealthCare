@@ -27,7 +27,7 @@ public class PatientController : HealthCareController, IPatientsAppService
     }
 
     [HttpGet]
-    public virtual Task<PagedResultDto<PatientDto>> GetListAsync(GetPatientsInput input)
+    public virtual Task<PagedResultDto<PatientWithNavigationPropertiesDto>> GetListAsync(GetPatientsInput input)
     {
         return _patientsAppService.GetListAsync(input);
     }
@@ -38,6 +38,18 @@ public class PatientController : HealthCareController, IPatientsAppService
     {
         return _patientsAppService.GetAsync(id);
     }
+
+    [HttpGet]
+    [Route("with-navigation-properties/{id}")]
+    public Task<PatientWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id) => _patientsAppService.GetWithNavigationPropertiesAsync(id);
+
+    [HttpGet]
+    [Route("company-lookup")]
+    public Task<PagedResultDto<LookupDto<Guid>>> GetCompanyLookupAsync(LookupRequestDto input) => _patientsAppService.GetCompanyLookupAsync(input);
+
+    [HttpGet]
+    [Route("country-lookup")]
+    public Task<PagedResultDto<LookupDto<Guid>>> GetCountryLookupAsync(LookupRequestDto input) => _patientsAppService.GetCountryLookupAsync(input);
 
     [HttpPost]
     public virtual Task<PatientDto> CreateAsync(PatientCreateDto input)
@@ -86,4 +98,7 @@ public class PatientController : HealthCareController, IPatientsAppService
     {
         return _patientsAppService.DeleteAllAsync(input);
     }
+
+    
+
 }
