@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Pusula.Training.HealthCare.Countries;
+using Pusula.Training.HealthCare.PatientCompanies;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,8 +12,9 @@ namespace Pusula.Training.HealthCare.Patients
     {
         public Patient Patient { get; set; } = null!;
 
-        //public Country Country { get; set; } = null!;
-        //public Company Company { get; set; } = null!;
+        public Country Country { get; set; } = null!;
+
+        public PatientCompany PatientCompany { get; set; } = null!;
 
     }
 }

@@ -17,11 +17,11 @@ public class GetPatientsInput : PagedAndSortedResultRequestDto
     public string? Email { get; set; }
     public string? MobilePhoneNumber { get; set; }
     public string? EmergencyPhoneNumber { get; set; }
-    public Gender Gender { get; set; }
+    public Gender? Gender { get; set; }
     public int? No { get; set; }
     public string? MotherName { get; set; }
     public string? FatherName { get; set; }
-    public BloodType BloodType { get; set; }
+    public BloodType? BloodType { get; set; }
     public Type? Type { get; set; }
     public Guid? CompanyId { get; set; }
     public Guid? CountryId { get; set; }

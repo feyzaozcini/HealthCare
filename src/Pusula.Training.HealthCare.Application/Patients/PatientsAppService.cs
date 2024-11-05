@@ -1,12 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
+using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Numerics;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -21,7 +26,9 @@ namespace Pusula.Training.HealthCare.Patients
     [Authorize(HealthCarePermissions.Patients.Default)]
     public class PatientsAppService(IPatientRepository patientRepository, PatientManager patientManager,
         IDistributedCache<PatientDownloadTokenCacheItem, string> downloadTokenCache,
-        IDistributedEventBus distributedEventBus) : HealthCareAppService, IPatientsAppService
+        IDistributedEventBus distributedEventBus,
+        ICountryRepository countryRepository,
+        IPatientCompanyRepository patientCompanyRepository) : HealthCareAppService, IPatientsAppService
     {
 
         public virtual async Task<PagedResultDto<PatientWithNavigationPropertiesDto>> GetListAsync(GetPatientsInput input)
@@ -41,48 +48,48 @@ namespace Pusula.Training.HealthCare.Patients
 
 
         // Company ve Country lookuplarýný getirir
-        /*public virtual async Task<PatientWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id)
+        public virtual async Task<PatientWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id)
         {
             var patient = await patientRepository.GetWithNavigationPropertiesAsync(id);
-            await distributedEventBus.PublishAsync(new PatientCountryAndCompanyEto { Department = employee.Department.Name });
-            return ObjectMapper.Map<EmployeeWithNavigationProperties, EmployeeWithNavigationPropertiesDto>(employee);
-        }*/
+            await distributedEventBus.PublishAsync(new PatientCountryAndCompanyEto { Country = patient.Country.Name, Company = patient.PatientCompany.Name });
+            return ObjectMapper.Map<PatientWithNavigationProperties, PatientWithNavigationPropertiesDto>(patient);
+        }
 
 
         public virtual async Task<PatientDto> GetAsync(Guid id) => ObjectMapper.Map<Patient, PatientDto>(
                 await patientRepository.GetAsync(id));
 
         //Company Lookup
-        /*public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetCompanyLookupAsync(LookupRequestDto input)
+        public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetCompanyLookupAsync(LookupRequestDto input)
         {
-            var query = (await patientRepository.GetQueryableAsync())
+            var query = (await patientCompanyRepository.GetQueryableAsync())
                 .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
                     x => x.Name != null && x.Name.Contains(input.Filter!));
 
-            var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Department>();
+            var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<PatientCompany>();
             var totalCount = query.Count();
             return new PagedResultDto<LookupDto<Guid>>
             {
                 TotalCount = totalCount,
-                Items = ObjectMapper.Map<List<Department>, List<LookupDto<Guid>>>(lookupData)
+                Items = ObjectMapper.Map<List<PatientCompany>, List<LookupDto<Guid>>>(lookupData)
             };
-        }*/
+        }
 
-        /*
+        
         public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetCountryLookupAsync(LookupRequestDto input)
         {
-            var query = (await departmentRepository.GetQueryableAsync())
+            var query = (await countryRepository.GetQueryableAsync())
                 .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
                     x => x.Name != null && x.Name.Contains(input.Filter!));
 
-            var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Department>();
+            var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Country>();
             var totalCount = query.Count();
             return new PagedResultDto<LookupDto<Guid>>
             {
                 TotalCount = totalCount,
-                Items = ObjectMapper.Map<List<Department>, List<LookupDto<Guid>>>(lookupData)
+                Items = ObjectMapper.Map<List<Country>, List<LookupDto<Guid>>>(lookupData)
             };
-        }*/
+        }
 
 
         [Authorize(HealthCarePermissions.Patients.Create)]

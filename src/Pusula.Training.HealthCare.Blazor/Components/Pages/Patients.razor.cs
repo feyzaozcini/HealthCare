@@ -105,15 +105,7 @@ public partial class Patients
 
     private async Task GetPatientsAsync()
     {
-        Filter.MaxResultCount = PageSize;
-        Filter.SkipCount = (CurrentPage - 1) * PageSize;
-        Filter.Sorting = CurrentSorting;
-
-        var result = await PatientsAppService.GetListAsync(Filter);
-        PatientList = result.Items;
-        TotalCount = (int)result.TotalCount;
-
-        await ClearSelection();
+        
     }
 
     protected virtual async Task SearchAsync()
@@ -125,7 +117,7 @@ public partial class Patients
 
     private async Task DownloadAsExcelAsync()
     {
-        var token = (await PatientsAppService.GetDownloadTokenAsync()).Token;
+       /* var token = (await PatientsAppService.GetDownloadTokenAsync()).Token;
         var remoteService = await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("HealthCare") ?? await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
         var culture = CultureInfo.CurrentUICulture.Name ?? CultureInfo.CurrentCulture.Name;
         if (!culture.IsNullOrEmpty())
@@ -133,7 +125,7 @@ public partial class Patients
             culture = "&culture=" + culture;
         }
         await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
-        NavigationManager.NavigateTo($"{remoteService?.BaseUrl.EnsureEndsWith('/') ?? string.Empty}api/app/patients/as-excel-file?DownloadToken={token}&FilterText={HttpUtility.UrlEncode(Filter.FilterText)}{culture}&FirstName={HttpUtility.UrlEncode(Filter.FirstName)}&LastName={HttpUtility.UrlEncode(Filter.LastName)}&BirthDateMin={Filter.BirthDateMin?.ToString("O")}&BirthDateMax={Filter.BirthDateMax?.ToString("O")}&IdentityNumber={HttpUtility.UrlEncode(Filter.IdentityNumber)}&EmailAddress={HttpUtility.UrlEncode(Filter.EmailAddress)}&MobilePhoneNumber={HttpUtility.UrlEncode(Filter.MobilePhoneNumber)}&HomePhoneNumber={HttpUtility.UrlEncode(Filter.HomePhoneNumber)}&GenderMin={Filter.GenderMin}&GenderMax={Filter.GenderMax}", forceLoad: true);
+        NavigationManager.NavigateTo($"{remoteService?.BaseUrl.EnsureEndsWith('/') ?? string.Empty}api/app/patients/as-excel-file?DownloadToken={token}&FilterText={HttpUtility.UrlEncode(Filter.FilterText)}{culture}&FirstName={HttpUtility.UrlEncode(Filter.FirstName)}&LastName={HttpUtility.UrlEncode(Filter.LastName)}&BirthDateMin={Filter.BirthDateMin?.ToString("O")}&BirthDateMax={Filter.BirthDateMax?.ToString("O")}&IdentityNumber={HttpUtility.UrlEncode(Filter.IdentityNumber)}&EmailAddress={HttpUtility.UrlEncode(Filter.EmailAddress)}&MobilePhoneNumber={HttpUtility.UrlEncode(Filter.MobilePhoneNumber)}&HomePhoneNumber={HttpUtility.UrlEncode(Filter.HomePhoneNumber)}&GenderMin={Filter.GenderMin}&GenderMax={Filter.GenderMax}", forceLoad: true);*/
     }
 
     private async Task OnDataGridReadAsync(DataGridReadDataEventArgs<PatientDto> e)
@@ -277,16 +269,7 @@ public partial class Patients
         Filter.MobilePhoneNumber = homePhoneNumber;
         await SearchAsync();
     }
-    protected virtual async Task OnGenderMinChangedAsync(int? genderMin)
-    {
-        Filter.GenderMin = genderMin;
-        await SearchAsync();
-    }
-    protected virtual async Task OnGenderMaxChangedAsync(int? genderMax)
-    {
-        Filter.GenderMax = genderMax;
-        await SearchAsync();
-    }
+    
     private Task SelectAllItems()
     {
         AllPatientsSelected = true;

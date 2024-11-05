@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
+using Pusula.Training.HealthCare.PatientCompanies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -108,13 +110,13 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
             .Select(patient => new PatientWithNavigationProperties
             {
                 Patient = patient,
-                //Company = dbContext.Set<Company>().FirstOrDefault(c => c.Id == patient.CompanyId)!
-                //Country = dbContext.Set<Country>().FirstOrDefault(c => c.Id == patient.CountryId)!
+                PatientCompany = dbContext.Set<PatientCompany>().FirstOrDefault(c => c.Id == patient.CompanyId)!,
+                Country = dbContext.Set<Country>().FirstOrDefault(c => c.Id == patient.CountryId)!
             })
             .FirstOrDefault()!;
     }
 
-    public virtual async Task<List<PatientWithNavigationProperties>> GetWithNavigationPropertiesAsync(
+    public virtual async Task<List<PatientWithNavigationProperties>> GetListWithNavigationPropertiesAsync(
         string? filterText = null, 
         string? firstName = null, 
         string? lastName = null, 
@@ -191,14 +193,14 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
     //Company ve Country tablolarý ile join iþlemi yapýlýr. Entityler yok þu an önemli
     protected virtual async Task<IQueryable<PatientWithNavigationProperties>> GetQueryForNavigationPropertiesAsync() =>
         from patient in (await GetDbSetAsync())
-        join company in (await GetDbContextAsync()).Set<Company>() on patient.CompanyId equals company.Id into companies
+        join company in (await GetDbContextAsync()).Set<PatientCompany>() on patient.CompanyId equals company.Id into companies
         from company in companies.DefaultIfEmpty()
         join country in (await GetDbContextAsync()).Set<Country>() on patient.CountryId equals country.Id into countries
         from country in countries.DefaultIfEmpty()
         select new PatientWithNavigationProperties
         {
             Patient = patient,
-            Company = company,
+            PatientCompany = company,
             Country= country
         };
 

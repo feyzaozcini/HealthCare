@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Pusula.Training.HealthCare.Countries;
+using Pusula.Training.HealthCare.PatientCompanies;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +11,9 @@ namespace Pusula.Training.HealthCare.Patients
     public class PatientWithNavigationPropertiesDto
     {
         public PatientDto Patient { get; set; } = null!;
-        //public TitleDto Title { get; set; } = null!;
-        //public DepartmentDto Department { get; set; } = null!;
+
+        public CountryDto Country { get; set; } = null!;
+
+        public PatientCompanyDto PatientCompany { get; set; } = null!;
     }
 }

@@ -32,8 +32,7 @@
 <PageHeader Title="@L["Patients"]" BreadcrumbItems="BreadcrumbItems" Toolbar="Toolbar">
 
 </PageHeader>
-
-@* ************************* SEARCH ************************* *@
+@* @* ************************* SEARCH ************************* *@
 <Card>
     <CardBody>
         @*//<suite-custom-code-block-1>*@
@@ -103,7 +102,7 @@
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
                         <FieldLabel>@L["EmailAddress"]</FieldLabel>
-                        <TextEdit Text="@Filter.EmailAddress" TextChanged="@OnEmailAddressChangedAsync" />
+                        <TextEdit Text="@Filter.Email" TextChanged="@OnEmailAddressChangedAsync" />
                     </Field>
                 </Column>
                 <Column ColumnSize="ColumnSize.Is3">
@@ -112,28 +111,7 @@
                         <TextEdit Text="@Filter.MobilePhoneNumber" TextChanged="@OnMobilePhoneNumberChangedAsync" />
                     </Field>
                 </Column>
-                <Column ColumnSize="ColumnSize.Is3">
-                    <Field>
-                        <FieldLabel>@L["HomePhoneNumber"]</FieldLabel>
-                        <TextEdit Text="@Filter.HomePhoneNumber" TextChanged="@OnHomePhoneNumberChangedAsync" />
-                    </Field>
-                </Column>
-                <Column ColumnSize="ColumnSize.Is3">
-                    <Field>
-                        <FieldLabel>@L["MinGender"]</FieldLabel>
-                        <NumericEdit TValue="int?"
-                                     Value="@Filter.GenderMin"
-                                     ValueChanged="@OnGenderMinChangedAsync" />
-                    </Field>
-                </Column>
-                <Column ColumnSize="ColumnSize.Is3">
-                    <Field>
-                        <FieldLabel>@L["MaxGender"]</FieldLabel>
-                        <NumericEdit TValue="int?"
-                                     Value="@Filter.GenderMax"
-                                     ValueChanged="@OnGenderMaxChangedAsync" />
-                    </Field>
-                </Column>
+                
             </Row>
             @*//<suite-custom-code-block-2>*@
             @*//</suite-custom-code-block-2>*@
@@ -360,7 +338,7 @@
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
                             <FieldLabel>@L["EmailAddress"] *</FieldLabel>
-                            <TextEdit @bind-Text="@NewPatient.EmailAddress" MaxLength="PatientConsts.EmailAddressMaxLength" Role="TextRole.Email">
+                            <TextEdit @bind-Text="@NewPatient.Email" MaxLength="PatientConsts.EmailAddressMaxLength" Role="TextRole.Email">
                                 <Feedback>
                                     <ValidationError />
                                 </Feedback>
@@ -379,31 +357,6 @@
                             </TextEdit>
                         </Field>
                     </Validation>
-
-
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["HomePhoneNumber"]</FieldLabel>
-                            <TextEdit @bind-Text="@NewPatient.HomePhoneNumber">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </TextEdit>
-                        </Field>
-                    </Validation>
-
-
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["Gender"] *</FieldLabel>
-                            <NumericPicker TValue="int" @bind-Value="@NewPatient.Gender" Min="PatientConsts.GenderMinLength" Max="PatientConsts.GenderMaxLength" Decimals="0">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </NumericPicker>
-                        </Field>
-                    </Validation>
-
 
 
 
@@ -492,7 +445,7 @@
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
                             <FieldLabel>@L["EmailAddress"] *</FieldLabel>
-                            <TextEdit @bind-Text="@EditingPatient.EmailAddress" MaxLength="PatientConsts.EmailAddressMaxLength" Role="TextRole.Email">
+                            <TextEdit @bind-Text="@EditingPatient.Email" MaxLength="PatientConsts.EmailAddressMaxLength" Role="TextRole.Email">
                                 <Feedback>
                                     <ValidationError />
                                 </Feedback>
@@ -513,32 +466,6 @@
                     </Validation>
 
 
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["HomePhoneNumber"]</FieldLabel>
-                            <TextEdit @bind-Text="@EditingPatient.HomePhoneNumber">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </TextEdit>
-                        </Field>
-                    </Validation>
-
-
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["Gender"] *</FieldLabel>
-                            <NumericPicker TValue="int" @bind-Value="@EditingPatient.Gender" Min="PatientConsts.GenderMinLength" Max="PatientConsts.GenderMaxLength" Decimals="0">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </NumericPicker>
-                        </Field>
-                    </Validation>
-
-
-
-
                 </Validations>
             </ModalBody>
             <ModalFooter>
@@ -555,4 +482,3 @@
         @*//</suite-custom-code-block-10>*@
     </ModalContent>
 </Modal>
-
