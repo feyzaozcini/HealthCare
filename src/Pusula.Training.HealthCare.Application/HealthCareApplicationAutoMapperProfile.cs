@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Protocols;
@@ -29,5 +30,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Department, DepartmentExcelDto>();
         CreateMap<DepartmentDto, DepartmentUpdateDto>();
         CreateMap<Department, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+
+        CreateMap<Country, CountryDto>();
+        CreateMap<Country, CountryCreateDto>();
+        CreateMap<CountryDto, CountryCreateDto>();
+        CreateMap<Country, CountryUpdateDto>();
+        CreateMap<CountryDto, CountryUpdateDto>();
     }
 }
