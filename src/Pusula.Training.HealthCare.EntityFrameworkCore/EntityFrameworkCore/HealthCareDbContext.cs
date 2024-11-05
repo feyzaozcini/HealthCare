@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Protocols;
@@ -31,6 +32,7 @@ public class HealthCareDbContext :
     public DbSet<Department> Departments { get; set; } = null!;
     public DbSet<Protocol> Protocols { get; set; } = null!;
     public DbSet<Patient> Patients { get; set; } = null!;
+    public DbSet<Country> Countries { get; set; } = null!;
 
 
     #region Entities from the modules
@@ -85,6 +87,7 @@ public class HealthCareDbContext :
         /* Configure your own tables/entities inside here */
         if (builder.IsHostDatabase())
         {
+            // Migrationdan önce kontrol edilmesi gereken tablolar
             builder.Entity<Patient>(b =>
             {
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Patients", HealthCareConsts.DbSchema);
@@ -92,11 +95,19 @@ public class HealthCareDbContext :
                 b.Property(x => x.FirstName).HasColumnName(nameof(Patient.FirstName)).IsRequired().HasMaxLength(PatientConsts.FirstNameMaxLength);
                 b.Property(x => x.LastName).HasColumnName(nameof(Patient.LastName)).IsRequired().HasMaxLength(PatientConsts.LastNameMaxLength);
                 b.Property(x => x.BirthDate).HasColumnName(nameof(Patient.BirthDate));
-                b.Property(x => x.IdentityNumber).HasColumnName(nameof(Patient.IdentityNumber)).IsRequired().HasMaxLength(PatientConsts.IdentityNumberMaxLength);
-                b.Property(x => x.EmailAddress).HasColumnName(nameof(Patient.EmailAddress)).IsRequired().HasMaxLength(PatientConsts.EmailAddressMaxLength);
+                b.Property(x => x.IdentityNumber).HasColumnName(nameof(Patient.IdentityNumber)).HasMaxLength(PatientConsts.IdentityNumberMaxLength);
+                b.Property(x => x.PassportNumber).HasColumnName(nameof(Patient.PassportNumber));
+                b.Property(x => x.Email).HasColumnName(nameof(Patient.Email)).IsRequired().HasMaxLength(PatientConsts.EmailAddressMaxLength);
                 b.Property(x => x.MobilePhoneNumber).HasColumnName(nameof(Patient.MobilePhoneNumber)).IsRequired().HasMaxLength(PatientConsts.MobilePhoneNumberMaxLength);
-                b.Property(x => x.HomePhoneNumber).HasColumnName(nameof(Patient.HomePhoneNumber));
-                b.Property(x => x.Gender).HasColumnName(nameof(Patient.Gender)).IsRequired().HasMaxLength(PatientConsts.GenderMaxLength);
+                b.Property(x => x.EmergencyPhoneNumber).HasColumnName(nameof(Patient.EmergencyPhoneNumber)).HasMaxLength(PatientConsts.MobilePhoneNumberMaxLength);
+                b.Property(x => x.Gender).HasColumnName(nameof(Patient.Gender)).IsRequired();
+                b.Property(x => x.No).HasColumnName(nameof(Patient.No)).IsRequired();
+                b.Property(x => x.MotherName).HasColumnName(nameof(Patient.MotherName));
+                b.Property(x => x.FatherName).HasColumnName(nameof(Patient.FatherName));
+                b.Property(x => x.BloodType).HasColumnName(nameof(Patient.BloodType));
+                b.Property(x => x.Type).HasColumnName(nameof(Patient.Type)).IsRequired();
+                //b.HasOne<PatientCompany>().WithMany().IsRequired().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.NoAction);
+                //b.HasOne<Country>().WithMany().IsRequired().HasForeignKey(x => x.CountryId).OnDelete(DeleteBehavior.NoAction);
             });
 
             builder.Entity<Department>(b =>
@@ -104,6 +115,14 @@ public class HealthCareDbContext :
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Departments", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
                 b.Property(x => x.Name).HasColumnName(nameof(Department.Name)).IsRequired().HasMaxLength(DepartmentConsts.NameMaxLength);
+            });
+
+            builder.Entity<Country>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Countries", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(Country.Name)).IsRequired().HasMaxLength(CountryConsts.NameMaxLength);
+                b.Property(x => x.Code).HasColumnName(nameof(Country.Code)).IsRequired().HasMaxLength(CountryConsts.CodeMaxLength);
             });
 
             builder.Entity<Protocol>(b =>

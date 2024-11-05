@@ -264,7 +264,7 @@ public partial class Patients
     }
     protected virtual async Task OnEmailAddressChangedAsync(string? emailAddress)
     {
-        Filter.EmailAddress = emailAddress;
+        Filter.Email = emailAddress;
         await SearchAsync();
     }
     protected virtual async Task OnMobilePhoneNumberChangedAsync(string? mobilePhoneNumber)
@@ -274,7 +274,7 @@ public partial class Patients
     }
     protected virtual async Task OnHomePhoneNumberChangedAsync(string? homePhoneNumber)
     {
-        Filter.HomePhoneNumber = homePhoneNumber;
+        Filter.MobilePhoneNumber = homePhoneNumber;
         await SearchAsync();
     }
     protected virtual async Task OnGenderMinChangedAsync(int? genderMin)

@@ -68,6 +68,15 @@ public class HealthCareMenuContributor : IMenuContributor
                 requiredPermissionName: HealthCarePermissions.Departments.Default)
         );
 
+        context.Menu.AddItem(
+            new ApplicationMenuItem(
+                HealthCareMenus.Departments,
+                l["Menu:Countries"],
+                url: "/countries",
+                icon: "fa fa-file-alt",
+                requiredPermissionName: HealthCarePermissions.Countries.Default)
+        );
+
         return Task.CompletedTask;
     }
 
