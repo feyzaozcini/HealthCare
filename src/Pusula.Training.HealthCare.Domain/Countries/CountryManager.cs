@@ -32,8 +32,7 @@ public class CountryManager(ICountryRepository countryRepository) : DomainServic
     public virtual async Task<Country> UpdateAsync(
         Guid id,
         string name,
-        string code,
-        [CanBeNull] string? concurrencyStamp = null
+        string code
     )
     {
         Check.NotNull(name, nameof(name));
@@ -45,7 +44,6 @@ public class CountryManager(ICountryRepository countryRepository) : DomainServic
         var country = await countryRepository.GetAsync(id);
         country.Name = name;
         country.Code = code;
-
         return await countryRepository.UpdateAsync(country);
     }
 }

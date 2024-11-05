@@ -95,8 +95,7 @@ public class CountriesAppService(
         var country = await countryManager.UpdateAsync(
                     input.Id,
                     input.Name, 
-                    input.Code,
-                    input.ConcurrencyStamp
+                    input.Code
                     );
 
         return ObjectMapper.Map<Country, CountryDto>(country);
