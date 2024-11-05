@@ -10,24 +10,38 @@ namespace Pusula.Training.HealthCare.Patients;
 public class PatientManager(IPatientRepository patientRepository) : DomainService
 {
     public virtual async Task<Patient> CreateAsync(
-        string firstName, string lastName, DateTime birthDate, string identityNumber, string emailAddress, string mobilePhoneNumber, int gender, string? homePhoneNumber = null)
+        Guid companyId,
+        Guid countryId,
+        string firstName, 
+        string lastName, 
+        DateTime birthDate, 
+        string identityNumber, 
+        string passportNumber, 
+        string email, 
+        string mobilePhoneNumber, 
+        string emergencyPhoneNumber, 
+        Gender gender, 
+        int no, 
+        string motherName, 
+        string fatherName, 
+        BloodType bloodType, 
+        Type type)
     {
-        Check.NotNullOrWhiteSpace(firstName, nameof(firstName));
-        Check.Length(firstName, nameof(firstName), PatientConsts.FirstNameMaxLength);
-        Check.NotNullOrWhiteSpace(lastName, nameof(lastName));
-        Check.Length(lastName, nameof(lastName), PatientConsts.LastNameMaxLength);
-        Check.NotNull(birthDate, nameof(birthDate));
-        Check.NotNullOrWhiteSpace(identityNumber, nameof(identityNumber));
-        Check.Length(identityNumber, nameof(identityNumber), PatientConsts.IdentityNumberMaxLength);
-        Check.NotNullOrWhiteSpace(emailAddress, nameof(emailAddress));
-        Check.Length(emailAddress, nameof(emailAddress), PatientConsts.EmailAddressMaxLength);
-        Check.NotNullOrWhiteSpace(mobilePhoneNumber, nameof(mobilePhoneNumber));
-        Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.MobilePhoneNumberMaxLength);
-        Check.Range(gender, nameof(gender), PatientConsts.GenderMinLength, PatientConsts.GenderMaxLength);
+        Check.NotNull(firstName, nameof(firstName));
+        Check.Length(firstName, nameof(firstName), PatientConsts.FirstNameMaxLength, 0);
+        Check.NotNull(lastName, nameof(lastName));
+        Check.Length(lastName, nameof(lastName), PatientConsts.LastNameMaxLength, 0);
+        Check.NotNull(identityNumber, nameof(identityNumber));
+        Check.Length(identityNumber, nameof(identityNumber), PatientConsts.IdentityNumberMaxLength, 0);
+        Check.NotNull(email, nameof(email));
+        Check.Length(email, nameof(email), PatientConsts.EmailAddressMaxLength, 0);
+        Check.NotNull(mobilePhoneNumber, nameof(mobilePhoneNumber));
+        Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.MobilePhoneNumberMaxLength, 0);
+        Check.Length(emergencyPhoneNumber, nameof(emergencyPhoneNumber), PatientConsts.MobilePhoneNumberMaxLength, 0);
 
         var patient = new Patient(
          GuidGenerator.Create(),
-         firstName, lastName, birthDate, identityNumber, emailAddress, mobilePhoneNumber, gender, homePhoneNumber
+         companyId,countryId,firstName, lastName, birthDate, identityNumber, passportNumber, email, mobilePhoneNumber, emergencyPhoneNumber,gender,no,motherName,fatherName,bloodType,type
          );
 
         return await patientRepository.InsertAsync(patient);
@@ -35,32 +49,56 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
 
     public virtual async Task<Patient> UpdateAsync(
         Guid id,
-        string firstName, string lastName, DateTime birthDate, string identityNumber, string emailAddress, string mobilePhoneNumber, int gender, string? homePhoneNumber = null, [CanBeNull] string? concurrencyStamp = null
+        Guid companyId,
+        Guid countryId,
+        string firstName,
+        string lastName,
+        DateTime birthDate,
+        string identityNumber,
+        string passportNumber,
+        string email,
+        string mobilePhoneNumber,
+        string emergencyPhoneNumber,
+        Gender gender,
+        int no,
+        string motherName,
+        string fatherName,
+        BloodType bloodType,
+        Type type, 
+        [CanBeNull] string? concurrencyStamp = null
     )
     {
-        Check.NotNullOrWhiteSpace(firstName, nameof(firstName));
-        Check.Length(firstName, nameof(firstName), PatientConsts.FirstNameMaxLength);
-        Check.NotNullOrWhiteSpace(lastName, nameof(lastName));
-        Check.Length(lastName, nameof(lastName), PatientConsts.LastNameMaxLength);
-        Check.NotNull(birthDate, nameof(birthDate));
-        Check.NotNullOrWhiteSpace(identityNumber, nameof(identityNumber));
-        Check.Length(identityNumber, nameof(identityNumber), PatientConsts.IdentityNumberMaxLength);
-        Check.NotNullOrWhiteSpace(emailAddress, nameof(emailAddress));
-        Check.Length(emailAddress, nameof(emailAddress), PatientConsts.EmailAddressMaxLength);
-        Check.NotNullOrWhiteSpace(mobilePhoneNumber, nameof(mobilePhoneNumber));
-        Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.MobilePhoneNumberMaxLength);
-        Check.Range(gender, nameof(gender), PatientConsts.GenderMinLength, PatientConsts.GenderMaxLength);
+        Check.NotNull(firstName, nameof(firstName));
+        Check.Length(firstName, nameof(firstName), PatientConsts.FirstNameMaxLength, 0);
+        Check.NotNull(lastName, nameof(lastName));
+        Check.Length(lastName, nameof(lastName), PatientConsts.LastNameMaxLength, 0);
+        Check.NotNull(identityNumber, nameof(identityNumber));
+        Check.Length(identityNumber, nameof(identityNumber), PatientConsts.IdentityNumberMaxLength, 0);
+        Check.NotNull(email, nameof(email));
+        Check.Length(email, nameof(email), PatientConsts.EmailAddressMaxLength, 0);
+        Check.NotNull(mobilePhoneNumber, nameof(mobilePhoneNumber));
+        Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.MobilePhoneNumberMaxLength, 0);
+        Check.Length(emergencyPhoneNumber, nameof(emergencyPhoneNumber), PatientConsts.MobilePhoneNumberMaxLength, 0);
 
         var patient = await patientRepository.GetAsync(id);
 
+        patient.CompanyId = companyId;
+        patient.CountryId = countryId;
         patient.FirstName = firstName;
         patient.LastName = lastName;
         patient.BirthDate = birthDate;
         patient.IdentityNumber = identityNumber;
-        patient.EmailAddress = emailAddress;
+        patient.PassportNumber = passportNumber;
+        patient.Email = email;
         patient.MobilePhoneNumber = mobilePhoneNumber;
+        patient.EmergencyPhoneNumber = emergencyPhoneNumber;
         patient.Gender = gender;
-        patient.HomePhoneNumber = homePhoneNumber;
+        patient.No = no;
+        patient.MotherName = motherName;
+        patient.FatherName = fatherName;
+        patient.BloodType = bloodType;
+        patient.Type = type;
+
 
         patient.SetConcurrencyStampIfNotNull(concurrencyStamp);
         return await patientRepository.UpdateAsync(patient);

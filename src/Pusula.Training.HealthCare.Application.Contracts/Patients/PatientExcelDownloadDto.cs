@@ -15,9 +15,10 @@ public class PatientExcelDownloadDto
     public string? IdentityNumber { get; set; }
     public string? EmailAddress { get; set; }
     public string? MobilePhoneNumber { get; set; }
-    public string? HomePhoneNumber { get; set; }
-    public int? GenderMin { get; set; }
-    public int? GenderMax { get; set; }
+    public Gender? Gender { get; set; }
+    public Type? type { get; set; }
+    public Guid? CompanyId { get; set; }
+    public Guid? CountryId { get; set; }
 
     public PatientExcelDownloadDto()
     {
