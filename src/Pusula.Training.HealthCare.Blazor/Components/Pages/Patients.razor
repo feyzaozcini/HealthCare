@@ -53,14 +53,19 @@
             </Addons>
         </Form>
 
-        <Row Class="mt-3 mb-3">
+        @* <Row Class="mt-3 mb-3">
             <div class="col-md-12">
                 <a href="javascript:;" class="text-decoration-none" @onclick="() => ShowAdvancedFilters = !ShowAdvancedFilters">@L["SeeAdvancedFilters"]</a>
             </div>
-        </Row>
+        </Row> *@
 
-        <div style="display: @(!ShowAdvancedFilters ? "none" : "block")">
+        <div@*  style="display: @(!ShowAdvancedFilters ? "none" : "block")" *@>
             <Row>
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Field>
+                        <FieldLabel>@L["PatientNo"]</FieldLabel>
+                        <NumericEdit TValue="int?" Value="@Filter.No" ValueChanged="@OnNoChangedAsync" />
+                        </Field> </Column>
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
                         <FieldLabel>@L["FirstName"]</FieldLabel>
@@ -73,7 +78,7 @@
                         <TextEdit Text="@Filter.LastName" TextChanged="@OnLastNameChangedAsync" />
                     </Field>
                 </Column>
-                <Column ColumnSize="ColumnSize.Is3">
+                @* <Column ColumnSize="ColumnSize.Is3">
                     <Field>
                         <FieldLabel>@L["MinBirthDate"]</FieldLabel>
                         <DatePicker TValue="DateTime?"
@@ -92,7 +97,7 @@
                                     DateChanged="@OnBirthDateMaxChangedAsync"
                                     Placeholder="@string.Empty" />
                     </Field>
-                </Column>
+                </Column> *@
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
                         <FieldLabel>@L["IdentityNumber"]</FieldLabel>
@@ -101,8 +106,14 @@
                 </Column>
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
-                        <FieldLabel>@L["EmailAddress"]</FieldLabel>
-                        <TextEdit Text="@Filter.Email" TextChanged="@OnEmailAddressChangedAsync" />
+                        <FieldLabel>@L["PassportNumber"]</FieldLabel>
+                        <TextEdit Text="@Filter.PassportNumber" TextChanged="@OnPassportNumberChangedAsync" />
+                    </Field>
+                </Column>
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Field>
+                        <FieldLabel>@L["FatherName"]</FieldLabel>
+                        <TextEdit Text="@Filter.FatherName" TextChanged="@OnFatherNameChangedAsync" />
                     </Field>
                 </Column>
                 <Column ColumnSize="ColumnSize.Is3">
@@ -169,7 +180,7 @@
 
             <hr class="my-1 mx-0" />
         }
-        <DataGrid TItem="PatientDto"
+        <DataGrid TItem="PatientWithNavigationPropertiesDto"
                   Data="PatientList"
                   SelectionMode="DataGridSelectionMode.Multiple"
                   SelectedRows="SelectedPatients"
@@ -199,17 +210,17 @@
 
                 @if (CanDeletePatient && PatientList.Any())
                 {
-                    <DataGridMultiSelectColumn TItem="PatientDto" DisplayOrder="-1" Width="30px"></DataGridMultiSelectColumn>
+                    <DataGridMultiSelectColumn TItem="PatientWithNavigationPropertiesDto" DisplayOrder="-1" Width="30px"></DataGridMultiSelectColumn>
                 }
 
-                <DataGridEntityActionsColumn TItem="PatientDto" @ref="@EntityActionsColumn">
+                <DataGridEntityActionsColumn TItem="PatientWithNavigationPropertiesDto" @ref="@EntityActionsColumn">
                     <DisplayTemplate>
-                        <EntityActions TItem="PatientDto" EntityActionsColumn="@EntityActionsColumn">
-                            <EntityAction TItem="PatientDto"
+                        <EntityActions TItem="PatientWithNavigationPropertiesDto" EntityActionsColumn="@EntityActionsColumn">
+                            <EntityAction TItem="PatientWithNavigationPropertiesDto"
                                           Visible="@CanEditPatient"
                                           Clicked="async () => await OpenEditPatientModalAsync(context)"
                                           Text="@L["Edit"]"></EntityAction>
-                            <EntityAction TItem="PatientDto"
+                            <EntityAction TItem="PatientWithNavigationPropertiesDto"
                                           Visible="@CanDeletePatient"
                                           Clicked="() => DeletePatientAsync(context)"
                                           ConfirmationMessage="@(()=> L["DeleteConfirmationMessage"])"
@@ -220,48 +231,48 @@
                     </DisplayTemplate>
                 </DataGridEntityActionsColumn>
 
-                <DataGridColumn TItem="PatientDto"
-                                Field="FirstName"
+                <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
+                                Field="Patient.FirstName"
                                 Caption="@L["FirstName"]">
                 </DataGridColumn>
 
-                <DataGridColumn TItem="PatientDto"
-                                Field="LastName"
+                <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
+                                Field="Patient.LastName"
                                 Caption="@L["LastName"]">
                 </DataGridColumn>
 
-                <DataGridColumn TItem="PatientDto"
+               @*  <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
                                 Field="BirthDate"
                                 Caption="@L["BirthDate"]">
                     <DisplayTemplate>
                         @context.BirthDate.ToShortDateString()
                     </DisplayTemplate>
-                </DataGridColumn>
+                </DataGridColumn> *@
 
-                <DataGridColumn TItem="PatientDto"
-                                Field="IdentityNumber"
+                <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
+                                Field="Patient.IdentityNumber"
                                 Caption="@L["IdentityNumber"]">
                 </DataGridColumn>
 
-                <DataGridColumn TItem="PatientDto"
-                                Field="EmailAddress"
-                                Caption="@L["EmailAddress"]">
+                <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
+                                Field="Patient.Email"
+                                Caption="@L["Email"]">
                 </DataGridColumn>
 
-                <DataGridColumn TItem="PatientDto"
-                                Field="MobilePhoneNumber"
+                <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
+                                Field="Patient.MobilePhoneNumber"
                                 Caption="@L["MobilePhoneNumber"]">
                 </DataGridColumn>
 
-                <DataGridColumn TItem="PatientDto"
+                @* <DataGridColumn TItem="PatientDto"
                                 Field="HomePhoneNumber"
                                 Caption="@L["HomePhoneNumber"]">
-                </DataGridColumn>
+                </DataGridColumn> *@
 
-                <DataGridColumn TItem="PatientDto"
+                @* <DataGridColumn TItem="PatientDto"
                                 Field="Gender"
                                 Caption="@L["Gender"]">
-                </DataGridColumn>
+                </DataGridColumn> *@
 
             </DataGridColumns>
 
