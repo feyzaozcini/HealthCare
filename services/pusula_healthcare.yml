@@ -1,0 +1,25 @@
+version: '3.3'
+services:
+  pusula_healthcare:
+    image: ghcr.io/mehmet-d02/pusula_healthcare:${TAG}
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_HTTP_PORTS=80
+    networks:
+      - healthcare_network
+    depends_on:
+      - postgresdb
+      - redis
+      - rabbitmq
+      - elasticsearch
+    deploy:
+      placement:
+        constraints: [node.role==manager]
+          
+
+networks:
+  healthcare_network:
+    external: true
