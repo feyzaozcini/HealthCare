@@ -20,8 +20,8 @@ public partial class Patients
 {
     protected List<Volo.Abp.BlazoriseUI.BreadcrumbItem> BreadcrumbItems = [];
     protected PageToolbar Toolbar { get; } = new PageToolbar();
-    protected bool ShowAdvancedFilters { get; set; }
-    private IReadOnlyList<PatientDto> PatientList { get; set; }
+    //protected bool ShowAdvancedFilters { get; set; }
+    private IReadOnlyList<PatientWithNavigationPropertiesDto> PatientList { get; set; }
     private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
     private int CurrentPage { get; set; } = 1;
     private string CurrentSorting { get; set; } = string.Empty;
@@ -37,11 +37,11 @@ public partial class Patients
     private Modal CreatePatientModal { get; set; } = new();
     private Modal EditPatientModal { get; set; } = new();
     private GetPatientsInput Filter { get; set; }
-    private DataGridEntityActionsColumn<PatientDto> EntityActionsColumn { get; set; } = new();
+    private DataGridEntityActionsColumn<PatientWithNavigationPropertiesDto> EntityActionsColumn { get; set; } = new();
     protected string SelectedCreateTab = "patient-create-tab";
     protected string SelectedEditTab = "patient-edit-tab";
 
-    private List<PatientDto> SelectedPatients { get; set; } = [];
+    private List<PatientWithNavigationPropertiesDto> SelectedPatients { get; set; } = [];
     private bool AllPatientsSelected { get; set; }
 
     public Patients()
@@ -84,7 +84,7 @@ public partial class Patients
 
     protected virtual ValueTask SetToolbarItemsAsync()
     {
-        Toolbar.AddButton(L["ExportToExcel"], DownloadAsExcelAsync, IconName.Download);
+        //Toolbar.AddButton(L["ExportToExcel"], DownloadAsExcelAsync, IconName.Download);
 
         Toolbar.AddButton(L["NewPatient"], OpenCreatePatientModalAsync, IconName.Add, requiredPolicyName: HealthCarePermissions.Patients.Create);
 
@@ -117,18 +117,18 @@ public partial class Patients
 
     private async Task DownloadAsExcelAsync()
     {
-       /* var token = (await PatientsAppService.GetDownloadTokenAsync()).Token;
-        var remoteService = await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("HealthCare") ?? await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
-        var culture = CultureInfo.CurrentUICulture.Name ?? CultureInfo.CurrentCulture.Name;
-        if (!culture.IsNullOrEmpty())
-        {
-            culture = "&culture=" + culture;
-        }
-        await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
-        NavigationManager.NavigateTo($"{remoteService?.BaseUrl.EnsureEndsWith('/') ?? string.Empty}api/app/patients/as-excel-file?DownloadToken={token}&FilterText={HttpUtility.UrlEncode(Filter.FilterText)}{culture}&FirstName={HttpUtility.UrlEncode(Filter.FirstName)}&LastName={HttpUtility.UrlEncode(Filter.LastName)}&BirthDateMin={Filter.BirthDateMin?.ToString("O")}&BirthDateMax={Filter.BirthDateMax?.ToString("O")}&IdentityNumber={HttpUtility.UrlEncode(Filter.IdentityNumber)}&EmailAddress={HttpUtility.UrlEncode(Filter.EmailAddress)}&MobilePhoneNumber={HttpUtility.UrlEncode(Filter.MobilePhoneNumber)}&HomePhoneNumber={HttpUtility.UrlEncode(Filter.HomePhoneNumber)}&GenderMin={Filter.GenderMin}&GenderMax={Filter.GenderMax}", forceLoad: true);*/
+        //var token = (await PatientsAppService.GetDownloadTokenAsync()).Token;
+        //var remoteService = await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("HealthCare") ?? await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
+        //var culture = CultureInfo.CurrentUICulture.Name ?? CultureInfo.CurrentCulture.Name;
+        //if (!culture.IsNullOrEmpty())
+        //{
+        //    culture = "&culture=" + culture;
+        //}
+        //await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
+        //NavigationManager.NavigateTo($"{remoteService?.BaseUrl.EnsureEndsWith('/') ?? string.Empty}api/app/patients/as-excel-file?DownloadToken={token}&FilterText={HttpUtility.UrlEncode(Filter.FilterText)}{culture}&FirstName={HttpUtility.UrlEncode(Filter.FirstName)}&LastName={HttpUtility.UrlEncode(Filter.LastName)}&BirthDateMin={Filter.BirthDateMin?.ToString("O")}&BirthDateMax={Filter.BirthDateMax?.ToString("O")}&IdentityNumber={HttpUtility.UrlEncode(Filter.IdentityNumber)}&EmailAddress={HttpUtility.UrlEncode(Filter.EmailAddress)}&MobilePhoneNumber={HttpUtility.UrlEncode(Filter.MobilePhoneNumber)}&HomePhoneNumber={HttpUtility.UrlEncode(Filter.HomePhoneNumber)}&GenderMin={Filter.GenderMin}&GenderMax={Filter.GenderMax}", forceLoad: true);
     }
 
-    private async Task OnDataGridReadAsync(DataGridReadDataEventArgs<PatientDto> e)
+    private async Task OnDataGridReadAsync(DataGridReadDataEventArgs<PatientWithNavigationPropertiesDto> e)
     {
         CurrentSorting = e.Columns
             .Where(c => c.SortDirection != SortDirection.Default)
@@ -166,12 +166,12 @@ public partial class Patients
         await CreatePatientModal.Hide();
     }
 
-    private async Task OpenEditPatientModalAsync(PatientDto input)
+    private async Task OpenEditPatientModalAsync(PatientWithNavigationPropertiesDto input)
     {
         SelectedEditTab = "patient-edit-tab";
 
 
-        var patient = await PatientsAppService.GetAsync(input.Id);
+        var patient = await PatientsAppService.GetAsync(input.Patient.Id);
 
         EditingPatientId = patient.Id;
         EditingPatient = ObjectMapper.Map<PatientDto, PatientUpdateDto>(patient);
@@ -180,9 +180,9 @@ public partial class Patients
         await EditPatientModal.Show();
     }
 
-    private async Task DeletePatientAsync(PatientDto input)
+    private async Task DeletePatientAsync(PatientWithNavigationPropertiesDto input)
     {
-        await PatientsAppService.DeleteAsync(input.Id);
+        await PatientsAppService.DeleteAsync(input.Patient.Id);
         await GetPatientsAsync();
     }
 
@@ -239,6 +239,11 @@ public partial class Patients
         Filter.LastName = lastName;
         await SearchAsync();
     }
+    protected virtual async Task OnNoChangedAsync(int? no)
+    {
+        Filter.No = no;
+        await SearchAsync();
+    }
     protected virtual async Task OnBirthDateMinChangedAsync(DateTime? birthDateMin)
     {
         Filter.BirthDateMin = birthDateMin.HasValue ? birthDateMin.Value.Date : birthDateMin;
@@ -254,14 +259,24 @@ public partial class Patients
         Filter.IdentityNumber = identityNumber;
         await SearchAsync();
     }
-    protected virtual async Task OnEmailAddressChangedAsync(string? emailAddress)
+    //protected virtual async Task OnEmailAddressChangedAsync(string? emailAddress)
+    //{
+    //    Filter.Email = emailAddress;
+    //    await SearchAsync();
+    //}
+    protected virtual async Task OnPassportNumberChangedAsync(string? passportNumber)
     {
-        Filter.Email = emailAddress;
+        Filter.PassportNumber = passportNumber;
         await SearchAsync();
     }
     protected virtual async Task OnMobilePhoneNumberChangedAsync(string? mobilePhoneNumber)
     {
         Filter.MobilePhoneNumber = mobilePhoneNumber;
+        await SearchAsync();
+    }
+    protected virtual async Task OnFatherNameChangedAsync(string? fatherName)
+    {
+        Filter.FatherName = fatherName;
         await SearchAsync();
     }
     protected virtual async Task OnHomePhoneNumberChangedAsync(string? homePhoneNumber)
@@ -310,7 +325,7 @@ public partial class Patients
         }
         else
         {
-            await PatientsAppService.DeleteByIdsAsync(SelectedPatients.Select(x => x.Id).ToList());
+            await PatientsAppService.DeleteByIdsAsync(SelectedPatients.Select(x => x.Patient.Id).ToList());
         }
 
         SelectedPatients.Clear();
