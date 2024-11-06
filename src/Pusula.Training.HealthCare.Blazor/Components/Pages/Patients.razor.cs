@@ -68,7 +68,7 @@ public partial class Patients
     {
         await SetPermissionsAsync();
         await GetCountryCollectionLookupAsync();
-        await GetCompanyCollectionLookupAsync();
+        
         GendersCollection = Enum.GetValues(typeof(Gender))
        .Cast<Gender>()
        .Select(g => new LookupDto<Gender>
