@@ -43,15 +43,6 @@ public class HealthCareMenuContributor : IMenuContributor
 
         context.Menu.AddItem(
             new ApplicationMenuItem(
-                HealthCareMenus.Patients,
-                l["Menu:Patients"],
-                url: "/patients",
-                icon: "fa fa-file-alt",
-                requiredPermissionName: HealthCarePermissions.Patients.Default)
-        );
-
-        context.Menu.AddItem(
-            new ApplicationMenuItem(
                 HealthCareMenus.Protocols,
                 l["Menu:Protocols"],
                 url: "/protocols",
