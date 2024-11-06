@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
+using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,6 +14,7 @@ using System.Web;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.AspNetCore.Components.Web.Theming.PageToolbars;
 using Volo.Abp.BlazoriseUI.Components;
+using Type = Pusula.Training.HealthCare.Patients.Type;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages;
 
@@ -20,7 +22,7 @@ public partial class Patients
 {
     protected List<Volo.Abp.BlazoriseUI.BreadcrumbItem> BreadcrumbItems = [];
     protected PageToolbar Toolbar { get; } = new PageToolbar();
-    //protected bool ShowAdvancedFilters { get; set; }
+    protected bool ShowAdvancedFilters { get; set; }
     private IReadOnlyList<PatientWithNavigationPropertiesDto> PatientList { get; set; }
     private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
     private int CurrentPage { get; set; } = 1;
@@ -38,9 +40,14 @@ public partial class Patients
     private Modal EditPatientModal { get; set; } = new();
     private GetPatientsInput Filter { get; set; }
     private DataGridEntityActionsColumn<PatientWithNavigationPropertiesDto> EntityActionsColumn { get; set; } = new();
-    protected string SelectedCreateTab = "patient-create-tab";
-    protected string SelectedEditTab = "patient-edit-tab";
+    protected string SelectedCreateTab = "Patient-create-tab";
+    protected string SelectedEditTab = "Patient-edit-tab";
 
+    private IReadOnlyList<LookupDto<Guid>> CountriesCollection { get; set; } = [];
+    private IReadOnlyList<LookupDto<Guid>> CompaniesCollection { get; set; } = [];
+    private IReadOnlyList<LookupDto<Gender>> GendersCollection { get; set; } = new List<LookupDto<Gender>>();
+    private IReadOnlyList<LookupDto<Type>> TypesCollection { get; set; } = new List<LookupDto<Type>>();
+    private IReadOnlyList<LookupDto<BloodType>> BloodTypesCollection { get; set; } = new List<LookupDto<BloodType>>();
     private List<PatientWithNavigationPropertiesDto> SelectedPatients { get; set; } = [];
     private bool AllPatientsSelected { get; set; }
 
@@ -55,13 +62,21 @@ public partial class Patients
             Sorting = CurrentSorting
         };
         PatientList = [];
-
-
     }
 
     protected override async Task OnInitializedAsync()
     {
         await SetPermissionsAsync();
+        await GetCountryCollectionLookupAsync();
+        await GetCompanyCollectionLookupAsync();
+        GendersCollection = Enum.GetValues(typeof(Gender))
+       .Cast<Gender>()
+       .Select(g => new LookupDto<Gender>
+       {
+           Id = g,
+           DisplayName = g.ToString()
+       })
+       .ToList();
 
     }
 
@@ -69,7 +84,6 @@ public partial class Patients
     {
         if (firstRender)
         {
-
             await SetBreadcrumbItemsAsync();
             await SetToolbarItemsAsync();
             await InvokeAsync(StateHasChanged);
@@ -84,28 +98,30 @@ public partial class Patients
 
     protected virtual ValueTask SetToolbarItemsAsync()
     {
-        //Toolbar.AddButton(L["ExportToExcel"], DownloadAsExcelAsync, IconName.Download);
-
+        
         Toolbar.AddButton(L["NewPatient"], OpenCreatePatientModalAsync, IconName.Add, requiredPolicyName: HealthCarePermissions.Patients.Create);
-
         return ValueTask.CompletedTask;
     }
 
     private async Task SetPermissionsAsync()
     {
-        CanCreatePatient = await AuthorizationService
-            .IsGrantedAsync(HealthCarePermissions.Patients.Create);
-        CanEditPatient = await AuthorizationService
-                        .IsGrantedAsync(HealthCarePermissions.Patients.Edit);
-        CanDeletePatient = await AuthorizationService
-                        .IsGrantedAsync(HealthCarePermissions.Patients.Delete);
-
-
+        CanCreatePatient = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.Patients.Create);
+        CanEditPatient = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.Patients.Edit);
+        CanDeletePatient = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.Patients.Delete);
     }
 
     private async Task GetPatientsAsync()
     {
-        
+        Filter.MaxResultCount = PageSize;
+        Filter.SkipCount = (CurrentPage - 1) * PageSize;
+        Filter.Sorting = CurrentSorting;
+
+        var result = await PatientsAppService.GetListAsync(Filter);
+        PatientList = (IReadOnlyList<PatientWithNavigationPropertiesDto>)result.Items;
+        TotalCount = (int)result.TotalCount;
+
+
+        await ClearSelection();
     }
 
     protected virtual async Task SearchAsync()
@@ -115,25 +131,25 @@ public partial class Patients
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task DownloadAsExcelAsync()
+    /*private async Task DownloadAsExcelAsync()
     {
-        //var token = (await PatientsAppService.GetDownloadTokenAsync()).Token;
-        //var remoteService = await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("HealthCare") ?? await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
-        //var culture = CultureInfo.CurrentUICulture.Name ?? CultureInfo.CurrentCulture.Name;
-        //if (!culture.IsNullOrEmpty())
-        //{
-        //    culture = "&culture=" + culture;
-        //}
-        //await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
-        //NavigationManager.NavigateTo($"{remoteService?.BaseUrl.EnsureEndsWith('/') ?? string.Empty}api/app/patients/as-excel-file?DownloadToken={token}&FilterText={HttpUtility.UrlEncode(Filter.FilterText)}{culture}&FirstName={HttpUtility.UrlEncode(Filter.FirstName)}&LastName={HttpUtility.UrlEncode(Filter.LastName)}&BirthDateMin={Filter.BirthDateMin?.ToString("O")}&BirthDateMax={Filter.BirthDateMax?.ToString("O")}&IdentityNumber={HttpUtility.UrlEncode(Filter.IdentityNumber)}&EmailAddress={HttpUtility.UrlEncode(Filter.EmailAddress)}&MobilePhoneNumber={HttpUtility.UrlEncode(Filter.MobilePhoneNumber)}&HomePhoneNumber={HttpUtility.UrlEncode(Filter.HomePhoneNumber)}&GenderMin={Filter.GenderMin}&GenderMax={Filter.GenderMax}", forceLoad: true);
-    }
+        var token = (await PatientsAppService.GetDownloadTokenAsync()).Token;
+        var remoteService = await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("HealthCare") ?? await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
+        var culture = CultureInfo.CurrentUICulture.Name ?? CultureInfo.CurrentCulture.Name;
+        if (!culture.IsNullOrEmpty())
+        {
+            culture = "&culture=" + culture;
+        }
+        await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
+        NavigationManager.NavigateTo($"{remoteService?.BaseUrl.EnsureEndsWith('/') ?? string.Empty}api/app/Patients/as-excel-file?DownloadToken={token}&FilterText={HttpUtility.UrlEncode(Filter.FilterText)}{culture}&Name={HttpUtility.UrlEncode(Filter.FirstName)}", forceLoad: true);
+    }*/
 
     private async Task OnDataGridReadAsync(DataGridReadDataEventArgs<PatientWithNavigationPropertiesDto> e)
     {
         CurrentSorting = e.Columns
-            .Where(c => c.SortDirection != SortDirection.Default)
-            .Select(c => c.Field + (c.SortDirection == SortDirection.Descending ? " DESC" : ""))
-            .JoinAsString(",");
+        .Where(c => c.SortDirection != SortDirection.Default)
+        .Select(c => c.Field + (c.SortDirection == SortDirection.Descending ? " DESC" : ""))
+        .JoinAsString(",");
         CurrentPage = e.Page;
         await GetPatientsAsync();
         await InvokeAsync(StateHasChanged);
@@ -145,11 +161,12 @@ public partial class Patients
         {
             BirthDate = DateTime.Now,
 
+            CountryId = CountriesCollection.Select(x => x.Id).FirstOrDefault(),
 
+            CompanyId = CompaniesCollection.Select(x => x.Id).FirstOrDefault()
         };
 
-        SelectedCreateTab = "patient-create-tab";
-
+        SelectedCreateTab = "Patient-create-tab";
 
         await NewPatientValidations.ClearAll();
         await CreatePatientModal.Show();
@@ -159,22 +176,20 @@ public partial class Patients
     {
         NewPatient = new PatientCreateDto
         {
-            BirthDate = DateTime.Now,
-
 
         };
+
         await CreatePatientModal.Hide();
     }
 
     private async Task OpenEditPatientModalAsync(PatientWithNavigationPropertiesDto input)
     {
-        SelectedEditTab = "patient-edit-tab";
+        SelectedEditTab = "Patient-edit-tab";
 
+        var Patient = await PatientsAppService.GetAsync(input.Patient.Id);
 
-        var patient = await PatientsAppService.GetAsync(input.Patient.Id);
-
-        EditingPatientId = patient.Id;
-        EditingPatient = ObjectMapper.Map<PatientDto, PatientUpdateDto>(patient);
+        EditingPatientId = Patient.Id;
+        EditingPatient = ObjectMapper.Map<PatientDto, PatientUpdateDto>(Patient);
 
         await EditingPatientValidations.ClearAll();
         await EditPatientModal.Show();
@@ -194,14 +209,13 @@ public partial class Patients
             {
                 return;
             }
-
             await PatientsAppService.CreateAsync(NewPatient);
             await GetPatientsAsync();
             await CloseCreatePatientModalAsync();
         }
         catch (Exception ex)
         {
-            await HandleErrorAsync(ex);
+
         }
     }
 
@@ -218,14 +232,13 @@ public partial class Patients
             {
                 return;
             }
-
             await PatientsAppService.UpdateAsync(EditingPatientId, EditingPatient);
             await GetPatientsAsync();
-            await EditPatientModal.Hide();
+            await CloseEditPatientModalAsync();
         }
         catch (Exception ex)
         {
-            await HandleErrorAsync(ex);
+
         }
     }
 
@@ -308,6 +321,16 @@ public partial class Patients
         }
 
         return Task.CompletedTask;
+    }
+
+    private async Task GetCountryCollectionLookupAsync(string? newValue = null)
+    {
+        CountriesCollection = (await PatientsAppService.GetCountryLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
+    }
+
+    private async Task GetCompanyCollectionLookupAsync(string? newValue = null)
+    {
+        CompaniesCollection = (await PatientsAppService.GetCountryLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
     }
 
     private async Task DeleteSelectedPatientsAsync()
