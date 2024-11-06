@@ -1,0 +1,24 @@
+version: '3.3'
+services:
+  kibana:
+    image: kibana:8.15.0
+    restart: always
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - XPACK_MONITORING_ENABLED=true
+      - XPACK_MONITORING_COLLECTION_ENABLED=true
+      - ELASTIC_USERNAME=elastic
+      - ELASTIC_PASSWORD=zqhp3x.5
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - healthcare_network
+    deploy:
+      replicas: 1
+
+networks:
+  healthcare_network:
+    external: true
