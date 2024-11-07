@@ -69,13 +69,6 @@ public class HealthCareApplicationModule : AbpModule
             options.DefaultTimeout = 86400;
         });
 
-        //Detaylı hata yakalama
-        Configure<AbpExceptionHandlingOptions>(options =>
-        {
-            options.SendExceptionsDetailsToClients = true; 
-            options.SendStackTraceToClients = true; 
-        });
-
         var redis = ConnectionMultiplexer.Connect(configuration["Redis:Configuration"]!);
 
         context.Services
@@ -84,5 +77,7 @@ public class HealthCareApplicationModule : AbpModule
             .PersistKeysToStackExchangeRedis(redis, "PTH-Protection-Keys");
 
         context.Services.AddSingleton<IDistributedLockProvider>(_ => new RedisDistributedSynchronizationProvider(redis.GetDatabase()));
+        context.Services.AddTransient<CountryBusinessRules>();
+
     }
 }

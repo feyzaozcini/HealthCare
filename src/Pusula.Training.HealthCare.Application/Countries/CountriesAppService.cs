@@ -1,17 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
-using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
-using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
 
 namespace Pusula.Training.HealthCare.Countries;
 
@@ -19,6 +15,7 @@ namespace Pusula.Training.HealthCare.Countries;
 [Authorize(HealthCarePermissions.Countries.Default)]
 public class CountriesAppService(
     ICountryRepository countryRepository,
+    CountryBusinessRules countryBusinessRules,
     CountryManager countryManager,
     IDistributedCache<CountryDownloadTokenCacheItem, string> downloadTokenCache)
     : HealthCareAppService, ICountriesAppService
@@ -27,32 +24,29 @@ public class CountriesAppService(
     [Authorize(HealthCarePermissions.Countries.Create)]
     public virtual async Task<CountryDto> CreateAsync(CountryCreateDto input)
     {
+
         var country = await countryManager.CreateAsync(
             input.Name,
             input.Code
             );
 
+        await countryBusinessRules.CountryNameCannotBeDuplicatedWhenInserted(input.Name);
+
         return ObjectMapper.Map<Country, CountryDto>(country);
     }
 
     [Authorize(HealthCarePermissions.Countries.Delete)]
-    public virtual async Task DeleteAllAsync(GetCountriesInput input)
+    public virtual async Task<CountryDeletedDto> DeleteAsync(Guid id)
     {
-        await countryRepository.DeleteAllAsync(input.FilterText, input.Name, input.Code);
-    }
+        Country? country = await countryRepository.GetAsync(predicate: c => c.Id == id);
 
-    [Authorize(HealthCarePermissions.Countries.Delete)]
-    public virtual async Task DeleteAsync(Guid id)
-    {
         await countryRepository.DeleteAsync(id);
-    }
 
-    [Authorize(HealthCarePermissions.Countries.Delete)]
-    public virtual async Task DeleteByIdsAsync(List<Guid> countryIds)
-    {
-        await countryRepository.DeleteManyAsync(countryIds);
-    }
+        CountryDeletedDto response = ObjectMapper.Map<Country, CountryDeletedDto>(country);
+        response.Message = CountryConsts.CountryDeletedMessage;
 
+        return response;
+    }
 
     public virtual async Task<CountryDto> GetAsync(Guid id)
     {
