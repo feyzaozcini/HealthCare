@@ -37,6 +37,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
 
         CreateMap<Country, CountryDto>();
         CreateMap<Country, CountryCreateDto>();
+        CreateMap<Country, CountryDeletedDto>();
         CreateMap<CountryDto, CountryCreateDto>();
         CreateMap<Country, CountryUpdateDto>();
         CreateMap<CountryDto, CountryUpdateDto>();

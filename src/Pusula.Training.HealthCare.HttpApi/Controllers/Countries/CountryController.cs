@@ -22,18 +22,12 @@ public class CountryController(ICountriesAppService countriesAppService)
     public virtual Task<CountryDto> CreateAsync(CountryCreateDto input) => countriesAppService.CreateAsync(input);
 
     [HttpDelete]
-    [Route("all")]
-    public Task DeleteAllAsync(GetCountriesInput input) => countriesAppService.DeleteAllAsync(input);
-    
-
-    [HttpDelete]
     [Route("{id}")]
-    public Task DeleteAsync(Guid id) => countriesAppService.DeleteAsync(id);
-
-
-    [HttpDelete]
-    [Route("")]
-    public Task DeleteByIdsAsync(List<Guid> countryIds) => countriesAppService.DeleteByIdsAsync(countryIds);
+    public async Task<CountryDeletedDto> DeleteAsync(Guid id)
+    {
+        CountryDeletedDto input = new CountryDeletedDto { Id = id };
+        return await countriesAppService.DeleteAsync(input.Id);
+    }
 
     [HttpGet]
     [Route("{id}")]

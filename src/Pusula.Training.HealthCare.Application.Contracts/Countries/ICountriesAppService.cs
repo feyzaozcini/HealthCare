@@ -13,11 +13,9 @@ public interface ICountriesAppService : IApplicationService
 {
     Task<PagedResultDto<CountryDto>> GetListAsync(GetCountriesInput input);
     Task<CountryDto> GetAsync(Guid id);
-    Task DeleteAsync(Guid id);
+    Task<CountryDeletedDto> DeleteAsync(Guid id);
     Task<CountryDto> CreateAsync(CountryCreateDto input);
     Task<CountryDto> UpdateAsync(CountryUpdateDto input);
-    Task DeleteByIdsAsync(List<Guid> countryIds);
-    Task DeleteAllAsync(GetCountriesInput input);
     Task<Shared.DownloadTokenResultDto> GetDownloadTokenAsync();
 
 }
