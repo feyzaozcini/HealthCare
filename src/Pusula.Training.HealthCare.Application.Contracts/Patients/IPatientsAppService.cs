@@ -20,7 +20,7 @@ public interface IPatientsAppService : IApplicationService
 
     Task<PagedResultDto<LookupDto<Guid>>> GetCountryLookupAsync(LookupRequestDto input);
 
-    Task DeleteAsync(Guid id);
+    Task<PatientDeletedDto> DeleteAsync(Guid id);
 
     Task<PatientDto> CreateAsync(PatientCreateDto input);
 

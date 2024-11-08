@@ -23,6 +23,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Patient, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.FirstName));
         CreateMap<PatientWithNavigationProperties, PatientWithNavigationPropertiesDto>();
         CreateMap<Patient, PatientWithNavigationPropertiesDto>();
+        CreateMap<Patient, PatientDeletedDto>();
 
         CreateMap<Protocol, ProtocolDto>();
         CreateMap<Protocol, ProtocolExcelDto>();

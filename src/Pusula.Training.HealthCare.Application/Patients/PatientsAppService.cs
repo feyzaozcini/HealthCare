@@ -28,7 +28,9 @@ namespace Pusula.Training.HealthCare.Patients
         IDistributedCache<PatientDownloadTokenCacheItem, string> downloadTokenCache,
         IDistributedEventBus distributedEventBus,
         ICountryRepository countryRepository,
-        IPatientCompanyRepository patientCompanyRepository) : HealthCareAppService, IPatientsAppService
+        IPatientCompanyRepository patientCompanyRepository,
+        PatientBusinessRules patientBusinessRules
+        ) : HealthCareAppService, IPatientsAppService
     {
 
         public virtual async Task<PagedResultDto<PatientWithNavigationPropertiesDto>> GetListAsync(GetPatientsInput input)
@@ -93,10 +95,14 @@ namespace Pusula.Training.HealthCare.Patients
 
 
         [Authorize(HealthCarePermissions.Patients.Create)]
-        public virtual async Task<PatientDto> CreateAsync(PatientCreateDto input) => ObjectMapper.Map<Patient, PatientDto>(
-                await patientManager.CreateAsync(
-                    input.CompanyId,input.CountryId,input.FirstName,input.LastName, input.BirthDate, input.IdentityNumber,input.PassportNumber, input.Email, input.MobilePhoneNumber,input.EmergencyPhoneNumber,input.Gender,input.No,input.MotherName,input.FatherName,input.BloodType,input.Type));
+        public virtual async Task<PatientDto> CreateAsync(PatientCreateDto input)
+        {
+            var patient = await patientManager.CreateAsync(input.CompanyId, input.CountryId, input.FirstName, input.LastName, input.BirthDate, input.IdentityNumber, input.PassportNumber, input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.No, input.MotherName, input.FatherName, input.BloodType, input.Type);
 
+            await patientBusinessRules.IdentityNumberCannotBeDuplicatedWhenInserted(input.IdentityNumber);
+
+            return ObjectMapper.Map<Patient, PatientDto>(patient);
+        }
 
         [Authorize(HealthCarePermissions.Patients.Edit)]
         public virtual async Task<PatientDto> UpdateAsync(Guid id, PatientUpdateDto input) => ObjectMapper.Map<Patient, PatientDto>(
@@ -104,7 +110,17 @@ namespace Pusula.Training.HealthCare.Patients
                     input.Id,input.CompanyId,input.CountryId, input.FirstName, input.LastName, input.BirthDate, input.IdentityNumber, input.PassportNumber, input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.No, input.MotherName, input.FatherName, input.BloodType, input.Type));
 
         [Authorize(HealthCarePermissions.Patients.Delete)]
-        public virtual async Task DeleteAsync(Guid id) => await patientRepository.DeleteAsync(id);
+        public virtual async Task<PatientDeletedDto> DeleteAsync(Guid id)
+        {
+            Patient? patient = await patientRepository.GetAsync(predicate: c => c.Id == id);
+
+            await patientRepository.DeleteAsync(id);
+
+            PatientDeletedDto response = ObjectMapper.Map<Patient, PatientDeletedDto>(patient);
+            response.DeleteMessage = PatientBusinessMessages.DeleteMessage;
+
+            return response;
+        }
 
         [AllowAnonymous]
         public virtual async Task<IRemoteStreamContent> GetListAsExcelFileAsync(PatientExcelDownloadDto input)

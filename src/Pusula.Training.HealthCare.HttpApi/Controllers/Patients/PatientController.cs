@@ -66,9 +66,10 @@ public class PatientController : HealthCareController, IPatientsAppService
 
     [HttpDelete]
     [Route("{id}")]
-    public virtual Task DeleteAsync(Guid id)
+    public async virtual Task<PatientDeletedDto> DeleteAsync(Guid id)
     {
-        return _patientsAppService.DeleteAsync(id);
+        PatientDeletedDto input = new PatientDeletedDto { Id = id };
+        return await _patientsAppService.DeleteAsync(input.Id);
     }
 
     [HttpGet]

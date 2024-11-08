@@ -23,6 +23,7 @@ public class PatientDto : FullAuditedEntityDto<Guid>, IHasConcurrencyStamp
     [StringLength(PatientConsts.IdentityNumberMaxLength)]
     public string IdentityNumber { get; set; } = null!;
 
+    [StringLength(PatientConsts.PassportNumberMaxLength)]
     public string PassportNumber { get; set; } = null!;
 
     [Required]
@@ -37,7 +38,7 @@ public class PatientDto : FullAuditedEntityDto<Guid>, IHasConcurrencyStamp
 
     [Required]
     [RegularExpression(@"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$")]
-    [StringLength(PatientConsts.MobilePhoneNumberMaxLength)]
+    [StringLength(PatientConsts.EmergencyPhoneNumberMaxLength)]
     public string EmergencyPhoneNumber { get; set; } = null!;
 
     [Required]
@@ -45,8 +46,10 @@ public class PatientDto : FullAuditedEntityDto<Guid>, IHasConcurrencyStamp
 
     public int No { get; set; }
 
+    [StringLength(PatientConsts.FirstNameMaxLength)]
     public string MotherName { get; set; } = null!;
 
+    [StringLength(PatientConsts.FirstNameMaxLength)]
     public string FatherName { get; set; } = null!;
 
     public BloodType BloodType { get; set; }
