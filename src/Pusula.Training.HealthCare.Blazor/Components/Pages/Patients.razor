@@ -40,96 +40,108 @@
         <Form id="PatientSearchForm" class="mb-3">
             <Addons>
                 <Addon AddonType="AddonType.Body">
-                    <TextEdit @bind-Text="@Filter.FilterText"
+                    <TextEdit 
+                              @bind-value= "@Filter.FilterText"
+                              @oninput="@OnSearchTextChanged"
                               Autofocus="true"
                               Placeholder="@L["Search"]">
                     </TextEdit>
                 </Addon>
-                <Addon AddonType="AddonType.End">
-                    <SubmitButton Form="PatientSearchForm" Clicked="GetPatientsAsync">
-                        <Icon Name="IconName.Search" Class="me-1"></Icon>@L["Search"]
-                    </SubmitButton>
-                </Addon>
+               
             </Addons>
         </Form>
 
+
         @* <Row Class="mt-3 mb-3">
-            <div class="col-md-12">
-                <a href="javascript:;" class="text-decoration-none" @onclick="() => ShowAdvancedFilters = !ShowAdvancedFilters">@L["SeeAdvancedFilters"]</a>
-            </div>
+        <div class="col-md-12">
+        <a href="javascript:;" class="text-decoration-none" @onclick="() => ShowAdvancedFilters = !ShowAdvancedFilters">@L["SeeAdvancedFilters"]</a>
+        </div>
         </Row> *@
 
-        <div@*  style="display: @(!ShowAdvancedFilters ? "none" : "block")" *@>
+        <div>
+            @* style="display: @(!ShowAdvancedFilters ? "none" : "block")"  div içine konulup kullanýlabilir*@
             <Row>
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
                         <FieldLabel>@L["PatientNo"]</FieldLabel>
-                        <NumericEdit TValue="int?" Value="@Filter.No" ValueChanged="@OnNoChangedAsync" />
-                        </Field> </Column>
+                        <TextEdit Text="@Filter.No?.ToString()" TextChanged="@OnNoChanged" />
+                    </Field>
+                </Column>
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
                         <FieldLabel>@L["FirstName"]</FieldLabel>
-                        <TextEdit Text="@Filter.FirstName" TextChanged="@OnFirstNameChangedAsync" />
+                        <TextEdit Text="@Filter.FirstName" TextChanged="@OnFirstNameChanged" />
                     </Field>
                 </Column>
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
                         <FieldLabel>@L["LastName"]</FieldLabel>
-                        <TextEdit Text="@Filter.LastName" TextChanged="@OnLastNameChangedAsync" />
+                        <TextEdit Text="@Filter.LastName" TextChanged="@OnLastNameChanged" />
                     </Field>
                 </Column>
-                @* <Column ColumnSize="ColumnSize.Is3">
-                    <Field>
-                        <FieldLabel>@L["MinBirthDate"]</FieldLabel>
-                        <DatePicker TValue="DateTime?"
-                                    InputMode="DateInputMode.Date"
-                                    Date="@Filter.BirthDateMin"
-                                    DateChanged="@OnBirthDateMinChangedAsync"
-                                    Placeholder="@string.Empty" />
-                    </Field>
-                </Column>
-                <Column ColumnSize="ColumnSize.Is3">
-                    <Field>
-                        <FieldLabel>@L["MaxBirthDate"]</FieldLabel>
-                        <DatePicker TValue="DateTime?"
-                                    InputMode="DateInputMode.Date"
-                                    Date="@Filter.BirthDateMax"
-                                    DateChanged="@OnBirthDateMaxChangedAsync"
-                                    Placeholder="@string.Empty" />
-                    </Field>
-                </Column> *@
+
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
                         <FieldLabel>@L["IdentityNumber"]</FieldLabel>
-                        <TextEdit Text="@Filter.IdentityNumber" TextChanged="@OnIdentityNumberChangedAsync" />
+                        <TextEdit Text="@Filter.IdentityNumber" TextChanged="@OnIdentityNumberChanged" />
                     </Field>
                 </Column>
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
                         <FieldLabel>@L["PassportNumber"]</FieldLabel>
-                        <TextEdit Text="@Filter.PassportNumber" TextChanged="@OnPassportNumberChangedAsync" />
+                        <TextEdit Text="@Filter.PassportNumber" TextChanged="@OnPassportNumberChanged" />
                     </Field>
                 </Column>
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
-                        <FieldLabel>@L["FatherName"]</FieldLabel>
-                        <TextEdit Text="@Filter.FatherName" TextChanged="@OnFatherNameChangedAsync" />
+                        <FieldLabel>@L["Email"]</FieldLabel>
+                        <TextEdit Text="@Filter.Email" TextChanged="@OnEmailChanged" />
                     </Field>
                 </Column>
                 <Column ColumnSize="ColumnSize.Is3">
                     <Field>
                         <FieldLabel>@L["MobilePhoneNumber"]</FieldLabel>
-                        <TextEdit Text="@Filter.MobilePhoneNumber" TextChanged="@OnMobilePhoneNumberChangedAsync" />
+                        <TextEdit Text="@Filter.MobilePhoneNumber" TextChanged="@OnMobilePhoneNumberChanged" />
                     </Field>
                 </Column>
-                
+                <Column ColumnSize="ColumnSize.Is3">
+                    <Field Style="margin-top: 24px;">
+                        <Addon AddonType="AddonType.End">
+                            <SubmitButton Form="PatientSearchForm" Clicked="OnSearchButtonClicked">
+                                <Icon Name="IconName.Search" Class="me-1"></Icon>@L["Filter"]
+                            </SubmitButton>
+                        </Addon>
+                    </Field>
+                </Column>
+
+
+                @* <Column ColumnSize="ColumnSize.Is3">
+                <Field>
+                <FieldLabel>@L["MinBirthDate"]</FieldLabel>
+                <DatePicker TValue="DateTime?"
+                InputMode="DateInputMode.Date"
+                Date="@Filter.BirthDateMin"
+                DateChanged="@OnBirthDateMinChangedAsync"
+                Placeholder="@string.Empty" />
+                </Field>
+                </Column>
+                <Column ColumnSize="ColumnSize.Is3">
+                <Field>
+                <FieldLabel>@L["MaxBirthDate"]</FieldLabel>
+                <DatePicker TValue="DateTime?"
+                InputMode="DateInputMode.Date"
+                Date="@Filter.BirthDateMax"
+                DateChanged="@OnBirthDateMaxChangedAsync"
+                Placeholder="@string.Empty" />
+                </Field>
+                </Column> *@
             </Row>
             @*//<suite-custom-code-block-2>*@
             @*//</suite-custom-code-block-2>*@
-        </div>
+            </div>
 
-        @*//<suite-custom-code-block-3>*@
-        @*//</suite-custom-code-block-3>*@
+            @*//<suite-custom-code-block-3>*@
+            @*//</suite-custom-code-block-3>*@
     </CardBody>
 </Card>
 
@@ -186,7 +198,6 @@
                   SelectedRows="SelectedPatients"
                   RowSelectable="@((args) => CanDeletePatient)"
                   SelectedRowsChanged="SelectedPatientRowsChanged"
-                  ReadData="OnDataGridReadAsync"
                   TotalItems="TotalCount"
                   ShowPager="true"
                   Responsive="true"
@@ -232,6 +243,10 @@
                 </DataGridEntityActionsColumn>
 
                 <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
+                                Field="Patient.No"
+                                Caption="@L["PatientNo"]">
+                </DataGridColumn>
+                <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
                                 Field="Patient.FirstName"
                                 Caption="@L["FirstName"]">
                 </DataGridColumn>
@@ -241,14 +256,18 @@
                                 Caption="@L["LastName"]">
                 </DataGridColumn>
 
-               @*  <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
-                                Field="BirthDate"
-                                Caption="@L["BirthDate"]">
-                    <DisplayTemplate>
-                        @context.BirthDate.ToShortDateString()
-                    </DisplayTemplate>
+                @*  <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
+                Field="BirthDate"
+                Caption="@L["BirthDate"]">
+                <DisplayTemplate>
+                @context.BirthDate.ToShortDateString()
+                </DisplayTemplate>
                 </DataGridColumn> *@
 
+                <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
+                                Field="Patient.PassportNumber"
+                                Caption="@L["PassportNumber"]">
+                </DataGridColumn>
                 <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
                                 Field="Patient.IdentityNumber"
                                 Caption="@L["IdentityNumber"]">
@@ -265,13 +284,13 @@
                 </DataGridColumn>
 
                 @* <DataGridColumn TItem="PatientDto"
-                                Field="HomePhoneNumber"
-                                Caption="@L["HomePhoneNumber"]">
+                Field="HomePhoneNumber"
+                Caption="@L["HomePhoneNumber"]">
                 </DataGridColumn> *@
 
                 @* <DataGridColumn TItem="PatientDto"
-                                Field="Gender"
-                                Caption="@L["Gender"]">
+                Field="Gender"
+                Caption="@L["Gender"]">
                 </DataGridColumn> *@
 
             </DataGridColumns>

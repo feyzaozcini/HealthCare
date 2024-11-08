@@ -2,6 +2,7 @@ using Blazorise;
 using Blazorise.DataGrid;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Pusula.Training.HealthCare.Handlers;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
@@ -112,14 +113,33 @@ public partial class Patients
 
     private async Task GetPatientsAsync()
     {
+        if (Filter == null || (string.IsNullOrEmpty(Filter.FilterText) &&
+        (Filter.FirstName == null && Filter.LastName == null && Filter.IdentityNumber == null &&
+        Filter.PassportNumber == null && Filter.MobilePhoneNumber == null &&
+        Filter.Email == null && Filter.No == null)))
+        {
+            return; // Hiçbir filtre yoksa, veri getirme iþlemi yapýlmaz
+        }
+
         Filter.MaxResultCount = PageSize;
         Filter.SkipCount = (CurrentPage - 1) * PageSize;
         Filter.Sorting = CurrentSorting;
 
-        var result = await PatientsAppService.GetListAsync(Filter);
-        PatientList = (IReadOnlyList<PatientWithNavigationPropertiesDto>)result.Items;
-        TotalCount = (int)result.TotalCount;
+        //Filter = FilterValidator.ValidateFilters(Filter);
 
+        //if (Filter == null) return;
+
+        if (Filter == null)
+        {
+            PatientList = [];
+            TotalCount = 0;
+        }
+        else
+        {
+            var result = await PatientsAppService.GetListAsync(Filter);
+            PatientList = (IReadOnlyList<PatientWithNavigationPropertiesDto>)result.Items;
+            TotalCount = (int)result.TotalCount;
+        }
 
         await ClearSelection();
     }
@@ -130,6 +150,20 @@ public partial class Patients
         await GetPatientsAsync();
         await InvokeAsync(StateHasChanged);
     }
+    private async Task OnSearchTextChanged(ChangeEventArgs args)
+    {
+        if(string.IsNullOrEmpty(args?.Value?.ToString()))
+        {
+           
+            PatientList = new List<PatientWithNavigationPropertiesDto>();
+            TotalCount = 0;
+            return;
+        }
+
+        Filter.FilterText = args.Value.ToString();
+        await GetPatientsAsync();
+    }
+
 
     /*private async Task DownloadAsExcelAsync()
     {
@@ -242,62 +276,74 @@ public partial class Patients
         }
     }
 
-    protected virtual async Task OnFirstNameChangedAsync(string? firstName)
+    protected virtual void OnFirstNameChanged(string? firstName)
     {
         Filter.FirstName = firstName;
-        await SearchAsync();
     }
-    protected virtual async Task OnLastNameChangedAsync(string? lastName)
+
+    protected virtual void OnLastNameChanged(string? lastName)
     {
         Filter.LastName = lastName;
-        await SearchAsync();
     }
-    protected virtual async Task OnNoChangedAsync(int? no)
+
+    protected virtual void OnNoChanged(string no)
     {
-        Filter.No = no;
-        await SearchAsync();
+        if (int.TryParse(no, out int parsedNo))
+        {
+            Filter.No = parsedNo;
+        }
+        else
+        {
+            Filter.No = null;
+        }
     }
-    protected virtual async Task OnBirthDateMinChangedAsync(DateTime? birthDateMin)
+
+    protected virtual void OnBirthDateMinChanged(DateTime? birthDateMin)
     {
         Filter.BirthDateMin = birthDateMin.HasValue ? birthDateMin.Value.Date : birthDateMin;
-        await SearchAsync();
     }
-    protected virtual async Task OnBirthDateMaxChangedAsync(DateTime? birthDateMax)
+
+    protected virtual void OnBirthDateMaxChanged(DateTime? birthDateMax)
     {
         Filter.BirthDateMax = birthDateMax.HasValue ? birthDateMax.Value.Date.AddDays(1).AddSeconds(-1) : birthDateMax;
-        await SearchAsync();
     }
-    protected virtual async Task OnIdentityNumberChangedAsync(string? identityNumber)
+
+    protected virtual void OnIdentityNumberChanged(string? identityNumber)
     {
         Filter.IdentityNumber = identityNumber;
-        await SearchAsync();
     }
-    //protected virtual async Task OnEmailAddressChangedAsync(string? emailAddress)
-    //{
-    //    Filter.Email = emailAddress;
-    //    await SearchAsync();
-    //}
-    protected virtual async Task OnPassportNumberChangedAsync(string? passportNumber)
+
+    protected virtual void OnPassportNumberChanged(string? passportNumber)
     {
         Filter.PassportNumber = passportNumber;
-        await SearchAsync();
     }
-    protected virtual async Task OnMobilePhoneNumberChangedAsync(string? mobilePhoneNumber)
+    protected virtual void OnEmailChanged(string? email)
+    {
+        Filter.Email = email;
+    }
+    protected virtual void OnMobilePhoneNumberChanged(string? mobilePhoneNumber)
     {
         Filter.MobilePhoneNumber = mobilePhoneNumber;
-        await SearchAsync();
     }
-    protected virtual async Task OnFatherNameChangedAsync(string? fatherName)
-    {
-        Filter.FatherName = fatherName;
-        await SearchAsync();
-    }
-    protected virtual async Task OnHomePhoneNumberChangedAsync(string? homePhoneNumber)
-    {
-        Filter.MobilePhoneNumber = homePhoneNumber;
-        await SearchAsync();
-    }
+
     
+
+
+    // Butona týklandýðýnda arama yapacak metot
+    protected virtual async Task OnSearchButtonClicked()
+    {
+        if (Filter == null || (string.IsNullOrEmpty(Filter.FilterText) &&
+            (Filter.FirstName == null && Filter.LastName == null && Filter.IdentityNumber == null &&
+            Filter.PassportNumber == null && Filter.MobilePhoneNumber == null &&
+            Filter.Email == null && Filter.No == null)))
+        {
+            return; // Boþ filtrelerle veri çekme
+        }
+
+        // Filtreyi doðrula ve veriyi getir
+        await GetPatientsAsync();
+    }
+
     private Task SelectAllItems()
     {
         AllPatientsSelected = true;
@@ -305,12 +351,12 @@ public partial class Patients
         return Task.CompletedTask;
     }
 
-    private Task ClearSelection()
+    private async Task ClearSelection()
     {
         AllPatientsSelected = false;
         SelectedPatients.Clear();
 
-        return Task.CompletedTask;
+        await InvokeAsync(StateHasChanged);
     }
 
     private Task SelectedPatientRowsChanged()
@@ -330,7 +376,7 @@ public partial class Patients
 
     private async Task GetCompanyCollectionLookupAsync(string? newValue = null)
     {
-        CompaniesCollection = (await PatientsAppService.GetCountryLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
+        CompaniesCollection = (await PatientsAppService.GetCompanyLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
     }
 
     private async Task DeleteSelectedPatientsAsync()
