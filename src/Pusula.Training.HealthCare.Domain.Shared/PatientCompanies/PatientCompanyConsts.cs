@@ -15,5 +15,7 @@ namespace Pusula.Training.HealthCare.PatientCompanies
 
         public const int NameMinLength = 3;
         public const int NameMaxLength = 60;
+
+        public const string PatientCompanyDeleteMessage = "Kurum silme işlemi başarılı";
     }
 }

@@ -15,7 +15,7 @@ namespace Pusula.Training.HealthCare.PatientCompanies
 
         Task<PatientCompanyDto> GetAsync(Guid id);
 
-        Task DeleteAsync(Guid id);  
+        Task<PatientCompanyDeleteDto> DeleteAsync(Guid id);  
 
         Task<PatientCompanyDto> CreateAsync(PatientCompanyCreateDto input);
 

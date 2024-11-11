@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -34,7 +35,12 @@ namespace Pusula.Training.HealthCare.Controllers.PatientCompanies
 
         [HttpDelete]
         [Route("{id}")]
-        public Task DeleteAsync(Guid id) => patientCompaniesAppService.DeleteAsync(id);
+        public async Task<PatientCompanyDeleteDto> DeleteAsync(Guid id) 
+        {
+
+            PatientCompanyDeleteDto input = new PatientCompanyDeleteDto { Id = id };
+            return await patientCompaniesAppService.DeleteAsync(input.Id);
+        } 
 
         [HttpGet]
         [Route("as-excel-file")]
