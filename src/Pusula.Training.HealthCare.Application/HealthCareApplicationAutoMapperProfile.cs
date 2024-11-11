@@ -49,7 +49,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<PatientCompany, PatientCompanyExcelDto>();
         CreateMap<PatientCompanyDto, PatientCompanyUpdateDto>();
         CreateMap<PatientCompany, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
-
+        CreateMap<PatientCompany, PatientCompanyDeleteDto>();
 
     }
 }

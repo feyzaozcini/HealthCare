@@ -24,6 +24,7 @@ using Pusula.Training.HealthCare.Workers;
 using Pusula.Training.HealthCare.Countries;
 using Volo.Abp.AspNetCore.ExceptionHandling;
 using Pusula.Training.HealthCare.Patients;
+using Pusula.Training.HealthCare.PatientCompanies;
 
 namespace Pusula.Training.HealthCare;
 
@@ -86,6 +87,7 @@ public class HealthCareApplicationModule : AbpModule
         context.Services.AddSingleton<IDistributedLockProvider>(_ => new RedisDistributedSynchronizationProvider(redis.GetDatabase()));
         context.Services.AddTransient<CountryBusinessRules>();
         context.Services.AddTransient<PatientBusinessRules>();
+        context.Services.AddTransient<PatientCompanyBusinessRules>();
 
     }
 }

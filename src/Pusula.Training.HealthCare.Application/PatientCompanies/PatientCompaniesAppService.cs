@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
+using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
@@ -22,7 +23,9 @@ namespace Pusula.Training.HealthCare.PatientCompanies
     [RemoteService(IsEnabled = false)]
     [Authorize(HealthCarePermissions.PatientCompanies.Default)]
     public class PatientCompaniesAppService(IPatientCompanyRepository patientCompanyRepository,
-        PatientCompanyManager patientCompanyManager, IDistributedCache<PatientCompanyDownloadTokenCacheItem, string> downloadTokenCache)
+        PatientCompanyManager patientCompanyManager, 
+        IDistributedCache<PatientCompanyDownloadTokenCacheItem, string> downloadTokenCache,
+        PatientCompanyBusinessRules patientCompanyBusinessRules)
         : HealthCareAppService, IPatientCompaniesAppService
     {
         public async Task<PagedResultDto<PatientCompanyDto>> GetListAsync(GetPatientCompaniesInput input)
@@ -42,11 +45,26 @@ namespace Pusula.Training.HealthCare.PatientCompanies
         }
 
         [Authorize(HealthCarePermissions.PatientCompanies.Delete)]
-        public async Task DeleteAsync(Guid id) => await patientCompanyRepository.DeleteAsync(id);
+        public async Task<PatientCompanyDeleteDto> DeleteAsync(Guid id)
+        {
+
+            var patientCompany = await patientCompanyBusinessRules.PatientCompanyNotFound(id);
+            //PatientCompany? patientCompany = await patientCompanyRepository.GetAsync(predicate: c => c.Id == id);
+
+            await patientCompanyRepository.DeleteAsync(id);
+
+            PatientCompanyDeleteDto response = ObjectMapper.Map<PatientCompany, PatientCompanyDeleteDto>(patientCompany);
+            response.Message = PatientCompanyConsts.PatientCompanyDeleteMessage;
+
+            return response;
+           
+        }
 
         [Authorize(HealthCarePermissions.PatientCompanies.Create)]
         public async Task<PatientCompanyDto> CreateAsync(PatientCompanyCreateDto input)
         {
+
+            await patientCompanyBusinessRules.DuplicatedPatientCompanyName(input.Name);
             var patientCompany = await patientCompanyManager.CreateAsync(input.Name);
             return ObjectMapper.Map<PatientCompany, PatientCompanyDto>(patientCompany);
         }
