@@ -43,7 +43,9 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Country, CountryUpdateDto>();
         CreateMap<CountryDto, CountryUpdateDto>();
         CreateMap<Country, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
-
+        CreateMap<Country, GetCountryLookupDto<Guid>>()
+    .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+    .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Code));
 
         CreateMap<PatientCompany, PatientCompanyDto>();
         CreateMap<PatientCompany, PatientCompanyExcelDto>();

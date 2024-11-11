@@ -49,7 +49,7 @@ public class PatientController : HealthCareController, IPatientsAppService
 
     [HttpGet]
     [Route("country-lookup")]
-    public Task<PagedResultDto<LookupDto<Guid>>> GetCountryLookupAsync(LookupRequestDto input) => _patientsAppService.GetCountryLookupAsync(input);
+    public Task<PagedResultDto<GetCountryLookupDto<Guid>>> GetCountryLookupAsync(LookupRequestDto input) => _patientsAppService.GetCountryLookupAsync(input);
 
     [HttpPost]
     public virtual Task<PatientDto> CreateAsync(PatientCreateDto input)

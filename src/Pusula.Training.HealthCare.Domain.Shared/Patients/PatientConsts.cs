@@ -16,7 +16,7 @@ namespace Pusula.Training.HealthCare.Patients
         public const int EmailAddressMaxLength = 128;
         public const int MobilePhoneNumberMaxLength = 32;
         public const int EmergencyPhoneNumberMaxLength = 32;
-        public const int GenderMinLength = 0;
-        public const int GenderMaxLength = 2;
+        public const int PatientCompanyMaxLength = 60;
+        public const int CountryCodeMaxLength = 3;
     }
 }
