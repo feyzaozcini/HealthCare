@@ -8,7 +8,9 @@ namespace Pusula.Training.HealthCare.Patients
 {
     public enum Gender
     {
-        Erkek = 1,
-        Kadin = 2
+        Unspecified = 1,
+        Male = 2,
+        Female = 3,
+        Other = 4,
     }
 }

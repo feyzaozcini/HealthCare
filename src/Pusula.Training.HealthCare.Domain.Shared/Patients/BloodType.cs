@@ -8,13 +8,13 @@ namespace Pusula.Training.HealthCare.Patients
 {
     public enum BloodType
     {
-        APositive = 1,
-        ANegative = 2,
-        BPositive = 3,
-        BNegative = 4,
-        ABPositive = 5,
-        ABNegative = 6,
-        OPositive = 7,
-        ONegative = 8
+        A_Positive = 1,
+        A_Negative = 2,
+        B_Positive = 3,
+        B_Negative = 4,
+        AB_Positive = 5,
+        AB_Negative = 6,
+        O_Positive = 7,
+        O_Negative = 8
     }
 }

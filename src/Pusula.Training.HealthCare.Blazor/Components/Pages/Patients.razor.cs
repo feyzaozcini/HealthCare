@@ -32,6 +32,10 @@ public partial class Patients
     private bool CanCreatePatient { get; set; }
     private bool CanEditPatient { get; set; }
     private bool CanDeletePatient { get; set; }
+    private int SelectedGenderId { get; set; } = 1;
+    private int SelectedPatientTypeId { get; set; } = 1;
+    private int SelectedBloodTypeId { get; set; } = 1;
+    private int SelectedCompanyId { get; set; }
     private PatientCreateDto NewPatient { get; set; }
     private Validations NewPatientValidations { get; set; } = new();
     private PatientUpdateDto EditingPatient { get; set; }
@@ -51,6 +55,9 @@ public partial class Patients
     private IReadOnlyList<LookupDto<BloodType>> BloodTypesCollection { get; set; } = new List<LookupDto<BloodType>>();
     private List<PatientWithNavigationPropertiesDto> SelectedPatients { get; set; } = [];
     private bool AllPatientsSelected { get; set; }
+    private IReadOnlyList<GetCountryLookupDto<Guid>> CountriesCodeCollection { get; set; } = [];
+
+    private string SelectedCountryCode;
 
     public Patients()
     {
@@ -65,10 +72,29 @@ public partial class Patients
         PatientList = [];
     }
 
+    private void OnCountryChanged(ChangeEventArgs e)
+    {
+        // Seçilen ülke ID'sini al
+        if (Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
+        {
+            // Seçilen ülkeyi CountriesCodeCollection içinden bul
+            var selectedCountry = CountriesCodeCollection.FirstOrDefault(c => c.Id == selectedCountryId);
+
+            // Seçilen ülke null deðilse, SelectedCountryCode'u güncelle
+            if (selectedCountry != null)
+            {
+                SelectedCountryCode = selectedCountry.Code;
+            }
+        }
+        else
+        {
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await SetPermissionsAsync();
-        await GetCountryCollectionLookupAsync();
+        await GetCountryCodeCollectionLookupAsync();
         
         GendersCollection = Enum.GetValues(typeof(Gender))
        .Cast<Gender>()
@@ -79,6 +105,23 @@ public partial class Patients
        })
        .ToList();
 
+        TypesCollection = Enum.GetValues(typeof(Type))
+       .Cast<Type>()
+       .Select(t => new LookupDto<Type>
+       {
+           Id = t,
+           DisplayName = t.ToString()
+       })
+       .ToList();
+
+        BloodTypesCollection = Enum.GetValues(typeof(BloodType))
+       .Cast<BloodType>()
+       .Select(b => new LookupDto<BloodType>
+       {
+           Id = b,
+           DisplayName = b.ToString().Replace('_', ' ')
+       })
+       .ToList();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -195,7 +238,7 @@ public partial class Patients
         {
             BirthDate = DateTime.Now,
 
-            CountryId = CountriesCollection.Select(x => x.Id).FirstOrDefault(),
+            //CountryId = CountriesCodeCollection.Select(x => x.Id).FirstOrDefault(),
 
             CompanyId = CompaniesCollection.Select(x => x.Id).FirstOrDefault()
         };
@@ -210,7 +253,9 @@ public partial class Patients
     {
         NewPatient = new PatientCreateDto
         {
+            BirthDate = DateTime.Now,
 
+            CompanyId = CompaniesCollection.Select(x => x.Id).FirstOrDefault()
         };
 
         await CreatePatientModal.Hide();
@@ -326,8 +371,17 @@ public partial class Patients
         Filter.MobilePhoneNumber = mobilePhoneNumber;
     }
 
-    
-
+    private async Task OnCompanyNameChanged(ChangeEventArgs e)
+    {
+        if (Guid.TryParse(e.Value?.ToString(), out var companyId))
+        {
+            Filter.CompanyId = companyId;
+        }
+        else
+        {
+            Filter.CompanyId = null;
+        }
+    }
 
     // Butona týklandýðýnda arama yapacak metot
     protected virtual async Task OnSearchButtonClicked()
@@ -369,9 +423,9 @@ public partial class Patients
         return Task.CompletedTask;
     }
 
-    private async Task GetCountryCollectionLookupAsync(string? newValue = null)
+    private async Task GetCountryCodeCollectionLookupAsync(string? newValue = null)
     {
-        CountriesCollection = (await PatientsAppService.GetCountryLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
+        CountriesCodeCollection = (IReadOnlyList<GetCountryLookupDto<Guid>>)(await PatientsAppService.GetCountryLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
     }
 
     private async Task GetCompanyCollectionLookupAsync(string? newValue = null)

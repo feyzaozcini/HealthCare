@@ -13,9 +13,10 @@ public class PatientCreateDto
     [StringLength(PatientConsts.LastNameMaxLength)]
     public string LastName { get; set; } = null!;
 
+    [Required]
     public DateTime BirthDate { get; set; }
 
-    
+    [Required]
     [RegularExpression(@"^[1-9]{1}[0-9]{9}[02468]{1}$")]
     [StringLength(PatientConsts.IdentityNumberMaxLength)]
     public string IdentityNumber { get; set; } = null!;
@@ -23,7 +24,7 @@ public class PatientCreateDto
     [StringLength(PatientConsts.PassportNumberMaxLength)]
     public string PassportNumber { get; set; } = null!;
 
-    [Required]
+    
     [EmailAddress]
     [StringLength(PatientConsts.EmailAddressMaxLength)]
     public string Email { get; set; } = null!;
@@ -33,7 +34,7 @@ public class PatientCreateDto
     [StringLength(PatientConsts.MobilePhoneNumberMaxLength)]
     public string MobilePhoneNumber { get; set; } = null!;
 
-    [Required]
+    
     [RegularExpression(@"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$")]
     [StringLength(PatientConsts.EmergencyPhoneNumberMaxLength)]
     public string EmergencyPhoneNumber { get; set; } = null!;
@@ -51,6 +52,7 @@ public class PatientCreateDto
 
     public BloodType BloodType { get; set; }
 
+    [Required]
     public Type Type { get; set; }
 
     public Guid CompanyId { get; set; }

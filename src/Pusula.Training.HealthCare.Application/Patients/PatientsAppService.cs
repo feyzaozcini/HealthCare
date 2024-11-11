@@ -77,19 +77,23 @@ namespace Pusula.Training.HealthCare.Patients
             };
         }
 
-        
-        public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetCountryLookupAsync(LookupRequestDto input)
+
+        public virtual async Task<PagedResultDto<GetCountryLookupDto<Guid>>> GetCountryLookupAsync(LookupRequestDto input)
         {
             var query = (await countryRepository.GetQueryableAsync())
-                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
-                    x => x.Name != null && x.Name.Contains(input.Filter!));
+        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
+            x => x.Name.Contains(input.Filter!) || x.Code.Contains(input.Filter!)); // Hem Name hem de Code üzerinden filtreleme
 
             var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Country>();
             var totalCount = query.Count();
-            return new PagedResultDto<LookupDto<Guid>>
+
+            // AutoMapper ile Country'den LookupDto'ya dönüþtürme
+            var lookupDtoList = ObjectMapper.Map<List<Country>, List<GetCountryLookupDto<Guid>>>(lookupData);
+
+            return new PagedResultDto<GetCountryLookupDto<Guid>>
             {
                 TotalCount = totalCount,
-                Items = ObjectMapper.Map<List<Country>, List<LookupDto<Guid>>>(lookupData)
+                Items = lookupDtoList
             };
         }
 
