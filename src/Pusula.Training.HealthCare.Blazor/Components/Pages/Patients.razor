@@ -335,7 +335,7 @@
                     <Validation MessageLocalizer="@LH.Localize">
                             <Field>
                                 <FieldLabel>@L["Country"]</FieldLabel>
-                                <Select TValue="Guid" @bind-SelectedValue="@NewPatient.CountryId" @onchange="OnCountryChanged">
+                                <Select TValue="Guid" @bind-SelectedValue="@NewPatient.CountryId" >
                                         <SelectItem Value="0" disabled selected>@L["Select"]</SelectItem>
                                     @foreach (var country in CountriesCodeCollection)
                                     {
@@ -348,7 +348,7 @@
                             </Validation>
                                 </Column>
 
-                        <Column ColumnSize="ColumnSize.Is3">
+                        @*<Column ColumnSize="ColumnSize.Is3">
                         <Validation MessageLocalizer="@LH.Localize">
                             <Field>
                                 <FieldLabel>@L["Code"] *</FieldLabel>
@@ -359,7 +359,7 @@
                                 </TextEdit>
                             </Field>
                         </Validation>
-                        </Column>
+                        </Column>*@
 
                         <Column ColumnSize="ColumnSize.Is3">
                     <Validation MessageLocalizer="@LH.Localize">
@@ -429,55 +429,58 @@
                         </Column>
 
                         <Column ColumnSize="ColumnSize.Is3">
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["Gender"] *</FieldLabel>
-                            <Select @bind-SelectedValue="@SelectedGenderId">
-                                @foreach (var gender in GendersCollection)
-                                {
-                                    <SelectItem Value="@gender.Id">
-                                        @gender.DisplayName
-                                    </SelectItem>
-                                }
-                            </Select>
-                        </Field>
-                    </Validation>
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["Gender"] *</FieldLabel>
+                                    <Select TValue="Gender" @bind-SelectedValue="NewPatient.Gender">
+                                        @foreach (var gender in GendersCollection)
+                                        {
+                                            <SelectItem TValue="Gender" Value="@gender.Id">
+                                                @gender.DisplayName
+                                            </SelectItem>
+                                        }
+                                    </Select>
+                                </Field>
+                            </Validation>
                         </Column>
                     </Row>
 
                     <Row>
                         <Column ColumnSize="ColumnSize.Is3">
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["BloodType"]</FieldLabel>
-                            <Select @bind-SelectedValue="@SelectedBloodTypeId">
-                                <SelectItem Value="0" disabled selected>@L["Select"]</SelectItem>
-                                @foreach (var bloodType in BloodTypesCollection)
-                                {
-                                    <SelectItem Value="@bloodType.Id">
-                                        @bloodType.DisplayName
-                                    </SelectItem>
-                                }
-                            </Select>
-                        </Field>
-                    </Validation>
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["BloodType"]</FieldLabel>
+                                    <Select TValue="BloodType" @bind-SelectedValue="NewPatient.BloodType">
+                                        <SelectItem Value="0" disabled selected>@L["Select"]</SelectItem>
+                                        @foreach (var bloodType in BloodTypesCollection)
+                                        {
+                                            <SelectItem TValue="BloodType" Value="@bloodType.Id">
+                                                @bloodType.DisplayName
+                                            </SelectItem>
+                                        }
+                                    </Select>
+                                </Field>
+                            </Validation>
                         </Column>
-                    
+
                         <Column ColumnSize="ColumnSize.Is3">
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["PatientType"] *</FieldLabel>
-                            <Select @bind-SelectedValue="@SelectedPatientTypeId">
-                                @foreach (var patientType in TypesCollection)
-                                {
-                                    <SelectItem Value="@patientType.Id">
-                                        @patientType.DisplayName
-                                    </SelectItem>
-                                }
-                            </Select>
-                        </Field>
-                    </Validation>
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["Type"] *</FieldLabel>
+                                    <Select TValue="Pusula.Training.HealthCare.Patients.Type" @bind-SelectedValue="NewPatient.Type">
+                                        @foreach (var type in TypesCollection)
+                                        {
+                                            <SelectItem TValue="Pusula.Training.HealthCare.Patients.Type" Value="@type.Id">
+                                                @type.DisplayName
+                                            </SelectItem>
+                                        }
+                                    </Select>
+                                </Field>
+                            </Validation>
                         </Column>
+                                   
+                    
+                        
                         
                         <Column ColumnSize="ColumnSize.Is3">
                     <Validation MessageLocalizer="@LH.Localize">
@@ -551,7 +554,7 @@
                             <Validation MessageLocalizer="@LH.Localize">
                                 <Field>
                                     <FieldLabel>@L["Company"]</FieldLabel>
-                                    <Select TValue="Guid" @bind-SelectedValue="@NewPatient.CompanyId" @onchange="OnCompanyNameChanged">
+                                    <Select TValue="Guid" @bind-SelectedValue="@NewPatient.CompanyId" >
                                         <SelectItem Value="0" disabled selected>@L["Select"]</SelectItem>
                                         @foreach (var company in CompaniesCollection)
                                         {

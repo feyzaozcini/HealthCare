@@ -75,7 +75,7 @@ public partial class Patients
     private void OnCountryChanged(ChangeEventArgs e)
     {
         // Seçilen ülke ID'sini al
-        if (Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
+        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
         {
             // Seçilen ülkeyi CountriesCodeCollection içinden bul
             var selectedCountry = CountriesCodeCollection.FirstOrDefault(c => c.Id == selectedCountryId);
@@ -95,6 +95,7 @@ public partial class Patients
     {
         await SetPermissionsAsync();
         await GetCountryCodeCollectionLookupAsync();
+        await GetCompanyCollectionLookupAsync();
         
         GendersCollection = Enum.GetValues(typeof(Gender))
        .Cast<Gender>()
@@ -371,16 +372,10 @@ public partial class Patients
         Filter.MobilePhoneNumber = mobilePhoneNumber;
     }
 
-    private async Task OnCompanyNameChanged(ChangeEventArgs e)
+    protected virtual void OnCompanyNameChanged(Guid? companyId)
     {
-        if (Guid.TryParse(e.Value?.ToString(), out var companyId))
-        {
             Filter.CompanyId = companyId;
-        }
-        else
-        {
-            Filter.CompanyId = null;
-        }
+ 
     }
 
     // Butona týklandýðýnda arama yapacak metot

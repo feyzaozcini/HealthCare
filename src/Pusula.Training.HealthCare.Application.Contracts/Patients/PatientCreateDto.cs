@@ -42,7 +42,7 @@ public class PatientCreateDto
     [Required]
     public Gender Gender { get; set; }
 
-    public int No { get; set; }
+    public int No { get; set; } = 100;
 
     [StringLength(PatientConsts.FirstNameMaxLength)]
     public string MotherName { get; set; } = null!;
