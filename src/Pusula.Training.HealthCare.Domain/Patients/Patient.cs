@@ -56,7 +56,7 @@ namespace Pusula.Training.HealthCare.Patients
             MobilePhoneNumber = string.Empty;
         }
 
-        public Patient(Guid id, Guid companyId,Guid countryId,string firstName, string lastName, DateTime birthDate, string identityNumber, string passportNumber, string email, string mobilePhoneNumber, string emergencyPhoneNumber, Gender gender, int no, string motherName, string fatherName, BloodType bloodType, Type type)
+        public Patient(Guid id, Guid companyId,Guid countryId,string firstName, string lastName, DateTime birthDate, string identityNumber, string passportNumber, string email, string mobilePhoneNumber, string emergencyPhoneNumber, Gender gender, string motherName, string fatherName, BloodType bloodType, Type type)
         {
 
             Id = id;
@@ -85,7 +85,7 @@ namespace Pusula.Training.HealthCare.Patients
             Email = email;
             MobilePhoneNumber = mobilePhoneNumber;
             EmergencyPhoneNumber = emergencyPhoneNumber;
-            No = no;
+            //No = no;
             MotherName = motherName;
             FatherName = fatherName;
             BloodType = bloodType;

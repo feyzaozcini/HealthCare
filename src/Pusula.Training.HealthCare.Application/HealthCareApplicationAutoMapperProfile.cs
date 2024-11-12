@@ -47,6 +47,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
     .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
     .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Code));
 
+
         CreateMap<PatientCompany, PatientCompanyDto>();
         CreateMap<PatientCompany, PatientCompanyExcelDto>();
         CreateMap<PatientCompanyDto, PatientCompanyUpdateDto>();

@@ -44,7 +44,7 @@ public class PatientUpdateDto : IHasConcurrencyStamp
     [Required]
     public Gender Gender { get; set; }
 
-    public int No { get; set; }
+    //public int No { get; set; }
 
     [StringLength(PatientConsts.FirstNameMaxLength)]
     public string MotherName { get; set; } = null!;
