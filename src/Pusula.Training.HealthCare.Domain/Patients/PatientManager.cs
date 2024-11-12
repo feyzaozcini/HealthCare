@@ -20,8 +20,7 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         string email, 
         string mobilePhoneNumber, 
         string emergencyPhoneNumber, 
-        Gender gender, 
-        int no, 
+        Gender gender,
         string motherName, 
         string fatherName, 
         BloodType bloodType, 
@@ -38,10 +37,11 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         Check.NotNull(mobilePhoneNumber, nameof(mobilePhoneNumber));
         Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.MobilePhoneNumberMaxLength, 0);
         Check.Length(emergencyPhoneNumber, nameof(emergencyPhoneNumber), PatientConsts.MobilePhoneNumberMaxLength, 0);
+        
 
         var patient = new Patient(
          GuidGenerator.Create(),
-         companyId,countryId,firstName, lastName, birthDate, identityNumber, passportNumber, email, mobilePhoneNumber, emergencyPhoneNumber,gender,no,motherName,fatherName,bloodType,type
+         companyId,countryId,firstName, lastName, birthDate, identityNumber, passportNumber, email, mobilePhoneNumber, emergencyPhoneNumber,gender, motherName,fatherName,bloodType,type
          );
 
         return await patientRepository.InsertAsync(patient);
@@ -60,7 +60,6 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         string mobilePhoneNumber,
         string emergencyPhoneNumber,
         Gender gender,
-        int no,
         string motherName,
         string fatherName,
         BloodType bloodType,
@@ -93,7 +92,6 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         patient.MobilePhoneNumber = mobilePhoneNumber;
         patient.EmergencyPhoneNumber = emergencyPhoneNumber;
         patient.Gender = gender;
-        patient.No = no;
         patient.MotherName = motherName;
         patient.FatherName = fatherName;
         patient.BloodType = bloodType;

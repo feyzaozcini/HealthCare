@@ -91,6 +91,10 @@ public class HealthCareDbContext :
         /* Configure your own tables/entities inside here */
         if (builder.IsHostDatabase())
         {
+
+            // Patient tablosu için sequence tanımlama
+            builder.HasSequence<int>("PatientNoSequence").StartsAt(10000).IncrementsBy(1);
+
             // Migrationdan önce kontrol edilmesi gereken tablolar
             builder.Entity<Patient>(b =>
             {
@@ -105,7 +109,7 @@ public class HealthCareDbContext :
                 b.Property(x => x.MobilePhoneNumber).HasColumnName(nameof(Patient.MobilePhoneNumber)).IsRequired().HasMaxLength(PatientConsts.MobilePhoneNumberMaxLength);
                 b.Property(x => x.EmergencyPhoneNumber).HasColumnName(nameof(Patient.EmergencyPhoneNumber)).HasMaxLength(PatientConsts.MobilePhoneNumberMaxLength);
                 b.Property(x => x.Gender).HasColumnName(nameof(Patient.Gender)).IsRequired();
-                b.Property(x => x.No).HasColumnName(nameof(Patient.No)).IsRequired();
+                b.Property(x => x.No).HasColumnName(nameof(Patient.No)).IsRequired().HasDefaultValueSql("nextval('\"PatientNoSequence\"')");
                 b.Property(x => x.MotherName).HasColumnName(nameof(Patient.MotherName));
                 b.Property(x => x.FatherName).HasColumnName(nameof(Patient.FatherName));
                 b.Property(x => x.BloodType).HasColumnName(nameof(Patient.BloodType));
