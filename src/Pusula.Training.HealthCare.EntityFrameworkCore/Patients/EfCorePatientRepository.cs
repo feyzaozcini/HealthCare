@@ -55,7 +55,8 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
         string? email = null, 
         string? mobilePhoneNumber = null, 
         string? emergencyPhoneNumber = null, 
-        Gender? gender = null, int? no = null, 
+        Gender? gender = null, 
+        int? no = null, 
         string? motherName = null, 
         string? fatherName = null, 
         BloodType? bloodType = null, 
@@ -83,7 +84,8 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
         string? email = null, 
         string? mobilePhoneNumber = null, 
         string? emergencyPhoneNumber = null, 
-        Gender? gender = null, int? no = null,
+        Gender? gender = null, 
+        int? no = null,
         string? motherName = null, 
         string? fatherName = null, 
         BloodType? bloodType = null, 
@@ -170,7 +172,7 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
         Guid? companyId = null,
         Guid? countryId = null) =>
             query
-                .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.FirstName.StartsWith(filterText!) || e.LastName.StartsWith(filterText!) || e.MobilePhoneNumber.StartsWith(filterText!) || e.IdentityNumber.StartsWith(filterText!) || e.Email.StartsWith(filterText!) || e.PassportNumber.StartsWith(filterText!))
+                .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.No.ToString().StartsWith(filterText!) || e.FirstName.StartsWith(filterText!) || e.LastName.StartsWith(filterText!) || e.MobilePhoneNumber.StartsWith(filterText!) || e.IdentityNumber.StartsWith(filterText!) || e.Email.StartsWith(filterText!) || e.PassportNumber.StartsWith(filterText!))
                 .WhereIf(!string.IsNullOrWhiteSpace(firstName), e => e.FirstName.StartsWith(firstName!))
                 .WhereIf(!string.IsNullOrWhiteSpace(lastName), e => e.LastName.StartsWith(lastName!))
                 .WhereIf(birthDateMin.HasValue, e => e.BirthDate >= birthDateMin!.Value)
@@ -226,7 +228,7 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
         Guid? countryId = null
         ) =>
             query
-                .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Patient.FirstName.StartsWith(filterText!) || e.Patient.LastName.StartsWith(filterText!) || e.Patient.MobilePhoneNumber.StartsWith(filterText!) || e.Patient.IdentityNumber.StartsWith(filterText!) || e.Patient.Email.StartsWith(filterText!) || e.Patient.PassportNumber.StartsWith(filterText!))
+                .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Patient.No.ToString().StartsWith(filterText!) || e.Patient.FirstName.StartsWith(filterText!) || e.Patient.LastName.StartsWith(filterText!) || e.Patient.MobilePhoneNumber.StartsWith(filterText!) || e.Patient.IdentityNumber.StartsWith(filterText!) || e.Patient.Email.StartsWith(filterText!) || e.Patient.PassportNumber.StartsWith(filterText!))
                 .WhereIf(!string.IsNullOrWhiteSpace(firstName), e => e.Patient.FirstName.StartsWith(firstName!))
                 .WhereIf(!string.IsNullOrWhiteSpace(lastName), e => e.Patient.LastName.StartsWith(lastName!))
                 .WhereIf(birthDateMin.HasValue, e => e.Patient.BirthDate >= birthDateMin!.Value)

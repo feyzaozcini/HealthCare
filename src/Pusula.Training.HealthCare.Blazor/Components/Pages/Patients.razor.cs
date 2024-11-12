@@ -239,10 +239,18 @@ public partial class Patients
         {
             BirthDate = DateTime.Now,
 
+            PassportNumber = "",
+
             CountryId = CountriesCodeCollection.Select(x => x.Id).FirstOrDefault(),
 
-            CompanyId = CompaniesCollection.Select(x => x.Id).FirstOrDefault()
+            //CompanyId = CompaniesCollection.Select(x => x.Id).FirstOrDefault()
         };
+
+        var selectedCountry = CountriesCodeCollection.FirstOrDefault(c => c.Id == NewPatient.CountryId);
+        if (selectedCountry != null)
+        {
+            SelectedCountryCode = selectedCountry.Code;
+        }
 
         SelectedCreateTab = "Patient-create-tab";
 
