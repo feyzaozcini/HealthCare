@@ -578,7 +578,7 @@
 
 @* ************************* EDIT MODAL ************************* *@
 <Modal @ref="EditPatientModal" Closing="@EditPatientModal.CancelClosingModalWhenFocusLost">
-    <ModalContent Centered="true">
+    <ModalContent Centered="true" Size="ModalSize.ExtraLarge">
         @*//<suite-custom-code-block-8>*@
         @*//</suite-custom-code-block-8>*@
         <Form id="EditPatientForm">
@@ -592,7 +592,8 @@
                              Model="@EditingPatient"
                              ValidateOnLoad="false">
 
-
+                    <Row>
+                          <Column ColumnSize="ColumnSize.Is3">
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
                             <FieldLabel>@L["FirstName"] *</FieldLabel>
@@ -603,8 +604,9 @@
                             </TextEdit>
                         </Field>
                     </Validation>
+                    </Column>
 
-
+                    <Column ColumnSize="ColumnSize.Is3">
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
                             <FieldLabel>@L["LastName"] *</FieldLabel>
@@ -615,8 +617,9 @@
                             </TextEdit>
                         </Field>
                     </Validation>
+                        </Column>
 
-
+                        <Column ColumnSize="ColumnSize.Is3">
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
                             <FieldLabel>@L["BirthDate"]</FieldLabel>
@@ -627,8 +630,9 @@
                             </DateEdit>
                         </Field>
                     </Validation>
+                        </Column>
 
-
+                        <Column ColumnSize="ColumnSize.Is3">
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
                             <FieldLabel>@L["IdentityNumber"] *</FieldLabel>
@@ -639,8 +643,24 @@
                             </TextEdit>
                         </Field>
                     </Validation>
+                        </Column>
+                        </Row>
 
+                        <Row>
+                          <Column ColumnSize="ColumnSize.Is3">  
+                    <Validation MessageLocalizer="@LH.Localize">
+                        <Field>
+                            <FieldLabel>@L["PassportNumber"] *</FieldLabel>
+                            <TextEdit @bind-Text="@EditingPatient.PassportNumber" MaxLength="PatientConsts.PassportNumberMaxLength">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                        </Column>
 
+                        <Column ColumnSize="ColumnSize.Is3">  
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
                             <FieldLabel>@L["EmailAddress"] *</FieldLabel>
@@ -651,8 +671,9 @@
                             </TextEdit>
                         </Field>
                     </Validation>
+                        </Column>
 
-
+                        <Column ColumnSize="ColumnSize.Is3"> 
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
                             <FieldLabel>@L["MobilePhoneNumber"] *</FieldLabel>
@@ -663,7 +684,49 @@
                             </TextEdit>
                         </Field>
                     </Validation>
+                        </Column>
 
+                        <Column ColumnSize="ColumnSize.Is3"> 
+                    <Validation MessageLocalizer="@LH.Localize">
+                        <Field>
+                            <FieldLabel>@L["EmergencyPhoneNumber"] *</FieldLabel>
+                            <TextEdit @bind-Text="@EditingPatient.EmergencyPhoneNumber" MaxLength="PatientConsts.EmergencyPhoneNumberMaxLength">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                        </Column>
+                    </Row>
+
+                    <Row>
+                        <Column ColumnSize="ColumnSize.Is3"> 
+                    <Validation MessageLocalizer="@LH.Localize">
+                        <Field>
+                            <FieldLabel>@L["MotherName"] *</FieldLabel>
+                            <TextEdit @bind-Text="@EditingPatient.MotherName" MaxLength="PatientConsts.FirstNameMaxLength">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                        </Column>
+
+                        <Column ColumnSize="ColumnSize.Is3"> 
+                    <Validation MessageLocalizer="@LH.Localize">
+                        <Field>
+                            <FieldLabel>@L["FatherName"] *</FieldLabel>
+                            <TextEdit @bind-Text="@EditingPatient.FatherName" MaxLength="PatientConsts.FirstNameMaxLength">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                        </Column>
+                    </Row>
 
                 </Validations>
             </ModalBody>
