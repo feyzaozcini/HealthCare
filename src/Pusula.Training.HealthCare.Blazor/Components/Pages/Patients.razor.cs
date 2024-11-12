@@ -75,7 +75,7 @@ public partial class Patients
     private void OnCountryChanged(ChangeEventArgs e)
     {
         // Seçilen ülke ID'sini al
-        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
+        if (Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
         {
             // Seçilen ülkeyi CountriesCodeCollection içinden bul
             var selectedCountry = CountriesCodeCollection.FirstOrDefault(c => c.Id == selectedCountryId);
@@ -239,7 +239,7 @@ public partial class Patients
         {
             BirthDate = DateTime.Now,
 
-            //CountryId = CountriesCodeCollection.Select(x => x.Id).FirstOrDefault(),
+            CountryId = CountriesCodeCollection.Select(x => x.Id).FirstOrDefault(),
 
             CompanyId = CompaniesCollection.Select(x => x.Id).FirstOrDefault()
         };
