@@ -336,7 +336,6 @@
                             <Field>
                                 <FieldLabel>@L["Country"]</FieldLabel>
                                     <Select TValue="Guid" @bind-SelectedValue="@NewPatient.CountryId" @onchange="@OnCountryChanged">
-                                        <SelectItem Value="0" disabled selected>@L["Select"]</SelectItem>
                                     @foreach (var country in CountriesCodeCollection)
                                     {
                                         <SelectItem TValue="Guid" Value="@(country.Id)">
@@ -359,29 +358,29 @@
                         </Column>
 
                         <Column ColumnSize="ColumnSize.Is3">
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["IdentityNumber"] *</FieldLabel>
-                            <TextEdit @bind-Text="@NewPatient.IdentityNumber" MaxLength="PatientConsts.IdentityNumberMaxLength">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </TextEdit>
-                        </Field>
-                    </Validation>
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["MobilePhoneNumber"] *</FieldLabel>
+                                    <TextEdit @bind-Text="@NewPatient.MobilePhoneNumber" MaxLength="PatientConsts.MobilePhoneNumberMaxLength">
+                                        <Feedback>
+                                            <ValidationError />
+                                        </Feedback>
+                                    </TextEdit>
+                                </Field>
+                            </Validation>
                         </Column>
 
                         <Column ColumnSize="ColumnSize.Is3">
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["PassportNumber"] </FieldLabel>
-                            <TextEdit @bind-Text="@NewPatient.PassportNumber" MaxLength="PatientConsts.PassportNumberMaxLength">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </TextEdit>
-                        </Field>
-                    </Validation>
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["EmergencyPhoneNumber"]</FieldLabel>
+                                    <TextEdit @bind-Text="@NewPatient.EmergencyPhoneNumber" MaxLength="PatientConsts.EmergencyPhoneNumberMaxLength">
+                                        <Feedback>
+                                            <ValidationError />
+                                        </Feedback>
+                                    </TextEdit>
+                                </Field>
+                            </Validation>
                         </Column>
                     </Row>
 
@@ -446,9 +445,35 @@
                         <Column ColumnSize="ColumnSize.Is3">
                             <Validation MessageLocalizer="@LH.Localize">
                                 <Field>
+                                    <FieldLabel>@L["IdentityNumber"] *</FieldLabel>
+                                    <TextEdit @bind-Text="@NewPatient.IdentityNumber" MaxLength="PatientConsts.IdentityNumberMaxLength">
+                                        <Feedback>
+                                            <ValidationError />
+                                        </Feedback>
+                                    </TextEdit>
+                                </Field>
+                            </Validation>
+                        </Column>
+
+                        <Column ColumnSize="ColumnSize.Is3">
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["PassportNumber"] </FieldLabel>
+                                    <TextEdit @bind-Text="@NewPatient.PassportNumber" MaxLength="PatientConsts.PassportNumberMaxLength">
+                                        <Feedback>
+                                            <ValidationError />
+                                        </Feedback>
+                                    </TextEdit>
+                                </Field>
+                            </Validation>
+                        </Column>
+
+                        <Column ColumnSize="ColumnSize.Is3">
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
                                     <FieldLabel>@L["BloodType"]</FieldLabel>
                                     <Select TValue="BloodType" @bind-SelectedValue="NewPatient.BloodType">
-                                        <SelectItem Value="0" disabled selected>@L["Select"]</SelectItem>
+                                         <SelectItem Value="0" selected>@L["Select"]</SelectItem> 
                                         @foreach (var bloodType in BloodTypesCollection)
                                         {
                                             <SelectItem TValue="BloodType" Value="@bloodType.Id">
@@ -475,35 +500,6 @@
                                 </Field>
                             </Validation>
                         </Column>
-                                   
-                    
-                        
-                        
-                        <Column ColumnSize="ColumnSize.Is3">
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["MobilePhoneNumber"] *</FieldLabel>
-                            <TextEdit @bind-Text="@NewPatient.MobilePhoneNumber" MaxLength="PatientConsts.MobilePhoneNumberMaxLength">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </TextEdit>
-                        </Field>
-                    </Validation>
-                        </Column>
-
-                        <Column ColumnSize="ColumnSize.Is3">
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["EmergencyPhoneNumber"]</FieldLabel>
-                            <TextEdit @bind-Text="@NewPatient.EmergencyPhoneNumber" MaxLength="PatientConsts.EmergencyPhoneNumberMaxLength">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </TextEdit>
-                        </Field>
-                    </Validation>
-                        </Column>
                         </Row>
 
                         <Row>
@@ -520,7 +516,6 @@
                     </Validation>
                         </Column>
                         
-
                         <Column ColumnSize="ColumnSize.Is3">
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
@@ -548,11 +543,11 @@
                     </Column>
 
                         <Column ColumnSize="ColumnSize.Is3">
-                            <Validation MessageLocalizer="@LH.Localize">
+                             <Validation MessageLocalizer="@LH.Localize"> 
                                 <Field>
                                     <FieldLabel>@L["Company"]</FieldLabel>
                                     <Select TValue="Guid" @bind-SelectedValue="@NewPatient.CompanyId" >
-                                        <SelectItem Value="0" disabled selected>@L["Select"]</SelectItem>
+                                        <SelectItem Value="@Guid.Empty" selected>@L["Select"]</SelectItem>
                                         @foreach (var company in CompaniesCollection)
                                         {
                                             <SelectItem TValue="Guid" Value="@(company.Id)">
@@ -561,22 +556,8 @@
                                         }
                                     </Select>
                                 </Field>
-                            </Validation>
+                             </Validation> 
                         </Column>
-
-                       @*  <Column ColumnSize="ColumnSize.Is3">
-                            <Validation MessageLocalizer="@LH.Localize">
-                                <Field>
-                                    <FieldLabel>@L["Company"] *</FieldLabel>
-                                    <Select @bind-SelectedValue="@SelectedCompanyId">
-                                        @foreach (var company in CompaniesCollection)
-                                        {
-                                            <SelectItem Value="@company.Id">@company.DisplayName</SelectItem>
-                                        }
-                                    </Select>
-                                </Field>
-                            </Validation>
-                        </Column> *@
                     </Row>
                 </Validations>
             </ModalBody>
