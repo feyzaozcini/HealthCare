@@ -21,6 +21,8 @@ public class UserProfileManager : DomainService
 
     public async Task<IdentityUser> CreateUserWithPropertiesAsync(
     string userName,
+    string name,
+    string surname,
     string email,
     string password,
     string role = null,
@@ -29,7 +31,11 @@ public class UserProfileManager : DomainService
 )
     {
         // Burada yeni bir user nesnesi oluşturuyoruz.
-        var user = new IdentityUser(GuidGenerator.Create(), userName, email, CurrentTenant.Id);
+        var user = new IdentityUser(GuidGenerator.Create(), userName, email, CurrentTenant.Id)
+        {
+            Name = name,
+            Surname = surname
+        };
 
         // Oluşturduğumuz user nesnesi ile gerçek bir user oluşturma işlemi yapıyoruz.
         var createUserResult = await _userManager.CreateAsync(user, password);
@@ -46,6 +52,7 @@ public class UserProfileManager : DomainService
                     .WithData("Errors", string.Join(", ", setPhoneResult.Errors.Select(e => e.Description)));
             }
         }
+
 
         // Burada oluşturulan kullanıcıya bir rol ekliyoruz.
         var addToRoleResult = await _userManager.AddToRoleAsync(user, role);
