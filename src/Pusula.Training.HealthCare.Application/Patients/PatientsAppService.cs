@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
+using Pusula.Training.HealthCare.Core.Rules.Patients;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.PatientCompanies;
@@ -120,7 +121,7 @@ namespace Pusula.Training.HealthCare.Patients
             await patientRepository.DeleteAsync(id);
 
             PatientDeletedDto response = ObjectMapper.Map<Patient, PatientDeletedDto>(patient);
-            response.DeleteMessage = PatientBusinessMessages.DeleteMessage;
+            response.DeleteMessage = HealthCareDomainErrorCodes.DeleteMessage;
 
             return response;
         }

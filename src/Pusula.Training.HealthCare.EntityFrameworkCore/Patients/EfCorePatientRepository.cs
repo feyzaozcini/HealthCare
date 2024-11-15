@@ -16,6 +16,13 @@ namespace Pusula.Training.HealthCare.Patients;
 public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbContextProvider) 
     : EfCoreRepository<HealthCareDbContext, Patient, Guid>(dbContextProvider), IPatientRepository
 {
+    public async Task<Patient> FindByIdentityNumberAsync(string identityNumber)
+    {
+        var dbContext = await GetDbContextAsync();
+        return await dbContext.Patients
+            .FirstOrDefaultAsync(patient => patient.IdentityNumber == identityNumber);
+    }
+
     public virtual async Task DeleteAllAsync(
         string? filterText = null, 
         string? firstName = null, 
@@ -246,5 +253,6 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
                 .WhereIf(companyId.HasValue, e => e.Patient.CompanyId == companyId)
                 .WhereIf(countryId.HasValue, e => e.Patient.CountryId == countryId);
 
+  
     #endregion
 }
