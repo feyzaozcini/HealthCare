@@ -2,5 +2,7 @@
 
 public static class HealthCareDomainErrorCodes
 {
-    /* You can add your business exception error codes here, as constants */
+    public const string IdentityNumberAlreadyExists = "Bu TC kimlik numarasına sahip bir hasta zaten mevcut.";
+
+    public const string DeleteMessage = " ID'ye sahip Hasta silindi.";
 }

@@ -86,7 +86,7 @@ public class HealthCareApplicationModule : AbpModule
 
         context.Services.AddSingleton<IDistributedLockProvider>(_ => new RedisDistributedSynchronizationProvider(redis.GetDatabase()));
         context.Services.AddTransient<CountryBusinessRules>();
-        context.Services.AddTransient<PatientBusinessRules>();
+        //context.Services.AddTransient<Patien>();
         context.Services.AddTransient<PatientCompanyBusinessRules>();
 
     }
