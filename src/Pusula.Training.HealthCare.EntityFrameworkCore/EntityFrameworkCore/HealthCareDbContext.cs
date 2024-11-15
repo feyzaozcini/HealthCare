@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.DepartmentServices;
 using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Protocols;
+using Pusula.Training.HealthCare.Titles;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -34,10 +36,9 @@ public class HealthCareDbContext :
     public DbSet<Protocol> Protocols { get; set; } = null!;
     public DbSet<Patient> Patients { get; set; } = null!;
     public DbSet<Country> Countries { get; set; } = null!;
-
     public DbSet<PatientCompany> PatientCompanies { get; set; } = null!;
-
-
+    public DbSet<Title> Titles { get; set; } = null!;
+    public DbSet<DepartmentService> DepartmentServices { get; set; } = null!;
 
     #region Entities from the modules
 
@@ -149,6 +150,20 @@ public class HealthCareDbContext :
                 b.ToTable(HealthCareConsts.DbTablePrefix + "PatientCompanies", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
                 b.Property(x => x.Name).HasColumnName(nameof(PatientCompany.Name)).IsRequired().HasMaxLength(PatientCompanyConsts.NameMaxLength);
+            });
+
+            builder.Entity<Title>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Titles", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(Title.Name)).IsRequired().HasMaxLength(TitleConsts.NameMaxLength);
+            });
+
+            builder.Entity<DepartmentService>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "DepartmentServices", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(DepartmentService.Name)).IsRequired().HasMaxLength(DepartmentServiceConsts.NameMaxLength);
             });
         }
 

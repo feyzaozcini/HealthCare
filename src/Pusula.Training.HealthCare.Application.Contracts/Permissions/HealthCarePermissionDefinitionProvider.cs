@@ -41,6 +41,16 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         countryPermission.AddChild(HealthCarePermissions.Countries.Create, L("Permission:Create"));
         countryPermission.AddChild(HealthCarePermissions.Countries.Edit, L("Permission:Edit"));
         countryPermission.AddChild(HealthCarePermissions.Countries.Delete, L("Permission:Delete"));
+
+        var titlePermission = myGroup.AddPermission(HealthCarePermissions.Titles.Default, L("Permission:Titles"));
+        titlePermission.AddChild(HealthCarePermissions.Titles.Create, L("Permission:Create"));
+        titlePermission.AddChild(HealthCarePermissions.Titles.Edit, L("Permission:Edit"));
+        titlePermission.AddChild(HealthCarePermissions.Titles.Delete, L("Permission:Delete"));
+
+        var departmentServicePermission = myGroup.AddPermission(HealthCarePermissions.DepartmentServices.Default, L("Permission:DepartmentServices"));
+        departmentServicePermission.AddChild(HealthCarePermissions.DepartmentServices.Create, L("Permission:Create"));
+        departmentServicePermission.AddChild(HealthCarePermissions.DepartmentServices.Edit, L("Permission:Edit"));
+        departmentServicePermission.AddChild(HealthCarePermissions.DepartmentServices.Delete, L("Permission:Delete"));
     }
 
     private static LocalizableString L(string name)
