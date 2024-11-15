@@ -77,13 +77,18 @@
     "MaxStartTime": "Max Start Time",
     "NewProtocol": "New Protocol",
     "Menu:Protocols": "Protocols",
-    "Permission:Departments": "Departments",
     "Name": "Name",
+    "Permission:Departments": "Departments",
     "Departments": "Departments",
     "NewDepartment": "New Department",
     "Menu:Departments": "Departments",
     "Department": "Department",
-    "Menu:Countries": "Countries"
-
+    "Menu:Countries": "Countries",
+    "Permission:Titles": "Titles",
+    "Titles": "Titles",
+    "Title": "Title",
+    "Permission:DepartmentServices": "DepartmentServices",
+    "DepartmentServices": "DepartmentServices",
+    "DepartmentService": "DepartmentService"
   }
 }
