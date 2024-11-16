@@ -17,7 +17,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pusula.Training.HealthCare.Blazor</title>
     <base href="~/" />
-
+    @*  Syncfusion CSS  *@
+    <link href="_content/Syncfusion.Blazor/styles/bootstrap5.css" rel="stylesheet" />
     <abp-style-bundle name="@BlazorLeptonXLiteThemeBundles.Styles.Global" />
    @*  <link href="libs/global-styles.css" rel="stylesheet" /> *@
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
@@ -36,7 +37,8 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
-
+  @*  (Opsiyonel) Syncfusion JS  *@
+    <script src="_content/Syncfusion.Blazor/scripts/syncfusion-blazor.min.js"></script> 
     <abp-script-bundle name="@BlazorLeptonXLiteThemeBundles.Scripts.Global" />
 </body>
 </html>

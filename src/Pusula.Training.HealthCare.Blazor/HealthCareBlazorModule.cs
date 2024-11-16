@@ -44,6 +44,7 @@ using Volo.Abp.UI;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+using Syncfusion.Blazor;
 
 namespace Pusula.Training.HealthCare.Blazor;
 
@@ -117,6 +118,10 @@ public class HealthCareBlazorModule : AbpModule
         // Add services to the container.
         context.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
+
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1JpR2JGfV5ycEVHalxTTnJeUj0eQnxTdEFiWH5acXdVRGRdVkd/XQ==");
+        context.Services.AddSyncfusionBlazor();
+
 
         ConfigureAuthentication(context);
         ConfigureUrls(configuration);
