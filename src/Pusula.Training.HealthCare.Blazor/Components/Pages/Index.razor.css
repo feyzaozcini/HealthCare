@@ -2,7 +2,7 @@
 .button-container {
     display: flex;
     justify-content: center;
-    gap: 600px; /* Butonlar arasý boþluk */
+    gap: 200px; /* Butonlar arasý boþluk */
     margin-top: 20px; /* Üstten boþluk */
 }
 

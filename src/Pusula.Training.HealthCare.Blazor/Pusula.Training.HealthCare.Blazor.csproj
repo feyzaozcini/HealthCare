@@ -25,6 +25,8 @@
     <PackageReference Include="Syncfusion.Blazor.Grid" Version="27.2.2" />
     <PackageReference Include="Syncfusion.Blazor.Inputs" Version="27.2.2" />
     <PackageReference Include="Syncfusion.Blazor.Popups" Version="27.2.2" />
+    <PackageReference Include="Syncfusion.Blazor.Schedule" Version="27.2.2" />
+    <PackageReference Include="Syncfusion.Blazor.Themes" Version="27.2.2" />
   </ItemGroup>
 
   <ItemGroup>
