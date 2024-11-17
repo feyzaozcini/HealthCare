@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
-using Pusula.Training.HealthCare.Countries;
-using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Core.Rules.PatientCompanies;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -47,17 +46,12 @@ namespace Pusula.Training.HealthCare.PatientCompanies
         [Authorize(HealthCarePermissions.PatientCompanies.Delete)]
         public async Task<PatientCompanyDeleteDto> DeleteAsync(Guid id)
         {
-
-            var patientCompany = await patientCompanyBusinessRules.PatientCompanyNotFound(id);
-            //PatientCompany? patientCompany = await patientCompanyRepository.GetAsync(predicate: c => c.Id == id);
-
+            await patientCompanyBusinessRules.PatientCompanyNotFound(id);
+            PatientCompany? patientCompany = await patientCompanyRepository.GetAsync(predicate: c => c.Id == id);
             await patientCompanyRepository.DeleteAsync(id);
-
             PatientCompanyDeleteDto response = ObjectMapper.Map<PatientCompany, PatientCompanyDeleteDto>(patientCompany);
-            response.Message = PatientCompanyConsts.PatientCompanyDeleteMessage;
-
+            response.Message = "Patient Company deleted successfully";
             return response;
-           
         }
 
         [Authorize(HealthCarePermissions.PatientCompanies.Create)]

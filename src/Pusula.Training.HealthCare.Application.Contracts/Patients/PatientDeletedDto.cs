@@ -9,6 +9,6 @@ namespace Pusula.Training.HealthCare.Patients
     public class PatientDeletedDto
     {
         public Guid Id { get; set; }
-        public String? DeleteMessage { get; set; }
+        public string? Message { get; set; }
     }
 }

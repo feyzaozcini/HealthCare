@@ -85,9 +85,7 @@ public class HealthCareApplicationModule : AbpModule
             .PersistKeysToStackExchangeRedis(redis, "PTH-Protection-Keys");
 
         context.Services.AddSingleton<IDistributedLockProvider>(_ => new RedisDistributedSynchronizationProvider(redis.GetDatabase()));
-        context.Services.AddTransient<CountryBusinessRules>();
-        //context.Services.AddTransient<Patien>();
-        context.Services.AddTransient<PatientCompanyBusinessRules>();
+        
 
     }
 }
