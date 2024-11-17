@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.Core.Rules.Countries;
+using Pusula.Training.HealthCare.Core.Rules.PatientCompanies;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -25,26 +27,22 @@ public class CountriesAppService(
     public virtual async Task<CountryDto> CreateAsync(CountryCreateDto input)
     {
 
+        await countryBusinessRules.CountryNameCannotBeDuplicatedWhenInserted(input.Name);
         var country = await countryManager.CreateAsync(
             input.Name,
             input.Code
             );
-
-        await countryBusinessRules.CountryNameCannotBeDuplicatedWhenInserted(input.Name);
-
         return ObjectMapper.Map<Country, CountryDto>(country);
     }
 
     [Authorize(HealthCarePermissions.Countries.Delete)]
     public virtual async Task<CountryDeletedDto> DeleteAsync(Guid id)
     {
+        await countryBusinessRules.CountryNotFound(id);
         Country? country = await countryRepository.GetAsync(predicate: c => c.Id == id);
-
         await countryRepository.DeleteAsync(id);
-
         CountryDeletedDto response = ObjectMapper.Map<Country, CountryDeletedDto>(country);
-        response.Message = CountryConsts.CountryDeletedMessage;
-
+        response.Message = "Country deleted successfully";
         return response;
     }
 

@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Pusula.Training.HealthCare.Domain.Shared\Pusula.Training.HealthCare.Domain.Shared.csproj" />
+    <ProjectReference Include="..\Pusula.Training.HealthCare.Domain\Pusula.Training.HealthCare.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
