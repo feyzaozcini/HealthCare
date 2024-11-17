@@ -68,4 +68,25 @@ public static class HealthCarePermissions
         public const string Create = Default + ".Create";
         public const string Delete = Default + ".Delete";
     }
+    public static class TestGroups
+    {
+        public const string Default = GroupName + ".TestGroups";
+        public const string Edit = Default + ".Edit";
+        public const string Create = Default + ".Create";
+        public const string Delete = Default + ".Delete";
+    }
+    public static class TestGroupItems
+    {
+        public const string Default = GroupName + ".TestGroupItems";
+        public const string Edit = Default + ".Edit";
+        public const string Create = Default + ".Create";
+        public const string Delete = Default + ".Delete";
+    }
+    public static class LabRequests
+    {
+        public const string Default = GroupName + ".LabRequests";
+        public const string Edit = Default + ".Edit";
+        public const string Create = Default + ".Create";
+        public const string Delete = Default + ".Delete";
+    }
 }

@@ -51,6 +51,21 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         departmentServicePermission.AddChild(HealthCarePermissions.DepartmentServices.Create, L("Permission:Create"));
         departmentServicePermission.AddChild(HealthCarePermissions.DepartmentServices.Edit, L("Permission:Edit"));
         departmentServicePermission.AddChild(HealthCarePermissions.DepartmentServices.Delete, L("Permission:Delete"));
+
+        var labRequestPermission = myGroup.AddPermission(HealthCarePermissions.LabRequests.Default, L("Permission:LabRequest"));
+        labRequestPermission.AddChild(HealthCarePermissions.LabRequests.Create, L("Permission:Create"));
+        labRequestPermission.AddChild(HealthCarePermissions.LabRequests.Edit, L("Permission:Edit"));
+        labRequestPermission.AddChild(HealthCarePermissions.LabRequests.Delete, L("Permission:Delete"));
+
+        var testGroupPermission = myGroup.AddPermission(HealthCarePermissions.TestGroups.Default, L("Permission:TestGroups"));
+        testGroupPermission.AddChild(HealthCarePermissions.TestGroups.Create, L("Permission:Create"));
+        testGroupPermission.AddChild(HealthCarePermissions.TestGroups.Edit, L("Permission:Edit"));
+        testGroupPermission.AddChild(HealthCarePermissions.TestGroups.Delete, L("Permission:Delete"));
+
+        var testGroupItemPermission = myGroup.AddPermission(HealthCarePermissions.TestGroupItems.Default, L("Permission:TestGroupItems"));
+        testGroupItemPermission.AddChild(HealthCarePermissions.TestGroupItems.Create, L("Permission:Create"));
+        testGroupItemPermission.AddChild(HealthCarePermissions.TestGroupItems.Edit, L("Permission:Edit"));
+        testGroupItemPermission.AddChild(HealthCarePermissions.TestGroupItems.Delete, L("Permission:Delete"));
     }
 
     private static LocalizableString L(string name)
