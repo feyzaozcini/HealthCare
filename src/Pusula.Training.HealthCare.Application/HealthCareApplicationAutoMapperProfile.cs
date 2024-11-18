@@ -2,12 +2,14 @@
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.DepartmentServices;
+using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Protocols;
 using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.Titles;
 using System;
+using Volo.Abp.Identity;
 
 namespace Pusula.Training.HealthCare;
 
@@ -62,5 +64,20 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<DepartmentService, DepartmentServiceExcelDto>();
         CreateMap<DepartmentServiceDto, DepartmentServiceUpdateDto>();
         CreateMap<DepartmentService, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+
+        CreateMap<Doctor, DoctorDto>();
+        CreateMap<IdentityUser, DoctorDto>()
+           .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id));
+        CreateMap<DoctorWithNavigationProperties, DoctorDto>()
+        .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
+        .ForMember(dest => dest.SurName, opt => opt.MapFrom(src => src.User.Surname))
+        .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
+        .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+        .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
+        .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.Id))
+        .ForMember(dest => dest.BirthDate, opt => opt.MapFrom(src => src.Doctor.BirthDate))
+        .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Doctor.Gender));
+
+
     }
 }

@@ -25,6 +25,7 @@ using Pusula.Training.HealthCare.Countries;
 using Volo.Abp.AspNetCore.ExceptionHandling;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.PatientCompanies;
+using Pusula.Training.HealthCare.UserProfiles;
 
 namespace Pusula.Training.HealthCare;
 
@@ -88,6 +89,7 @@ public class HealthCareApplicationModule : AbpModule
         context.Services.AddTransient<CountryBusinessRules>();
         //context.Services.AddTransient<Patien>();
         context.Services.AddTransient<PatientCompanyBusinessRules>();
+        context.Services.AddTransient<UserProfileManager>();
 
     }
 }
