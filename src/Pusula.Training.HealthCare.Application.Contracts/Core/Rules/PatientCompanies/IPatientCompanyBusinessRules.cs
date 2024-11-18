@@ -11,6 +11,5 @@ namespace Pusula.Training.HealthCare.Core.Rules.PatientCompanies
     {
         Task DuplicatedPatientCompanyName(string name);
 
-        Task<PatientCompany?> PatientCompanyNotFound(Guid id);
     }
 }

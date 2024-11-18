@@ -16,11 +16,6 @@ namespace Pusula.Training.HealthCare.Core.Rules.PatientCompanies
             HealthCareException.ThrowIf(HealthCareDomainErrorCodes.PatientCompanyNameExist, await patientCompanyRepository.FirstOrDefaultAsync(c => c.Name == name) is not null);
         }
 
-        public async Task<PatientCompany?> PatientCompanyNotFound(Guid id)
-        {
-            var patientCompany = await patientCompanyRepository.FirstOrDefaultAsync(predicate: c => c.Id == id);
-            HealthCareException.ThrowIf(HealthCareDomainErrorCodes.PatientCompanyNameNotFound, patientCompany is null);
-            return patientCompany;
-        }
+        
     }
 }

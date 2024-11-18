@@ -38,7 +38,7 @@ public class CountriesAppService(
     [Authorize(HealthCarePermissions.Countries.Delete)]
     public virtual async Task<CountryDeletedDto> DeleteAsync(Guid id)
     {
-        await countryBusinessRules.CountryNotFound(id);
+        //await countryBusinessRules.CountryNotFound(id);
         Country? country = await countryRepository.GetAsync(predicate: c => c.Id == id);
         await countryRepository.DeleteAsync(id);
         CountryDeletedDto response = ObjectMapper.Map<Country, CountryDeletedDto>(country);

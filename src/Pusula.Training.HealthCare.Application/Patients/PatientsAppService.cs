@@ -114,7 +114,7 @@ namespace Pusula.Training.HealthCare.Patients
         [Authorize(HealthCarePermissions.Patients.Delete)]
         public virtual async Task<PatientDeletedDto> DeleteAsync(Guid id)
         {
-            await patientBusinessRules.PatientNotFount(id);
+            //await patientBusinessRules.PatientNotFount(id);
             Patient? patient = await patientRepository.GetAsync(predicate: c => c.Id == id);
             await patientRepository.DeleteAsync(id);
             PatientDeletedDto response = ObjectMapper.Map<Patient, PatientDeletedDto>(patient);
