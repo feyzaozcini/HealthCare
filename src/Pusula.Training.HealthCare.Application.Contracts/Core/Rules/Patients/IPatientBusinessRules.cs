@@ -11,6 +11,6 @@ namespace Pusula.Training.HealthCare.Core.Rules.Patients
     {
         Task IdentityNumberCannotBeDuplicatedWhenInserted(string identityNumber);
 
-        Task<Patient?> PatientNotFount(Guid id);
+        
     }
 }

@@ -17,11 +17,6 @@ namespace Pusula.Training.HealthCare.Core.Rules.Countries
             HealthCareException.ThrowIf(HealthCareDomainErrorCodes.CountryNameExists, await countryRepository.FirstOrDefaultAsync(c => c.Name == name) is not null);
         }
 
-        public async Task<Country?> CountryNotFound(Guid id)
-        {
-            var country = await countryRepository.FirstOrDefaultAsync(predicate: c => c.Id == id);
-            HealthCareException.ThrowIf(HealthCareDomainErrorCodes.CountryNotFound, country is null);
-            return country;
-        }
+        
     }
 }

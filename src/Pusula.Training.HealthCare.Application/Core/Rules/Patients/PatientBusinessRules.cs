@@ -15,12 +15,6 @@ namespace Pusula.Training.HealthCare.Core.Rules.Patients
             HealthCareException.ThrowIf(HealthCareDomainErrorCodes.IdentityNumberAlreadyExists, await patientRepository.FirstOrDefaultAsync(c => c.IdentityNumber == identityNumber) is not null);
         }
 
-        public async Task<Patient?> PatientNotFount(Guid id)
-        {
-            var patient = await patientRepository.FirstOrDefaultAsync(predicate: c => c.Id == id);
-            HealthCareException.ThrowIf(HealthCareDomainErrorCodes.PatientNotFound, patient is null);
-            return patient;
-        }
     }
 }
 

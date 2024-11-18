@@ -12,6 +12,6 @@ namespace Pusula.Training.HealthCare.Core.Rules.Countries
     {
         Task CountryNameCannotBeDuplicatedWhenInserted(string name);
 
-        Task<Country?> CountryNotFound(Guid id);
+        
     }
 }
