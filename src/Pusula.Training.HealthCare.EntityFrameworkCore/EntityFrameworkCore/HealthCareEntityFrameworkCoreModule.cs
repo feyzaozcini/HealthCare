@@ -19,6 +19,7 @@ using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Titles;
 using Pusula.Training.HealthCare.DepartmentServices;
+using Pusula.Training.HealthCare.AppointmentTypes;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -59,6 +60,7 @@ public class HealthCareEntityFrameworkCoreModule : AbpModule
             options.AddRepository<Country, EfCoreCountryRepository>();
             options.AddRepository<Title, EfCoreTitleRepository>();
             options.AddRepository<DepartmentService, EfCoreDepartmentServiceRepository>();
+            options.AddRepository<AppointmentType, EfCoreAppointmentTypeRepository>();
         });
 
         Configure<AbpDbContextOptions>(options =>
