@@ -24,6 +24,7 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Pusula.Training.HealthCare.AppointmentTypes;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -269,6 +270,17 @@ public class HealthCareDbContext :
                 b.Property(x => x.DoctorId)
                     .HasColumnName(nameof(LabRequest.DoctorId))
                     .IsRequired();
+            });
+
+            builder.Entity<AppointmentType>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "AppointmentTypes", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+
+                b.Property(x => x.Name)
+                    .HasColumnName(nameof(AppointmentType.Name))
+                    .IsRequired()
+                    .HasMaxLength(AppointmentTypeConst.NameMaxLength);
             });
 
         }

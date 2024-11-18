@@ -98,15 +98,6 @@ public static class HealthCarePermissions
         public const string Delete = Default + ".Delete";
     }
 
-
-
-
-
-
-
-
-
-
     public static class AppointmentTypes
     {
         public const string Default = GroupName + ".AppointmentTypes";
