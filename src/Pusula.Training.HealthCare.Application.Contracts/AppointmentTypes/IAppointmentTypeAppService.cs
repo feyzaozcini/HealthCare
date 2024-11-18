@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Application.Services;
 
 namespace Pusula.Training.HealthCare.AppointmentTypes
 {
-    public interface IAppointmentTypeAppService
+    public interface IAppointmentTypeAppService : IApplicationService
     {
         Task<PagedResultDto<AppointmentTypeDto>> GetListAsync(GetAppointmentTypesInput input);
         Task<AppointmentTypeDto> GetAsync(Guid id);

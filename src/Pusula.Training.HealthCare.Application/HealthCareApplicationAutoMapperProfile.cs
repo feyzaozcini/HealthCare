@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Pusula.Training.HealthCare.AppointmentTypes;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.DepartmentServices;
@@ -95,6 +96,12 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         .ForMember(dest => dest.BirthDate, opt => opt.MapFrom(src => src.Doctor.BirthDate))
         .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => src.Doctor.Gender));
 
+
+        CreateMap<AppointmentType, GetAppointmentTypesInput>();
+        CreateMap<AppointmentType, AppointmentTypeCreateDto>();
+        CreateMap<AppointmentType, AppointmentTypeUpdateDto>();
+        CreateMap<AppointmentType, AppointmentTypeDeleteDto>();
+        CreateMap<AppointmentType, AppointmentTypeDto>();
 
     }
 }

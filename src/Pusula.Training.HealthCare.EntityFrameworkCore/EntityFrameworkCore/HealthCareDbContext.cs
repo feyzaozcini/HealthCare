@@ -51,6 +51,7 @@ public class HealthCareDbContext :
     public DbSet<TestGroup> TestGroups { get; set; } = null!;
     public DbSet<TestGroupItem> TestGroupItems { get; set; } = null!;
     public DbSet<LabRequest> LabRequests { get; set; } = null!;
+    public DbSet<AppointmentType> AppointmentTypes { get; set; } = null!;
 
     #region Entities from the modules
 
