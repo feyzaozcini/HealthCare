@@ -1,0 +1,81 @@
+﻿.control-section {
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+.schedule-overview {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.time {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.control-panel {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+
+.calendar-import {
+    margin-right: 10px;
+}
+
+.calendar-export {
+    margin-right: 10px;
+}
+
+.overview-toolbar {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.overview-content {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.left-panel {
+    width: 70%;
+}
+
+.right-panel {
+    width: 28%;
+    border-left: 1px solid #ddd;
+    padding-left: 20px;
+}
+
+    .right-panel.hide {
+        display: none;
+    }
+
+.col-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.col-left {
+    width: 40%;
+}
+
+.col-right {
+    width: 58%;
+}
+
+.template {
+    display: flex;
+    align-items: center;
+}
+
+.icon-child {
+    margin-right: 5px;
+}
+
+.text-child {
+    font-weight: bold;
+}

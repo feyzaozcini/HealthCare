@@ -1,12 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.LabRequests;
 using Pusula.Training.HealthCare.DepartmentServices;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Protocols;
 using Pusula.Training.HealthCare.Titles;
+using Pusula.Training.HealthCare.TestGroupItems;
+using Pusula.Training.HealthCare.TestGroups;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -44,6 +47,9 @@ public class HealthCareDbContext :
     public DbSet<PatientCompany> PatientCompanies { get; set; } = null!;
     public DbSet<Title> Titles { get; set; } = null!;
     public DbSet<DepartmentService> DepartmentServices { get; set; } = null!;
+    public DbSet<TestGroup> TestGroups { get; set; } = null!;
+    public DbSet<TestGroupItem> TestGroupItems { get; set; } = null!;
+    public DbSet<LabRequest> LabRequests { get; set; } = null!;
 
     #region Entities from the modules
 
@@ -184,6 +190,87 @@ public class HealthCareDbContext :
                 b.HasOne<Title>().WithMany().HasForeignKey(x=>x.TitleId).OnDelete(DeleteBehavior.NoAction);
 
             });
+
+            builder.Entity<TestGroup>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "TestGroups", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+
+                b.Property(x => x.Name)
+                    .HasColumnName(nameof(TestGroup.Name))
+                    .IsRequired()
+                    .HasMaxLength(TestGroupConsts.NameMaxLength);
+            });
+
+            builder.Entity<TestGroupItem>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "TestGroupItems", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+
+                b.Property(x => x.Name)
+                    .HasColumnName(nameof(TestGroupItem.Name))
+                    .IsRequired()
+                    .HasMaxLength(TestGroupItemConsts.NameMaxLength);
+
+                b.Property(x => x.Code)
+                    .HasColumnName(nameof(TestGroupItem.Code))
+                    .IsRequired()
+                    .HasMaxLength(TestGroupItemConsts.CodeMaxLength);
+
+                b.Property(x => x.TestType)
+                    .HasColumnName(nameof(TestGroupItem.TestType))
+                    .IsRequired()
+                    .HasMaxLength(TestGroupItemConsts.TestTypeMaxLength);
+
+                b.Property(x => x.Description)
+                    .HasColumnName(nameof(TestGroupItem.Description))
+                    .HasMaxLength(TestGroupItemConsts.DescriptionMaxLength);
+
+                b.Property(x => x.TurnaroundTime)
+                    .HasColumnName(nameof(TestGroupItem.TurnaroundTime))
+                    .IsRequired();
+
+                b.HasOne<TestGroup>()
+                    .WithMany()
+                    .HasForeignKey(x => x.TestGroupId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
+            builder.Entity<LabRequest>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "LabRequests", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+
+                b.Property(x => x.Name)
+                    .HasColumnName(nameof(LabRequest.Name))
+                    .IsRequired()
+                    .HasMaxLength(LabRequestConsts.NameMaxLength);
+
+                b.Property(x => x.Date)
+                    .HasColumnName(nameof(LabRequest.Date))
+                    .IsRequired();
+
+                b.Property(x => x.Status)
+                    .HasColumnName(nameof(LabRequest.Status))
+                    .IsRequired();
+
+                b.HasOne<TestGroupItem>()
+                    .WithMany()
+                    .HasForeignKey(x => x.TestGroupItemId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.Property(x => x.ProtocolId)
+                    .HasColumnName(nameof(LabRequest.ProtocolId))
+                    .IsRequired();
+
+                b.Property(x => x.DoctorId)
+                    .HasColumnName(nameof(LabRequest.DoctorId))
+                    .IsRequired();
+            });
+
         }
 
         //builder.Entity<YourEntity>(b =>

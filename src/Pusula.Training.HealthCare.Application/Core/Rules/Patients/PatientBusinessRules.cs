@@ -2,32 +2,19 @@
 using Pusula.Training.HealthCare.Patients;
 using System;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Volo.Abp.Domain.Repositories;
 
 namespace Pusula.Training.HealthCare.Core.Rules.Patients
 {
-    public class PatientBusinessRules : IPatientBusinessRules
+    public class PatientBusinessRules(IPatientRepository patientRepository) : IPatientBusinessRules
     {
-        private readonly IPatientRepository _patientRepository;
-
-        public PatientBusinessRules(IPatientRepository patientRepository)
-        {
-            _patientRepository = patientRepository;
-        }
-
+       
         public async Task IdentityNumberCannotBeDuplicatedWhenInserted(string identityNumber)
         {
-            var existingPatient = await _patientRepository.FindByIdentityNumberAsync(identityNumber);
-            if (existingPatient != null)
-            {
-                HealthCareException.Throw(HealthCareDomainErrorCodes.IdentityNumberAlreadyExists);
-            }
+            HealthCareException.ThrowIf(HealthCareDomainErrorCodes.IdentityNumberAlreadyExists, await patientRepository.FirstOrDefaultAsync(c => c.IdentityNumber == identityNumber) is not null);
         }
 
-        public void IdentityNumberCannotBeEmpty(string identityNumber)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
 

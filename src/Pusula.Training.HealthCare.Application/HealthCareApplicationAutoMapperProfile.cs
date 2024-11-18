@@ -3,10 +3,13 @@ using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.DepartmentServices;
 using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.LabRequests;
 using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Protocols;
 using Pusula.Training.HealthCare.Shared;
+using Pusula.Training.HealthCare.TestGroupItems;
+using Pusula.Training.HealthCare.TestGroups;
 using Pusula.Training.HealthCare.Titles;
 using System;
 using Volo.Abp.Identity;
@@ -56,9 +59,23 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<PatientCompany, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
         CreateMap<PatientCompany, PatientCompanyDeleteDto>();
 
-        CreateMap<Title, TitleDto>();
-        CreateMap<Title, TitleExcelDto>();
-        CreateMap<Title, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+        CreateMap<LabRequest, GetLabRequestsInput>().ReverseMap();
+        CreateMap<LabRequest, LabRequestCreateDto>().ReverseMap();
+        CreateMap<LabRequest, LabRequestUpdateDto>().ReverseMap();
+        CreateMap<LabRequest, LabRequestDeletedDto>().ReverseMap();
+        CreateMap<LabRequest, LabRequestDto>().ReverseMap();
+
+        CreateMap<TestGroup, GetTestGroupsInput>().ReverseMap();
+        CreateMap<TestGroup, TestGroupsCreateDto>().ReverseMap();
+        CreateMap<TestGroup, TestGroupsUpdateDto>().ReverseMap();
+        CreateMap<TestGroup, TestGroupsDeletedDto>().ReverseMap();
+        CreateMap<TestGroup, TestGroupDto>().ReverseMap();
+
+        CreateMap<TestGroupItem, GetTestGroupItemsInput>().ReverseMap();
+        CreateMap<TestGroupItem, TestGroupItemsCreateDto>().ReverseMap();
+        CreateMap<TestGroupItem, TestGroupItemsUpdateDto>().ReverseMap();
+        CreateMap<TestGroupItem, TestGroupItemsDeletedDto>().ReverseMap();
+        CreateMap<TestGroupItem, TestGroupItemDto>().ReverseMap();
 
         CreateMap<DepartmentService, DepartmentServiceDto>();
         CreateMap<DepartmentService, DepartmentServiceExcelDto>();

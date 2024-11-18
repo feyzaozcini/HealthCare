@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
-using MiniExcelLibs;
 using Pusula.Training.HealthCare.Core.Rules.Patients;
 using Pusula.Training.HealthCare.Countries;
-using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
@@ -116,13 +114,11 @@ namespace Pusula.Training.HealthCare.Patients
         [Authorize(HealthCarePermissions.Patients.Delete)]
         public virtual async Task<PatientDeletedDto> DeleteAsync(Guid id)
         {
+            //await patientBusinessRules.PatientNotFount(id);
             Patient? patient = await patientRepository.GetAsync(predicate: c => c.Id == id);
-
             await patientRepository.DeleteAsync(id);
-
             PatientDeletedDto response = ObjectMapper.Map<Patient, PatientDeletedDto>(patient);
-            response.DeleteMessage = HealthCareDomainErrorCodes.DeleteMessage;
-
+            response.Message = "Patient deleted successfully";
             return response;
         }
 

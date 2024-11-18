@@ -9,10 +9,13 @@
         <img src="/images/main/Doctors-rafiki.png" alt="Button 1" class="button-image" />
         <span class="demoFont">Doctor</span>
     </button>
-
     <button class="image-button" @onclick="OnButtonClick2">
         <img src="/images/main/doctor-visit.png" alt="Button 2" class="button-image" />
         <span class="demoFont">PRM</span>
+    </button>
+    <button class="image-button" @onclick="OnButtonClick3">
+        <img src="/images/main/medical-appointment.png" alt="Button 3" class="button-image" />
+        <span class="demoFont">Appointment</span>
     </button>
 </div>
 
@@ -27,6 +30,11 @@
     private void OnButtonClick2()
     {
         Navigation.NavigateTo("/patients");
+    }
+
+    private void OnButtonClick3()
+    {
+        Navigation.NavigateTo("/appointment");
     }
 
     protected override async Task OnInitializedAsync()

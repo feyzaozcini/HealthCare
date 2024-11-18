@@ -90,6 +90,7 @@ public class HealthCareApplicationModule : AbpModule
         //context.Services.AddTransient<Patien>();
         context.Services.AddTransient<PatientCompanyBusinessRules>();
         context.Services.AddTransient<UserProfileManager>();
+        
 
     }
 }

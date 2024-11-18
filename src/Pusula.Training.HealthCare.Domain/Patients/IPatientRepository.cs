@@ -9,8 +9,6 @@ namespace Pusula.Training.HealthCare.Patients;
 public interface IPatientRepository : IRepository<Patient, Guid>
 {
 
-    Task<Patient> FindByIdentityNumberAsync(string identityNumber);
-
     Task DeleteAllAsync(
         string? filterText = null,
         string? firstName = null,
