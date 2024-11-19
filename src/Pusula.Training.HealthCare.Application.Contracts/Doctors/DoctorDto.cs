@@ -1,4 +1,5 @@
-﻿using Pusula.Training.HealthCare.Patients;
+﻿using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Patients;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -33,5 +34,7 @@ namespace Pusula.Training.HealthCare.Doctors
         public DateTime BirthDate { get; set; }
 
         public Gender Gender { get; set; }
+
+        public List<string> DoctorDepartments { get; set; } = new();
     }
 }

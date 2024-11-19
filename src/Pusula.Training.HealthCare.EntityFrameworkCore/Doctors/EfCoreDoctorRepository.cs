@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.DoctorDepartments;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Titles;
@@ -47,7 +48,11 @@ namespace Pusula.Training.HealthCare.Doctors
                 {
                     Doctor = doctor,
                     User = dbContext.Users.FirstOrDefault(c => c.Id == doctor.UserId)!,
-                    Title = dbContext.Set<Title>().FirstOrDefault(c => c.Id == doctor.TitleId)!
+                    Title = dbContext.Set<Title>().FirstOrDefault(c => c.Id == doctor.TitleId)!,
+                    DoctorDepartments = dbContext.Set<DoctorDepartment>()
+                .Where(c => c.DoctorId == doctor.Id)
+                .Select(dd => dd.Department.Name)
+                .ToList()
                 })
                 .FirstOrDefault()!;
         }
