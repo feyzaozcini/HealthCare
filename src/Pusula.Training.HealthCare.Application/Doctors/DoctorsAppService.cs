@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
+using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.DoctorDepartments;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
@@ -20,6 +21,7 @@ using Volo.Abp.Content;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.Identity;
+using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
 
 namespace Pusula.Training.HealthCare.Doctors
 {
@@ -70,8 +72,28 @@ namespace Pusula.Training.HealthCare.Doctors
         public async Task DeleteByIdsAsync(List<Guid> doctorIds) => await doctorRepository.DeleteManyAsync(doctorIds);
 
 
-        public async  Task<DoctorDto> GetAsync(Guid id) => ObjectMapper.Map<Doctor, DoctorDto>(
-                await doctorRepository.GetAsync(id));
+
+        public async  Task<DoctorDto> GetAsync(Guid id)
+        {
+            // Doktorun navigasyon verileriyle birlikte bilgisini al
+            var doctorWithNavProps = await doctorRepository.GetWithNavigationProperties(id);
+
+            if (doctorWithNavProps == null)
+            {
+                throw new EntityNotFoundException($"Doctor with id '{id}' not found.");
+            }
+
+            
+            var doctorDto = ObjectMapper.Map<DoctorWithNavigationProperties, DoctorDto>(doctorWithNavProps);
+
+            
+            doctorDto.DoctorDepartments = doctorWithNavProps.DoctorDepartments
+                .ToList();
+
+            return doctorDto;
+        }
+
+
 
         public async Task<DoctorDto> GetDoctorWithUserIdAsync(Guid userId)
         {
@@ -93,6 +115,10 @@ namespace Pusula.Training.HealthCare.Doctors
 
             // DoctorWithNavigationProperties'i DoctorDto'ya mapliyoruz
             var doctorDto = ObjectMapper.Map<DoctorWithNavigationProperties, DoctorDto>(doctorWithNavProps);
+
+            // DoctorDepartments'ı da mapliyoruz
+            doctorDto.DoctorDepartments = doctorWithNavProps.DoctorDepartments
+                .ToList();
 
             return doctorDto;
         }
