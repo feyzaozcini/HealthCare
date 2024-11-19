@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
-using Pusula.Training.HealthCare.Countries;
-using Pusula.Training.HealthCare.PatientCompanies;
-using Pusula.Training.HealthCare.Patients;
+using Pusula.Training.HealthCare.DoctorDepartments;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.UserProfiles;
@@ -41,6 +39,17 @@ namespace Pusula.Training.HealthCare.Doctors
 
             var doctor = await doctorManager.CreateAsync(user.Id,input.TitleId,input.IdentityNumber, input.BirthDate, input.Gender);
 
+            // DoctorDepartment ilişkisi kuruluyor
+            foreach (var departmentId in input.DepartmentIds)
+            {
+                var doctorDepartment = new DoctorDepartment
+                {
+                    DoctorId = doctor.Id,
+                    DepartmentId = departmentId
+                };
+
+                doctor.DoctorDepartments.Add(doctorDepartment);
+            }
 
             var doctorDto = ObjectMapper.Map<Doctor, DoctorDto>(doctor);
             ObjectMapper.Map(user, doctorDto);

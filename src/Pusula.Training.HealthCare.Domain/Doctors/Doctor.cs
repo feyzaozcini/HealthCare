@@ -1,6 +1,9 @@
 ﻿using JetBrains.Annotations;
+using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.DoctorDepartments;
 using Pusula.Training.HealthCare.Patients;
 using System;
+using System.Collections.Generic;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Identity;
@@ -24,13 +27,16 @@ namespace Pusula.Training.HealthCare.Doctors
         [NotNull]
         public virtual Guid TitleId { get; set; }
 
+        public virtual ICollection<DoctorDepartment> DoctorDepartments { get; set; }
+
 
         protected Doctor()
         {
             BirthDate = DateTime.Now;
             Gender = Gender.Unspecified;
             IdentityNumber = string.Empty;
-          
+            DoctorDepartments = new List<DoctorDepartment>();
+
         }
 
         public Doctor(Guid id, Guid userId, DateTime birthDate, Gender gender, Guid titleId, string identityNumber) 
@@ -49,6 +55,7 @@ namespace Pusula.Training.HealthCare.Doctors
             Check.NotNull(titleId, nameof(titleId));
             TitleId = titleId;
 
+            DoctorDepartments = new List<DoctorDepartment>();
         }
 
         public void SetGender(Gender gender)

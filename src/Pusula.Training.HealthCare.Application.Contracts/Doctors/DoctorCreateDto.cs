@@ -38,5 +38,7 @@ namespace Pusula.Training.HealthCare.Doctors
 
         public string IdentityNumber { get; set; } = null!;
 
+        public List<Guid> DepartmentIds { get; set; }
+
     }
 }
