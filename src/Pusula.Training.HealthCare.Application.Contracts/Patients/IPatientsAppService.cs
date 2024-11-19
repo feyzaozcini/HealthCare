@@ -5,6 +5,7 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Content;
 using Pusula.Training.HealthCare.Shared;
+using Pusula.Training.HealthCare.Countries;
 
 namespace Pusula.Training.HealthCare.Patients;
 
@@ -18,7 +19,7 @@ public interface IPatientsAppService : IApplicationService
 
     Task<PagedResultDto<LookupDto<Guid>>> GetCompanyLookupAsync(LookupRequestDto input);
 
-    Task<PagedResultDto<GetCountryLookupDto<Guid>>> GetCountryLookupAsync(LookupRequestDto input);
+    Task<PagedResultDto<GetCountryLookupDto<Guid>>>GetCountryLookupAsync(LookupRequestDto input);
 
     Task<PatientDeletedDto> DeleteAsync(Guid id);
 

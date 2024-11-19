@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.LabRequests;
@@ -49,6 +50,7 @@ public class HealthCareDbContext :
     public DbSet<PatientCompany> PatientCompanies { get; set; } = null!;
     public DbSet<Title> Titles { get; set; } = null!;
     public DbSet<DepartmentService> DepartmentServices { get; set; } = null!;
+    public DbSet<City> Cities { get; set; } = null!;
     public DbSet<TestGroup> TestGroups { get; set; } = null!;
     public DbSet<TestGroupItem> TestGroupItems { get; set; } = null!;
     public DbSet<LabRequest> LabRequests { get; set; } = null!;
@@ -138,14 +140,6 @@ public class HealthCareDbContext :
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Departments", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
                 b.Property(x => x.Name).HasColumnName(nameof(Department.Name)).IsRequired().HasMaxLength(DepartmentConsts.NameMaxLength);
-            });
-
-            builder.Entity<Country>(b =>
-            {
-                b.ToTable(HealthCareConsts.DbTablePrefix + "Countries", HealthCareConsts.DbSchema);
-                b.ConfigureByConvention();
-                b.Property(x => x.Name).HasColumnName(nameof(Country.Name)).IsRequired().HasMaxLength(CountryConsts.NameMaxLength);
-                b.Property(x => x.Code).HasColumnName(nameof(Country.Code)).IsRequired().HasMaxLength(CountryConsts.CodeMaxLength);
             });
 
             builder.Entity<Protocol>(b =>
@@ -240,7 +234,6 @@ public class HealthCareDbContext :
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-
             builder.Entity<LabRequest>(b =>
             {
                 b.ToTable(HealthCareConsts.DbTablePrefix + "LabRequests", HealthCareConsts.DbSchema);
@@ -304,8 +297,21 @@ public class HealthCareDbContext :
                     .HasForeignKey(dd => dd.DepartmentId)
                     .IsRequired();
             });
+            builder.Entity<Country>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Countries", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(Country.Name)).IsRequired().HasMaxLength(CountryConsts.NameMaxLength);
+                b.Property(x => x.Code).HasColumnName(nameof(Country.Code)).IsRequired().HasMaxLength(CountryConsts.CodeMaxLength);
+            });
 
-
+            builder.Entity<City>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Cities", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(City.Name)).IsRequired().HasMaxLength(CityConsts.NameMaxLength);
+                b.HasOne<Country>().WithMany().IsRequired().HasForeignKey(x => x.CountryId).OnDelete(DeleteBehavior.NoAction);
+            });
         }
 
         //builder.Entity<YourEntity>(b =>

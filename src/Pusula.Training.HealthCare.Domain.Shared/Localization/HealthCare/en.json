@@ -89,6 +89,12 @@
     "Title": "Title",
     "Permission:DepartmentServices": "DepartmentServices",
     "DepartmentServices": "DepartmentServices",
-    "DepartmentService": "DepartmentService"
+    "DepartmentService": "DepartmentService",
+    "Permission:Countries": "Countries",
+    "Countries": "Countries",
+    "Country": "Country",
+    "Permission:Cities": "Cities",
+    "Cities": "Cities",
+    "City": "City"
   }
 }

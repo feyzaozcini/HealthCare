@@ -38,14 +38,6 @@ public static class HealthCarePermissions
         public const string Delete = Default + ".Delete";
     }
 
-    public static class Countries
-    {
-        public const string Default = GroupName + ".Countries";
-        public const string Edit = Default + ".Edit";
-        public const string Create = Default + ".Create";
-        public const string Delete = Default + ".Delete";
-    }
-
     public static class PatientCompanies
     {
         public const string Default = GroupName + ".PatientCompanies";
@@ -64,6 +56,22 @@ public static class HealthCarePermissions
     public static class DepartmentServices
     {
         public const string Default = GroupName + ".DepartmentServices";
+        public const string Edit = Default + ".Edit";
+        public const string Create = Default + ".Create";
+        public const string Delete = Default + ".Delete";
+    }
+
+    public static class Countries
+    {
+        public const string Default = GroupName + ".Countries";
+        public const string Edit = Default + ".Edit";
+        public const string Create = Default + ".Create";
+        public const string Delete = Default + ".Delete";
+    }
+
+    public static class Cities
+    {
+        public const string Default = GroupName + ".Cities";
         public const string Edit = Default + ".Edit";
         public const string Create = Default + ".Create";
         public const string Delete = Default + ".Delete";

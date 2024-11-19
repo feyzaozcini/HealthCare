@@ -37,11 +37,6 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         patientCompanyPermission.AddChild(HealthCarePermissions.PatientCompanies.Edit, L("Permission:Edit"));
         patientCompanyPermission.AddChild(HealthCarePermissions.PatientCompanies.Delete, L("Permission:Delete"));
 
-        var countryPermission = myGroup.AddPermission(HealthCarePermissions.Countries.Default, L("Permission:Countries"));
-        countryPermission.AddChild(HealthCarePermissions.Countries.Create, L("Permission:Create"));
-        countryPermission.AddChild(HealthCarePermissions.Countries.Edit, L("Permission:Edit"));
-        countryPermission.AddChild(HealthCarePermissions.Countries.Delete, L("Permission:Delete"));
-
         var titlePermission = myGroup.AddPermission(HealthCarePermissions.Titles.Default, L("Permission:Titles"));
         titlePermission.AddChild(HealthCarePermissions.Titles.Create, L("Permission:Create"));
         titlePermission.AddChild(HealthCarePermissions.Titles.Edit, L("Permission:Edit"));
@@ -51,6 +46,16 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         departmentServicePermission.AddChild(HealthCarePermissions.DepartmentServices.Create, L("Permission:Create"));
         departmentServicePermission.AddChild(HealthCarePermissions.DepartmentServices.Edit, L("Permission:Edit"));
         departmentServicePermission.AddChild(HealthCarePermissions.DepartmentServices.Delete, L("Permission:Delete"));
+
+        var countryPermission = myGroup.AddPermission(HealthCarePermissions.Countries.Default, L("Permission:Countries"));
+        countryPermission.AddChild(HealthCarePermissions.Countries.Create, L("Permission:Create"));
+        countryPermission.AddChild(HealthCarePermissions.Countries.Edit, L("Permission:Edit"));
+        countryPermission.AddChild(HealthCarePermissions.Countries.Delete, L("Permission:Delete"));
+
+        var cityPermission = myGroup.AddPermission(HealthCarePermissions.Cities.Default, L("Permission:Cities"));
+        cityPermission.AddChild(HealthCarePermissions.Cities.Create, L("Permission:Create"));
+        cityPermission.AddChild(HealthCarePermissions.Cities.Edit, L("Permission:Edit"));
+        cityPermission.AddChild(HealthCarePermissions.Cities.Delete, L("Permission:Delete"));
 
         var labRequestPermission = myGroup.AddPermission(HealthCarePermissions.LabRequests.Default, L("Permission:LabRequest"));
         labRequestPermission.AddChild(HealthCarePermissions.LabRequests.Create, L("Permission:Create"));

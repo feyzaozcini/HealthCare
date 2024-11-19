@@ -1,5 +1,7 @@
 ﻿using JetBrains.Annotations;
+using Pusula.Training.HealthCare.Cities;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
@@ -13,6 +15,7 @@ public class Country: AuditedEntity<Guid>
     public string Name { get; set; }
     [NotNull]
     public string Code { get; set; }
+    //public virtual ICollection<City> Cities { get; set; } = new List<City>();
 
     protected Country()
     {
@@ -25,7 +28,7 @@ public class Country: AuditedEntity<Guid>
         Id = id;
 
         Check.NotNull(name, nameof(name));
-        Check.Length(name, nameof(name), CountryConsts.NameMaxLength, CountryConsts.NameMinLength);
+        Check.Length(name, nameof(name), CountryConsts.NameMaxLength);
         Name = name;
 
         Check.NotNull(code, nameof(code));
