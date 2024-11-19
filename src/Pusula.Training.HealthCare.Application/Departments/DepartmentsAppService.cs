@@ -78,6 +78,18 @@ namespace Pusula.Training.HealthCare.Departments
             return ObjectMapper.Map<Department, DepartmentDto>(department);
         }
 
+        [Authorize(HealthCarePermissions.Departments.Delete)]
+        public virtual async Task DeleteByIdsAsync(List<Guid> departmentIds)
+        {
+            await departmentRepository.DeleteManyAsync(departmentIds);
+        }
+
+        [Authorize(HealthCarePermissions.Departments.Delete)]
+        public virtual async Task DeleteAllAsync(GetDepartmentsInput input)
+        {
+            await departmentRepository.DeleteAllAsync(input.FilterText, input.Name);
+        }
+
         [AllowAnonymous]
         public virtual async Task<IRemoteStreamContent> GetListAsExcelFileAsync(DepartmentExcelDownloadDto input)
         {
@@ -96,17 +108,6 @@ namespace Pusula.Training.HealthCare.Departments
             return new RemoteStreamContent(memoryStream, "Departments.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 
-        [Authorize(HealthCarePermissions.Departments.Delete)]
-        public virtual async Task DeleteByIdsAsync(List<Guid> departmentIds)
-        {
-            await departmentRepository.DeleteManyAsync(departmentIds);
-        }
-
-        [Authorize(HealthCarePermissions.Departments.Delete)]
-        public virtual async Task DeleteAllAsync(GetDepartmentsInput input)
-        {
-            await departmentRepository.DeleteAllAsync(input.FilterText, input.Name);
-        }
         public virtual async Task<DownloadTokenResultDto> GetDownloadTokenAsync()
         {
             var token = Guid.NewGuid().ToString("N");

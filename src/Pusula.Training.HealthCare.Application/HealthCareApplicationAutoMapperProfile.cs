@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.AppointmentTypes;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
@@ -44,17 +45,6 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<DepartmentDto, DepartmentUpdateDto>();
         CreateMap<Department, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
 
-        CreateMap<Country, CountryDto>();
-        CreateMap<Country, CountryCreateDto>();
-        CreateMap<Country, CountryDeletedDto>();
-        CreateMap<CountryDto, CountryCreateDto>();
-        CreateMap<Country, CountryUpdateDto>();
-        CreateMap<CountryDto, CountryUpdateDto>();
-        CreateMap<Country, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
-        CreateMap<Country, GetCountryLookupDto<Guid>>()
-    .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-    .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Code));
-
         CreateMap<PatientCompany, PatientCompanyDto>();
         CreateMap<PatientCompany, PatientCompanyExcelDto>();
         CreateMap<PatientCompanyDto, PatientCompanyUpdateDto>();
@@ -83,6 +73,29 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<DepartmentService, DepartmentServiceExcelDto>();
         CreateMap<DepartmentServiceDto, DepartmentServiceUpdateDto>();
         CreateMap<DepartmentService, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+
+        CreateMap<Country, CountryDto>();
+        CreateMap<Country, CountryCreateDto>();
+        CreateMap<Country, CountryDeletedDto>();
+        CreateMap<CountryDto, CountryCreateDto>();
+        CreateMap<Country, CountryUpdateDto>();
+        CreateMap<CountryDto, CountryUpdateDto>();
+        CreateMap<CountryDto, CountryDeletedDto>();
+        CreateMap<Country, CountryExcelDto>();
+        CreateMap<Country, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+        CreateMap<Country, GetCountryLookupDto<Guid>>().ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                                                 .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Code));
+
+        CreateMap<City, CityDto>();
+        CreateMap<City, CityCreateDto>();
+        CreateMap<City, CityDeleteDto>();
+        CreateMap<CityDto, CityCreateDto>();
+        CreateMap<City, CityUpdateDto>();
+        CreateMap<CityDto, CityUpdateDto>();
+        CreateMap<CityDto, CityDeleteDto>();
+        CreateMap<City, CityExcelDto>();
+        CreateMap<City, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+        CreateMap<City, GetCityLookupDto>().ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
 
         CreateMap<Doctor, DoctorDto>();
         CreateMap<IdentityUser, DoctorDto>()

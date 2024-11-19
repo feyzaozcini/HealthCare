@@ -22,8 +22,7 @@ namespace Pusula.Training.HealthCare.Controllers.DepartmentServices
     : HealthCareController, IDepartmentServicesAppService
     {
         [HttpGet]
-        public virtual Task<PagedResultDto<DepartmentServiceDto>> GetListAsync(GetDepartmentServicesInput input)
-        => departmentServicesAppService.GetListAsync(input);
+        public virtual Task<PagedResultDto<DepartmentServiceDto>> GetListAsync(GetDepartmentServicesInput input) => departmentServicesAppService.GetListAsync(input);
 
         [HttpGet]
         [Route("{id}")]

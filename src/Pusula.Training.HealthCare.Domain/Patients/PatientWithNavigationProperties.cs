@@ -11,9 +11,7 @@ namespace Pusula.Training.HealthCare.Patients
     public class PatientWithNavigationProperties
     {
         public Patient Patient { get; set; } = null!;
-
         public Country Country { get; set; } = null!;
-
         public PatientCompany PatientCompany { get; set; } = null!;
 
     }

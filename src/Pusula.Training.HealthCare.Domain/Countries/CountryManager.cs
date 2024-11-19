@@ -15,7 +15,7 @@ public class CountryManager(ICountryRepository countryRepository) : DomainServic
         )
     {
         Check.NotNull(name, nameof(name));
-        Check.Length(name, nameof(name), CountryConsts.NameMaxLength, CountryConsts.NameMinLength);
+        Check.Length(name, nameof(name), CountryConsts.NameMaxLength);
 
         Check.NotNull(code, nameof(code));
         Check.Length(code, nameof(code), CountryConsts.CodeMaxLength, CountryConsts.CodeMinLength);
@@ -36,7 +36,7 @@ public class CountryManager(ICountryRepository countryRepository) : DomainServic
     )
     {
         Check.NotNull(name, nameof(name));
-        Check.Length(name, nameof(name), CountryConsts.NameMaxLength, CountryConsts.NameMinLength);
+        Check.Length(name, nameof(name), CountryConsts.NameMaxLength);
 
         Check.NotNull(code, nameof(code));
         Check.Length(code, nameof(code), CountryConsts.CodeMaxLength, CountryConsts.CodeMinLength);
