@@ -3,6 +3,7 @@ using Pusula.Training.HealthCare.AppointmentTypes;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.DepartmentServices;
+using Pusula.Training.HealthCare.DoctorDepartments;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.LabRequests;
 using Pusula.Training.HealthCare.PatientCompanies;
@@ -102,6 +103,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<AppointmentType, AppointmentTypeUpdateDto>();
         CreateMap<AppointmentType, AppointmentTypeDeleteDto>();
         CreateMap<AppointmentType, AppointmentTypeDto>();
+
+        CreateMap<Title, TitleDto>();
+        CreateMap<Title, TitleExcelDto>();
+        CreateMap<TitleDto, TitleUpdateDto>();
+        CreateMap<Title, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
 
     }
 }

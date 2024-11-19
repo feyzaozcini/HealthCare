@@ -25,6 +25,7 @@ using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Pusula.Training.HealthCare.AppointmentTypes;
+using Pusula.Training.HealthCare.DoctorDepartments;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -283,6 +284,27 @@ public class HealthCareDbContext :
                     .IsRequired()
                     .HasMaxLength(AppointmentTypeConst.NameMaxLength);
             });
+
+            builder.Entity<DoctorDepartment>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "DoctorDepartments", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+
+                // Composite Key
+                b.HasKey(dd => new { dd.DoctorId, dd.DepartmentId });
+
+                // Relationships
+                b.HasOne(dd => dd.Doctor)
+                    .WithMany(d => d.DoctorDepartments)
+                    .HasForeignKey(dd => dd.DoctorId)
+                    .IsRequired();
+
+                b.HasOne(dd => dd.Department)
+                    .WithMany(d => d.DoctorDepartments)
+                    .HasForeignKey(dd => dd.DepartmentId)
+                    .IsRequired();
+            });
+
 
         }
 

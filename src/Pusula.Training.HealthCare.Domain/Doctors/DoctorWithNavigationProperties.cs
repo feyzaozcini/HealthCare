@@ -17,8 +17,5 @@ namespace Pusula.Training.HealthCare.Doctors
         public Title Title { get; set; } = null!;
 
 
-
-
-
     }
 }

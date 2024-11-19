@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
+using Pusula.Training.HealthCare.DoctorDepartments;
+using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -51,7 +53,16 @@ namespace Pusula.Training.HealthCare.Departments
             var department = await departmentManager.CreateAsync(
             input.Name
             );
+            foreach (var doctorId in input.DoctorIds)
+            {
+                var departmentDoctor = new DoctorDepartment
+                {
+                    DepartmentId = department.Id,
+                    DoctorId = doctorId
+                };
 
+                department.DoctorDepartments.Add(departmentDoctor);
+            }
             return ObjectMapper.Map<Department, DepartmentDto>(department);
         }
 
