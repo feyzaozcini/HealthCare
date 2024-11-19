@@ -1,13 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
+using Volo.Abp.EventBus.Distributed;
+using Volo.Abp.ObjectMapping;
 
 namespace Pusula.Training.HealthCare.TestGroupItems;
 
@@ -102,7 +107,13 @@ public class TestGroupItemsAppService(
             Items = ObjectMapper.Map<List<TestGroupItem>, List<TestGroupItemDto>>(items)
         };
     }
-    
+
+    public virtual async Task<TestGroupItemWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id)
+    {
+        var testGroupItem = await testGroupItemRepository.GetWithNavigationPropertiesAsync(id);
+        return ObjectMapper.Map<TestGroupItemWithNavigationProperties, TestGroupItemWithNavigationPropertiesDto>(testGroupItem);
+    }
+
     [Authorize(HealthCarePermissions.TestGroupItems.Edit)]
     public virtual async Task<TestGroupItemDto> UpdateAsync(TestGroupItemsUpdateDto input)
     {

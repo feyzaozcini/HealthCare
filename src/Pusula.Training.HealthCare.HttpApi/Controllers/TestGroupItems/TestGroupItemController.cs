@@ -33,6 +33,10 @@ public class TestGroupItemController(ITestGroupItemsAppService testGroupItemsApp
 
     [HttpGet]
     public Task<PagedResultDto<TestGroupItemDto>> GetListAsync(GetTestGroupItemsInput input) => testGroupItemsAppService.GetListAsync(input);
+    [HttpGet]
+
+    [Route("with-navigation-properties/{id}")]
+    public Task<TestGroupItemWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id) => testGroupItemsAppService.GetWithNavigationPropertiesAsync(id);
 
     [HttpPut]
     public Task<TestGroupItemDto> UpdateAsync(TestGroupItemsUpdateDto input) => testGroupItemsAppService.UpdateAsync(input);

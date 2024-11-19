@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
+using Pusula.Training.HealthCare.TestGroupItems;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -76,6 +80,21 @@ public class TestGroupsAppService(
         {
             TotalCount = totalCount,
             Items = ObjectMapper.Map<List<TestGroup>, List<TestGroupDto>>(items)
+        };
+    }
+
+    public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetGroupNameLookupAsync(LookupRequestDto input)
+    {
+        var query = (await testGroupRepository.GetQueryableAsync())
+                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
+                    x => x.Name != null && x.Name.Contains(input.Filter!));
+
+        var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<TestGroup>();
+        var totalCount = query.Count();
+        return new PagedResultDto<LookupDto<Guid>>
+        {
+            TotalCount = totalCount,
+            Items = ObjectMapper.Map<List<TestGroup>, List<LookupDto<Guid>>>(lookupData)
         };
     }
 

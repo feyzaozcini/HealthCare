@@ -1,0 +1,253 @@
+﻿@page "/test-groups"
+@using Pusula.Training.HealthCare.Shared
+@using Pusula.Training.HealthCare.TestGroupItems
+@using Pusula.Training.HealthCare.TestGroups
+@using Syncfusion.Blazor.Navigations
+
+@inject ITestGroupItemsAppService TestGroupItemsAppService
+@inject ITestGroupsAppService TestGroupsAppService
+
+@*Add Modal*@
+<SfButton CssClass="custom-button e-primary" Content="Test Ekle" OnClick="OpenCreateModal" />
+
+@*Filter By GroupNames Dropdown*@
+<SfDropDownList TItem="LookupDto<Guid>" TValue="Guid" Width="200px" DataSource="@TestGroupNamesCollection"
+                Value="@(SelectedTestGroupId ?? Guid.Empty)">
+    <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
+    <DropDownListEvents TValue="Guid" TItem="LookupDto<Guid>" ValueChange="OnTestGroupChange"></DropDownListEvents>
+</SfDropDownList>
+
+<div class="container-fluid">
+    <div class="row g-0">
+        <div class="col-2">
+            <SfListView Width="100%" DataSource="@TestGroupNamesCollection" ShowHeader="true" HeaderTitle="Laboratuvar">
+                <ListViewFieldSettings TValue="LookupDto<Guid>" Id="Id" Text="DisplayName"></ListViewFieldSettings>
+            </SfListView>
+        </div>
+        <div class="col-10 m-0">
+
+            @*Data Grid*@
+            <SfGrid @ref="DefaultGrid" DataSource="@TestGroupItemsList" AllowPaging="true" AllowSorting="true" TotalItemsCount="@TotalCount">
+                <GridColumns>
+                    <GridColumn Field=@nameof(TestGroupItem.Code) HeaderText="Test Kodu" Width="25"></GridColumn>
+                    <GridColumn HeaderText="Test Grubu" Width="30">
+                        <Template>
+                            @if (context is TestGroupItemDto testGroupItem)
+                            {
+                                var testGroupId = testGroupItem.TestGroupId;
+                                <span>@GetTestGroupName(testGroupId)</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(TestGroupItem.Name) HeaderText="Test Adı" Width="100"></GridColumn>
+                    <GridColumn Field=@nameof(TestGroupItem.TestType) HeaderText="Test Tipi" Width="30"></GridColumn>
+                    <GridColumn Field=@nameof(TestGroupItem.TurnaroundTime) HeaderText="Tahmini Sonuçlanma Süresi" Width="25"></GridColumn>
+                    <GridColumn Field=@nameof(TestGroupItem.Description) HeaderText="Açıklama" Width="25"></GridColumn>
+                    <GridColumn HeaderText="Actions" Width="20">
+                        <Template>
+                            @if (context is TestGroupItemDto testGroupItem)
+                            {
+                                <div class="d-flex justify-content-center">
+                                    <SfButton CssClass="e-success e-small" Content="Edit" OnClick="(() => OpenUpdateModal(testGroupItem))"></SfButton>
+                                    <SfButton CssClass="e-danger e-small ml-2" Content="Delete" OnClick="(() => OpenDeleteModal(testGroupItem.Id))"></SfButton>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+
+            @*Create Modal*@
+            <SfDialog IsModal="true" ShowCloseIcon="true" Visible="@IsCreateModalVisible" Width="500px" Header="Yeni Test Ekle">
+                <DialogTemplates>
+                    <Content>
+                        <EditForm Model="@CreateDto" OnValidSubmit="SaveNewItem" class="custom-form">
+                            <DataAnnotationsValidator />
+
+                            <SfDropDownList TItem="LookupDto<Guid>" TValue="Guid" DataSource="@TestGroupNamesCollection" Placeholder="Test Grubu" @bind-Value="CreateDto.TestGroupId">
+                                <DropDownListFieldSettings Text="DisplayName" Value="Id"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                            <ValidationMessage For="@(() => CreateDto.TestGroupId)" CssClass="my-validation-message" />
+
+                            <SfTextBox TValue="string" Placeholder="Test Adı" @bind-Value="CreateDto.Name"></SfTextBox>
+                            <ValidationMessage For="@(() => CreateDto.Name)" CssClass="my-validation-message" />
+
+                            <SfTextBox TValue="string" Placeholder="Test Kodu" @bind-Value="CreateDto.Code"></SfTextBox>
+                            <ValidationMessage For="@(() => CreateDto.Code)" CssClass="my-validation-message" />
+
+                            <SfTextBox TValue="string" Placeholder="Test Tipi" @bind-Value="CreateDto.TestType"></SfTextBox>
+                            <ValidationMessage For="@(() => CreateDto.TestType)" CssClass="my-validation-message" />
+
+                            <SfTextBox TValue="string" Placeholder="Açıklama" @bind-Value="CreateDto.Description"></SfTextBox>
+                            <ValidationMessage For="@(() => CreateDto.Description)" CssClass="my-validation-message" />
+
+                            <SfNumericTextBox TValue="int" Placeholder="Tahmini Süre" @bind-Value="CreateDto.TurnaroundTime"></SfNumericTextBox>
+                            <ValidationMessage For="@(() => CreateDto.TurnaroundTime)" CssClass="my-validation-message" />
+
+                            <div class="form-buttons">
+                                <SfButton CssClass="e-success e-small" IsPrimary="true">Ekle</SfButton>
+                                <SfButton CssClass="e-primary e-small" OnClick="CloseCreateModal">İptal</SfButton>
+                            </div>
+
+                        </EditForm>
+                    </Content>
+                </DialogTemplates>
+            </SfDialog>
+
+            @*Delete Modal*@
+            <SfDialog IsModal="true" ShowCloseIcon="true" Visible="@IsDeleteModalVisible" Width="300px" Header="Silme İşlemi">
+                <DialogTemplates>
+                    <Content>
+                        <p>Silmek istediğinize emin misiniz?</p>
+                    </Content>
+                    <FooterTemplate>
+                        <SfButton CssClass="e-danger e-small" OnClick="ConfirmDelete">Evet</SfButton>
+                        <SfButton CssClass="e-primary e-small" OnClick="CancelDelete">Hayır</SfButton>
+                    </FooterTemplate>
+                </DialogTemplates>
+            </SfDialog>
+
+            @*Update Modal*@
+            <SfDialog IsModal="true" ShowCloseIcon="true" Visible="@IsUpdateModalVisible" Width="500px" Header="Güncelleme">
+                <DialogTemplates>
+                    <Content>
+                        <EditForm Model="@UpdateDto" OnValidSubmit="SaveChanges" class="custom-form">
+                            <DataAnnotationsValidator />
+
+                            <SfTextBox TValue="string" Placeholder="Test Adı" @bind-Value="UpdateDto.Name"></SfTextBox>
+                            <ValidationMessage For="@(() => UpdateDto.Name)" CssClass="my-validation-message" />
+
+                            <!-- Test Kodu -->
+                            <SfTextBox TValue="string" Placeholder="Test Kodu" @bind-Value="UpdateDto.Code"></SfTextBox>
+                            <ValidationMessage For="@(() => UpdateDto.Code)" CssClass="my-validation-message" />
+
+                            <!-- Test Tipi -->
+                            <SfTextBox TValue="string" Placeholder="Test Tipi" @bind-Value="UpdateDto.TestType"></SfTextBox>
+                            <ValidationMessage For="@(() => UpdateDto.TestType)" CssClass="my-validation-message" />
+
+                            <!-- Açıklama -->
+                            <SfTextBox TValue="string" Placeholder="Açıklama" @bind-Value="UpdateDto.Description"></SfTextBox>
+                            <ValidationMessage For="@(() => UpdateDto.Description)" CssClass="my-validation-message" />
+
+                            <!-- Tahmini Süre -->
+                            <SfNumericTextBox TValue="int" Placeholder="Tahmini Süre" @bind-Value="UpdateDto.TurnaroundTime"></SfNumericTextBox>
+                            <ValidationMessage For="@(() => UpdateDto.TurnaroundTime)" CssClass="my-validation-message" />
+
+                            <!-- Test Grubu -->
+                            <SfDropDownList TItem="LookupDto<Guid>" TValue="Guid" DataSource="@TestGroupNamesCollection" Placeholder="Test Grubu" @bind-Value="UpdateDto.TestGroupId">
+                                <DropDownListFieldSettings Text="DisplayName" Value="Id"></DropDownListFieldSettings>
+                            </SfDropDownList>
+                            <ValidationMessage For="@(() => UpdateDto.TestGroupId)" CssClass="my-validation-message" />
+
+                            <!-- Form Butonları -->
+                            <div class="form-buttons">
+                                <SfButton CssClass="e-success e-small" IsPrimary="true">Kaydet</SfButton>
+                                <SfButton CssClass="e-primary e-small" OnClick="CloseUpdateModal">İptal</SfButton>
+                            </div>
+                        </EditForm>
+                    </Content>
+                </DialogTemplates>
+            </SfDialog>
+        </div>
+    </div>
+</div>
+
+@*  ****************** YAPILACAKLAR ******************
+    - Styles .css altına taşınacak, sayfada olmayacak.
+    - Form inputlar Bootstrap ile güncellenecek.
+    - Modal bug'ı giderilecek.
+    - Listeleme uzunluğu sabitlenecek (full screen).
+    - Test Grubu ekleme butonu olacak.
+    - Searchbar eklenecek. 
+    - LabGroups ve LabGroupItems Cache alınacak (inş.)
+*@
+
+<style>
+    .custom-button {
+        width: 120px;
+        margin-bottom: 10px;
+        margin-left: auto;
+        display: block;
+    }
+
+    .custom-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+        .custom-form .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .custom-form .e-input,
+        .custom-form .e-numerictextbox,
+        .custom-form .e-dropdownlist {
+            width: 100%;
+            border-radius: 4px;
+        }
+    .custom-plus-button {
+        margin-left: auto;
+    }
+
+    .e-round {
+        margin-left: auto;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+
+    .my-validation-message {
+        color: red;
+        font-size: 0.875rem;
+    }
+
+    .custom-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .e-sidebar {
+        background-color: #bbbbbb;
+        color: black;
+    }
+
+    .e-toolbar .e-toolbar-items {
+        background-color: midnightblue;
+        color: white;
+    }
+
+    .maincontent {
+        height: 400px;
+        background-color: rgb(244, 246, 249);
+    }
+
+    .main > div {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .e-listview .e-list-item {
+        color: pink;
+        background-color: white;
+    }
+
+    .e-listview .e-list-item {
+        color: black;
+        background-color: white;
+    }
+
+    .e-listview .e-list-header {
+        color: black;
+        background-color: white;
+        border-bottom: 1px solid #dcdcdc;
+    }
+
+    .e-plus-icon::before {
+        content: '\e823';
+    }
+</style>

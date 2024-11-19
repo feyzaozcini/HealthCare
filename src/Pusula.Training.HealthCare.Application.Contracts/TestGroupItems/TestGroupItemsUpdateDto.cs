@@ -6,6 +6,7 @@ namespace Pusula.Training.HealthCare.TestGroupItems;
 public class TestGroupItemsUpdateDto
 {
     public Guid Id { get; set; }
+    [Required]
     public Guid TestGroupId { get; set; }
 
     [Required]

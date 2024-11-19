@@ -89,6 +89,7 @@
     "Title": "Title",
     "Permission:DepartmentServices": "DepartmentServices",
     "DepartmentServices": "DepartmentServices",
-    "DepartmentService": "DepartmentService"
+    "DepartmentService": "DepartmentService",
+    "Menu:TestGroups":  "Lab Tests"
   }
 }

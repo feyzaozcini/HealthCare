@@ -34,6 +34,10 @@ public class TestGroupController(ITestGroupsAppService testGroupsAppService)
     [HttpGet]
     public Task<PagedResultDto<TestGroupDto>> GetListAsync(GetTestGroupsInput input) => testGroupsAppService.GetListAsync(input);
 
+    [HttpGet]
+    [Route("test-group-name-lookup")]
+    public Task<PagedResultDto<LookupDto<Guid>>> GetGroupNameLookupAsync(LookupRequestDto input) => testGroupsAppService.GetGroupNameLookupAsync(input);
+
     [HttpPut]
     public Task<TestGroupDto> UpdateAsync(TestGroupsUpdateDto input) => testGroupsAppService.UpdateAsync(input);
 }
