@@ -87,7 +87,6 @@ namespace Pusula.Training.HealthCare.Cities
             await cityRepository.DeleteManyAsync(cityIds);
         }
 
-
         [Authorize(HealthCarePermissions.Cities.Delete)]
         public virtual async Task DeleteAllAsync(GetCitiesInput input)
         {
@@ -102,8 +101,6 @@ namespace Pusula.Training.HealthCare.Cities
             var idsToDelete = cities.Select(c => c.Id).ToList();
             await cityRepository.DeleteManyAsync(idsToDelete);
         }
-
-
 
         [AllowAnonymous]
         public virtual async Task<IRemoteStreamContent> GetListAsExcelFileAsync(CityExcelDownloadDto input)

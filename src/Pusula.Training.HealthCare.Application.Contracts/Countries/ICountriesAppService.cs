@@ -17,8 +17,8 @@ public interface ICountriesAppService : IApplicationService
     Task DeleteAsync(Guid id);
     Task<CountryDto> CreateAsync(CountryCreateDto input);
     Task<CountryDto> UpdateAsync(Guid id, CountryUpdateDto input);
-    Task<IRemoteStreamContent> GetListAsExcelFileAsync(CountryExcelDownloadDto input); // Excel desteği eklendi
-    Task DeleteByIdsAsync(List<Guid> countryIds); // Çoklu silme eklendi
-    Task DeleteAllAsync(GetCountriesInput input); // Filtreye göre toplu silme eklendi
+    Task<IRemoteStreamContent> GetListAsExcelFileAsync(CountryExcelDownloadDto input); 
+    Task DeleteByIdsAsync(List<Guid> countryIds); 
+    Task DeleteAllAsync(GetCountriesInput input); 
     Task<Shared.DownloadTokenResultDto> GetDownloadTokenAsync();
 }

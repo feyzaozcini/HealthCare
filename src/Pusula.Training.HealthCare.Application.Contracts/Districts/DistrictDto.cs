@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 
-namespace Pusula.Training.HealthCare.Cities
+namespace Pusula.Training.HealthCare.Districts
 {
-    public class CityDto : AuditedEntityDto<Guid>
+    public class DistrictDto : AuditedEntityDto<Guid>
     {
         public string Name { get; set; } = null!;
-        public Guid CountryId { get; set; }
+        public Guid CityId { get; set; }
     }
 }
