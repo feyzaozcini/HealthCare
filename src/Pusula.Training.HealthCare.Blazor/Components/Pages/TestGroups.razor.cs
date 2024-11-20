@@ -1,3 +1,4 @@
+using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.TestGroupItems;
 using Syncfusion.Blazor.Grids;
@@ -16,7 +17,8 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
     {
         private List<TestGroupItemDto> TestGroupItemsList { get; set; } = new List<TestGroupItemDto>();
         private IReadOnlyList<LookupDto<Guid>> TestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
-        private IReadOnlyList<LookupDto<Guid>> FilteredTestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
+        private GetTestGroupItemsInput Filter { get; set; }
+
 
         private TestGroupItemsCreateDto CreateDto = new();
         private TestGroupItemsUpdateDto UpdateDto = new();
@@ -31,16 +33,27 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private bool IsCreateModalVisible = false;
 
         private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
-        private string CurrentSorting { get; set; } = string.Empty;
         private int CurrentPage { get; set; } = 1;
         private long TotalCount;
 
-        SfSidebar sidebarObj;
-        private string SearchQuery { get; set; } = string.Empty;
-
+        //Modal yönetimi
+        private SfDialog CreateDialog;
+        private SfDialog DeleteDialog;
+        private SfDialog UpdateDialog;
 
         protected override async Task OnInitializedAsync()
         {
+            Filter = new GetTestGroupItemsInput
+            {
+                FilterText = string.Empty,
+                Name = string.Empty,
+                Code = string.Empty,
+                TestType = string.Empty,
+                Description = string.Empty,
+                TestGroupId = Guid.Empty,
+                MaxResultCount = PageSize,
+                SkipCount = 0
+            };
             await LoadLookupsAsync();
             await GetTestGroupItemsAsync();
         }
@@ -52,17 +65,27 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             var input = new LookupRequestDto
             {
                 MaxResultCount = PageSize,
-                Filter = null
+                Filter = Filter.FilterText
             };
 
             var result = await TestGroupsAppService.GetGroupNameLookupAsync(input);
             TestGroupNamesCollection = result.Items;
+
+            if (TestGroupNamesCollection.Any())
+            {
+                Filter.TestGroupId = TestGroupNamesCollection.First().Id;
+            }
         }
 
         private async Task GetTestGroupItemsAsync()
         {
             var input = new GetTestGroupItemsInput
             {
+                FilterText = Filter.FilterText,
+                Name = Filter.Name,
+                Code = Filter.Code,
+                TestType = Filter.TestType,
+                Description = Filter.Description,
                 MaxResultCount = PageSize,
                 SkipCount = (CurrentPage - 1) * PageSize,
                 TestGroupId = SelectedTestGroupId ?? Guid.Empty
@@ -70,6 +93,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
             var result = await TestGroupItemsAppService.GetListAsync(input);
             TestGroupItemsList = result.Items.ToList();
+            TotalCount = result.TotalCount;
         }
 
         private string GetTestGroupName(Guid testGroupId)
@@ -79,47 +103,11 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         #endregion
 
-        private void OnInput(InputEventArgs args)
-        {
-            CurrentSorting = args.Value?.ToString() ?? string.Empty;
-            _ = GetTestGroupItemsAsync();
-        }
-
         private async Task SaveNewItem()
         {
             await TestGroupItemsAppService.CreateAsync(CreateDto);
-            CloseCreateModal();
+            await CloseCreateModal();
             await GetTestGroupItemsAsync();
-        }
-
-        private void OpenCreateModal()
-        {
-            CreateDto = new TestGroupItemsCreateDto();
-            IsCreateModalVisible = true;
-
-            IsDeleteModalVisible = false;
-            IsUpdateModalVisible = false;
-        }
-
-
-        private void CloseCreateModal()
-        {
-            IsCreateModalVisible = false;
-        }
-
-        private void OpenDeleteModal(Guid id)
-        {
-            SelectedTestGroupItemId = id;
-            IsDeleteModalVisible = true;
-
-            IsUpdateModalVisible = false;
-            IsCreateModalVisible = false;
-        }
-
-        private void CloseDeleteModal()
-        {
-            SelectedTestGroupItemId = null;
-            IsDeleteModalVisible = false;
         }
 
         private async Task ConfirmDelete()
@@ -129,21 +117,32 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 await TestGroupItemsAppService.DeleteAsync(SelectedTestGroupItemId.Value);
                 await GetTestGroupItemsAsync();
             }
-            CloseDeleteModal();
+            await CloseDeleteModal();
         }
 
-        private void CancelDelete()
+        //Modals
+        private async Task OpenCreateModal()
         {
-            CloseDeleteModal();
+            CreateDto = new TestGroupItemsCreateDto();
+            await CreateDialog.ShowAsync(); 
         }
-
-        private async Task OnTestGroupChange(Syncfusion.Blazor.DropDowns.ChangeEventArgs<Guid, LookupDto<Guid>> args)
+        private async Task CloseCreateModal()
         {
-            SelectedTestGroupId = args.Value;
-            await GetTestGroupItemsAsync();
+            await CreateDialog.HideAsync(); 
+        }
+        private async Task OpenDeleteModal(Guid id)
+        {
+            SelectedTestGroupItemId = id;
+            await DeleteDialog.ShowAsync(); 
         }
 
-        private void OpenUpdateModal(TestGroupItemDto item)
+        private async Task CloseDeleteModal()
+        {
+            SelectedTestGroupItemId = null;
+            await DeleteDialog.HideAsync(); 
+        }
+
+        private async Task OpenUpdateModal(TestGroupItemDto item)
         {
             UpdateDto = new TestGroupItemsUpdateDto
             {
@@ -155,20 +154,27 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 Description = item.Description,
                 TurnaroundTime = item.TurnaroundTime
             };
-            IsUpdateModalVisible = true;
+            await UpdateDialog.ShowAsync(); 
         }
 
-        private void CloseUpdateModal()
+        private async Task CloseUpdateModal()
         {
-            IsUpdateModalVisible = false;
+            await UpdateDialog.HideAsync(); 
         }
 
         private async Task SaveChanges()
         {
             await TestGroupItemsAppService.UpdateAsync(UpdateDto);
-            CloseUpdateModal();
-            await GetTestGroupItemsAsync(); // Grid'i güncelle
+            await CloseUpdateModal();
+            await GetTestGroupItemsAsync();
         }
 
+        //Search
+        private async Task SearchAsync(InputEventArgs args)
+        {
+            CurrentPage = 1;
+            Filter.FilterText = args.Value; 
+            await GetTestGroupItemsAsync();
+        }
     }
 }

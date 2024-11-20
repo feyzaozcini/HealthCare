@@ -10,12 +10,15 @@
 @*Add Modal*@
 <SfButton CssClass="custom-button e-primary" Content="Test Ekle" OnClick="OpenCreateModal" />
 
-@*Filter By GroupNames Dropdown*@
-<SfDropDownList TItem="LookupDto<Guid>" TValue="Guid" Width="200px" DataSource="@TestGroupNamesCollection"
-                Value="@(SelectedTestGroupId ?? Guid.Empty)">
-    <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
-    <DropDownListEvents TValue="Guid" TItem="LookupDto<Guid>" ValueChange="OnTestGroupChange"></DropDownListEvents>
-</SfDropDownList>
+<!-- Search Box -->
+<SfToolbar>
+    <SfTextBox Placeholder="Ara"
+               FloatLabelType="FloatLabelType.Auto"
+               @bind-Value="Filter.FilterText"
+               Width="100%"
+               Input="@(async (args) => await SearchAsync(args))">
+    </SfTextBox>
+</SfToolbar>
 
 <div class="container-fluid">
     <div class="row g-0">
@@ -58,12 +61,11 @@
             </SfGrid>
 
             @*Create Modal*@
-            <SfDialog IsModal="true" ShowCloseIcon="true" Visible="@IsCreateModalVisible" Width="500px" Header="Yeni Test Ekle">
+            <SfDialog @ref="CreateDialog" IsModal="true" ShowCloseIcon="true" Width="500px" Header="Yeni Test Ekle" Visible="false">
                 <DialogTemplates>
                     <Content>
                         <EditForm Model="@CreateDto" OnValidSubmit="SaveNewItem" class="custom-form">
                             <DataAnnotationsValidator />
-
                             <SfDropDownList TItem="LookupDto<Guid>" TValue="Guid" DataSource="@TestGroupNamesCollection" Placeholder="Test Grubu" @bind-Value="CreateDto.TestGroupId">
                                 <DropDownListFieldSettings Text="DisplayName" Value="Id"></DropDownListFieldSettings>
                             </SfDropDownList>
@@ -88,27 +90,26 @@
                                 <SfButton CssClass="e-success e-small" IsPrimary="true">Ekle</SfButton>
                                 <SfButton CssClass="e-primary e-small" OnClick="CloseCreateModal">İptal</SfButton>
                             </div>
-
                         </EditForm>
                     </Content>
                 </DialogTemplates>
             </SfDialog>
 
             @*Delete Modal*@
-            <SfDialog IsModal="true" ShowCloseIcon="true" Visible="@IsDeleteModalVisible" Width="300px" Header="Silme İşlemi">
+            <SfDialog @ref="DeleteDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Silme İşlemi" Visible="false">
                 <DialogTemplates>
                     <Content>
                         <p>Silmek istediğinize emin misiniz?</p>
                     </Content>
                     <FooterTemplate>
                         <SfButton CssClass="e-danger e-small" OnClick="ConfirmDelete">Evet</SfButton>
-                        <SfButton CssClass="e-primary e-small" OnClick="CancelDelete">Hayır</SfButton>
+                        <SfButton CssClass="e-primary e-small" OnClick="CloseDeleteModal">Hayır</SfButton>
                     </FooterTemplate>
                 </DialogTemplates>
             </SfDialog>
 
             @*Update Modal*@
-            <SfDialog IsModal="true" ShowCloseIcon="true" Visible="@IsUpdateModalVisible" Width="500px" Header="Güncelleme">
+            <SfDialog @ref="UpdateDialog" IsModal="true" ShowCloseIcon="true" Width="500px" Header="Güncelleme" Visible="false">
                 <DialogTemplates>
                     <Content>
                         <EditForm Model="@UpdateDto" OnValidSubmit="SaveChanges" class="custom-form">
@@ -117,29 +118,23 @@
                             <SfTextBox TValue="string" Placeholder="Test Adı" @bind-Value="UpdateDto.Name"></SfTextBox>
                             <ValidationMessage For="@(() => UpdateDto.Name)" CssClass="my-validation-message" />
 
-                            <!-- Test Kodu -->
                             <SfTextBox TValue="string" Placeholder="Test Kodu" @bind-Value="UpdateDto.Code"></SfTextBox>
                             <ValidationMessage For="@(() => UpdateDto.Code)" CssClass="my-validation-message" />
 
-                            <!-- Test Tipi -->
                             <SfTextBox TValue="string" Placeholder="Test Tipi" @bind-Value="UpdateDto.TestType"></SfTextBox>
                             <ValidationMessage For="@(() => UpdateDto.TestType)" CssClass="my-validation-message" />
 
-                            <!-- Açıklama -->
                             <SfTextBox TValue="string" Placeholder="Açıklama" @bind-Value="UpdateDto.Description"></SfTextBox>
                             <ValidationMessage For="@(() => UpdateDto.Description)" CssClass="my-validation-message" />
 
-                            <!-- Tahmini Süre -->
                             <SfNumericTextBox TValue="int" Placeholder="Tahmini Süre" @bind-Value="UpdateDto.TurnaroundTime"></SfNumericTextBox>
                             <ValidationMessage For="@(() => UpdateDto.TurnaroundTime)" CssClass="my-validation-message" />
 
-                            <!-- Test Grubu -->
                             <SfDropDownList TItem="LookupDto<Guid>" TValue="Guid" DataSource="@TestGroupNamesCollection" Placeholder="Test Grubu" @bind-Value="UpdateDto.TestGroupId">
                                 <DropDownListFieldSettings Text="DisplayName" Value="Id"></DropDownListFieldSettings>
                             </SfDropDownList>
                             <ValidationMessage For="@(() => UpdateDto.TestGroupId)" CssClass="my-validation-message" />
 
-                            <!-- Form Butonları -->
                             <div class="form-buttons">
                                 <SfButton CssClass="e-success e-small" IsPrimary="true">Kaydet</SfButton>
                                 <SfButton CssClass="e-primary e-small" OnClick="CloseUpdateModal">İptal</SfButton>
@@ -148,6 +143,7 @@
                     </Content>
                 </DialogTemplates>
             </SfDialog>
+
         </div>
     </div>
 </div>
@@ -158,7 +154,7 @@
     - Modal bug'ı giderilecek.
     - Listeleme uzunluğu sabitlenecek (full screen).
     - Test Grubu ekleme butonu olacak.
-    - Searchbar eklenecek. 
+    - Searchbar css düzenlenecek.
     - LabGroups ve LabGroupItems Cache alınacak (inş.)
 *@
 
@@ -190,6 +186,7 @@
             width: 100%;
             border-radius: 4px;
         }
+
     .custom-plus-button {
         margin-left: auto;
     }
