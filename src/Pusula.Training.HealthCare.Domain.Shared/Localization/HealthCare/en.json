@@ -101,9 +101,7 @@
     "District": "District",
     "Permission:Villages": "Villages",
     "Villages": "Villages",
-    "Village": "Village"
-    "City": "City"
-    "DepartmentService": "DepartmentService",
+    "Village": "Village",
     "Menu:TestGroups":  "Lab Tests"
   }
 }
