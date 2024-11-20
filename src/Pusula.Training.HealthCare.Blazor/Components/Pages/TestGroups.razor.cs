@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.TestGroupItems;
+using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
 using Syncfusion.Blazor.Navigations;
@@ -32,6 +35,10 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private bool IsDeleteModalVisible = false;
         private bool IsCreateModalVisible = false;
 
+        //private bool CanCreateTest { get; set; }
+        //private bool CanEditTest { get; set; }
+        //private bool CanDeleteTest { get; set; }
+
         private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
         private int CurrentPage { get; set; } = 1;
         private long TotalCount;
@@ -43,6 +50,8 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            //await SetPermissionsAsync();
+
             Filter = new GetTestGroupItemsInput
             {
                 FilterText = string.Empty,
@@ -103,24 +112,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         #endregion
 
-        private async Task SaveNewItem()
-        {
-            await TestGroupItemsAppService.CreateAsync(CreateDto);
-            await CloseCreateModal();
-            await GetTestGroupItemsAsync();
-        }
-
-        private async Task ConfirmDelete()
-        {
-            if (SelectedTestGroupItemId.HasValue)
-            {
-                await TestGroupItemsAppService.DeleteAsync(SelectedTestGroupItemId.Value);
-                await GetTestGroupItemsAsync();
-            }
-            await CloseDeleteModal();
-        }
-
-        //Modals
+        #region Modals
         private async Task OpenCreateModal()
         {
             CreateDto = new TestGroupItemsCreateDto();
@@ -159,16 +151,39 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private async Task CloseUpdateModal()
         {
-            await UpdateDialog.HideAsync(); 
+            UpdateDto = new TestGroupItemsUpdateDto();
+            await UpdateDialog.HideAsync();
         }
 
-        private async Task SaveChanges()
+        #endregion
+
+        #region Save Changes
+        //Deðiþiklikleri Kaydetme
+        private async Task UpdateChanges()
         {
             await TestGroupItemsAppService.UpdateAsync(UpdateDto);
             await CloseUpdateModal();
             await GetTestGroupItemsAsync();
         }
+        private async Task SaveChanges()
+        {
+            await TestGroupItemsAppService.CreateAsync(CreateDto);
+            await CloseCreateModal();
+            await GetTestGroupItemsAsync();
+        }
+        private async Task ConfirmDelete()
+        {
+            if (SelectedTestGroupItemId.HasValue)
+            {
+                await TestGroupItemsAppService.DeleteAsync(SelectedTestGroupItemId.Value);
+                await GetTestGroupItemsAsync();
+            }
+            await CloseDeleteModal();
+        }
 
+        #endregion
+
+        #region Search
         //Search
         private async Task SearchAsync(InputEventArgs args)
         {
@@ -176,5 +191,17 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             Filter.FilterText = args.Value; 
             await GetTestGroupItemsAsync();
         }
+
+        #endregion
+
+        //#region Permission
+        ////Yetkilendirme
+        //private async Task SetPermissionsAsync()
+        //{
+        //    CanCreateTest = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.TestGroupItems.Create);
+        //    CanEditTest = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.TestGroupItems.Edit);
+        //    CanDeleteTest = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.TestGroupItems.Delete);
+        //}
+        //#endregion
     }
 }

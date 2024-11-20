@@ -95,8 +95,7 @@
     "Country": "Country",
     "Permission:Cities": "Cities",
     "Cities": "Cities",
-    "City": "City"
-    "DepartmentService": "DepartmentService",
+    "City": "City",
     "Menu:TestGroups":  "Lab Tests"
   }
 }
