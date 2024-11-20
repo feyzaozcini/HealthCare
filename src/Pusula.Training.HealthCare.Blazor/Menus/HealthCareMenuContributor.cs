@@ -59,6 +59,15 @@ public class HealthCareMenuContributor : IMenuContributor
                 requiredPermissionName: HealthCarePermissions.Departments.Default)
         );
 
+        context.Menu.AddItem(
+            new ApplicationMenuItem(
+                HealthCareMenus.TestGroups,
+                l["Menu:TestGroups"],
+                url: "/test-groups",
+                icon: "fa fa-flask",
+                requiredPermissionName: HealthCarePermissions.TestGroups.Default)
+        );
+
         return Task.CompletedTask;
     }
 

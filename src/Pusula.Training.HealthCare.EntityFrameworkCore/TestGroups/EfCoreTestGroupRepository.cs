@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
+using Pusula.Training.HealthCare.PatientCompanies;
+using Pusula.Training.HealthCare.Patients;
+using Pusula.Training.HealthCare.TestGroupItems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,5 +66,4 @@ public class EfCoreTestGroupRepository(IDbContextProvider<HealthCareDbContext> d
             )
             .WhereIf(!string.IsNullOrWhiteSpace(name), e => e.Name.Contains(name!));
     }
-
 }

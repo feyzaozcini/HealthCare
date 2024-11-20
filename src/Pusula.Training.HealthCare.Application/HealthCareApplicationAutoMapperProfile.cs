@@ -59,16 +59,20 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<LabRequest, LabRequestDto>().ReverseMap();
 
         CreateMap<TestGroup, GetTestGroupsInput>().ReverseMap();
+        CreateMap<TestGroup, GetTestGroupItemsInput>();
         CreateMap<TestGroup, TestGroupsCreateDto>().ReverseMap();
         CreateMap<TestGroup, TestGroupsUpdateDto>().ReverseMap();
         CreateMap<TestGroup, TestGroupsDeletedDto>().ReverseMap();
         CreateMap<TestGroup, TestGroupDto>().ReverseMap();
+        CreateMap<TestGroup, LookupDto<Guid>>()
+    .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
 
         CreateMap<TestGroupItem, GetTestGroupItemsInput>().ReverseMap();
         CreateMap<TestGroupItem, TestGroupItemsCreateDto>().ReverseMap();
         CreateMap<TestGroupItem, TestGroupItemsUpdateDto>().ReverseMap();
         CreateMap<TestGroupItem, TestGroupItemsDeletedDto>().ReverseMap();
         CreateMap<TestGroupItem, TestGroupItemDto>().ReverseMap();
+        CreateMap<TestGroupItemWithNavigationProperties, TestGroupItemWithNavigationPropertiesDto>();
 
         CreateMap<DepartmentService, DepartmentServiceDto>();
         CreateMap<DepartmentService, DepartmentServiceExcelDto>();
