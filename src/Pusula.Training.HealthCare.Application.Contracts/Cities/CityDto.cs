@@ -10,8 +10,6 @@ namespace Pusula.Training.HealthCare.Cities
     public class CityDto : AuditedEntityDto<Guid>
     {
         public string Name { get; set; } = null!;
-
-        // City'nin hangi Country'ye ait olduğunu belirten ID
         public Guid CountryId { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.Appointments;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -62,10 +63,11 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)
                 });
 
-            return new DownloadTokenResultDto
+            return new Shared.DownloadTokenResultDto
             {
                 Token = token
             };
+
         }
 
         public virtual async Task<PagedResultDto<AppointmentTypeDto>> GetListAsync(GetAppointmentTypesInput input)

@@ -15,7 +15,6 @@ public class Country: AuditedEntity<Guid>
     public string Name { get; set; }
     [NotNull]
     public string Code { get; set; }
-    //public virtual ICollection<City> Cities { get; set; } = new List<City>();
 
     protected Country()
     {

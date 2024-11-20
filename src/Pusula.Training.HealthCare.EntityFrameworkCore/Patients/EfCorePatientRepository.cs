@@ -236,7 +236,7 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
                 .WhereIf(!string.IsNullOrWhiteSpace(mobilePhoneNumber), e => e.Patient.MobilePhoneNumber.StartsWith(mobilePhoneNumber!))
                 .WhereIf(!string.IsNullOrWhiteSpace(identityNumber), e => e.Patient.IdentityNumber.StartsWith(identityNumber!))
                 .WhereIf(!string.IsNullOrWhiteSpace(passportNumber), e => e.Patient.PassportNumber.StartsWith(passportNumber!))
-                .WhereIf(!string.IsNullOrWhiteSpace(email), e => e.Patient.Email.StartsWith(email))
+                .WhereIf(!string.IsNullOrWhiteSpace(email), e => e.Patient.Email.StartsWith(email!))
                 .WhereIf(!string.IsNullOrWhiteSpace(emergencyPhoneNumber), e => e.Patient.EmergencyPhoneNumber.StartsWith(emergencyPhoneNumber!))
                 .WhereIf(no.HasValue, e => e.Patient.No.ToString().StartsWith(no!.Value.ToString()))
                 .WhereIf(!string.IsNullOrWhiteSpace(motherName), e => e.Patient.MotherName.StartsWith(motherName!))

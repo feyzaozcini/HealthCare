@@ -27,6 +27,9 @@ using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Pusula.Training.HealthCare.AppointmentTypes;
 using Pusula.Training.HealthCare.DoctorDepartments;
+using Pusula.Training.HealthCare.Districts;
+using Pusula.Training.HealthCare.Villages;
+using Pusula.Training.HealthCare.Appointments;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -43,10 +46,7 @@ public class HealthCareDbContext :
     public DbSet<Protocol> Protocols { get; set; } = null!;
     public DbSet<Patient> Patients { get; set; } = null!;
     public DbSet<Country> Countries { get; set; } = null!;
-
     public DbSet<Doctor> Doctors { get; set; } = null!;
-
-
     public DbSet<PatientCompany> PatientCompanies { get; set; } = null!;
     public DbSet<Title> Titles { get; set; } = null!;
     public DbSet<DepartmentService> DepartmentServices { get; set; } = null!;
@@ -55,6 +55,8 @@ public class HealthCareDbContext :
     public DbSet<TestGroupItem> TestGroupItems { get; set; } = null!;
     public DbSet<LabRequest> LabRequests { get; set; } = null!;
     public DbSet<AppointmentType> AppointmentTypes { get; set; } = null!;
+    public DbSet<District> Districts { get; set; } = null!;
+    public DbSet<Village> Villages { get; set; } = null!;
 
     #region Entities from the modules
 
@@ -312,6 +314,24 @@ public class HealthCareDbContext :
                 b.Property(x => x.Name).HasColumnName(nameof(City.Name)).IsRequired().HasMaxLength(CityConsts.NameMaxLength);
                 b.HasOne<Country>().WithMany().IsRequired().HasForeignKey(x => x.CountryId).OnDelete(DeleteBehavior.NoAction);
             });
+
+            builder.Entity<District>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Districts", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(District.Name)).IsRequired().HasMaxLength(DistrictConsts.NameMaxLength);
+                b.HasOne<City>().WithMany().IsRequired().HasForeignKey(x => x.CityId).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            builder.Entity<Village>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Villages", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(Village.Name)).IsRequired().HasMaxLength(VillageConsts.NameMaxLength);
+                b.HasOne<District>().WithMany().IsRequired().HasForeignKey(x => x.DistrictId).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            
         }
 
         //builder.Entity<YourEntity>(b =>
