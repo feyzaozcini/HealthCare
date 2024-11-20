@@ -95,6 +95,13 @@
     "Country": "Country",
     "Permission:Cities": "Cities",
     "Cities": "Cities",
+    "City": "City",
+    "Permission:Districts": "Districts",
+    "Districts": "Districts",
+    "District": "District",
+    "Permission:Villages": "Villages",
+    "Villages": "Villages",
+    "Village": "Village"
     "City": "City"
     "DepartmentService": "DepartmentService",
     "Menu:TestGroups":  "Lab Tests"

@@ -16,6 +16,8 @@ using Pusula.Training.HealthCare.TestGroups;
 using Pusula.Training.HealthCare.Titles;
 using System;
 using Volo.Abp.Identity;
+using Pusula.Training.HealthCare.Districts;
+using Pusula.Training.HealthCare.Villages;
 using Pusula.Training.HealthCare.Appointments;
 
 namespace Pusula.Training.HealthCare;
@@ -99,8 +101,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<CityDto, CityUpdateDto>();
         CreateMap<CityDto, CityDeleteDto>();
         CreateMap<City, CityExcelDto>();
-        CreateMap<Patient, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.FirstName));
-        CreateMap<City, GetCityLookupDto>().ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+        CreateMap<City, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
 
         CreateMap<Doctor, DoctorDto>();
         CreateMap<IdentityUser, DoctorDto>()
@@ -127,6 +128,26 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Title, TitleExcelDto>();
         CreateMap<TitleDto, TitleUpdateDto>();
         CreateMap<Title, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+
+        CreateMap<District, DistrictDto>();
+        CreateMap<District, DistrictCreateDto>();
+        CreateMap<District, DistrictDeleteDto>();
+        CreateMap<DistrictDto, DistrictCreateDto>();
+        CreateMap<District, DistrictUpdateDto>();
+        CreateMap<DistrictDto, DistrictUpdateDto>();
+        CreateMap<DistrictDto, DistrictDeleteDto>();
+        CreateMap<District, DistrictExcelDto>();
+        CreateMap<District, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+
+        CreateMap<Village, VillageDto>();
+        CreateMap<Village, VillageCreateDto>();
+        CreateMap<Village, VillageDeleteDto>();
+        CreateMap<VillageDto, VillageCreateDto>();
+        CreateMap<Village, VillageUpdateDto>();
+        CreateMap<VillageDto, VillageUpdateDto>();
+        CreateMap<VillageDto, VillageDeleteDto>();
+        CreateMap<Village, VillageExcelDto>();
+        CreateMap<Village, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
 
         CreateMap<Appointment,AppointmentDto>();
         CreateMap<Appointment, AppointmentWithNavigationPropertiesDto>();

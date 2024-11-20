@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Application.Dtos;
 
-namespace Pusula.Training.HealthCare.Cities
+namespace Pusula.Training.HealthCare.Villages
 {
-    public class CityDto : AuditedEntityDto<Guid>
+    public class VillageUpdateDto
     {
+        [Required]
         public string Name { get; set; } = null!;
-        public Guid CountryId { get; set; }
     }
 }

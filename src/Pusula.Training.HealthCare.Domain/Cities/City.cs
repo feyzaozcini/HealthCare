@@ -17,8 +17,6 @@ namespace Pusula.Training.HealthCare.Cities
         [NotNull]
         public virtual string Name { get; set; }
         public virtual Guid CountryId { get; set; }
-        //public virtual Country Country { get; set; }
-        //public virtual ICollection<District> Districts { get; set; } = new List<District>();
 
         protected City()
         {
