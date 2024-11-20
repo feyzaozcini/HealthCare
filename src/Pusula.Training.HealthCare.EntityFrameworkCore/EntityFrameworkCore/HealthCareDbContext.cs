@@ -57,7 +57,6 @@ public class HealthCareDbContext :
     public DbSet<AppointmentType> AppointmentTypes { get; set; } = null!;
     public DbSet<District> Districts { get; set; } = null!;
     public DbSet<Village> Villages { get; set; } = null!;
-    public DbSet<Appointment> Appointments { get; set; } = null!;
 
     #region Entities from the modules
 
@@ -332,20 +331,7 @@ public class HealthCareDbContext :
                 b.HasOne<District>().WithMany().IsRequired().HasForeignKey(x => x.DistrictId).OnDelete(DeleteBehavior.NoAction);
             });
 
-            builder.Entity<Appointment>(b =>
-            {
-                b.ToTable(HealthCareConsts.DbTablePrefix + "Appointments", HealthCareConsts.DbSchema);
-                b.ConfigureByConvention();
-                b.Property(x => x.StartDate).HasColumnName(nameof(Appointment.StartDate)).IsRequired();
-                b.Property(x => x.EndDate).HasColumnName(nameof(Appointment.EndDate)).IsRequired();
-                b.Property(x => x.AppointmentStatus).HasColumnName(nameof(Appointment.AppointmentStatus)).IsRequired();
-                b.Property(x => x.Note).HasColumnName(nameof(Appointment.Note)).HasMaxLength(AppointmentConst.NoteMaxLength);
-
-                b.HasOne<Doctor>().WithMany().HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Patient>().WithMany().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Department>().WithMany().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<AppointmentType>().WithMany().HasForeignKey(x => x.AppointmentTypeId).OnDelete(DeleteBehavior.NoAction);
-            });
+            
         }
 
         //builder.Entity<YourEntity>(b =>
