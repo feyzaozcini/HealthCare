@@ -10,10 +10,8 @@ namespace Pusula.Training.HealthCare.Appointments
     public class GetAppointmentsInput : PagedAndSortedResultRequestDto
     {
         public string? FilterText { get; set; }
-        public DateTime? AppointmentDateMin { get; set; }
-        public DateTime? AppointmentDateMax { get; set; }
-        public TimeSpan? StartTime { get; set; }
-        public TimeSpan? EndTime { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public string? Note { get; set; }
         public AppointmentStatus? AppointmentStatus { get; set; }
         public Guid? PatientId { get; set; }

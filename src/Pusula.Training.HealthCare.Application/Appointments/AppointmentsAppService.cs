@@ -35,8 +35,8 @@ namespace Pusula.Training.HealthCare.Appointments
 
         public virtual async Task<PagedResultDto<AppointmentWithNavigationPropertiesDto>> GetListAsync(GetAppointmentsInput input)
         {
-            var totalCount = await appointmentRepository.GetCountAsync(input.FilterText, input.AppointmentDateMin, input.AppointmentDateMax, input.StartTime, input.EndTime, input.Note, input.AppointmentStatus, input.PatientId, input.DoctorId, input.DepartmentId, input.AppointmentTypeId);
-            var items = await appointmentRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.AppointmentDateMin, input.AppointmentDateMax, input.StartTime, input.EndTime, input.Note, input.AppointmentStatus, input.PatientId, input.DoctorId, input.DepartmentId, input.AppointmentTypeId, input.Sorting, input.MaxResultCount, input.SkipCount);
+            var totalCount = await appointmentRepository.GetCountAsync(input.FilterText, input.StartDate, input.EndDate, input.Note, input.AppointmentStatus, input.PatientId, input.DoctorId, input.DepartmentId, input.AppointmentTypeId);
+            var items = await appointmentRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.StartDate, input.EndDate, input.Note, input.AppointmentStatus, input.PatientId, input.DoctorId, input.DepartmentId, input.AppointmentTypeId, input.Sorting, input.MaxResultCount, input.SkipCount);
 
             return new PagedResultDto<AppointmentWithNavigationPropertiesDto>
             {
@@ -117,36 +117,20 @@ namespace Pusula.Training.HealthCare.Appointments
 
 
         [Authorize(HealthCarePermissions.Appointments.Create)]
-        public virtual async Task<AppointmentDto> CreateAsync(AppointmentCreateDto input)
-        {
-            TimeSpan startTime;
-            TimeSpan endTime;
-            try
-            {
-                startTime = TimeSpan.Parse(input.StartTime);
-                endTime = TimeSpan.Parse(input.EndTime);
-            }
-            catch (FormatException)
-            {
-                throw new UserFriendlyException("StartTime and EndTime must be in the format hh:mm:ss.");
-            }
-
-            // Appointment oluşturma işlemi
-            var appointment = await appointmentManager.CreateAsync(
+        public virtual async Task<AppointmentDto> CreateAsync(AppointmentCreateDto input) => ObjectMapper.Map<Appointment, AppointmentDto>(
+            await appointmentManager.CreateAsync(
                 input.PatientId,
                 input.DoctorId,
                 input.DepartmentId,
                 input.AppointmentTypeId,
-                input.AppointmentDate,
-                startTime,
-                endTime,
+                input.StartDate,
+                input.EndDate,
                 input.Note,
                 input.AppointmentStatus
-            );
+            ));
 
-            return ObjectMapper.Map<Appointment, AppointmentDto>(appointment);
-        
-    }
+
+
 
         [Authorize(HealthCarePermissions.Appointments.Delete)]
         public virtual async Task DeleteAsync(Guid id) => await appointmentRepository.DeleteAsync(id);
@@ -160,9 +144,8 @@ namespace Pusula.Training.HealthCare.Appointments
                 input.DoctorId,
                 input.DepartmentId,
                 input.AppointmentTypeId,
-                input.AppointmentDate,
-                input.StartTime,
-                input.EndTime,
+                input.StartDate,
+                input.EndDate,
                 input.Note,
                 input.AppointmentStatus
             ));

@@ -13,8 +13,8 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Pusula.Training.HealthCare.Migrations
 {
     [DbContext(typeof(HealthCareDbContext))]
-    [Migration("20241119195752_AppointmentTableUpdated")]
-    partial class AppointmentTableUpdated
+    [Migration("20241120100349_Appointment_Time_Edited")]
+    partial class Appointment_Time_Edited
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,10 +67,6 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("AppointmentDate")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("AppointmentDate");
-
                     b.Property<int>("AppointmentStatus")
                         .HasColumnType("integer")
                         .HasColumnName("AppointmentStatus");
@@ -107,9 +103,9 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.Property<Guid>("DoctorId")
                         .HasColumnType("uuid");
 
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("interval")
-                        .HasColumnName("EndTime");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("EndDate");
 
                     b.Property<string>("ExtraProperties")
                         .IsRequired()
@@ -139,9 +135,9 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.Property<Guid>("PatientId")
                         .HasColumnType("uuid");
 
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("interval")
-                        .HasColumnName("StartTime");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("StartDate");
 
                     b.HasKey("Id");
 

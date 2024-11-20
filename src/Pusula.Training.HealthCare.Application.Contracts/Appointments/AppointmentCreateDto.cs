@@ -10,15 +10,10 @@ namespace Pusula.Training.HealthCare.Appointments
     public class AppointmentCreateDto
     {
         [Required]
-        public DateTime AppointmentDate { get; set; }
+        public DateTime StartDate { get; set; } 
 
         [Required]
-        [RegularExpression(@"^\d{2}:\d{2}:\d{2}$", ErrorMessage = "StartTime must be in the format hh:mm:ss")]
-        public string StartTime { get; set; } // TimeSpan yerine string
-
-        [Required]
-        [RegularExpression(@"^\d{2}:\d{2}:\d{2}$", ErrorMessage = "EndTime must be in the format hh:mm:ss")]
-        public string EndTime { get; set; } // TimeSpan yerine string
+        public DateTime EndDate { get; set; } 
 
         [StringLength(AppointmentConst.NoteMaxLength)]
         public string Note { get; set; } = null!;

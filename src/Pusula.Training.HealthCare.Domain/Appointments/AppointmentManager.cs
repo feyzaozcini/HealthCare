@@ -12,23 +12,21 @@ namespace Pusula.Training.HealthCare.Appointments
     public class AppointmentManager(IAppointmentRepository appointmentRepository) : DomainService
     {
         public virtual async Task<Appointment> CreateAsync(
-            Guid patientId, Guid doctorId, Guid departmentId, Guid appointmentTyeId,DateTime appointmentDate, TimeSpan startTime, TimeSpan endTime, String note, AppointmentStatus appointmentStatus)
+            Guid patientId, Guid doctorId, Guid departmentId, Guid appointmentTyeId, DateTime startDate, DateTime endDate, String note, AppointmentStatus appointmentStatus)
         {
             Check.NotNull(patientId, nameof(patientId));
             Check.NotNull(doctorId, nameof(doctorId));
             Check.NotNull(departmentId, nameof(departmentId));
             Check.NotNull(appointmentTyeId, nameof(appointmentTyeId));
-            Check.NotNull(appointmentDate, nameof(appointmentDate));
-            Check.NotNull(startTime, nameof(startTime));
-            Check.NotNull(endTime, nameof(endTime));
+            Check.NotNull(startDate, nameof(startDate));
+            Check.NotNull(endDate, nameof(endDate));
             Check.Length(note, nameof(note), AppointmentConst.NoteMaxLength);
             Check.Range((int)appointmentStatus, nameof(appointmentStatus), 1, 10);
 
             var appointment = new Appointment(
                 GuidGenerator.Create(),
-                appointmentDate,
-                startTime,
-                endTime,
+                startDate,
+                endDate,
                 note,
                 appointmentStatus,
                 patientId,
@@ -46,18 +44,15 @@ namespace Pusula.Training.HealthCare.Appointments
             Guid doctorId,
             Guid departmentId,
             Guid appointmentTyeId,
-            DateTime appointmentDate,
-            TimeSpan startTime,
-            TimeSpan endTime,
+            DateTime startDate,
+            DateTime endDate,
             String note,
             AppointmentStatus appointmentStatus
         )
         {
             var appointment = await appointmentRepository.GetAsync(id);
-
-            appointment.SetAppointmentDate(appointmentDate);
-            appointment.SetStartTime(startTime);
-            appointment.SetEndTime(endTime);
+            appointment.SetStartDate(startDate);
+            appointment.SetEndDate(endDate);
             appointment.SetNote(note);
             appointment.SetAppointmentStatus(appointmentStatus);
             appointment.SetPatientId(patientId);
