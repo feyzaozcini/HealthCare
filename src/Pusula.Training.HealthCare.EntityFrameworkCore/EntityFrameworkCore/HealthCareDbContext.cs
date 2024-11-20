@@ -319,10 +319,8 @@ public class HealthCareDbContext :
             {
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Appointments", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
-
-                b.Property(x => x.AppointmentDate).HasColumnName(nameof(Appointment.AppointmentDate)).IsRequired();
-                b.Property(x => x.StartTime).HasColumnName(nameof(Appointment.StartTime)).IsRequired();
-                b.Property(x => x.EndTime).HasColumnName(nameof(Appointment.EndTime)).IsRequired();
+                b.Property(x => x.StartDate).HasColumnName(nameof(Appointment.StartDate)).IsRequired();
+                b.Property(x => x.EndDate).HasColumnName(nameof(Appointment.EndDate)).IsRequired();
                 b.Property(x => x.AppointmentStatus).HasColumnName(nameof(Appointment.AppointmentStatus)).IsRequired();
                 b.Property(x => x.Note).HasColumnName(nameof(Appointment.Note)).HasMaxLength(AppointmentConst.NoteMaxLength);
 

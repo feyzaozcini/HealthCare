@@ -21,10 +21,8 @@ namespace Pusula.Training.HealthCare.Appointments
     {
         public virtual async Task DeleteAllAsync(
             string? filterText = null, 
-            DateTime? appointmentDateMin = null, 
-            DateTime? appointmentDateMax = null, 
-            TimeSpan? startTime = null, 
-            TimeSpan? endTime = null, 
+            DateTime? startDate = null, 
+            DateTime? endDate = null, 
             string? note = null, 
             AppointmentStatus? appointmentStatus = null, 
             Guid? patientId = null, 
@@ -34,7 +32,7 @@ namespace Pusula.Training.HealthCare.Appointments
             CancellationToken cancellationToken = default)
         {
             var query = await GetQueryForNavigationPropertiesAsync();
-            query = ApplyFilter(query, filterText, appointmentDateMin, appointmentDateMax, startTime, endTime, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
+            query = ApplyFilter(query, filterText, startDate, endDate, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
 
             var ids = query.Select(x => x.Appointment.Id);
             await DeleteManyAsync(ids, cancellationToken: GetCancellationToken(cancellationToken));
@@ -43,10 +41,8 @@ namespace Pusula.Training.HealthCare.Appointments
 
         public virtual async Task<long> GetCountAsync(
             string? filterText = null, 
-            DateTime? appointmentDateMin = null, 
-            DateTime? appointmentDateMax = null, 
-            TimeSpan? startTime = null, 
-            TimeSpan? endTime = null, 
+            DateTime? startDate = null, 
+            DateTime? endDate = null, 
             string? note = null, 
             AppointmentStatus? appointmentStatus = null, 
             Guid? patientId = null, 
@@ -56,17 +52,15 @@ namespace Pusula.Training.HealthCare.Appointments
             CancellationToken cancellationToken = default)
         {
             var query = await GetQueryForNavigationPropertiesAsync();
-            query = ApplyFilter(query, filterText, appointmentDateMin, appointmentDateMax, startTime, endTime, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
+            query = ApplyFilter(query, filterText, startDate, endDate, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
 
             return await query.LongCountAsync(GetCancellationToken(cancellationToken));
         }
 
         public virtual async Task<List<Appointment>> GetListAsync(
             string? filterText = null, 
-            DateTime? appointmentDateMin = null, 
-            DateTime? appointmentDateMax = null, 
-            TimeSpan? startTime = null, 
-            TimeSpan? endTime = null, 
+            DateTime? startDate = null, 
+            DateTime? endDate = null, 
             string? note = null, 
             AppointmentStatus? appointmentStatus = null,
             Guid? patientId = null,
@@ -78,17 +72,15 @@ namespace Pusula.Training.HealthCare.Appointments
             int skipCount = 0, 
             CancellationToken cancellationToken = default)
         {
-            var query=ApplyFilter(await GetQueryableAsync(), filterText, appointmentDateMin, appointmentDateMax, startTime, endTime, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
+            var query=ApplyFilter(await GetQueryableAsync(), filterText, startDate, endDate, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
             query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? AppointmentConst.GetDefaultSorting(false) : sorting);
             return await query.Page(skipCount, maxResultCount).ToListAsync(cancellationToken);
         }
 
         public virtual async Task<List<AppointmentWithNavigationProperties>> GetListWithNavigationPropertiesAsync(
             string? filterText = null, 
-            DateTime? appointmentDateMin = null, 
-            DateTime? appointmentDateMax = null, 
-            TimeSpan? startTime = null, 
-            TimeSpan? endTime = null, 
+            DateTime? startDate = null, 
+            DateTime? endDate = null, 
             string? note = null, 
             AppointmentStatus? appointmentStatus = null, 
             Guid? patientId = null, 
@@ -101,7 +93,7 @@ namespace Pusula.Training.HealthCare.Appointments
             CancellationToken cancellationToken = default)
         {
             var query = await GetQueryForNavigationPropertiesAsync();
-            query = ApplyFilter(query, filterText, appointmentDateMin, appointmentDateMax, startTime, endTime, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
+            query = ApplyFilter(query, filterText, startDate, endDate, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
             query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? AppointmentConst.GetDefaultSorting(true) : sorting);
             return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
         }
@@ -129,10 +121,8 @@ namespace Pusula.Training.HealthCare.Appointments
         protected virtual IQueryable<Appointment> ApplyFilter(
             IQueryable<Appointment> query,
             string? filterText = null,
-            DateTime? appointmentDateMin = null,
-            DateTime? appointmentDateMax = null,
-            TimeSpan? startTime = null,
-            TimeSpan? endTime = null,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
             string? note = null,
             AppointmentStatus? appointmentStatus = null,
             Guid? patientId = null,
@@ -141,10 +131,8 @@ namespace Pusula.Training.HealthCare.Appointments
             Guid? appointmentTypeId = null) =>
                 query
                     .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.PatientId.ToString()!.Contains(filterText!) || e.DoctorId.ToString()!.Contains(filterText!) || e.DepartmentId.ToString()!.Contains(filterText!) || e.AppointmentTypeId.ToString()!.Contains(filterText!))
-                    .WhereIf(appointmentDateMin.HasValue, e => e.AppointmentDate >= appointmentDateMin!.Value)
-                    .WhereIf(appointmentDateMax.HasValue, e => e.AppointmentDate <= appointmentDateMax!.Value)
-                    .WhereIf(startTime.HasValue, e => e.StartTime >= startTime!.Value)
-                    .WhereIf(endTime.HasValue, e => e.EndTime <= endTime!.Value)
+                    .WhereIf(startDate.HasValue, e => e.StartDate >= startDate!.Value)
+                    .WhereIf(endDate.HasValue, e => e.EndDate <= endDate!.Value)
                     .WhereIf(!string.IsNullOrWhiteSpace(note), e => e.Note!.Contains(note!))
                     .WhereIf(appointmentStatus.HasValue, e => e.AppointmentStatus == appointmentStatus)
                     .WhereIf(patientId.HasValue, e => e.PatientId == patientId)
@@ -177,10 +165,8 @@ namespace Pusula.Training.HealthCare.Appointments
         protected virtual IQueryable<AppointmentWithNavigationProperties> ApplyFilter(
             IQueryable<AppointmentWithNavigationProperties> query,
             string? filterText = null,
-            DateTime? appointmentDateMin = null,
-            DateTime? appointmentDateMax = null,
-            TimeSpan? startTime = null,
-            TimeSpan? endTime = null,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
             string? note = null,
             AppointmentStatus? appointmentStatus = null,
             Guid? patientId = null,
@@ -189,10 +175,8 @@ namespace Pusula.Training.HealthCare.Appointments
             Guid? appointmentTypeId = null) =>
                 query
                     .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Patient.Id.ToString()!.Contains(filterText!) || e.Doctor.Id.ToString()!.Contains(filterText!) || e.Department.Id.ToString()!.Contains(filterText!) || e.AppointmentType.Id.ToString()!.Contains(filterText!))
-                    .WhereIf(appointmentDateMin.HasValue, e => e.Appointment.AppointmentDate >= appointmentDateMin!.Value)
-                    .WhereIf(appointmentDateMax.HasValue, e => e.Appointment.AppointmentDate <= appointmentDateMax!.Value)
-                    .WhereIf(startTime.HasValue, e => e.Appointment.StartTime >= startTime!.Value)
-                    .WhereIf(endTime.HasValue, e => e.Appointment.EndTime <= endTime!.Value)
+                    .WhereIf(startDate.HasValue, e => e.Appointment.StartDate >= startDate!.Value)
+                    .WhereIf(endDate.HasValue, e => e.Appointment.EndDate <= endDate!.Value)
                     .WhereIf(!string.IsNullOrWhiteSpace(note), e => e.Appointment.Note!.Contains(note!))
                     .WhereIf(appointmentStatus.HasValue, e => e.Appointment.AppointmentStatus == appointmentStatus)
                     .WhereIf(patientId.HasValue, e => e.Patient.Id == patientId)

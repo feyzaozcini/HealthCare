@@ -7,13 +7,10 @@ namespace Pusula.Training.HealthCare.Appointments
     public class AppointmentDto : FullAuditedEntityDto<Guid>
     {
         [Required]
-        public DateTime AppointmentDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         [Required]
-        public TimeSpan StartTime { get; set; }
-
-        [Required]
-        public TimeSpan EndTime { get; set; }
+        public DateTime EndDate { get; set; }
 
         [StringLength(AppointmentConst.NoteMaxLength)]
         public string Note { get; set; } = null!;

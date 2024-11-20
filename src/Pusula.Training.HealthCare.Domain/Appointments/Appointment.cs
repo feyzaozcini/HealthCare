@@ -7,12 +7,11 @@ namespace Pusula.Training.HealthCare.Appointments
 {
     public class Appointment : FullAuditedAggregateRoot<Guid>
     {
+        
         [NotNull]
-        public DateTime AppointmentDate { get; private set; } 
+        public DateTime StartDate { get; private set; } 
         [NotNull]
-        public TimeSpan StartTime { get; private set; } 
-        [NotNull]
-        public TimeSpan EndTime { get; private set; }
+        public DateTime EndDate { get; private set; }
         [CanBeNull]
         public virtual string Note { get; private set; } = null!; 
         [CanBeNull]
@@ -28,17 +27,15 @@ namespace Pusula.Training.HealthCare.Appointments
 
         protected Appointment()
         {
-            AppointmentDate = DateTime.Now;
-            StartTime = DateTime.Now.TimeOfDay;
-            EndTime = DateTime.Now.TimeOfDay;
+            StartDate = DateTime.Now;
+            EndDate = DateTime.Now;
         }
 
-        public Appointment(Guid id, DateTime appointmentDate, TimeSpan startTime, TimeSpan endTime, string note, AppointmentStatus appointmentStatus, Guid patientId, Guid doctorId, Guid departmentId, Guid appointmentTypeId)
+        public Appointment(Guid id, DateTime startDate, DateTime endDate, string note, AppointmentStatus appointmentStatus, Guid patientId, Guid doctorId, Guid departmentId, Guid appointmentTypeId)
         {
             Id = id;
-            SetAppointmentDate(appointmentDate);
-            SetStartTime(startTime);
-            SetEndTime(endTime);
+            SetStartDate(startDate);
+            SetEndDate(endDate);
             SetNote(note);
             SetAppointmentStatus(appointmentStatus);
             SetPatientId(patientId);
@@ -47,20 +44,16 @@ namespace Pusula.Training.HealthCare.Appointments
             SetAppointmentType(appointmentTypeId);
         }
 
-        public void SetAppointmentDate(DateTime appointmentDate)
+        
+        public void SetStartDate(DateTime startDate)
         {
-            Check.NotNull(appointmentDate, nameof(appointmentDate));
-            AppointmentDate = appointmentDate;
+            Check.NotNull(startDate, nameof(startDate));
+            StartDate = startDate;
         }
-        public void SetStartTime(TimeSpan startTime)
+        public void SetEndDate(DateTime endDate)
         {
-            Check.NotNull(startTime, nameof(startTime));
-            StartTime = startTime;
-        }
-        public void SetEndTime(TimeSpan endTime)
-        {
-            Check.NotNull(endTime, nameof(endTime));
-            EndTime = endTime;
+            Check.NotNull(endDate, nameof(endDate));
+            EndDate = endDate;
         }
         public void SetNote(string note)
         {

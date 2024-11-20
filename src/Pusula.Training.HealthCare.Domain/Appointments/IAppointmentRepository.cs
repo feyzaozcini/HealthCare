@@ -12,10 +12,8 @@ namespace Pusula.Training.HealthCare.Appointments
     {
         Task DeleteAllAsync(
             string? filterText = null,
-            DateTime? appointmentDateMin = null,
-            DateTime? appointmentDateMax = null,
-            TimeSpan? startTime = null,
-            TimeSpan? endTime = null,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
             string? note = null,
             AppointmentStatus? appointmentStatus = null,
             Guid? patientId = null,
@@ -29,10 +27,8 @@ namespace Pusula.Training.HealthCare.Appointments
 
         Task<List<AppointmentWithNavigationProperties>> GetListWithNavigationPropertiesAsync(
             string? filterText = null,
-            DateTime? appointmentDateMin = null,
-            DateTime? appointmentDateMax = null,
-            TimeSpan? startTime = null,
-            TimeSpan? endTime = null,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
             string? note = null,
             AppointmentStatus? appointmentStatus = null,
             Guid? patientId = null,
@@ -47,10 +43,8 @@ namespace Pusula.Training.HealthCare.Appointments
 
         Task<List<Appointment>> GetListAsync(
             string? filterText = null,
-            DateTime? appointmentDateMin = null,
-            DateTime? appointmentDateMax = null,
-            TimeSpan? startTime = null,
-            TimeSpan? endTime = null,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
             string? note = null,
             AppointmentStatus? appointmentStatus = null,
             Guid? patientId = null,
@@ -65,10 +59,8 @@ namespace Pusula.Training.HealthCare.Appointments
 
         Task<long> GetCountAsync(
             string? filterText = null,
-            DateTime? appointmentDateMin = null,
-            DateTime? appointmentDateMax = null,
-            TimeSpan? startTime = null,
-            TimeSpan? endTime = null,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
             string? note = null,
             AppointmentStatus? appointmentStatus = null,
             Guid? patientId = null,
