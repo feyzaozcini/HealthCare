@@ -25,8 +25,8 @@ public class UserProfileManager : DomainService
     string surname,
     string email,
     string password,
-    string role = null,
-    string phoneNumber = null,
+    string role = null!,
+    string phoneNumber = null!,
     bool isEmailConfirmed = false
 )
     {
@@ -61,6 +61,8 @@ public class UserProfileManager : DomainService
             throw new BusinessException("AddToRoleFailed")
                 .WithData("Errors", string.Join(", ", addToRoleResult.Errors.Select(e => e.Description)));
         }
+
+       
 
         return user;
     }

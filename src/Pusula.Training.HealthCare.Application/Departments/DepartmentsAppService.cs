@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
+using Pusula.Training.HealthCare.DoctorDepartments;
+using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -51,7 +53,16 @@ namespace Pusula.Training.HealthCare.Departments
             var department = await departmentManager.CreateAsync(
             input.Name
             );
+            foreach (var doctorId in input.DoctorIds)
+            {
+                var departmentDoctor = new DoctorDepartment
+                {
+                    DepartmentId = department.Id,
+                    DoctorId = doctorId
+                };
 
+                department.DoctorDepartments.Add(departmentDoctor);
+            }
             return ObjectMapper.Map<Department, DepartmentDto>(department);
         }
 
@@ -65,6 +76,18 @@ namespace Pusula.Training.HealthCare.Departments
             );
 
             return ObjectMapper.Map<Department, DepartmentDto>(department);
+        }
+
+        [Authorize(HealthCarePermissions.Departments.Delete)]
+        public virtual async Task DeleteByIdsAsync(List<Guid> departmentIds)
+        {
+            await departmentRepository.DeleteManyAsync(departmentIds);
+        }
+
+        [Authorize(HealthCarePermissions.Departments.Delete)]
+        public virtual async Task DeleteAllAsync(GetDepartmentsInput input)
+        {
+            await departmentRepository.DeleteAllAsync(input.FilterText, input.Name);
         }
 
         [AllowAnonymous]
@@ -85,17 +108,6 @@ namespace Pusula.Training.HealthCare.Departments
             return new RemoteStreamContent(memoryStream, "Departments.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 
-        [Authorize(HealthCarePermissions.Departments.Delete)]
-        public virtual async Task DeleteByIdsAsync(List<Guid> departmentIds)
-        {
-            await departmentRepository.DeleteManyAsync(departmentIds);
-        }
-
-        [Authorize(HealthCarePermissions.Departments.Delete)]
-        public virtual async Task DeleteAllAsync(GetDepartmentsInput input)
-        {
-            await departmentRepository.DeleteAllAsync(input.FilterText, input.Name);
-        }
         public virtual async Task<DownloadTokenResultDto> GetDownloadTokenAsync()
         {
             var token = Guid.NewGuid().ToString("N");

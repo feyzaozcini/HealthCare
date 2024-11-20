@@ -10,10 +10,8 @@ public static class CountryConsts
     }
 
     public const int NameMaxLength = 60;
-    public const int NameMinLength = 3;
 
     public const int CodeMinLength = 2;
     public const int CodeMaxLength = 4;
 
-    public const string CountryDeletedMessage = "Ülke adı silindi.";
 }

@@ -1,5 +1,5 @@
 using System;
-
+using System.Collections.Generic;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Entities;
 
@@ -11,4 +11,5 @@ public class DepartmentDto : FullAuditedEntityDto<Guid>, IHasConcurrencyStamp
 
     public string ConcurrencyStamp { get; set; } = null!;
 
+    public List<string> DoctorDepartments { get; set; } = new();
 }

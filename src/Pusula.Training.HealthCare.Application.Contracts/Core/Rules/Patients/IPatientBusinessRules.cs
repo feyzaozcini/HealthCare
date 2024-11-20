@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pusula.Training.HealthCare.Patients;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,6 @@ namespace Pusula.Training.HealthCare.Core.Rules.Patients
     {
         Task IdentityNumberCannotBeDuplicatedWhenInserted(string identityNumber);
 
-        void IdentityNumberCannotBeEmpty(string identityNumber);
+        
     }
 }
