@@ -27,6 +27,7 @@ using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Pusula.Training.HealthCare.AppointmentTypes;
 using Pusula.Training.HealthCare.DoctorDepartments;
+using Pusula.Training.HealthCare.Appointments;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -55,6 +56,7 @@ public class HealthCareDbContext :
     public DbSet<TestGroupItem> TestGroupItems { get; set; } = null!;
     public DbSet<LabRequest> LabRequests { get; set; } = null!;
     public DbSet<AppointmentType> AppointmentTypes { get; set; } = null!;
+    public DbSet<Appointment> Appointments { get; set; } = null!;
 
     #region Entities from the modules
 
@@ -311,6 +313,23 @@ public class HealthCareDbContext :
                 b.ConfigureByConvention();
                 b.Property(x => x.Name).HasColumnName(nameof(City.Name)).IsRequired().HasMaxLength(CityConsts.NameMaxLength);
                 b.HasOne<Country>().WithMany().IsRequired().HasForeignKey(x => x.CountryId).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            builder.Entity<Appointment>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Appointments", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+
+                b.Property(x => x.AppointmentDate).HasColumnName(nameof(Appointment.AppointmentDate)).IsRequired();
+                b.Property(x => x.StartTime).HasColumnName(nameof(Appointment.StartTime)).IsRequired();
+                b.Property(x => x.EndTime).HasColumnName(nameof(Appointment.EndTime)).IsRequired();
+                b.Property(x => x.AppointmentStatus).HasColumnName(nameof(Appointment.AppointmentStatus)).IsRequired();
+                b.Property(x => x.Note).HasColumnName(nameof(Appointment.Note)).HasMaxLength(AppointmentConst.NoteMaxLength);
+
+                b.HasOne<Doctor>().WithMany().HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Patient>().WithMany().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Department>().WithMany().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<AppointmentType>().WithMany().HasForeignKey(x => x.AppointmentTypeId).OnDelete(DeleteBehavior.NoAction);
             });
         }
 
