@@ -24,6 +24,14 @@ using Pusula.Training.HealthCare.AppointmentTypes;
 using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.Villages;
 using Pusula.Training.HealthCare.Appointments;
+using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.DiagnosisGroups;
+using Pusula.Training.HealthCare.Diagnoses;
+using Pusula.Training.HealthCare.Anamneses;
+using Pusula.Training.HealthCare.ExaminationDiagnoses;
+using Pusula.Training.HealthCare.FallRisks;
+using Pusula.Training.HealthCare.PhysicalExaminations;
+using Pusula.Training.HealthCare.PshychologicalStates;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -69,6 +77,20 @@ public class HealthCareEntityFrameworkCoreModule : AbpModule
             options.AddRepository<District, EfCoreDistrictRepository>();
             options.AddRepository<Village, EfCoreVillageRepository>();
             options.AddRepository<Appointment, EfCoreAppointmentTypeRepository>();
+
+
+
+
+           options.AddRepository<Doctor, EfCoreDoctorRepository>();
+            options.AddRepository<DiagnosisGroup, EfCoreDiagnosisGroupRepository>();
+            options.AddRepository<Diagnosis, EfCoreDiagnosisRepository>();
+            options.AddRepository<Anamnesis, EfCoreAnamnesisRepository>();
+            options.AddRepository<Doctor, EfCoreDoctorRepository>();
+            options.AddRepository<ExaminationDiagnosis, EfCoreExaminationDiagnosisRepository>();
+            options.AddRepository<FallRisk, EfCoreFallRiskRepository>();
+            options.AddRepository<PhysicalExamination, EfCorePhysicalExaminationRepository>();
+            options.AddRepository<PshychologicalState, EfCorePshychologicalStateRepository>();
+
         });
 
         Configure<AbpDbContextOptions>(options =>

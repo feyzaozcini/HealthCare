@@ -97,6 +97,46 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         appointmentPermission.AddChild(HealthCarePermissions.Appointments.Edit, L("Permission:Edit"));
         appointmentPermission.AddChild(HealthCarePermissions.Appointments.Delete, L("Permission:Delete"));
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        var diagnosisGroupPermission = myGroup.AddPermission(HealthCarePermissions.DiagnosisGroups.Default, L("Permission:DiagnosisGroups"));
+        diagnosisGroupPermission.AddChild(HealthCarePermissions.DiagnosisGroups.Create, L("Permission:Create"));
+        diagnosisGroupPermission.AddChild(HealthCarePermissions.DiagnosisGroups.Edit, L("Permission:Edit"));
+        diagnosisGroupPermission.AddChild(HealthCarePermissions.DiagnosisGroups.Delete, L("Permission:Delete"));
+
+        var diagnosisPermission = myGroup.AddPermission(HealthCarePermissions.Diagnosis.Default, L("Permission:Diagnosis"));
+        diagnosisPermission.AddChild(HealthCarePermissions.Diagnosis.Create, L("Permission:Create"));
+        diagnosisPermission.AddChild(HealthCarePermissions.Diagnosis.Edit, L("Permission:Edit"));
+        diagnosisPermission.AddChild(HealthCarePermissions.Diagnosis.Delete, L("Permission:Delete"));
+
+        var examinationsPermission = myGroup.AddPermission(HealthCarePermissions.Examinations.Default, L("Permission:Examinations"));
+        examinationsPermission.AddChild(HealthCarePermissions.Examinations.Create, L("Permission:Create"));
+        examinationsPermission.AddChild(HealthCarePermissions.Examinations.Edit, L("Permission:Edit"));
+        examinationsPermission.AddChild(HealthCarePermissions.Examinations.Delete, L("Permission:Delete"));
     }
 
     private static LocalizableString L(string name)
