@@ -91,6 +91,5 @@ public class HealthCareApplicationModule : AbpModule
         
         context.Services.AddTransient<UserProfileManager>();
         
-
     }
 }
