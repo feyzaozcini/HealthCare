@@ -1,0 +1,295 @@
+﻿@page "/dashboard"
+
+@using Microsoft.AspNetCore.Components
+@using Pusula.Training.HealthCare.Patients
+@using Pusula.Training.HealthCare.Blazor.Containers
+@inject Microsoft.AspNetCore.Components.NavigationManager UriHelper
+@inject NavigationManager NavigationManager
+@inject PatientStateContainer StateService
+<div class="stepper-container" style="max-width: 1500px; margin: 0 auto; padding: 40px;">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title text-center">Doktor ve Departman Seçimi</h3>
+            <!-- Seçilen Veriler -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card selected-card">
+                        <h5>Seçilenler</h5>
+                        <p><strong>Doktor:</strong> @selectedDoctor?.Name </p>
+                        <p><strong>Departman:</strong> @selectedDepartment?.Name  </p>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="ClearSelections" style="width: 100%;">Seçimi Temizle</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Doktor ve Departman Seçim Alanları -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <!-- Doktor Seçimi -->
+                    <h4>Hekim</h4>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="doctorSearch" @bind="doctorSearchText" @oninput="FilterDoctors" />
+                    </div>
+
+                    <!-- Doktor Listesi -->
+                    <ul class="list-group">
+                        @foreach (var doctor in filteredDoctors)
+                        {
+                            <li class="list-group-item @GetSelectedClass(doctor)" @onclick="() => SelectDoctor(doctor)">
+                                @doctor.Name
+                            </li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="col-md-6">
+                    <!-- Departman Seçimi -->
+                    <h4>Departmanlar</h4>
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="departmentSearch" @bind="departmentSearchText" @oninput="FilterDepartments" />
+                    </div>
+
+                    <!-- Departman Listesi -->
+                    <ul class="list-group">
+                        @foreach (var department in filteredDepartments)
+                        {
+                            <li class="list-group-item @GetSelectedClass(department)" @onclick="() => SelectDepartment(department)">
+                                @department.Name
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Adım 2: Seçilen Verileri Göster -->
+            <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-primary" @onclick="ProceedToAppointments" disabled="@(selectedDoctor == null || selectedDepartment == null)">İleri</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string doctorSearchText = string.Empty;
+    private List<Doctor> allDoctors = new List<Doctor>
+    {
+        new Doctor { Id = 1, Name = "Dr. Ahmet Yılmaz" },
+        new Doctor { Id = 2, Name = "Dr. Ayşe Kara" },
+        new Doctor { Id = 3, Name = "Dr. Mehmet Can" },
+        new Doctor { Id = 4, Name = "Dr. Fatma Özdemir" },
+        new Doctor { Id = 5, Name = "Dr. Ali Aksoy" },
+        new Doctor { Id = 6, Name = "Dr. Ahmet Yılmaz" },
+        new Doctor { Id = 7, Name = "Dr. Ayşe Kara" },
+        new Doctor { Id = 8, Name = "Dr. Mehmet Can" },
+        new Doctor { Id = 9, Name = "Dr. Fatma Özdemir" },
+        new Doctor { Id = 10, Name = "Dr. Ali Aksoy" }
+    };
+    private List<Doctor> filteredDoctors;
+    private Doctor selectedDoctor;
+
+    private string departmentSearchText = string.Empty;
+    private List<Department> allDepartments = new List<Department>
+    {
+        new Department { Id = 1, Name = "Kardiyoloji" },
+        new Department { Id = 2, Name = "Dermatoloji" },
+        new Department { Id = 3, Name = "Pediatri" },
+        new Department { Id = 4, Name = "Nöroloji" }
+    };
+    private List<Department> filteredDepartments;
+    private Department selectedDepartment;
+
+    protected override void OnInitialized()
+    {
+        filteredDoctors = allDoctors;
+        filteredDepartments = allDepartments;
+    }
+
+    private void FilterDoctors() => filteredDoctors = allDoctors.Where(d => d.Name.Contains(doctorSearchText, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    private void FilterDepartments() => filteredDepartments = allDepartments.Where(d => d.Name.Contains(departmentSearchText, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    private void SelectDoctor(Doctor doctor) => selectedDoctor = doctor;
+
+    private void SelectDepartment(Department department) => selectedDepartment = department;
+
+    private void ClearSelections()
+    {
+        selectedDoctor = null;
+        selectedDepartment = null;
+    }
+
+    private void GoToStep3() => Console.WriteLine($"Seçilen Doktor: {selectedDoctor.Name}, Seçilen Departman: {selectedDepartment.Name}");
+    
+
+    private void ProceedToAppointments()
+    {
+        
+        // Appointment sayfasına yönlendir
+        NavigationManager.NavigateTo("/appointment");
+    }
+    private string GetSelectedClass(object item)
+    {
+        if (item is Doctor && selectedDoctor == item) return "selected-item";
+        if (item is Department && selectedDepartment == item) return "selected-item";
+        return string.Empty;
+    }
+
+    public class Doctor
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class Department
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+}
+
+<style>
+    .stepper-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px;
+    }
+
+    .card {
+        padding: 30px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .selected-card {
+        padding: 15px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    .card-title {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    h4 {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    input[type="text"] {
+        font-size: 16px;
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+    }
+
+    ul.list-group {
+        max-height: 350px;
+        overflow-y: auto;
+        padding-left: 0;
+        margin-bottom: 15px;
+    }
+
+    .list-group-item {
+        font-size: 18px;
+        cursor: pointer;
+        padding: 12px 15px;
+        border: 1px solid #f0f0f0;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+        .list-group-item:hover {
+            background-color: #f0f0f0;
+        }
+
+    .selected-item {
+        background-color: #cce5ff;
+        color: #0056b3;
+        font-weight: bold;
+    }
+
+    button {
+        font-size: 16px;
+        padding: 8px 16px;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+        button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .d-flex {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .mt-4 {
+        margin-top: 40px;
+    }
+
+    .mb-4 {
+        margin-bottom: 20px;
+    }
+
+    @@media (max-width: 768px) {
+        .row {
+            flex-direction: column;
+        }
+
+        .col-md-6 {
+            width: 100%;
+        }
+    }
+
+    .patient-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        background-color: #f8f9fa; /* Hafif bir arka plan rengi */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Hafif bir gölge efekti */
+        max-width: 1100px; /* Kart genişliği */
+        margin: auto; /* Ortala */
+    }
+
+        .patient-card .avatar {
+            width: 50px; /* Avatar boyutu */
+            height: 50px;
+            object-fit: cover;
+        }
+
+        .patient-card .card-body {
+            padding: 20px;
+        }
+
+        .patient-card h5 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+</style>
+
