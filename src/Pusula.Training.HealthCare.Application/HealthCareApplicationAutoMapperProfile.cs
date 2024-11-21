@@ -130,6 +130,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<AppointmentType, AppointmentTypeUpdateDto>();
         CreateMap<AppointmentType, AppointmentTypeDeleteDto>();
         CreateMap<AppointmentType, AppointmentTypeDto>();
+        CreateMap<AppointmentType, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
 
         CreateMap<Title, TitleDto>();
         CreateMap<Title, TitleExcelDto>();

@@ -78,7 +78,7 @@ public partial class Patients
         if (SelectedPatients.Count == 1)
         {
             StateService.SelectedPatient = SelectedPatients.First().Patient;
-            NavigationManager.NavigateTo("/appointment");
+            NavigationManager.NavigateTo("/dashboard");
         }
     }
 
