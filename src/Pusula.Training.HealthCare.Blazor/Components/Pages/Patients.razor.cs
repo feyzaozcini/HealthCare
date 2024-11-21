@@ -73,6 +73,15 @@ public partial class Patients
         PatientList = [];
     }
 
+    private void NavigateToAppointments()
+    {
+        if (SelectedPatients.Count == 1)
+        {
+            StateService.SelectedPatient = SelectedPatients.First().Patient;
+            NavigationManager.NavigateTo("/appointment");
+        }
+    }
+
     private void OnCountryChanged(ChangeEventArgs e)
     {
         // Seçilen ülke ID'sini al

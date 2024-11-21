@@ -45,6 +45,7 @@ using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 using Syncfusion.Blazor;
+using Pusula.Training.HealthCare.Blazor.Containers;
 
 namespace Pusula.Training.HealthCare.Blazor;
 
@@ -121,7 +122,7 @@ public class HealthCareBlazorModule : AbpModule
 
         Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1JpR2JGfV5ycEVHalxTTnJeUj0eQnxTdEFiWH5acXdVRGRdVkd/XQ==");
         context.Services.AddSyncfusionBlazor();
-
+        context.Services.AddScoped<PatientStateContainer>();
 
         ConfigureAuthentication(context);
         ConfigureUrls(configuration);
@@ -142,6 +143,7 @@ public class HealthCareBlazorModule : AbpModule
         {
             options.IsDynamicClaimsEnabled = true;
         });
+        
     }
 
     private void ConfigureUrls(IConfiguration configuration)
