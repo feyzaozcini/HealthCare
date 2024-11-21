@@ -68,6 +68,7 @@ public class HealthCareEntityFrameworkCoreModule : AbpModule
             options.AddRepository<AppointmentType, EfCoreAppointmentTypeRepository>();
             options.AddRepository<District, EfCoreDistrictRepository>();
             options.AddRepository<Village, EfCoreVillageRepository>();
+            options.AddRepository<Appointment, EfCoreAppointmentTypeRepository>();
         });
 
         Configure<AbpDbContextOptions>(options =>

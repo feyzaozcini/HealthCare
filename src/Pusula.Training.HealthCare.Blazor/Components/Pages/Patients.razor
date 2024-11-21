@@ -15,7 +15,7 @@
 @using Volo.Abp.ObjectMapping
 @using Volo.Abp.AspNetCore.Components.Messages
 @using Volo.Abp.AspNetCore.Components.Web.Theming.Layout
-
+@using Pusula.Training.HealthCare.Blazor.Containers
 @using Pusula.Training.HealthCare.Permissions
 @using Volo.Abp.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components
@@ -27,6 +27,7 @@
 @inject AbpBlazorMessageLocalizerHelper<HealthCareResource> LH
 @inject IRemoteServiceConfigurationProvider RemoteServiceConfigurationProvider
 @inject NavigationManager NavigationManager
+@inject PatientStateContainer StateService
 
 @* ************************* PAGE HEADER ************************* *@
 <PageHeader Title="@L["Patients"]" BreadcrumbItems="BreadcrumbItems" Toolbar="Toolbar">
@@ -184,9 +185,13 @@
                         }
                     }
 
-                    <Button Color="Color.Danger" Class="mx-1" Size="Size.Medium" Clicked="DeleteSelectedPatientsAsync">
-                        <Icon Name="@Blazorise.IconName.Delete" /> @L["Delete"]
-                    </Button>
+                   
+                    @if (SelectedPatients.Count == 1)
+                    {
+                        <Button Color="Color.Primary" Class="mx-1" Size="Size.Medium" Clicked="NavigateToAppointments">
+                            <Icon Name="@Blazorise.IconName.Calendar" /> Yeni Randevu
+                        </Button>
+                    }
                 </div>
             </div>
 
