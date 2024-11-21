@@ -5,6 +5,7 @@ using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.DepartmentServices;
 using Pusula.Training.HealthCare.DoctorDepartments;
+using Pusula.Training.HealthCare.DiagnosisGroups;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.LabRequests;
 using Pusula.Training.HealthCare.PatientCompanies;
@@ -14,8 +15,14 @@ using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.TestGroupItems;
 using Pusula.Training.HealthCare.TestGroups;
 using Pusula.Training.HealthCare.Titles;
+using Pusula.Training.HealthCare.Diagnoses;
 using System;
 using Volo.Abp.Identity;
+using Pusula.Training.HealthCare.Anamneses;
+using Pusula.Training.HealthCare.ExaminationDiagnoses;
+using Pusula.Training.HealthCare.FallRisks;
+using Pusula.Training.HealthCare.PhysicalExaminations;
+using Pusula.Training.HealthCare.PshychologicalStates;
 using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.Villages;
 using Pusula.Training.HealthCare.Appointments;
@@ -154,6 +161,94 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Appointment, AppointmentWithNavigationPropertiesDto>();
         CreateMap<AppointmentWithNavigationProperties, AppointmentWithNavigationPropertiesDto>();
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        CreateMap<DiagnosisGroup, DiagnosisGroupDto>().ReverseMap();
+        CreateMap<DiagnosisGroupCreateDto, DiagnosisGroup>().ReverseMap();
+        CreateMap<DiagnosisGroupUpdateDto, DiagnosisGroup>().ReverseMap();
+        CreateMap<DiagnosisGroupDto, DiagnosisGroupUpdateDto>().ReverseMap();
+
+
+        CreateMap<Diagnosis, DiagnosisDto>().ReverseMap();
+        CreateMap<DiagnosisCreateDto, Diagnosis>().ReverseMap();
+        CreateMap<DiagnosisUpdateDto, Diagnosis>().ReverseMap();
+        CreateMap<DiagnosisDto, DiagnosisUpdateDto>().ReverseMap();
+        CreateMap<DiagnosisWithNavigationProperties, DiagnosisWithNavigationPropertiesDto>().ReverseMap();
+
+
+        CreateMap<Anamnesis, AnamnesisDto>().ReverseMap();
+        CreateMap<AnamnesisCreateDto, Anamnesis>().ReverseMap();
+        CreateMap<AnamnesisUpdateDto, Anamnesis>().ReverseMap();
+        CreateMap<AnamnesisWithNavigationProperties, AnamnesisWithNavigationPropertiesDto>().ReverseMap();
+
+        CreateMap<ExaminationDiagnosis, ExaminationDiagnosisDto>().ReverseMap();
+        CreateMap<ExaminationDiagnosisCreateDto, ExaminationDiagnosis>().ReverseMap();
+        CreateMap<ExaminationDiagnosisUpdateDto, ExaminationDiagnosis>().ReverseMap();
+        CreateMap<ExaminationDiagnosisWithNavigationProperties, ExaminationDiagnosisWithNavigationPropertiesDto>().ReverseMap();
+
+        CreateMap<FallRisk, FallRiskDto>().ReverseMap();
+        CreateMap<FallRiskCreateDto, FallRisk>().ReverseMap();
+        CreateMap<FallRiskUpdateDto, FallRisk>().ReverseMap();
+        CreateMap<FallRiskWithNavigationProperties, FallRiskWithNavigationPropertiesDto>().ReverseMap();
+
+        CreateMap<PhysicalExamination, PhysicalExaminationDto>().ReverseMap();
+        CreateMap<PhysicalExaminationCreateDto, PhysicalExamination>().ReverseMap();
+        CreateMap<PhysicalExaminationUpdateDto, PhysicalExamination>().ReverseMap();
+        CreateMap<PhysicalExaminationWithNavigationProperties, PhysicalExaminationWithNavigationPropertiesDto>().ReverseMap();
+
+        CreateMap<PshychologicalState, PshychologicalStateDto>().ReverseMap();
+        CreateMap<PshychologicalStateCreateDto, PshychologicalState>().ReverseMap();
+        CreateMap<PshychologicalStateUpdateDto, PshychologicalState>().ReverseMap();
+        CreateMap<PshychologicalStateWithNavigationDto, PshychologicalStateWithNavigationProperties>().ReverseMap();
 
     }
 }

@@ -30,6 +30,13 @@ using Pusula.Training.HealthCare.DoctorDepartments;
 using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.Villages;
 using Pusula.Training.HealthCare.Appointments;
+using Pusula.Training.HealthCare.DiagnosisGroups;
+using Pusula.Training.HealthCare.Diagnoses;
+using Pusula.Training.HealthCare.Anamneses;
+using Pusula.Training.HealthCare.ExaminationDiagnoses;
+using Pusula.Training.HealthCare.PhysicalExaminations;
+using Pusula.Training.HealthCare.PshychologicalStates;
+using Pusula.Training.HealthCare.FallRisks;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -58,6 +65,19 @@ public class HealthCareDbContext :
     public DbSet<District> Districts { get; set; } = null!;
     public DbSet<Village> Villages { get; set; } = null!;
     public DbSet<Appointment> Appointments { get; set; } = null!;
+
+
+
+
+    public DbSet<DiagnosisGroup> DiagnosisGroups { get; set; } = null!;
+    public DbSet<Diagnosis> Diagnoses { get; set; } = null!;
+    public DbSet<Anamnesis> Anamneses { get; set; } = null!;
+    public DbSet<ExaminationDiagnosis> ExaminationDiagnoses { get; set; } = null!;
+    public DbSet<PhysicalExamination> PhysicalExaminations { get; set; } = null!;
+    public DbSet<PshychologicalState> PshychologicalStates { get; set; } = null!;
+    public DbSet<FallRisk> FallRisks { get; set; } = null!;
+
+
 
     #region Entities from the modules
 
@@ -324,6 +344,133 @@ public class HealthCareDbContext :
                 b.HasOne<City>().WithMany().IsRequired().HasForeignKey(x => x.CityId).OnDelete(DeleteBehavior.NoAction);
             });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            builder.Entity<DiagnosisGroup>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "DiagnosisGroups", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(DiagnosisGroup.Name)).IsRequired().HasMaxLength(DiagnosisGroupConsts.NameMaxLength);
+                b.Property(x => x.Code).HasColumnName(nameof(DiagnosisGroup.Code)).IsRequired().HasMaxLength(DiagnosisGroupConsts.CodeMaxLength);
+
+            });
+
+
+            builder.Entity<Diagnosis>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Diagnoses", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention(); // ABP'nin varsayılan kuralları
+                b.Property(x => x.Name).HasColumnName(nameof(Diagnosis.Name)).IsRequired().HasMaxLength(DiagnosisConsts.NameMaxLength);
+                b.Property(x => x.Code).HasColumnName(nameof(Diagnosis.Code)).IsRequired().HasMaxLength(DiagnosisConsts.CodeMaxLength);
+                b.HasOne<DiagnosisGroup>().WithMany().HasForeignKey(x => x.GroupId).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<Anamnesis>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Anamneses", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention(); // ABP'nin varsayılan kuralları
+                b.Property(x => x.Complaint).HasColumnName(nameof(Anamnesis.Complaint)).IsRequired();
+                b.Property(x => x.Story).HasColumnName(nameof(Anamnesis.Story)).IsRequired();
+                b.Property(x => x.StartDate).HasColumnName(nameof(Anamnesis.StartDate)).IsRequired();
+                b.HasOne<Protocol>().WithOne().HasForeignKey<Anamnesis>(x => x.ProtocolId).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            builder.Entity<ExaminationDiagnosis>(b =>
+            {
+
+                b.ToTable(HealthCareConsts.DbTablePrefix + "ExaminationDiagnoses", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.DiagnosisType).HasColumnName(nameof(ExaminationDiagnosis.DiagnosisType)).IsRequired();
+                b.Property(x => x.InitialDate).HasColumnName(nameof(ExaminationDiagnosis.InitialDate)).IsRequired();
+                b.Property(x => x.Note).HasColumnName(nameof(ExaminationDiagnosis.Note)).HasMaxLength(ExaminationDiagnosisConsts.NoteMaxLength);
+                b.HasOne<Protocol>().WithMany().HasForeignKey(x => x.ProtocolId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Diagnosis>().WithMany().HasForeignKey(x => x.DiagnosisId).OnDelete(DeleteBehavior.NoAction);
+
+            });
+
+            builder.Entity<PhysicalExamination>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "PhysicalExaminations", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Weight).HasColumnName(nameof(PhysicalExamination.Weight)).HasPrecision(5, 2);
+                b.Property(x => x.Height).HasColumnName(nameof(PhysicalExamination.Height)).HasPrecision(5, 2);
+                b.Property(x => x.BMI).HasColumnName(nameof(PhysicalExamination.BMI)).HasPrecision(5, 2);
+                b.Property(x => x.VYA).HasColumnName(nameof(PhysicalExamination.VYA)).HasPrecision(5, 2);
+                b.Property(x => x.Temperature).HasColumnName(nameof(PhysicalExamination.Temperature)).HasPrecision(5, 2);
+                b.Property(x => x.Pulse).HasColumnName(nameof(PhysicalExamination.Pulse));
+                b.Property(x => x.SystolicBP).HasColumnName(nameof(PhysicalExamination.SystolicBP));
+                b.Property(x => x.DiastolicBP).HasColumnName(nameof(PhysicalExamination.DiastolicBP));
+                b.Property(x => x.SPO2).HasColumnName(nameof(PhysicalExamination.SPO2));
+                b.Property(x => x.Note).HasColumnName(nameof(PhysicalExamination.Note)).HasMaxLength(PhysicalExaminationConsts.NoteMaxLength);
+                b.HasOne<Protocol>().WithOne().HasForeignKey<PhysicalExamination>(x => x.ProtocolId).OnDelete(DeleteBehavior.NoAction);
+
+            });
+
+            builder.Entity<PshychologicalState>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "PshychologicalStates", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Description).HasColumnName(nameof(PshychologicalState.Description)).HasMaxLength(PshychologicalStateConsts.DescriptionMaxLength);
+                b.Property(x => x.State).HasColumnName(nameof(PshychologicalState.State));
+                b.HasOne<Protocol>().WithOne().HasForeignKey<PshychologicalState>(x => x.ProtocolId).OnDelete(DeleteBehavior.NoAction);
+            });
+
             builder.Entity<Village>(b =>
             {
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Villages", HealthCareConsts.DbSchema);
@@ -345,6 +492,24 @@ public class HealthCareDbContext :
                 b.HasOne<Department>().WithMany().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne<AppointmentType>().WithMany().HasForeignKey(x => x.AppointmentTypeId).OnDelete(DeleteBehavior.NoAction);
             });
+
+
+            builder.Entity<FallRisk>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "FallRisks", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Score).HasColumnName(nameof(FallRisk.Score));
+                b.Property(x => x.Description).HasColumnName(nameof(FallRisk.Description));
+                b.Property(x => x.HasFallHistory).HasColumnName(nameof(FallRisk.HasFallHistory));
+                b.Property(x => x.UsesMedications).HasColumnName(nameof(FallRisk.UsesMedications));
+                b.Property(x => x.HasAddiction).HasColumnName(nameof(FallRisk.HasAddiction));
+                b.Property(x => x.HasBalanceDisorder).HasColumnName(nameof(FallRisk.HasBalanceDisorder));
+                b.Property(x => x.HasVisionImpairment).HasColumnName(nameof(FallRisk.HasVisionImpairment));
+                b.Property(x => x.MentalState).HasColumnName(nameof(FallRisk.MentalState));
+                b.Property(x => x.GeneralHealthState).HasColumnName(nameof(FallRisk.GeneralHealthState));
+                b.HasOne<Protocol>().WithOne().HasForeignKey<FallRisk>(x => x.ProtocolId).OnDelete(DeleteBehavior.NoAction);
+            });
+
 
 
         }
