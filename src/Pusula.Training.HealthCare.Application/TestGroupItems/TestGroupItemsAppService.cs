@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.Core.Rules.TestGroupItems;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
@@ -20,6 +21,7 @@ namespace Pusula.Training.HealthCare.TestGroupItems;
 [Authorize(HealthCarePermissions.TestGroupItems.Default)]
 public class TestGroupItemsAppService(
     ITestGroupItemRepository testGroupItemRepository,
+    ITestGroupItemBusinessRules testGroupItemBusinessRules,
     TestGroupItemManager testGroupItemManager,
     IDistributedCache<TestGroupItemDownloadTokenCacheItem, string> downloadTokenCache)
     : HealthCareAppService, ITestGroupItemsAppService
@@ -27,6 +29,10 @@ public class TestGroupItemsAppService(
     [Authorize(HealthCarePermissions.TestGroupItems.Create)]
     public virtual async Task<TestGroupItemDto> CreateAsync(TestGroupItemsCreateDto input)
     {
+        await testGroupItemBusinessRules.TestGroupItemCodeDuplicatedAsync(input.Code);
+        await testGroupItemBusinessRules.TestGroupItemNameDuplicatedAsync(input.Name);
+        await testGroupItemBusinessRules.ValidateMinimumTurnaroundTimeAsync(input.TurnaroundTime);
+
         var testGroupItem = await testGroupItemManager.CreateAsync(
            input.TestGroupId,
            input.Name,
@@ -42,6 +48,8 @@ public class TestGroupItemsAppService(
     [Authorize(HealthCarePermissions.TestGroupItems.Delete)]
     public virtual async Task<TestGroupItemsDeletedDto> DeleteAsync(Guid id)
     {
+        await testGroupItemBusinessRules.ValidateTestDeletableAsync(id);
+
         TestGroupItem? testGroupItem = await testGroupItemRepository.GetAsync(
             predicate: t => t.Id == id
             );
@@ -117,6 +125,8 @@ public class TestGroupItemsAppService(
     [Authorize(HealthCarePermissions.TestGroupItems.Edit)]
     public virtual async Task<TestGroupItemDto> UpdateAsync(TestGroupItemsUpdateDto input)
     {
+        await testGroupItemBusinessRules.ValidateTestGroupChangeAllowedAsync(input.Id, input.TestGroupId);
+
         var testGroupItem = await testGroupItemManager.UpdateAsync(
                     input.Id,
                     input.TestGroupId,

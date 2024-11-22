@@ -45,6 +45,8 @@ public class TestGroupsAppService(
             predicate: t => t.Id == id
             );
 
+        await testGroupBusinessRules.ValidateTestGroupDeletableAsync(id);
+
         await testGroupRepository.DeleteAsync(id);
 
         TestGroupsDeletedDto response = ObjectMapper.Map<TestGroup, TestGroupsDeletedDto>(testGroup);
@@ -106,7 +108,7 @@ public class TestGroupsAppService(
     [Authorize(HealthCarePermissions.TestGroups.Edit)]
     public virtual async Task<TestGroupDto> UpdateAsync(TestGroupsUpdateDto input)
     {
-        await testGroupBusinessRules.ValidateTestGroupUpdateAsync(input.Id);
+        await testGroupBusinessRules.TestGroupNameDuplicatedAsync(input.Name);
 
         var testGroup = await testGroupManager.UpdateAsync(
                     input.Id,

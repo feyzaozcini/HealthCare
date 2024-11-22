@@ -1,4 +1,5 @@
-﻿using Pusula.Training.HealthCare.TestGroupItems;
+﻿using Pusula.Training.HealthCare.Exceptions;
+using Pusula.Training.HealthCare.TestGroupItems;
 using Pusula.Training.HealthCare.TestGroups;
 using System;
 using System.Collections.Generic;
@@ -13,33 +14,21 @@ namespace Pusula.Training.HealthCare.Core.Rules.TestGroups;
 
 public class TestGroupBusinessRules(ITestGroupRepository testGroupRepository, ITestGroupItemRepository testGroupItemRepository) : ITestGroupBusinessRules
 {
+    //Aynı isimde yeni bir test grubu eklenemez.
     public async Task TestGroupNameDuplicatedAsync(string testGroupName)
     {
-        var groupExists = await testGroupRepository.AnyAsync(g => g.Name == testGroupName);
-        if (groupExists)
-        {
-            //Globale çekilecek.
-            throw new BusinessException("Bu isimde bir test grubu zaten mevcut.");
-        }
+        HealthCareException.ThrowIf(
+            HealthCareDomainErrorCodes.TestGroupNameAlreadyExists,
+            await testGroupRepository.AnyAsync(g => g.Name == testGroupName)
+        );
     }
 
-    public async Task ValidateTestGroupDeletionAsync(Guid testGroupId)
+    //Test grubuna bağlı testler varsa, silme işlemi geçerli olmaz.
+    public async Task ValidateTestGroupDeletableAsync(Guid testGroupId)
     {
-        var hasRelatedTests = await testGroupItemRepository.AnyAsync(ti => ti.TestGroupId == testGroupId);
-        if (hasRelatedTests)
-        {
-            //Globale çekilecek.
-            throw new BusinessException("Bu test grubuna bağlı testler bulunduğundan silinemez.");
-        }
-    }
-
-    public async Task ValidateTestGroupUpdateAsync(Guid testGroupId)
-    {
-        var hasActiveTests = await testGroupItemRepository.AnyAsync(ti => ti.TestGroupId == testGroupId);
-        if (hasActiveTests)
-        {
-            //Globale çekilecek.
-            throw new BusinessException("Bu test grubuna bağlı testler mevcut. Güncelleme yapılamaz.");
-        }
+        HealthCareException.ThrowIf(
+            HealthCareDomainErrorCodes.TestGroupCannotBeDeleted,
+            await testGroupItemRepository.AnyAsync(ti => ti.TestGroupId == testGroupId)
+        );
     }
 }

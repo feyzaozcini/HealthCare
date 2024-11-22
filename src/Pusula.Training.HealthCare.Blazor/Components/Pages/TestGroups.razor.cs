@@ -34,6 +34,7 @@ public partial class TestGroups
 
     private SfGrid<TestGroupItemDto> DefaultGrid = null!;
 
+    private string SelectedDescription = string.Empty;
     private Guid? SelectedTestGroupId { get; set; } = null;
     private Guid? SelectedTestGroupItemId;
 
@@ -52,6 +53,7 @@ public partial class TestGroups
     private SfDialog? DeleteTestGroupsDialog;
     private SfDialog? UpdateTestGroupItemsDialog;
     private SfDialog? UpdateTestGroupsDialog;
+    private SfDialog? DescriptionDialog;
 
     protected override async Task OnInitializedAsync()
     {
@@ -212,7 +214,16 @@ public partial class TestGroups
         UpdateTestGroupsDto = new TestGroupsUpdateDto();
         await UpdateTestGroupsDialog!.HideAsync();
     }
-
+    private async Task OpenDescriptionModal(string? description)
+    {
+        SelectedDescription = description ?? "Açýklama mevcut deðil.";
+        await DescriptionDialog!.ShowAsync();
+    }
+    private async Task CloseDescriptionModal()
+    {
+        SelectedDescription = string.Empty;
+        await DescriptionDialog!.HideAsync();
+    }
     #endregion
 
     #region Save Changes
@@ -225,7 +236,7 @@ public partial class TestGroups
             await CloseTestGroupItemUpdateModal();
             await GetTestGroupItemsAsync();
             await ShowToast("Test baþarýyla güncellendi.", true);
-        }, message => ErrorMessage = message);
+        });
     }
     private async Task UpdateTestGroup()
     {
@@ -235,7 +246,7 @@ public partial class TestGroups
             await GetTestGroupsAsync();
             await CloseTestGroupUpdateModal();
             await ShowToast("Test Grubu baþarýyla güncellendi.", true);
-        }, message => ErrorMessage = message);
+        });
     }
     private async Task AddTestGroupItem()
     {
@@ -246,7 +257,7 @@ public partial class TestGroups
             await CloseTestGroupItemCreateModal();
             await GetTestGroupItemsAsync(); 
             await ShowToast("Test baþarýyla eklendi.", true);
-        }, message => ErrorMessage = message);
+        });
     }
     private async Task AddTestGroup()
     {
@@ -259,10 +270,6 @@ public partial class TestGroups
             await CloseTestGroupCreateModal();
             await GetTestGroupsAsync();
             await ShowToast("Test Grubu baþarýyla eklendi.", true);
-        },
-            message =>
-        {
-            ErrorMessage = message;
         });
     }
     private async Task ConfirmTestGroupItemDelete()
@@ -276,11 +283,7 @@ public partial class TestGroups
             }
             await CloseTestGroupItemDeleteModal();
             await ShowToast("Test baþarýyla silindi.", true);
-        },
-            message =>
-            {
-                ErrorMessage = message;
-            });
+        });
     }
     private async Task ConfirmTestGroupDelete()
     {
@@ -290,14 +293,13 @@ public partial class TestGroups
             {
                 await TestGroupsAppService.DeleteAsync(SelectedTestGroupId.Value);
                 await GetTestGroupsAsync();
+                await LoadTestGroupsAsync();
+                await LoadLookupsAsync();
+                StateHasChanged();
             }
             await CloseTestGroupDeleteModal();
             await ShowToast("Test Grubu baþarýyla silindi.", true);
-        },
-            message =>
-            {
-                ErrorMessage = message;
-            });
+        });
     }
 
     #endregion
@@ -329,19 +331,19 @@ public partial class TestGroups
 
     #region Toast & Exception Controls
 
-    public async Task HandleError(Func<Task> action, Action<string> onError)
+    public async Task HandleError(Func<Task> action)
     {
         try
         {
-            await action.Invoke();
+            await action();
         }
-        catch (BusinessException ex)
+        catch (UserFriendlyException ex)
         {
-            var genericMessage = "Bir hata oluþtu. Lütfen tekrar deneyin.";
-            onError(genericMessage);
-            await ShowToast(genericMessage, false);
-            //onError(ex.Message); 
-            //await ShowToast(ex.Message, false);
+            await ShowToast(ex.Message, false);
+        }
+        catch (Exception)
+        {
+            await ShowToast("Bir hata oluþtu. Lütfen tekrar deneyin.", false);
         }
     }
 
@@ -351,7 +353,7 @@ public partial class TestGroups
         {
             Content = message,
             CssClass = isSuccess ? "e-toast-success" : "e-toast-danger",
-            ExtendedTimeout = 3000,
+            Timeout = 3000,
             ShowCloseButton = true
         });
     }
