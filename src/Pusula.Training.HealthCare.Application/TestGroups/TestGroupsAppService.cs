@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.Core.Rules.Patients;
+using Pusula.Training.HealthCare.Core.Rules.TestGroups;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
@@ -20,12 +22,15 @@ namespace Pusula.Training.HealthCare.TestGroups;
 public class TestGroupsAppService(
     ITestGroupRepository testGroupRepository,
     TestGroupManager testGroupManager,
+    ITestGroupBusinessRules testGroupBusinessRules,
     IDistributedCache<TestGroupDownloadTokenCacheItem, string> downloadTokenCache)
     : HealthCareAppService, ITestGroupsAppService
 {
     [Authorize(HealthCarePermissions.TestGroups.Create)]
     public virtual async Task<TestGroupDto> CreateAsync(TestGroupsCreateDto input)
     {
+        await testGroupBusinessRules.TestGroupNameDuplicatedAsync(input.Name);
+
         var testGroup = await testGroupManager.CreateAsync(
             input.Name
             );
@@ -101,6 +106,8 @@ public class TestGroupsAppService(
     [Authorize(HealthCarePermissions.TestGroups.Edit)]
     public virtual async Task<TestGroupDto> UpdateAsync(TestGroupsUpdateDto input)
     {
+        await testGroupBusinessRules.ValidateTestGroupUpdateAsync(input.Id);
+
         var testGroup = await testGroupManager.UpdateAsync(
                     input.Id,
                     input.Name

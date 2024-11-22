@@ -12,6 +12,7 @@ public class TestGroupsUpdateDto
     public Guid Id { get; set; }
 
     [Required]
+    [StringLength(TestGroupConsts.NameMaxLength, MinimumLength = TestGroupConsts.NameMinLength)]
     public string Name { get; set; } = null!;
 
 }
