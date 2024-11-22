@@ -1,6 +1,9 @@
 @page "/patients"
 
 @attribute [Authorize(HealthCarePermissions.Patients.Default)]
+@using Pusula.Training.HealthCare.Cities
+@using Pusula.Training.HealthCare.Countries
+@using Pusula.Training.HealthCare.Districts
 @using Pusula.Training.HealthCare.Patients
 @using Pusula.Training.HealthCare.Localization
 @using Pusula.Training.HealthCare.Shared
@@ -10,6 +13,7 @@
 @using Blazorise
 @using Blazorise.Components
 @using Blazorise.DataGrid
+@using Pusula.Training.HealthCare.Villages
 @using Volo.Abp.BlazoriseUI
 @using Volo.Abp.BlazoriseUI.Components
 @using Volo.Abp.ObjectMapping
@@ -22,7 +26,11 @@
 @using Volo.Abp.Http.Client
 @inherits HealthCareComponentBase
 @inject IPatientsAppService PatientsAppService
-
+@inject ICountriesAppService countriesAppService
+@inject ICountryRepository countryRepository
+@inject ICityRepository cityRepository
+@inject IDistrictRepository districtRepository
+@inject IVillageRepository villageRepository
 @inject IUiMessageService UiMessageService
 @inject AbpBlazorMessageLocalizerHelper<HealthCareResource> LH
 @inject IRemoteServiceConfigurationProvider RemoteServiceConfigurationProvider
@@ -336,21 +344,73 @@
                     </Validation> *@
 
                       <Row>
-                          <Column ColumnSize="ColumnSize.Is3">
-                    <Validation MessageLocalizer="@LH.Localize">
-                            <Field>
-                                <FieldLabel>@L["Country"]</FieldLabel>
+                        <Column ColumnSize="ColumnSize.Is3">
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["Country"]</FieldLabel>
                                     <Select TValue="Guid" @bind-SelectedValue="@NewPatient.CountryId" @onchange="@OnCountryChanged">
-                                    @foreach (var country in CountriesCodeCollection)
-                                    {
-                                        <SelectItem TValue="Guid" Value="@(country.Id)">
-                                            @(country.Name)
+                                        <SelectItem TValue="Guid" Value="Guid.Empty"> 
+                                            @L["Select"]
                                         </SelectItem>
-                                    }
-                                </Select>
-                            </Field>
+
+                                        @foreach (var country in CountriesCodeCollection)
+                                        {
+                                            <SelectItem TValue="Guid" Value="@(country.Id)">
+                                                @(country.Name)
+                                            </SelectItem>
+                                        }
+                                    </Select>
+                                </Field>
                             </Validation>
-                                </Column>
+                        </Column>
+
+                        <Column ColumnSize="ColumnSize.Is3">
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["City"]</FieldLabel>
+                                    <Select TValue="Guid" @bind-SelectedValue="@NewPatient.CityId" @onchange="OnCityChanged">
+                                        @foreach (var city in CitiesCollection)
+                                        {
+                                            <SelectItem TValue="Guid" Value="@(city.Id)">
+                                                @(city.DisplayName)
+                                            </SelectItem>
+                                        }
+                                    </Select>
+                                </Field>
+                            </Validation>
+                        </Column>
+
+                        <Column ColumnSize="ColumnSize.Is3">
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["District"]</FieldLabel>
+                                    <Select TValue="Guid" @bind-SelectedValue="@NewPatient.DistrictId" @onchange="OnDistrictChanged">
+                                        @foreach (var district in DistrictsCollection)
+                                        {
+                                            <SelectItem TValue="Guid" Value="@(district.Id)">
+                                                @(district.DisplayName)
+                                            </SelectItem>
+                                        }
+                                    </Select>
+                                </Field>
+                            </Validation>
+                        </Column>
+
+                        <Column ColumnSize="ColumnSize.Is3">
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["Village"]</FieldLabel>
+                                    <Select TValue="Guid" @bind-SelectedValue="@NewPatient.VillageId">
+                                        @foreach (var village in VillagesCollection)
+                                        {
+                                            <SelectItem TValue="Guid" Value="@(village.Id)">
+                                                @(village.DisplayName)
+                                            </SelectItem>
+                                        }
+                                    </Select>
+                                </Field>
+                            </Validation>
+                        </Column>
 
                         <Column ColumnSize="ColumnSize.Is3">
                         

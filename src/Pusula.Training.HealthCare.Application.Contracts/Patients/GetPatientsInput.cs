@@ -25,6 +25,9 @@ public class GetPatientsInput : PagedAndSortedResultRequestDto
     public Type? Type { get; set; }
     public Guid? CompanyId { get; set; }
     public Guid? CountryId { get; set; }
+    public Guid? CityId { get; set; }
+    public Guid? DistrictId { get; set; }
+    public Guid? VillageId { get; set; }
 
     public GetPatientsInput()
     {
