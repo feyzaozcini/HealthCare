@@ -133,7 +133,6 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             SelectedTestGroupItemId = null;
             await DeleteDialog.HideAsync(); 
         }
-
         private async Task OpenUpdateModal(TestGroupItemDto item)
         {
             UpdateDto = new TestGroupItemsUpdateDto
@@ -148,7 +147,6 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             };
             await UpdateDialog.ShowAsync(); 
         }
-
         private async Task CloseUpdateModal()
         {
             UpdateDto = new TestGroupItemsUpdateDto();
