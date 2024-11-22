@@ -106,7 +106,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 Code = TestGroupItemsFilter.Code,
                 TestType = TestGroupItemsFilter.TestType,
                 Description = TestGroupItemsFilter.Description,
-                MaxResultCount = PageSize,
+                MaxResultCount = 20,
                 SkipCount = (CurrentPage - 1) * PageSize,
                 TestGroupId = SelectedTestGroupId ?? Guid.Empty
             };
@@ -197,7 +197,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         }
         private async Task OpenTestGroupUpdateModal(TestGroupDto item)
         {
-            UpdateTestGroupItemsDto = new TestGroupItemsUpdateDto
+            UpdateTestGroupsDto = new TestGroupsUpdateDto
             {
                 Id = item.Id,
                 Name = item.Name,
@@ -258,7 +258,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         {
             if (SelectedTestGroupId.HasValue)
             {
-                await TestGroupItemsAppService.DeleteAsync(SelectedTestGroupId.Value);
+                await TestGroupsAppService.DeleteAsync(SelectedTestGroupId.Value);
                 await GetTestGroupsAsync();
             }
             await CloseTestGroupDeleteModal();
