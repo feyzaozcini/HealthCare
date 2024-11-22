@@ -49,13 +49,13 @@ public class PatientCreateDto
 
     [StringLength(PatientConsts.FirstNameMaxLength)]
     public string FatherName { get; set; } = null!;
-
     public BloodType BloodType { get; set; }
 
     [Required]
     public Type Type { get; set; }
-
     public Guid CompanyId { get; set; }
-
     public Guid CountryId { get; set; }
+    public Guid CityId { get; set; }
+    public Guid DistrictId { get; set; }
+    public Guid VillageId { get; set; }
 }

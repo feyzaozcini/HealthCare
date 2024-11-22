@@ -2,6 +2,7 @@ using Blazorise;
 using Blazorise.DataGrid;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Handlers;
 using Pusula.Training.HealthCare.Patients;
@@ -30,6 +31,8 @@ public partial class Patients
     private int CurrentPage { get; set; } = 1;
     private string CurrentSorting { get; set; } = string.Empty;
     private int TotalCount { get; set; }
+    private long TotalCountLong { get; set; }
+
     private bool CanCreatePatient { get; set; }
     private bool CanEditPatient { get; set; }
     private bool CanDeletePatient { get; set; }
@@ -50,15 +53,23 @@ public partial class Patients
     protected string SelectedEditTab = "Patient-edit-tab";
 
     private IReadOnlyList<LookupDto<Guid>> CountriesCollection { get; set; } = [];
+    private IReadOnlyList<LookupDto<Guid>> CitiesCollection { get; set; } = [];
+    private IReadOnlyList<LookupDto<Guid>> DistrictsCollection { get; set; } = [];
+    private IReadOnlyList<LookupDto<Guid>> VillagesCollection { get; set; } = [];
     private IReadOnlyList<LookupDto<Guid>> CompaniesCollection { get; set; } = [];
     private IReadOnlyList<LookupDto<Gender>> GendersCollection { get; set; } = new List<LookupDto<Gender>>();
     private IReadOnlyList<LookupDto<Type>> TypesCollection { get; set; } = new List<LookupDto<Type>>();
     private IReadOnlyList<LookupDto<BloodType>> BloodTypesCollection { get; set; } = new List<LookupDto<BloodType>>();
     private List<PatientWithNavigationPropertiesDto> SelectedPatients { get; set; } = [];
+
+    private List<CountryDto> CountryList { get; set; } = new List<CountryDto>();
+    private GetCountriesInput? CountriesFilter { get; set; }
     private bool AllPatientsSelected { get; set; }
     private IReadOnlyList<GetCountryLookupDto<Guid>> CountriesCodeCollection { get; set; } = [];
 
     private string SelectedCountryCode;
+
+    
 
     public Patients()
     {
@@ -82,31 +93,102 @@ public partial class Patients
         }
     }
 
-    private void OnCountryChanged(ChangeEventArgs e)
+    private async Task GetCountriesAsync()
+    {
+
+        var input = new GetCountriesInput
+        {
+            FilterText = CountriesFilter!.FilterText,
+            Name = CountriesFilter.Name,
+            Code = CountriesFilter.Code,
+            Sorting = CountriesFilter.Sorting,
+            MaxResultCount = 200,
+            SkipCount = (CurrentPage-1)*PageSize
+        };
+
+        var result = await countriesAppService.GetListAsync(input);
+        CountryList = result.Items.ToList();
+    }
+    private async Task OnCountryChanged(ChangeEventArgs e)
     {
         // Seçilen ülke ID'sini al
-        if (Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
+        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
         {
+            // Eðer "Select" öðesi (Guid.Empty) seçildiyse, veriyi sýfýrlýyoruz
+            if (selectedCountryId == Guid.Empty)
+            {
+                // Veriyi sýfýrlýyoruz çünkü "Select" seçildi
+                CitiesCollection = new List<LookupDto<Guid>>();
+                DistrictsCollection = new List<LookupDto<Guid>>(); // Ýlçeleri sýfýrla
+                VillagesCollection = new List<LookupDto<Guid>>();
+                SelectedCountryCode = null;  // Baþlangýçta boþ býrakýyoruz
+
+                // UI'nin yeniden render edilmesini saðlýyoruz
+                StateHasChanged();
+                return;
+            }
+
             // Seçilen ülkeyi CountriesCodeCollection içinden bul
             var selectedCountry = CountriesCodeCollection.FirstOrDefault(c => c.Id == selectedCountryId);
 
-            // Seçilen ülke null deðilse, SelectedCountryCode'u güncelle
             if (selectedCountry != null)
             {
+                // Ülkeye baðlý city'leri alýyoruz
+                var cities = await cityRepository.GetListAsync(c => c.CountryId == selectedCountryId);
+
+                // City'leri ilgili property'ye atýyoruz
+                CitiesCollection = cities.Select(c => new LookupDto<Guid> { Id = c.Id, DisplayName = c.Name }).ToList();
+
+                // Seçilen ülke kodunu güncelliyoruz
                 SelectedCountryCode = selectedCountry.Code;
+
+                // UI'nin yeniden render edilmesi için
+                StateHasChanged();
             }
-        }
-        else
-        {
         }
     }
 
+    private async Task OnCityChanged(ChangeEventArgs e)
+    {
+        // Seçilen ülke ID'sini al
+        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCityId))
+        {
+                // Ülkeye baðlý city'leri alýyoruz
+                var districts = await districtRepository.GetListAsync(d => d.CityId == selectedCityId);
+
+                // City'leri ilgili property'ye atýyoruz
+                DistrictsCollection = districts.Select(d => new LookupDto<Guid> { Id = d.Id, DisplayName = d.Name }).ToList();
+
+                // UI'nin yeniden render edilmesi için
+                StateHasChanged();
+        }
+    }
+
+    private async Task OnDistrictChanged(ChangeEventArgs e)
+    {
+        // Seçilen ülke ID'sini al
+        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedDistrictId))
+        {
+            // Ülkeye baðlý city'leri alýyoruz
+            var villages = await villageRepository.GetListAsync(v => v.DistrictId == selectedDistrictId);
+
+            // City'leri ilgili property'ye atýyoruz
+            VillagesCollection = villages.Select(v => new LookupDto<Guid> { Id = v.Id, DisplayName = v.Name }).ToList();
+
+            // UI'nin yeniden render edilmesi için
+            StateHasChanged();
+        }
+    }
+
+
     protected override async Task OnInitializedAsync()
     {
-        await SetPermissionsAsync();
-        await GetCountryCodeCollectionLookupAsync();
-        await GetCompanyCollectionLookupAsync();
-        
+        await Task.WhenAll(
+       SetPermissionsAsync(),
+       GetCountryCodeCollectionLookupAsync(),
+       GetCompanyCollectionLookupAsync()
+   );
+
         GendersCollection = Enum.GetValues(typeof(Gender))
        .Cast<Gender>()
        .Select(g => new LookupDto<Gender>
@@ -338,6 +420,26 @@ public partial class Patients
         {
 
         }
+    }
+    //protected virtual Task OnCityChanged(ChangeEventArgs e)
+    //{
+    //    Guid? cityId = (Guid?)e.Value;
+    //    Filter.CityId = cityId;
+    //    return Task.CompletedTask;
+    //}
+
+    //protected virtual Task OnDistrictChanged(ChangeEventArgs e)
+    //{
+    //    Guid? districtId = (Guid?)e.Value;
+    //    Filter.DistrictId = districtId;
+    //    return Task.CompletedTask;
+    //}
+
+    protected virtual Task OnVillageChanged(ChangeEventArgs e)
+    {
+        Guid? villageId = (Guid?)e.Value;
+        Filter.VillageId = villageId;
+        return Task.CompletedTask;
     }
 
     protected virtual void OnFirstNameChanged(string? firstName)

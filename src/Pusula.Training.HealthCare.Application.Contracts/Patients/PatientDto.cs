@@ -59,6 +59,9 @@ public class PatientDto : FullAuditedEntityDto<Guid>, IHasConcurrencyStamp
     public Guid CompanyId { get; set; }
 
     public Guid CountryId { get; set; }
+    public Guid CityId { get; set; }
+    public Guid DistrictId { get; set; }
+    public Guid VillageId { get; set; }
 
     public string ConcurrencyStamp { get; set; } = null!;
 
