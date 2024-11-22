@@ -8,7 +8,7 @@ namespace Pusula.Training.HealthCare.Core.Rules.TestGroups;
 
 public interface ITestGroupBusinessRules : IBusinessRules
 {
-    Task ValidateTestGroupCreationAsync(string testGroupName);
+    Task TestGroupNameDuplicatedAsync(string testGroupName);
     Task ValidateTestGroupUpdateAsync(Guid testGroupId);
     Task ValidateTestGroupDeletionAsync(Guid testGroupId);
 }
