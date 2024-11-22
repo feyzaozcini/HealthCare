@@ -10,6 +10,7 @@ namespace Pusula.Training.HealthCare.TestGroupItems;
 
 public class TestGroupItemsCreateDto
 {
+    [Required]
     public Guid TestGroupId { get; set; }
 
     [Required]
@@ -22,6 +23,7 @@ public class TestGroupItemsCreateDto
     [Required]
     public string TestType { get; set; } = null!;
     [StringLength(TestGroupItemConsts.DescriptionMaxLength)]
-    public string? Description { get; set; } 
-    public int? TurnaroundTime { get; set; }
+    public string? Description { get; set; } = null;
+    [Required]
+    public int TurnaroundTime { get; set; }
 }

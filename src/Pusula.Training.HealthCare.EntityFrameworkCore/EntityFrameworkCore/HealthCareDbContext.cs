@@ -207,7 +207,7 @@ public class HealthCareDbContext :
                 b.Property(x => x.UserId).HasColumnName(nameof(Doctor.UserId)).IsRequired();
                 b.Property(x => x.TitleId).HasColumnName(nameof(Doctor.TitleId)).IsRequired();
                 b.HasOne<IdentityUser>().WithOne().HasForeignKey<Doctor>(x => x.UserId).IsRequired();
-                b.HasOne<Title>().WithMany().HasForeignKey(x=>x.TitleId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Title>().WithMany().HasForeignKey(x => x.TitleId).OnDelete(DeleteBehavior.NoAction);
 
             });
 
@@ -244,7 +244,9 @@ public class HealthCareDbContext :
 
                 b.Property(x => x.Description)
                     .HasColumnName(nameof(TestGroupItem.Description))
-                    .HasMaxLength(TestGroupItemConsts.DescriptionMaxLength);
+                    .HasMaxLength(TestGroupItemConsts.DescriptionMaxLength)
+                    .IsRequired(false);
+
 
                 b.Property(x => x.TurnaroundTime)
                     .HasColumnName(nameof(TestGroupItem.TurnaroundTime))

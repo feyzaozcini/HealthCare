@@ -10,7 +10,7 @@ namespace Pusula.Training.HealthCare.TestGroupItems;
 public class GetTestGroupItemsInput : PagedAndSortedResultRequestDto
 {
     public string? FilterText { get; set; }
-    public Guid TestGroupId { get; set; }
+    public Guid? TestGroupId { get; set; }
     public string? Name { get; set; }
     public string? Code { get; set; }
     public string? TestType { get; set; }
@@ -26,7 +26,7 @@ public class GetTestGroupItemsInput : PagedAndSortedResultRequestDto
             TestType = string.Empty;
             Description = string.Empty;
             TestGroupId = Guid.Empty;
-            MaxResultCount = 10; // Örnek varsayılan sayfa boyutu
+            MaxResultCount = PagedAndSortedResultRequestDto.DefaultMaxResultCount; 
             SkipCount = 0;
     }
 }
