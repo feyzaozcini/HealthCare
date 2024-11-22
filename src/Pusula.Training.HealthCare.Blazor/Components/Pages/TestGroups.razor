@@ -26,24 +26,22 @@
 
     @*Add Items Button*@
     <div>
-        <SfButton CssClass="btn btn-success btn-sm" Content="Test Ekle" OnClick="OpenTestGroupItemsCreateModal"></SfButton>
-    </div>
+        <SfButton CssClass="e-medium e-success" Content="Test Ekle" OnClick="OpenTestGroupItemsCreateModal"></SfButton>
 
     @*Add Test Group Button*@
-    <div>
-        <SfButton CssClass="btn btn-success btn-sm" Content="Test Grubu Ekle" OnClick="OpenTestGroupsCreateModal"></SfButton>
+
+        <SfButton CssClass="e-medium e-success" Content="Test Grubu Ekle" OnClick="OpenTestGroupsCreateModal"></SfButton>
     </div>
 </div>
-
 
 @*Lab Groups List*@
 <div class="container-fluid vh-100 d-flex flex-row">
 
-    @* Sol Panel*@
-    <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="false">
+    @*Sol Panel*@
+    <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="false" RowHeight="40">
         <GridColumns>
             <!-- Grup Adı Sütunu -->
-            <GridColumn Field="@nameof(TestGroup.Name)" HeaderText="Test Grupları" Width="50%">
+            <GridColumn Field="@nameof(TestGroup.Name)" HeaderText="Test Grupları" Width="70">
                 <Template Context="group">
                     @if (group is TestGroupDto testGroup)
                     {
@@ -52,7 +50,7 @@
                 </Template>
             </GridColumn>
 
-            <GridColumn HeaderText="Actions" Width="50" TextAlign="TextAlign.Center">
+            <GridColumn HeaderText="Actions" Width="30" TextAlign="TextAlign.Center">
                 <Template>
                     @if (context is TestGroupDto testGroup)
                     {
@@ -67,10 +65,10 @@
     </SfGrid>
 
 
-    @*     Sağ Panel*@
-    <div class="col-10 p-2">
+    @*Sağ Panel*@
+    <div class="col-10">
         @*Data Grid*@
-        <SfGrid DataSource="@TestGroupItemsList" AllowPaging="true" AllowSorting="true" Height="100%">
+        <SfGrid DataSource="@TestGroupItemsList" AllowPaging="true" AllowSorting="true" Height="100%" RowHeight="40">
             <GridColumns>
                 <GridColumn Field=@nameof(TestGroupItem.Code) HeaderText="Test Kodu" Width="25"></GridColumn>
                 <GridColumn HeaderText="Test Grubu" Width="25">
@@ -146,14 +144,14 @@
                 <div class="row mt-2">
                     <div class="col-6">
                         <label for="turnaroundTime">Tahmini Süre</label>
-                        <input type="number" id="testType" class="form-control" @bind="CreateTestGroupItemsDto.TurnaroundTime" placeholder="Test Süresi" />
+                        <input type="number" id="testType" class="form-control" @bind="CreateTestGroupItemsDto.TurnaroundTime" placeholder="Test Süresi" min="0" />
                         <ValidationMessage For="@(() => CreateTestGroupItemsDto.TurnaroundTime)" CssClass="invalid-feedback" />
                     </div>
                 </div>
                 <div class="row mt-2 mb-2">
                     <div class="col-12 text-end">
-                        <button class="btn btn-success me-2" type="submit">Ekle</button>
-                        <button class="btn btn-secondary" type="button" @onclick="CloseTestGroupItemCreateModal">İptal</button>
+                        <SfButton CssClass="e-success e-medium m-1" Content="Kaydet" Type="Submit"></SfButton>
+                        <SfButton CssClass="e-secondary e-medium m-1" Content="İptal" OnClick="CloseTestGroupItemCreateModal"></SfButton>
                     </div>
                 </div>
             </EditForm>
@@ -162,7 +160,7 @@
 </SfDialog>
 
 @*Create Test Groups Form*@
-<SfDialog @ref="CreateTestGroupsDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Test Grubu Ekle" Visible="false">
+<SfDialog @ref="CreateTestGroupsDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Test Grubu Ekle" Visible="false">
     <DialogTemplates>
         <Content>
             <EditForm Model="@CreateTestGroupsDto" OnValidSubmit="AddTestGroup" class="needs-validation" novalidate>
@@ -176,8 +174,8 @@
                 </div>
                 <div class="row mt-2 mb-2">
                     <div class="col-12 text-end">
-                        <button class="btn btn-success me-2" type="submit">Ekle</button>
-                        <button class="btn btn-secondary" type="button" @onclick="CloseTestGroupCreateModal">İptal</button>
+                        <SfButton CssClass="e-success e-small m-1" Content="Kaydet" Type="Submit"></SfButton>
+                        <SfButton CssClass="e-secondary e-small m-1" Content="İptal" OnClick="CloseTestGroupCreateModal"></SfButton>
                     </div>
                 </div>
             </EditForm>
@@ -192,8 +190,8 @@
             <p>Silmek istediğinize emin misiniz?</p>
         </Content>
         <FooterTemplate>
-            <SfButton CssClass="btn btn-danger btn-sm" OnClick="ConfirmTestGroupItemDelete">Evet</SfButton>
-            <SfButton CssClass="btn btn-primary btn-sm" OnClick="CloseTestGroupItemDeleteModal">Hayır</SfButton>
+            <SfButton CssClass="e-small e-danger" OnClick="ConfirmTestGroupItemDelete">Evet</SfButton>
+            <SfButton CssClass="e-small e-primary" OnClick="CloseTestGroupItemDeleteModal">Hayır</SfButton>
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
@@ -205,8 +203,8 @@
             <p>Silmek istediğinize emin misiniz?</p>
         </Content>
         <FooterTemplate>
-            <SfButton CssClass="btn btn-danger btn-sm" OnClick="ConfirmTestGroupDelete">Evet</SfButton>
-            <SfButton CssClass="btn btn-primary btn-sm" OnClick="CloseTestGroupDeleteModal">Hayır</SfButton>
+            <SfButton CssClass="e-small e-danger" OnClick="ConfirmTestGroupDelete">Evet</SfButton>
+            <SfButton CssClass="e-small e-primary" OnClick="CloseTestGroupDeleteModal">Hayır</SfButton>
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
@@ -220,10 +218,12 @@
                 <div class="row">
                     <div class="col-6">
                         <label for="testGroup">Test Grubu</label>
-                        <SfDropDownList TItem="LookupDto<Guid>" TValue="Guid" DataSource="@TestGroupNamesCollection"
-                                        Placeholder="Test Grubu" @bind-Value="UpdateTestGroupItemsDto.TestGroupId" CssClass="form-control">
-                            <DropDownListFieldSettings Text="DisplayName" Value="Id"></DropDownListFieldSettings>
-                        </SfDropDownList>
+                        <select id="testGroupId" class="form-select" @bind="UpdateTestGroupItemsDto.TestGroupId">
+                            @foreach (var group in TestGroupNamesCollection)
+                            {
+                                <option value="@group.Id">@group.DisplayName</option>
+                            }
+                        </select>
                         <ValidationMessage For="@(() => UpdateTestGroupItemsDto.TestGroupId)" CssClass="invalid-feedback" />
                     </div>
                     <div class="col-6">
@@ -239,9 +239,8 @@
                         <ValidationMessage For="@(() => UpdateTestGroupItemsDto.Code)" CssClass="invalid-feedback" />
                     </div>
                     <div class="col-6">
-                        <label for="turnaroundTime">Test Süresi</label>
-                        <SfNumericTextBox TValue="int?" Placeholder="Test Süresi" CssClass="form-control"
-                                          @bind-Value="UpdateTestGroupItemsDto.TurnaroundTime" Min="0" />
+                            <label for="turnaroundTime">Tahmini Süre</label>
+                        <input type="number" id="testType" class="form-control" @bind="UpdateTestGroupItemsDto.TurnaroundTime" placeholder="Test Süresi" min="0" />
                         <ValidationMessage For="@(() => UpdateTestGroupItemsDto.TurnaroundTime)" CssClass="invalid-feedback" />
                     </div>
                 </div>
@@ -255,7 +254,8 @@
                 </div>
                 <div class="row mt-2">
                     <div class="col-12 text-end">
-                        <button class="btn btn-success mb-2" type="submit">Kaydet</button>
+                        <SfButton CssClass="e-success e-medium m-2" Content="Kaydet" Type="Submit"></SfButton>
+                        <SfButton CssClass="e-secondary e-medium m-2" Content="İptal" OnClick="CloseTestGroupItemUpdateModal"></SfButton>
                     </div>
                 </div>
             </EditForm>
@@ -264,10 +264,10 @@
 </SfDialog>
 
 @*Update Test Groups Form*@
-<SfDialog @ref="UpdateTestGroupsDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Test Grubu Güncelleme" Visible="false">
+<SfDialog @ref="UpdateTestGroupsDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Test Grubu Güncelleme" Visible="false">
     <DialogTemplates>
         <Content>
-            <EditForm Model="@UpdateTestGroupsDto" OnValidSubmit="AddTestGroup" class="needs-validation" novalidate>
+            <EditForm Model="@UpdateTestGroupsDto" OnValidSubmit="UpdateTestGroup" class="needs-validation" novalidate>
                 <DataAnnotationsValidator />
                 <div class="row">
                     <div class="col-12">
@@ -278,8 +278,8 @@
                 </div>
                 <div class="row mt-2 mb-2">
                     <div class="col-12 text-end">
-                        <button class="btn btn-success me-2" type="submit">Ekle</button>
-                        <button class="btn btn-secondary" type="button" @onclick="CloseTestGroupUpdateModal">İptal</button>
+                        <SfButton CssClass="e-success e-small me-2" Content="Kaydet" Type="Submit"></SfButton>
+                        <SfButton CssClass="e-secondary e-small" Content="İptal" OnClick="CloseTestGroupUpdateModal"></SfButton>
                     </div>
                 </div>
             </EditForm>

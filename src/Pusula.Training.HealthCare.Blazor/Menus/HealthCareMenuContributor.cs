@@ -41,23 +41,23 @@ public class HealthCareMenuContributor : IMenuContributor
         administration.SetSubItemOrder(IdentityMenuNames.GroupName, 2);
         administration.SetSubItemOrder(SettingManagementMenus.GroupName, 3);
 
-        context.Menu.AddItem(
-            new ApplicationMenuItem(
-                HealthCareMenus.Protocols,
-                l["Menu:Protocols"],
-                url: "/protocols",
-                icon: "fa fa-file-alt",
-                requiredPermissionName: HealthCarePermissions.Protocols.Default)
-        );
+        //context.Menu.AddItem(
+        //    new ApplicationMenuItem(
+        //        HealthCareMenus.Protocols,
+        //        l["Menu:Protocols"],
+        //        url: "/protocols",
+        //        icon: "fa fa-file-alt",
+        //        requiredPermissionName: HealthCarePermissions.Protocols.Default)
+        //);
 
-        context.Menu.AddItem(
-            new ApplicationMenuItem(
-                HealthCareMenus.Departments,
-                l["Menu:Departments"],
-                url: "/departments",
-                icon: "fa fa-file-alt",
-                requiredPermissionName: HealthCarePermissions.Departments.Default)
-        );
+        //context.Menu.AddItem(
+        //    new ApplicationMenuItem(
+        //        HealthCareMenus.Departments,
+        //        l["Menu:Departments"],
+        //        url: "/departments",
+        //        icon: "fa fa-file-alt",
+        //        requiredPermissionName: HealthCarePermissions.Departments.Default)
+        //);
 
         context.Menu.AddItem(
             new ApplicationMenuItem(

@@ -17,7 +17,7 @@ public class TestGroupItemManager(ITestGroupItemRepository testGroupItemReposito
         string code,
         string testType,
         string? description,
-        int? turnaroundTime
+        int turnaroundTime
         )
     {
         
@@ -41,7 +41,7 @@ public class TestGroupItemManager(ITestGroupItemRepository testGroupItemReposito
         string code,
         string testType,
         string? description,
-        int? turnaroundTime
+        int turnaroundTime
         )
     {
         var testGroupItem = await testGroupItemRepository.GetAsync(id);

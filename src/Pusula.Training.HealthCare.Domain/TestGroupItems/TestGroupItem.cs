@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System;
+using System.Xml.Linq;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -17,8 +18,9 @@ public class TestGroupItem : AuditedEntity<Guid>
 
     [NotNull]
     public string TestType { get; private set; } = null!; // Test tipi, arayüzde kullanılacak. Senaryosu gerekirse tasarlanacak.
-    public string? Description { get; private set; } 
-    public int? TurnaroundTime { get; set; } // Tetkikin tahmini tamamlanma süresi. Saat cinsinden tanımlanacak. Arayüzde gün ve saat dönüşümü yapılacak.
+    public string? Description { get; private set; }
+    [NotNull]
+    public int TurnaroundTime { get; set; } // Tetkikin tahmini tamamlanma süresi. Saat cinsinden tanımlanacak. Arayüzde gün ve saat dönüşümü yapılacak.
 
     protected TestGroupItem()
     {
@@ -31,7 +33,7 @@ public class TestGroupItem : AuditedEntity<Guid>
         string code,
         string testType,
         string? description,
-        int? turnaroundTime)
+        int turnaroundTime)
     {
         Id = id;
         SetTestGroupId(testGroupId);
@@ -56,22 +58,28 @@ public class TestGroupItem : AuditedEntity<Guid>
 
     public void SetCode(string code)
     {
+        Check.NotNullOrWhiteSpace(code, nameof(code));
         Check.Length(code, nameof(code), TestGroupItemConsts.CodeMaxLength);
         Code = code;
     }
 
     public void SetTestType(string testType)
     {
+        Check.NotNullOrWhiteSpace(testType, nameof(testType));
         Check.Length(testType, nameof(testType), TestGroupItemConsts.TestTypeMaxLength);
         TestType = testType;
     }
 
     public void SetDescription(string? description)
     {
-        Check.Length(description, nameof(description), TestGroupItemConsts.DescriptionMaxLength);
+        if (!string.IsNullOrEmpty(description))
+        {
+            Check.Length(description, nameof(description), TestGroupItemConsts.DescriptionMaxLength);
+        }
         Description = description;
     }
-    public void SetTurnaroundTime(int? turnaroundTime)
+
+    public void SetTurnaroundTime(int turnaroundTime)
     {
         TurnaroundTime = turnaroundTime;
     }

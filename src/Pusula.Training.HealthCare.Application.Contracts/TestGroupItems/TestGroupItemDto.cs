@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,10 +10,18 @@ namespace Pusula.Training.HealthCare.TestGroupItems;
 
 public class TestGroupItemDto : AuditedEntityDto<Guid>
 {
-    public Guid TestGroupId { get; set; } 
+    [Required]
+    public Guid TestGroupId { get; set; }
+
+    [Required]
     public string Name { get; private set; } = null!;
+
+    [Required]
     public string Code { get; private set; } = null!;
+
+    [Required]
     public string TestType { get; private set; } = null!; 
     public string? Description { get; private set; }
-    public int? TurnaroundTime { get; set; }
+    [Required]
+    public int TurnaroundTime { get; set; }
 }
