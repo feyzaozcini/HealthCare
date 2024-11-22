@@ -18,6 +18,6 @@ public class TestGroupItemsUpdateDto
     public string Code { get; set; } = null!;
     public string TestType { get; set; } = null!;
     [StringLength(TestGroupItemConsts.DescriptionMaxLength)]
-    public string Description { get; set; } = null!;
-    public int TurnaroundTime { get; set; }
+    public string? Description { get; set; } 
+    public int? TurnaroundTime { get; set; }
 }

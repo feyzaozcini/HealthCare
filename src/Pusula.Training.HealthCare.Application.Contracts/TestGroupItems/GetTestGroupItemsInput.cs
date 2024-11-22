@@ -20,5 +20,13 @@ public class GetTestGroupItemsInput : PagedAndSortedResultRequestDto
 
     public GetTestGroupItemsInput()
     {
+            FilterText = string.Empty;
+            Name = string.Empty;
+            Code = string.Empty;
+            TestType = string.Empty;
+            Description = string.Empty;
+            TestGroupId = Guid.Empty;
+            MaxResultCount = 10; // Örnek varsayılan sayfa boyutu
+            SkipCount = 0;
     }
 }

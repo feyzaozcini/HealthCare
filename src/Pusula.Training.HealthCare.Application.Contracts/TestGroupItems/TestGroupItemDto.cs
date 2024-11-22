@@ -13,6 +13,6 @@ public class TestGroupItemDto : AuditedEntityDto<Guid>
     public string Name { get; private set; } = null!;
     public string Code { get; private set; } = null!;
     public string TestType { get; private set; } = null!; 
-    public string Description { get; private set; } = null!;
-    public int TurnaroundTime { get; set; }
+    public string? Description { get; private set; }
+    public int? TurnaroundTime { get; set; }
 }

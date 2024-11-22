@@ -11,5 +11,9 @@ public class GetTestGroupsInput : PagedAndSortedResultRequestDto
 
     public GetTestGroupsInput()
     {
+        FilterText = string.Empty;
+        Name = string.Empty;
+        MaxResultCount = 10; // Varsayılan sayfa boyutu
+        SkipCount = 0; // Başlangıç değeri
     }
 }

@@ -1,11 +1,15 @@
 ﻿@page "/appointment"
-
+@attribute [Authorize(HealthCarePermissions.Appointments.Default)]
 @inject Microsoft.AspNetCore.Components.NavigationManager UriHelper
 @using Pusula.Training.HealthCare.Blazor.Containers
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
 @using System.Globalization
 @using System.IO
 @using System.Timers
 @using Pusula.Training.HealthCare.Patients
+@using Pusula.Training.HealthCare.Appointments
+@using Pusula.Training.HealthCare.Permissions
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Calendars
 @using Syncfusion.Blazor.Data
@@ -15,7 +19,7 @@
 @using Syncfusion.Blazor.Schedule
 @using Syncfusion.Blazor.SplitButtons
 @inject PatientStateContainer StateService
-
+@inject IAppointmentsAppService AppointmentsAppService
 <div class="card patient-card mb-3">
     <div class="row g-0 align-items-center" style="height: 150px; max-width: 1100px; margin: auto;">
         <!-- Avatar Bölümü -->
@@ -31,7 +35,7 @@
                     <div class="col-md-6 mb-2">
                         <span class="fw-bold">Birthdate:</span> @StateService.SelectedPatient.BirthDate.ToShortDateString()
                     </div>
-                    <div class="col-md-6 mb-2">
+                    @*<div class="col-md-6 mb-2">
                         <span class="fw-bold">Gender:</span>
                         @switch (StateService.SelectedPatient.Gender)
                         {
@@ -51,7 +55,7 @@
                                 <span>Unknown</span>
                                 break;
                         }
-                    </div>
+                    </div>*@
                     <div class="col-md-6 mb-2">
                         <span class="fw-bold">Email:</span> @StateService.SelectedPatient.Email
                     </div>

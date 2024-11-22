@@ -27,6 +27,58 @@ namespace Pusula.Training.HealthCare.Migrations
             modelBuilder.HasSequence<int>("PatientNoSequence")
                 .StartsAt(10000L);
 
+            modelBuilder.Entity("Pusula.Training.HealthCare.Anamneses.Anamnesis", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Complaint")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("Complaint");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("ProtocolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("StartDate");
+
+                    b.Property<string>("Story")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("Story");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProtocolId")
+                        .IsUnique();
+
+                    b.ToTable("AppAnamneses", (string)null);
+                });
+
             modelBuilder.Entity("Pusula.Training.HealthCare.AppointmentTypes.AppointmentType", b =>
                 {
                     b.Property<Guid>("Id")
@@ -340,6 +392,67 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.ToTable("AppDepartments", (string)null);
                 });
 
+            modelBuilder.Entity("Pusula.Training.HealthCare.Diagnoses.Diagnosis", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
+                        .HasColumnName("Code");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("Name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
+
+                    b.ToTable("AppDiagnoses", (string)null);
+                });
+
+            modelBuilder.Entity("Pusula.Training.HealthCare.DiagnosisGroups.DiagnosisGroup", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)")
+                        .HasColumnName("Code");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppDiagnosisGroups", (string)null);
+                });
+
             modelBuilder.Entity("Pusula.Training.HealthCare.Districts.District", b =>
                 {
                     b.Property<Guid>("Id")
@@ -426,6 +539,104 @@ namespace Pusula.Training.HealthCare.Migrations
                         .IsUnique();
 
                     b.ToTable("AppDoctors", (string)null);
+                });
+
+            modelBuilder.Entity("Pusula.Training.HealthCare.ExaminationDiagnoses.ExaminationDiagnosis", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DiagnosisId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("DiagnosisType")
+                        .HasColumnType("integer")
+                        .HasColumnName("DiagnosisType");
+
+                    b.Property<DateTime>("InitialDate")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("InitialDate");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasMaxLength(75)
+                        .HasColumnType("character varying(75)")
+                        .HasColumnName("Note");
+
+                    b.Property<Guid>("ProtocolId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiagnosisId");
+
+                    b.HasIndex("ProtocolId");
+
+                    b.ToTable("AppExaminationDiagnoses", (string)null);
+                });
+
+            modelBuilder.Entity("Pusula.Training.HealthCare.FallRisks.FallRisk", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("Description");
+
+                    b.Property<bool>("GeneralHealthState")
+                        .HasColumnType("boolean")
+                        .HasColumnName("GeneralHealthState");
+
+                    b.Property<bool>("HasAddiction")
+                        .HasColumnType("boolean")
+                        .HasColumnName("HasAddiction");
+
+                    b.Property<bool>("HasBalanceDisorder")
+                        .HasColumnType("boolean")
+                        .HasColumnName("HasBalanceDisorder");
+
+                    b.Property<bool>("HasFallHistory")
+                        .HasColumnType("boolean")
+                        .HasColumnName("HasFallHistory");
+
+                    b.Property<bool>("HasVisionImpairment")
+                        .HasColumnType("boolean")
+                        .HasColumnName("HasVisionImpairment");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<bool>("MentalState")
+                        .HasColumnType("boolean")
+                        .HasColumnName("MentalState");
+
+                    b.Property<Guid>("ProtocolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("Score")
+                        .HasColumnType("integer")
+                        .HasColumnName("Score");
+
+                    b.Property<bool>("UsesMedications")
+                        .HasColumnType("boolean")
+                        .HasColumnName("UsesMedications");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProtocolId")
+                        .IsUnique();
+
+                    b.ToTable("AppFallRisks", (string)null);
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.LabRequests.LabRequest", b =>
@@ -688,6 +899,69 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.ToTable("AppPatients", (string)null);
                 });
 
+            modelBuilder.Entity("Pusula.Training.HealthCare.PhysicalExaminations.PhysicalExamination", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal?>("BMI")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("BMI");
+
+                    b.Property<int?>("DiastolicBP")
+                        .HasColumnType("integer")
+                        .HasColumnName("DiastolicBP");
+
+                    b.Property<decimal?>("Height")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("Height");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)")
+                        .HasColumnName("Note");
+
+                    b.Property<Guid>("ProtocolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("Pulse")
+                        .HasColumnType("integer")
+                        .HasColumnName("Pulse");
+
+                    b.Property<int?>("SPO2")
+                        .HasColumnType("integer")
+                        .HasColumnName("SPO2");
+
+                    b.Property<int?>("SystolicBP")
+                        .HasColumnType("integer")
+                        .HasColumnName("SystolicBP");
+
+                    b.Property<decimal?>("Temperature")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("Temperature");
+
+                    b.Property<decimal?>("VYA")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("VYA");
+
+                    b.Property<decimal?>("Weight")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)")
+                        .HasColumnName("Weight");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProtocolId")
+                        .IsUnique();
+
+                    b.ToTable("AppPhysicalExaminations", (string)null);
+                });
+
             modelBuilder.Entity("Pusula.Training.HealthCare.Protocols.Protocol", b =>
                 {
                     b.Property<Guid>("Id")
@@ -762,6 +1036,38 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.HasIndex("PatientId");
 
                     b.ToTable("AppProtocols", (string)null);
+                });
+
+            modelBuilder.Entity("Pusula.Training.HealthCare.PshychologicalStates.PshychologicalState", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("Description");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<Guid>("ProtocolId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("State")
+                        .HasColumnType("integer")
+                        .HasColumnName("State");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProtocolId")
+                        .IsUnique();
+
+                    b.ToTable("AppPshychologicalStates", (string)null);
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.TestGroupItems.TestGroupItem", b =>
@@ -2728,6 +3034,15 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.ToTable("AbpTenantConnectionStrings", (string)null);
                 });
 
+            modelBuilder.Entity("Pusula.Training.HealthCare.Anamneses.Anamnesis", b =>
+                {
+                    b.HasOne("Pusula.Training.HealthCare.Protocols.Protocol", null)
+                        .WithOne()
+                        .HasForeignKey("Pusula.Training.HealthCare.Anamneses.Anamnesis", "ProtocolId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Pusula.Training.HealthCare.Appointments.Appointment", b =>
                 {
                     b.HasOne("Pusula.Training.HealthCare.AppointmentTypes.AppointmentType", null)
@@ -2761,6 +3076,15 @@ namespace Pusula.Training.HealthCare.Migrations
                         .WithMany()
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Pusula.Training.HealthCare.Diagnoses.Diagnosis", b =>
+                {
+                    b.HasOne("Pusula.Training.HealthCare.DiagnosisGroups.DiagnosisGroup", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
@@ -2807,6 +3131,30 @@ namespace Pusula.Training.HealthCare.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Pusula.Training.HealthCare.ExaminationDiagnoses.ExaminationDiagnosis", b =>
+                {
+                    b.HasOne("Pusula.Training.HealthCare.Diagnoses.Diagnosis", null)
+                        .WithMany()
+                        .HasForeignKey("DiagnosisId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Pusula.Training.HealthCare.Protocols.Protocol", null)
+                        .WithMany()
+                        .HasForeignKey("ProtocolId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Pusula.Training.HealthCare.FallRisks.FallRisk", b =>
+                {
+                    b.HasOne("Pusula.Training.HealthCare.Protocols.Protocol", null)
+                        .WithOne()
+                        .HasForeignKey("Pusula.Training.HealthCare.FallRisks.FallRisk", "ProtocolId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Pusula.Training.HealthCare.LabRequests.LabRequest", b =>
                 {
                     b.HasOne("Pusula.Training.HealthCare.TestGroupItems.TestGroupItem", null)
@@ -2831,6 +3179,15 @@ namespace Pusula.Training.HealthCare.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Pusula.Training.HealthCare.PhysicalExaminations.PhysicalExamination", b =>
+                {
+                    b.HasOne("Pusula.Training.HealthCare.Protocols.Protocol", null)
+                        .WithOne()
+                        .HasForeignKey("Pusula.Training.HealthCare.PhysicalExaminations.PhysicalExamination", "ProtocolId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Pusula.Training.HealthCare.Protocols.Protocol", b =>
                 {
                     b.HasOne("Pusula.Training.HealthCare.Departments.Department", null)
@@ -2842,6 +3199,15 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.HasOne("Pusula.Training.HealthCare.Patients.Patient", null)
                         .WithMany()
                         .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Pusula.Training.HealthCare.PshychologicalStates.PshychologicalState", b =>
+                {
+                    b.HasOne("Pusula.Training.HealthCare.Protocols.Protocol", null)
+                        .WithOne()
+                        .HasForeignKey("Pusula.Training.HealthCare.PshychologicalStates.PshychologicalState", "ProtocolId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });

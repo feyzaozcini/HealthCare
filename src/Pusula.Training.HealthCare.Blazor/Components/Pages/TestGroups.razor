@@ -6,37 +6,70 @@
 @using Syncfusion.Blazor.Grids.Internal
 @using Syncfusion.Blazor.Navigations
 @using Microsoft.AspNetCore.Authorization
+@using Syncfusion.Blazor.Notifications
 
 
 @inject ITestGroupItemsAppService TestGroupItemsAppService
 @inject ITestGroupsAppService TestGroupsAppService
 
-@*Add Modal*@
-<SfButton CssClass="btn btn-success btn-sm" Content="Test Ekle" OnClick="OpenCreateModal" />
 
-
-@*Data Grid & List*@
-<div class="row h-100">
-    @*     Sol Panel*@
-    <div class="col-2 border-end p-2 overflow-auto">
-
-        @*Searchbox*@
-        <div class="d-flex align-items-center justify-content-center mb-2">
-            <SfTextBox Placeholder="Ara"
-                       FloatLabelType="FloatLabelType.Never"
-                       @bind-Value="Filter.FilterText"
-                       Width="80%"
-                       Input="@(async (args) => await SearchAsync(args))">
-            </SfTextBox>
-        </div>
-
-        <SfListView Width="100%" Height="100%" DataSource="@TestGroupNamesCollection" ShowHeader="true" HeaderTitle="Laboratuvar">
-            <ListViewFieldSettings TValue="LookupDto<Guid>" Id="Id" Text="DisplayName"></ListViewFieldSettings>
-        </SfListView>
+<div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+    @*Searchbox*@
+    <div class="w-50">
+        <SfTextBox Placeholder="Test Ara"
+                   FloatLabelType="FloatLabelType.Never"
+                   @bind-Value="TestGroupItemsFilter.FilterText"
+                   Width="33%"
+                   Input="@(async (args) => await SearchAsync(args))">
+        </SfTextBox>
     </div>
+
+    @*Add Items Button*@
+    <div>
+        <SfButton CssClass="btn btn-success btn-sm" Content="Test Ekle" OnClick="OpenTestGroupItemsCreateModal"></SfButton>
+    </div>
+
+    @*Add Test Group Button*@
+    <div>
+        <SfButton CssClass="btn btn-success btn-sm" Content="Test Grubu Ekle" OnClick="OpenTestGroupsCreateModal"></SfButton>
+    </div>
+</div>
+
+
+@*Lab Groups List*@
+<div class="container-fluid vh-100 d-flex flex-row">
+
+    @* Sol Panel*@
+    <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="false">
+        <GridColumns>
+            <!-- Grup Adı Sütunu -->
+            <GridColumn Field="@nameof(TestGroup.Name)" HeaderText="Test Grupları" Width="50%">
+                <Template Context="group">
+                    @if (group is TestGroupDto testGroup)
+                    {
+                        <SfButton CssClass="e-link" Content="@testGroup.Name" OnClick="(() => LoadTestGroupItems(testGroup.Id))"></SfButton>
+                    }
+                </Template>
+            </GridColumn>
+
+            <GridColumn HeaderText="Actions" Width="50" TextAlign="TextAlign.Center">
+                <Template>
+                    @if (context is TestGroupDto testGroup)
+                    {
+                        <div class="d-flex justify-content-center">
+                            <SfButton CssClass="e-small e-primary" IconCss="e-icons e-edit" OnClick="(() => OpenTestGroupUpdateModal(testGroup))"></SfButton>
+                            <SfButton CssClass="e-small e-danger" IconCss="e-icons e-delete" OnClick="(() => OpenTestGroupDeleteModal(testGroup.Id))"></SfButton>
+                        </div>
+                    }
+                </Template>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
+
 
     @*     Sağ Panel*@
     <div class="col-10 p-2">
+        @*Data Grid*@
         <SfGrid DataSource="@TestGroupItemsList" AllowPaging="true" AllowSorting="true" Height="100%">
             <GridColumns>
                 <GridColumn Field=@nameof(TestGroupItem.Code) HeaderText="Test Kodu" Width="25"></GridColumn>
@@ -49,7 +82,7 @@
                         }
                     </Template>
                 </GridColumn>
-                <GridColumn Field=@nameof(TestGroupItem.Name) HeaderText="Test Adı" Width="100" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field=@nameof(TestGroupItem.Name) HeaderText="Test Adı" Width="100" TextAlign="TextAlign.Left"></GridColumn>
                 <GridColumn Field=@nameof(TestGroupItem.TestType) HeaderText="Test Tipi" Width="25" TextAlign="TextAlign.Center"></GridColumn>
                 <GridColumn Field=@nameof(TestGroupItem.TurnaroundTime) HeaderText="Tahmini Süre" Width="25" TextAlign="TextAlign.Center"></GridColumn>
                 <GridColumn Field=@nameof(TestGroupItem.Description) HeaderText="Açıklama" Width="25" TextAlign="TextAlign.Center"></GridColumn>
@@ -58,8 +91,8 @@
                         @if (context is TestGroupItemDto testGroupItem)
                         {
                             <div class="d-flex justify-content-center">
-                                <SfButton CssClass="btn btn-primary btn-sm m-1" Content="Edit" OnClick="(() => OpenUpdateModal(testGroupItem))"></SfButton>
-                                <SfButton CssClass="btn btn-danger btn-sm m-1" Content="Delete" OnClick="(() => OpenDeleteModal(testGroupItem.Id))"></SfButton>
+                                <SfButton CssClass="e-small e-primary" IconCss="e-icons e-edit" OnClick="(() => OpenTestGroupItemUpdateModal(testGroupItem))"></SfButton>
+                                <SfButton CssClass="e-small e-danger" IconCss="e-icons e-delete" OnClick="(() => OpenTestGroupItemDeleteModal(testGroupItem.Id))"></SfButton>
                             </div>
                         }
                     </Template>
@@ -69,59 +102,58 @@
     </div>
 </div>
 
-@*Create Modal*@
-<SfDialog @ref="CreateDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Yeni Test Ekle" Visible="false">
+@*Create Test Group Items Form*@
+<SfDialog @ref="CreateTestGroupItemsDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Test Ekle" Visible="false">
     <DialogTemplates>
         <Content>
-            <EditForm Model="@CreateDto" OnValidSubmit="SaveChanges" class="needs-validation" novalidate>
+            <EditForm Model="@CreateTestGroupItemsDto" OnValidSubmit="AddTestGroupItem" class="needs-validation" novalidate>
                 <DataAnnotationsValidator />
                 <div class="row">
                     <div class="col-6">
                         <label for="testGroup">Test Grubu</label>
                         <SfDropDownList TItem="LookupDto<Guid>" TValue="Guid" DataSource="@TestGroupNamesCollection"
-                                        Placeholder="Test Grubu" @bind-Value="CreateDto.TestGroupId" CssClass="form-control">
+                                        Placeholder="Test Grubu" @bind-Value="CreateTestGroupItemsDto.TestGroupId" CssClass="form-control">
                             <DropDownListFieldSettings Text="DisplayName" Value="Id"></DropDownListFieldSettings>
                         </SfDropDownList>
-                        <ValidationMessage For="@(() => CreateDto.TestGroupId)" CssClass="invalid-feedback" />
+                        <ValidationMessage For="@(() => CreateTestGroupItemsDto.TestGroupId)" CssClass="invalid-feedback" />
                     </div>
                     <div class="col-6">
                         <label for="testName">Test Adı</label>
-                        <input type="text" id="testName" class="form-control" @bind="CreateDto.Name" placeholder="Test Adı" />
-                        <ValidationMessage For="@(() => CreateDto.Name)" CssClass="invalid-feedback" />
+                        <input type="text" id="testName" class="form-control" @bind="CreateTestGroupItemsDto.Name" placeholder="Test Adı" />
+                        <ValidationMessage For="@(() => CreateTestGroupItemsDto.Name)" CssClass="invalid-feedback" />
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-6">
                         <label for="testCode">Test Kodu</label>
-                        <input type="text" id="testCode" class="form-control" @bind="CreateDto.Code" placeholder="Test Kodu" />
-                        <ValidationMessage For="@(() => CreateDto.Code)" CssClass="invalid-feedback" />
+                        <input type="text" id="testCode" class="form-control" @bind="CreateTestGroupItemsDto.Code" placeholder="Test Kodu" />
+                        <ValidationMessage For="@(() => CreateTestGroupItemsDto.Code)" CssClass="invalid-feedback" />
                     </div>
                     <div class="col-6">
                         <label for="testType">Test Tipi</label>
-                        <input type="text" id="testType" class="form-control" @bind="CreateDto.TestType" placeholder="Test Tipi" />
-                        <ValidationMessage For="@(() => CreateDto.TestType)" CssClass="invalid-feedback" />
+                        <input type="text" id="testType" class="form-control" @bind="CreateTestGroupItemsDto.TestType" placeholder="Test Tipi" />
+                        <ValidationMessage For="@(() => CreateTestGroupItemsDto.TestType)" CssClass="invalid-feedback" />
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-12">
                         <label for="testDescription">Test Açıklaması</label>
-                        <textarea id="testDescription" class="form-control" rows="4" @bind="CreateDto.Description"
+                        <textarea id="testDescription" class="form-control" rows="4" @bind="CreateTestGroupItemsDto.Description"
                                   placeholder="Test Açıklaması"></textarea>
-                        <ValidationMessage For="@(() => CreateDto.Description)" CssClass="invalid-feedback" />
+                        <ValidationMessage For="@(() => CreateTestGroupItemsDto.Description)" CssClass="invalid-feedback" />
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-6">
                         <label for="turnaroundTime">Tahmini Süre</label>
-                        <SfNumericTextBox TValue="int" Placeholder="Tahmini Süre" CssClass="form-control"
-                                          @bind-Value="CreateDto.TurnaroundTime" Min="0" />
-                        <ValidationMessage For="@(() => CreateDto.TurnaroundTime)" CssClass="invalid-feedback" />
+                        <input type="number" id="testType" class="form-control" @bind="CreateTestGroupItemsDto.TurnaroundTime" placeholder="Test Süresi" />
+                        <ValidationMessage For="@(() => CreateTestGroupItemsDto.TurnaroundTime)" CssClass="invalid-feedback" />
                     </div>
                 </div>
                 <div class="row mt-2 mb-2">
                     <div class="col-12 text-end">
                         <button class="btn btn-success me-2" type="submit">Ekle</button>
-                        <button class="btn btn-secondary" type="button" @onclick="CloseCreateModal">İptal</button>
+                        <button class="btn btn-secondary" type="button" @onclick="CloseTestGroupItemCreateModal">İptal</button>
                     </div>
                 </div>
             </EditForm>
@@ -129,59 +161,96 @@
     </DialogTemplates>
 </SfDialog>
 
-@*Delete Modal*@
-<SfDialog @ref="DeleteDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Silme İşlemi" Visible="false">
+@*Create Test Groups Form*@
+<SfDialog @ref="CreateTestGroupsDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Test Grubu Ekle" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <EditForm Model="@CreateTestGroupsDto" OnValidSubmit="AddTestGroup" class="needs-validation" novalidate>
+                <DataAnnotationsValidator />
+                <div class="row">
+                    <div class="col-12">
+                        <label for="testGroupName">Test Adı</label>
+                        <input type="text" id="testGroupName" class="form-control" @bind="CreateTestGroupsDto.Name" placeholder="Test Grup Adı" />
+                        <ValidationMessage For="@(() => CreateTestGroupsDto.Name)" CssClass="invalid-feedback" />
+                    </div>
+                </div>
+                <div class="row mt-2 mb-2">
+                    <div class="col-12 text-end">
+                        <button class="btn btn-success me-2" type="submit">Ekle</button>
+                        <button class="btn btn-secondary" type="button" @onclick="CloseTestGroupCreateModal">İptal</button>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+@*Delete Test Group Items Modal*@
+<SfDialog @ref="DeleteTestGroupItemsDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Silme İşlemi" Visible="false">
     <DialogTemplates>
         <Content>
             <p>Silmek istediğinize emin misiniz?</p>
         </Content>
         <FooterTemplate>
-            <SfButton CssClass="btn btn-danger btn-sm" OnClick="ConfirmDelete">Evet</SfButton>
-            <SfButton CssClass="btn btn-primary btn-sm" OnClick="CloseDeleteModal">Hayır</SfButton>
+            <SfButton CssClass="btn btn-danger btn-sm" OnClick="ConfirmTestGroupItemDelete">Evet</SfButton>
+            <SfButton CssClass="btn btn-primary btn-sm" OnClick="CloseTestGroupItemDeleteModal">Hayır</SfButton>
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
 
-@*Update Modal*@
-<SfDialog @ref="UpdateDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Güncelleme" Visible="false">
+@*Delete Test Groups Modal*@
+<SfDialog @ref="DeleteTestGroupsDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Test Silme" Visible="false">
     <DialogTemplates>
         <Content>
-            <EditForm Model="@UpdateDto" OnValidSubmit="UpdateChanges" class="needs-validation" novalidate>
+            <p>Silmek istediğinize emin misiniz?</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="btn btn-danger btn-sm" OnClick="ConfirmTestGroupDelete">Evet</SfButton>
+            <SfButton CssClass="btn btn-primary btn-sm" OnClick="CloseTestGroupDeleteModal">Hayır</SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+@*Update Test Group Items Form*@
+<SfDialog @ref="UpdateTestGroupItemsDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Test Güncelleme" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <EditForm Model="@UpdateTestGroupItemsDto" OnValidSubmit="UpdateTestGroupItem" class="needs-validation" novalidate>
                 <DataAnnotationsValidator />
                 <div class="row">
                     <div class="col-6">
                         <label for="testGroup">Test Grubu</label>
                         <SfDropDownList TItem="LookupDto<Guid>" TValue="Guid" DataSource="@TestGroupNamesCollection"
-                                        Placeholder="Test Grubu" @bind-Value="UpdateDto.TestGroupId" CssClass="form-control">
+                                        Placeholder="Test Grubu" @bind-Value="UpdateTestGroupItemsDto.TestGroupId" CssClass="form-control">
                             <DropDownListFieldSettings Text="DisplayName" Value="Id"></DropDownListFieldSettings>
                         </SfDropDownList>
-                        <ValidationMessage For="@(() => UpdateDto.TestGroupId)" CssClass="invalid-feedback" />
+                        <ValidationMessage For="@(() => UpdateTestGroupItemsDto.TestGroupId)" CssClass="invalid-feedback" />
                     </div>
                     <div class="col-6">
                         <label for="testName">Test Adı</label>
-                        <input type="text" id="testName" class="form-control" @bind="UpdateDto.Name" placeholder="Test Adı" />
-                        <ValidationMessage For="@(() => UpdateDto.Name)" CssClass="invalid-feedback" />
+                        <input type="text" id="testName" class="form-control" @bind="UpdateTestGroupItemsDto.Name" placeholder="Test Adı" />
+                        <ValidationMessage For="@(() => UpdateTestGroupItemsDto.Name)" CssClass="invalid-feedback" />
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-6">
                         <label for="testCode">Test Kodu</label>
-                        <input type="text" id="testCode" class="form-control" @bind="UpdateDto.Code" placeholder="Test Kodu" />
-                        <ValidationMessage For="@(() => UpdateDto.Code)" CssClass="invalid-feedback" />
+                        <input type="text" id="testCode" class="form-control" @bind="UpdateTestGroupItemsDto.Code" placeholder="Test Kodu" />
+                        <ValidationMessage For="@(() => UpdateTestGroupItemsDto.Code)" CssClass="invalid-feedback" />
                     </div>
                     <div class="col-6">
                         <label for="turnaroundTime">Test Süresi</label>
-                        <SfNumericTextBox TValue="int" Placeholder="Test Süresi" CssClass="form-control"
-                                          @bind-Value="UpdateDto.TurnaroundTime" Min="0" />
-                        <ValidationMessage For="@(() => UpdateDto.TurnaroundTime)" CssClass="invalid-feedback" />
+                        <SfNumericTextBox TValue="int?" Placeholder="Test Süresi" CssClass="form-control"
+                                          @bind-Value="UpdateTestGroupItemsDto.TurnaroundTime" Min="0" />
+                        <ValidationMessage For="@(() => UpdateTestGroupItemsDto.TurnaroundTime)" CssClass="invalid-feedback" />
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-12">
                         <label for="testDescription">Test Açıklaması</label>
-                        <textarea id="testDescription" class="form-control" rows="4" @bind="UpdateDto.Description"
+                        <textarea id="testDescription" class="form-control" rows="4" @bind="UpdateTestGroupItemsDto.Description"
                                   placeholder="Test Açıklaması"></textarea>
-                        <ValidationMessage For="@(() => UpdateDto.Description)" CssClass="invalid-feedback" />
+                        <ValidationMessage For="@(() => UpdateTestGroupItemsDto.Description)" CssClass="invalid-feedback" />
                     </div>
                 </div>
                 <div class="row mt-2">
@@ -194,16 +263,51 @@
     </DialogTemplates>
 </SfDialog>
 
+@*Update Test Groups Form*@
+<SfDialog @ref="UpdateTestGroupsDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Test Grubu Güncelleme" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <EditForm Model="@UpdateTestGroupsDto" OnValidSubmit="AddTestGroup" class="needs-validation" novalidate>
+                <DataAnnotationsValidator />
+                <div class="row">
+                    <div class="col-12">
+                        <label for="testGroupName">Test Adı</label>
+                        <input type="text" id="testGroupName" class="form-control" @bind="UpdateTestGroupsDto.Name" placeholder="Test Grup Adı" />
+                        <ValidationMessage For="@(() => UpdateTestGroupsDto.Name)" CssClass="invalid-feedback" />
+                    </div>
+                </div>
+                <div class="row mt-2 mb-2">
+                    <div class="col-12 text-end">
+                        <button class="btn btn-success me-2" type="submit">Ekle</button>
+                        <button class="btn btn-secondary" type="button" @onclick="CloseTestGroupUpdateModal">İptal</button>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+@*Toast*@
+@* <SfToast @ref="ToastObj" Timeout="3000" Position="new Position { X = 'Right', Y = 'Top' }">
+    <ToastTemplates>
+        <Template>
+            <div class="e-toast-content">@ErrorMessage</div>
+        </Template>
+    </ToastTemplates>
+</SfToast> *@
+
+
 @*  ****************** YAPILACAKLAR ******************
     - Styles .css altına taşınacak, sayfada olmayacak.
-    - Test Grubu ekleme butonu olacak.
     - LabGroups ve LabGroupItems Cache alınacak (inş.)
     - Test ekleme modalında required olmayan alanlar boş kalınca hata veriyor. Düzeltilecek.
+    - Validation mesaj css'i düzenlenecek.
+    - Modallar ve formlar componente dönüştürülecek (çok tekrar var.)
+    - Searchbox sayfada güzel bir şekilde konumlandırılacak.
 *@
 
 <style>
-    /* Syncfusion TextBox özelleştirmesi */
-
+    /*      Syncfusion TextBox özelleştirmesi */
     .invalid-feedback {
         color: red;
         font-size: 0.875rem;
