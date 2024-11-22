@@ -17,8 +17,8 @@ public class TestGroupItem : AuditedEntity<Guid>
 
     [NotNull]
     public string TestType { get; private set; } = null!; // Test tipi, arayüzde kullanılacak. Senaryosu gerekirse tasarlanacak.
-    public string Description { get; private set; } = null!;
-    public int TurnaroundTime { get; set; } // Tetkikin tahmini tamamlanma süresi. Saat cinsinden tanımlanacak. Arayüzde gün ve saat dönüşümü yapılacak.
+    public string? Description { get; private set; } 
+    public int? TurnaroundTime { get; set; } // Tetkikin tahmini tamamlanma süresi. Saat cinsinden tanımlanacak. Arayüzde gün ve saat dönüşümü yapılacak.
 
     protected TestGroupItem()
     {
@@ -30,8 +30,8 @@ public class TestGroupItem : AuditedEntity<Guid>
         string name,
         string code,
         string testType,
-        string description,
-        int turnaroundTime)
+        string? description,
+        int? turnaroundTime)
     {
         Id = id;
         SetTestGroupId(testGroupId);
@@ -66,12 +66,12 @@ public class TestGroupItem : AuditedEntity<Guid>
         TestType = testType;
     }
 
-    public void SetDescription(string description)
+    public void SetDescription(string? description)
     {
         Check.Length(description, nameof(description), TestGroupItemConsts.DescriptionMaxLength);
         Description = description;
     }
-    public void SetTurnaroundTime(int turnaroundTime)
+    public void SetTurnaroundTime(int? turnaroundTime)
     {
         TurnaroundTime = turnaroundTime;
     }

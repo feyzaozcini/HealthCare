@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.TestGroupItems;
+using Pusula.Training.HealthCare.TestGroups;
 using Syncfusion.Blazor.DropDowns;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
 using Syncfusion.Blazor.Navigations;
+using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Popups;
 using System;
 using System.Collections.Generic;
@@ -19,21 +22,24 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
     public partial class TestGroups
     {
         private List<TestGroupItemDto> TestGroupItemsList { get; set; } = new List<TestGroupItemDto>();
+        private List<TestGroupDto> TestGroupsList { get; set; } = new List<TestGroupDto>();
         private IReadOnlyList<LookupDto<Guid>> TestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
-        private GetTestGroupItemsInput Filter { get; set; }
+        private GetTestGroupItemsInput TestGroupItemsFilter { get; set; }
+        private GetTestGroupsInput TestGroupsFilter { get; set; }
 
 
-        private TestGroupItemsCreateDto CreateDto = new();
-        private TestGroupItemsUpdateDto UpdateDto = new();
+        private TestGroupItemsCreateDto CreateTestGroupItemsDto = new();
+        private TestGroupItemsUpdateDto UpdateTestGroupItemsDto = new();
+        private TestGroupsCreateDto CreateTestGroupsDto = new();
+        private TestGroupsUpdateDto UpdateTestGroupsDto = new();
+
+        private SfToast ToastObj;
+        private string ErrorMessage = string.Empty;
 
         private SfGrid<TestGroupItemDto> DefaultGrid = null!;
 
         private Guid? SelectedTestGroupId { get; set; } = null;
         private Guid? SelectedTestGroupItemId;
-
-        private bool IsUpdateModalVisible = false;
-        private bool IsDeleteModalVisible = false;
-        private bool IsCreateModalVisible = false;
 
         //private bool CanCreateTest { get; set; }
         //private bool CanEditTest { get; set; }
@@ -44,27 +50,22 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private long TotalCount;
 
         //Modal yönetimi
-        private SfDialog CreateDialog;
-        private SfDialog DeleteDialog;
-        private SfDialog UpdateDialog;
+        private SfDialog CreateTestGroupItemsDialog;
+        private SfDialog CreateTestGroupsDialog;
+        private SfDialog DeleteTestGroupItemsDialog;
+        private SfDialog DeleteTestGroupsDialog;
+        private SfDialog UpdateTestGroupItemsDialog;
+        private SfDialog UpdateTestGroupsDialog;
 
         protected override async Task OnInitializedAsync()
         {
             //await SetPermissionsAsync();
 
-            Filter = new GetTestGroupItemsInput
-            {
-                FilterText = string.Empty,
-                Name = string.Empty,
-                Code = string.Empty,
-                TestType = string.Empty,
-                Description = string.Empty,
-                TestGroupId = Guid.Empty,
-                MaxResultCount = PageSize,
-                SkipCount = 0
-            };
+            TestGroupsFilter = new GetTestGroupsInput();
+            TestGroupItemsFilter = new GetTestGroupItemsInput();
             await LoadLookupsAsync();
             await GetTestGroupItemsAsync();
+            await GetTestGroupsAsync();
         }
 
 
@@ -74,7 +75,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             var input = new LookupRequestDto
             {
                 MaxResultCount = PageSize,
-                Filter = Filter.FilterText
+                Filter = TestGroupItemsFilter.FilterText
             };
 
             var result = await TestGroupsAppService.GetGroupNameLookupAsync(input);
@@ -82,19 +83,29 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
             if (TestGroupNamesCollection.Any())
             {
-                Filter.TestGroupId = TestGroupNamesCollection.First().Id;
+                TestGroupItemsFilter.TestGroupId = TestGroupNamesCollection.First().Id;
             }
         }
+        private async Task LoadTestGroupItems(Guid groupId)
+        {
+            // Test grubu ID'sine göre testleri getir
+            SelectedTestGroupId = groupId;
+            var result = await TestGroupItemsAppService.GetListAsync(new GetTestGroupItemsInput
+            {
+                TestGroupId = groupId
+            });
 
+            TestGroupItemsList = result.Items.ToList();
+        }
         private async Task GetTestGroupItemsAsync()
         {
             var input = new GetTestGroupItemsInput
             {
-                FilterText = Filter.FilterText,
-                Name = Filter.Name,
-                Code = Filter.Code,
-                TestType = Filter.TestType,
-                Description = Filter.Description,
+                FilterText = TestGroupItemsFilter.FilterText,
+                Name = TestGroupItemsFilter.Name,
+                Code = TestGroupItemsFilter.Code,
+                TestType = TestGroupItemsFilter.TestType,
+                Description = TestGroupItemsFilter.Description,
                 MaxResultCount = PageSize,
                 SkipCount = (CurrentPage - 1) * PageSize,
                 TestGroupId = SelectedTestGroupId ?? Guid.Empty
@@ -102,6 +113,20 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
             var result = await TestGroupItemsAppService.GetListAsync(input);
             TestGroupItemsList = result.Items.ToList();
+            TotalCount = result.TotalCount;
+        }
+
+        private async Task GetTestGroupsAsync()
+        {
+            var input = new GetTestGroupsInput
+            {
+                FilterText = TestGroupsFilter.FilterText,
+                Name = TestGroupsFilter.Name,
+                MaxResultCount = PageSize,
+                SkipCount = (CurrentPage - 1) * PageSize
+            };
+            var result = await TestGroupsAppService.GetListAsync(input);
+            TestGroupsList = result.Items.ToList();
             TotalCount = result.TotalCount;
         }
 
@@ -113,29 +138,52 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         #endregion
 
         #region Modals
-        private async Task OpenCreateModal()
+        private async Task OpenTestGroupItemsCreateModal()
         {
-            CreateDto = new TestGroupItemsCreateDto();
-            await CreateDialog.ShowAsync(); 
+            CreateTestGroupItemsDto = new TestGroupItemsCreateDto();
+            await CreateTestGroupItemsDialog.ShowAsync(); 
         }
-        private async Task CloseCreateModal()
+        private async Task OpenTestGroupsCreateModal()
         {
-            await CreateDialog.HideAsync(); 
+            CreateTestGroupsDto = new TestGroupsCreateDto();
+            await CreateTestGroupsDialog.ShowAsync();
         }
-        private async Task OpenDeleteModal(Guid id)
+  
+        private async Task CloseTestGroupItemCreateModal()
         {
-            SelectedTestGroupItemId = id;
-            await DeleteDialog.ShowAsync(); 
+            await CreateTestGroupItemsDialog.HideAsync(); 
         }
 
-        private async Task CloseDeleteModal()
+        private async Task CloseTestGroupCreateModal()
+        {
+            await CreateTestGroupsDialog.HideAsync();
+        }
+        private async Task OpenTestGroupItemDeleteModal(Guid id)
+        {
+            SelectedTestGroupItemId = id;
+            await DeleteTestGroupItemsDialog.ShowAsync(); 
+        }
+
+        private async Task OpenTestGroupDeleteModal(Guid id)
+        {
+            SelectedTestGroupId = id;
+            await DeleteTestGroupsDialog.ShowAsync();
+        }
+
+        private async Task CloseTestGroupItemDeleteModal()
         {
             SelectedTestGroupItemId = null;
-            await DeleteDialog.HideAsync(); 
+            await DeleteTestGroupItemsDialog.HideAsync(); 
         }
-        private async Task OpenUpdateModal(TestGroupItemDto item)
+
+        private async Task CloseTestGroupDeleteModal()
         {
-            UpdateDto = new TestGroupItemsUpdateDto
+            SelectedTestGroupId = null;
+            await DeleteTestGroupsDialog.HideAsync();
+        }
+        private async Task OpenTestGroupItemUpdateModal(TestGroupItemDto item)
+        {
+            UpdateTestGroupItemsDto = new TestGroupItemsUpdateDto
             {
                 Id = item.Id,
                 Name = item.Name,
@@ -145,38 +193,75 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 Description = item.Description,
                 TurnaroundTime = item.TurnaroundTime
             };
-            await UpdateDialog.ShowAsync(); 
+            await UpdateTestGroupItemsDialog.ShowAsync(); 
         }
-        private async Task CloseUpdateModal()
+        private async Task OpenTestGroupUpdateModal(TestGroupDto item)
         {
-            UpdateDto = new TestGroupItemsUpdateDto();
-            await UpdateDialog.HideAsync();
+            UpdateTestGroupItemsDto = new TestGroupItemsUpdateDto
+            {
+                Id = item.Id,
+                Name = item.Name,
+            };
+            await UpdateTestGroupsDialog.ShowAsync();
+        }
+        private async Task CloseTestGroupItemUpdateModal()
+        {
+            UpdateTestGroupItemsDto = new TestGroupItemsUpdateDto();
+            await UpdateTestGroupItemsDialog.HideAsync();
+        }
+        private async Task CloseTestGroupUpdateModal()
+        {
+            UpdateTestGroupsDto = new TestGroupsUpdateDto();
+            await UpdateTestGroupsDialog.HideAsync();
         }
 
         #endregion
 
         #region Save Changes
         //Deðiþiklikleri Kaydetme
-        private async Task UpdateChanges()
+        private async Task UpdateTestGroupItem()
         {
-            await TestGroupItemsAppService.UpdateAsync(UpdateDto);
-            await CloseUpdateModal();
+            await TestGroupItemsAppService.UpdateAsync(UpdateTestGroupItemsDto);
+            await CloseTestGroupItemUpdateModal();
             await GetTestGroupItemsAsync();
         }
-        private async Task SaveChanges()
+        private async Task UpdateTestGroup()
         {
-            await TestGroupItemsAppService.CreateAsync(CreateDto);
-            await CloseCreateModal();
+            await TestGroupsAppService.UpdateAsync(UpdateTestGroupsDto);
+            await CloseTestGroupUpdateModal();
+            await GetTestGroupsAsync();
+        }
+        private async Task AddTestGroupItem()
+        {
+            await TestGroupItemsAppService.CreateAsync(CreateTestGroupItemsDto);
+            await CloseTestGroupItemCreateModal();
             await GetTestGroupItemsAsync();
         }
-        private async Task ConfirmDelete()
+
+        private async Task AddTestGroup()
+        {
+            await TestGroupsAppService.CreateAsync(CreateTestGroupsDto);
+            await CloseTestGroupCreateModal();
+            await GetTestGroupsAsync();
+        }
+        private async Task ConfirmTestGroupItemDelete()
         {
             if (SelectedTestGroupItemId.HasValue)
             {
                 await TestGroupItemsAppService.DeleteAsync(SelectedTestGroupItemId.Value);
                 await GetTestGroupItemsAsync();
             }
-            await CloseDeleteModal();
+            await CloseTestGroupItemDeleteModal();
+        }
+
+        private async Task ConfirmTestGroupDelete()
+        {
+            if (SelectedTestGroupId.HasValue)
+            {
+                await TestGroupItemsAppService.DeleteAsync(SelectedTestGroupId.Value);
+                await GetTestGroupsAsync();
+            }
+            await CloseTestGroupDeleteModal();
         }
 
         #endregion
@@ -186,12 +271,30 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private async Task SearchAsync(InputEventArgs args)
         {
             CurrentPage = 1;
-            Filter.FilterText = args.Value; 
+            TestGroupItemsFilter.FilterText = args.Value; 
             await GetTestGroupItemsAsync();
         }
 
         #endregion
 
+
+        #region Toast
+        private async Task HandleValidSubmit()
+        {
+            Console.WriteLine("Ýþlem Baþarýlý!");
+        }
+
+        private async Task HandleInvalidSubmit(EditContext editContext)
+        {
+            var messages = editContext.GetValidationMessages().ToList();
+            if (messages.Any())
+            {
+                ErrorMessage = string.Join(", ", messages);
+                await ToastObj.ShowAsync();
+            }
+        }
+
+        #endregion
         //#region Permission
         ////Yetkilendirme
         //private async Task SetPermissionsAsync()
