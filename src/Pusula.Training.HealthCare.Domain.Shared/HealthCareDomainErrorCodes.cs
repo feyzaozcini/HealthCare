@@ -15,4 +15,14 @@ public static class HealthCareDomainErrorCodes
     public const string CountryNameExists = "Böyle bir ülke adı bulunmaktadır.";
 
     public const string CountryNotFound = "Böyle bir ülke adı bulunmamaktadır";
+
+
+    //LAB
+    public const string TestGroupNameAlreadyExists = "Bu isimde bir test grubu zaten mevcut.";
+    public const string TestGroupCannotBeDeleted = "Bu test grubuna bağlı testler bulunduğundan silinemez.";
+    public const string TestGroupItemCodeAlreadyExists = "Bu test kodu zaten kullanılıyor.";
+    public const string TestGroupItemNameAlreadyExists = "Bu test adı zaten kullanılıyor.";
+    public const string TestCannotBeDeletedDueToRequests = "Bu teste ait talepler bulunduğundan silinemez.";
+    public const string TestGroupCannotBeChangedDueToActiveRequests = "Bu teste ait aktif talepler bulunduğu için grubu değiştirilemez.";
+    public const string TurnaroundTimeCannotBeNegative = "Sonuçlanma süresi sıfırdan küçük olamaz.";
 }

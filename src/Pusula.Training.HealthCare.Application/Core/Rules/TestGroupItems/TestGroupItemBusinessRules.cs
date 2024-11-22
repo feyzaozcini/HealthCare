@@ -1,4 +1,5 @@
-﻿using Pusula.Training.HealthCare.LabRequests;
+﻿using Pusula.Training.HealthCare.Exceptions;
+using Pusula.Training.HealthCare.LabRequests;
 using Pusula.Training.HealthCare.TestGroupItems;
 using System;
 using System.Collections.Generic;
@@ -12,42 +13,49 @@ namespace Pusula.Training.HealthCare.Core.Rules.TestGroupItems;
 
 public class TestGroupItemBusinessRules(ITestGroupItemRepository testGroupItemRepository, ILabRequestRepository labRequestRepository) : ITestGroupItemBusinessRules
 {
-    public async Task ValidateTestItemCreationAsync(string code)
+    //Aynı test kodu eklenemez.
+    public async Task TestGroupItemCodeDuplicatedAsync(string code)
     {
-        var codeExists = await testGroupItemRepository.AnyAsync(ti => ti.Code == code);
-        if (codeExists)
-        {
-            //Globale çekilecek.
-            throw new BusinessException("Bu test kodu zaten kullanılıyor.");
-        }
+        HealthCareException.ThrowIf(
+            HealthCareDomainErrorCodes.TestGroupItemCodeAlreadyExists,
+            await testGroupItemRepository.AnyAsync(ti => ti.Code == code)
+        );
     }
 
-    public async Task ValidateTestItemDeletionAsync(Guid testItemId)
+    //Teste ait talepler varsa test silinemez.
+    public async Task ValidateTestDeletableAsync(Guid testItemId)
     {
-        var hasActiveRequests = await labRequestRepository.AnyAsync(lr => lr.Id == testItemId);
-        if (hasActiveRequests)
-        {
-            //Globale çekilecek.
-            throw new BusinessException("Bu teste ait talepler bulunduğundan silinemez.");
-        }
+        HealthCareException.ThrowIf(
+            HealthCareDomainErrorCodes.TestCannotBeDeletedDueToRequests,
+            await labRequestRepository.AnyAsync(lr => lr.TestGroupItemId == testItemId)
+        );
     }
 
-    public async Task ValidateTestItemUpdateAsync(Guid testItemId, Guid newGroupId)
+    //Teste ait talepler varsa grubu güncellenemez.
+    public async Task ValidateTestGroupChangeAllowedAsync(Guid testItemId, Guid newGroupId)
     {
-        var hasActiveRequests = await labRequestRepository.AnyAsync(lr => lr.Id == testItemId);
-        if (hasActiveRequests)
-        {
-            //Globale çekilecek.
-            throw new BusinessException("Bu teste ait aktif talepler bulunduğu için grubu değiştirilemez.");
-        }
+        HealthCareException.ThrowIf(
+            HealthCareDomainErrorCodes.TestGroupCannotBeChangedDueToActiveRequests,
+            await labRequestRepository.AnyAsync(lr => lr.TestGroupItemId == testItemId)
+        );
     }
 
-    public void ValidateTurnaroundTime(decimal turnaroundTime)
+    //Testin sonuçlanma süresi 0 saatten az olamaz.
+    public Task ValidateMinimumTurnaroundTimeAsync(decimal turnaroundTime)
     {
-        if (turnaroundTime < 0)
-        {
-            //Globale çekilecek.
-            throw new BusinessException("Sonuçlanma süresi sıfırdan küçük olamaz.");
-        }
+        HealthCareException.ThrowIf(
+            HealthCareDomainErrorCodes.TurnaroundTimeCannotBeNegative,
+            turnaroundTime < 0
+        );
+
+        return Task.CompletedTask; // Synchronous operation returned as Task
+    }
+
+    public async Task TestGroupItemNameDuplicatedAsync(string name)
+    {
+        HealthCareException.ThrowIf(
+           HealthCareDomainErrorCodes.TestGroupItemNameAlreadyExists,
+           await testGroupItemRepository.AnyAsync(ti => ti.Name == name)
+       );
     }
 }

@@ -81,8 +81,26 @@
                 </GridColumn>
                 <GridColumn Field=@nameof(TestGroupItem.Name) HeaderText="Test Adı" Width="100" TextAlign="TextAlign.Left"></GridColumn>
                 <GridColumn Field=@nameof(TestGroupItem.TestType) HeaderText="Test Tipi" Width="25" TextAlign="TextAlign.Center"></GridColumn>
-                <GridColumn Field=@nameof(TestGroupItem.TurnaroundTime) HeaderText="Tahmini Süre" Width="25" TextAlign="TextAlign.Center"></GridColumn>
-                <GridColumn Field=@nameof(TestGroupItem.Description) HeaderText="Açıklama" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn HeaderText="Tahmini Süre" Width="25" TextAlign="TextAlign.Center">
+                    <Template>
+                        @if (context is TestGroupItemDto testGroupItem)
+                        {
+                            <span>@($"{testGroupItem.TurnaroundTime} saat")</span>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn HeaderText="Açıklama" Width="25" TextAlign="TextAlign.Center">
+                    <Template>
+                        @if (context is TestGroupItemDto testGroupItem)
+                        {
+                            <SfButton CssClass="e-small e-link"
+                                      OnClick="(() => OpenDescriptionModal(testGroupItem.Description))"
+                                      Style="@(string.IsNullOrEmpty(testGroupItem.Description) ? "display:none;" : "")">
+                                <i class="fa-regular fa-file"></i>
+                            </SfButton>
+                        }
+                    </Template>
+                </GridColumn>
                 <GridColumn HeaderText="Actions" Width="30" TextAlign="TextAlign.Center">
                     <Template>
                         @if (context is TestGroupItemDto testGroupItem)
@@ -288,6 +306,18 @@
     </DialogTemplates>
 </SfDialog>
 
+@*Description Detail Modal*@
+<SfDialog @ref="DescriptionDialog" IsModal="true" ShowCloseIcon="true" Width="400px" Header="Açıklama" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <p>@SelectedDescription</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="e-small e-secondary" Content="Kapat" OnClick="CloseDescriptionModal"></SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
 @*Toast*@
 <SfToast @ref="ToastObj" Width="300px">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
@@ -296,5 +326,4 @@
 
 @*  ****************** YAPILACAKLAR ******************
     - LabGroups ve LabGroupItems Cache alınacak (inş.)
-    - Hata mesajları business exception'dan çekilecek.
 *@
