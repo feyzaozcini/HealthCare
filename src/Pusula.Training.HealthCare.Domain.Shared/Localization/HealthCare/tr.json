@@ -7,6 +7,7 @@
     "LongWelcomeMessage": "Uygulamaya hoşgeldiniz. Bu, ABP framework'ü üzerine bina edilmiş bir başlangıç projesidir. Daha fazla bilgi için abp.io adresini ziyaret edebilirsiniz.",
     "Countries": "Ülkeler",
     "Menu:Countries": "Ülkeler",
-    "Menu:Test Groups": "Laboratuvar Testleri"
+    "Menu:TestGroups": "Laboratuvar Testleri",
+    "Menu:TestRequests": "Test İstemleri"
   }
 }

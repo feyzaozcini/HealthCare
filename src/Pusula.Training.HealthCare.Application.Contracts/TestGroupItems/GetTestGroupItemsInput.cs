@@ -26,7 +26,7 @@ public class GetTestGroupItemsInput : PagedAndSortedResultRequestDto
             TestType = string.Empty;
             Description = string.Empty;
             TestGroupId = Guid.Empty;
-            MaxResultCount = PagedAndSortedResultRequestDto.DefaultMaxResultCount; 
+            MaxResultCount = PagedAndSortedResultRequestDto.MaxMaxResultCount; 
             SkipCount = 0;
     }
 }

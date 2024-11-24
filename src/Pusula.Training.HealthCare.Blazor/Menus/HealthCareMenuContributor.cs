@@ -68,6 +68,15 @@ public class HealthCareMenuContributor : IMenuContributor
                 requiredPermissionName: HealthCarePermissions.TestGroups.Default)
         );
 
+        context.Menu.AddItem(
+            new ApplicationMenuItem(
+                HealthCareMenus.TestGroups,
+                l["Menu:TestRequests"],
+                url: "/lab-request",
+                icon: "fa fa-receipt",
+                requiredPermissionName: HealthCarePermissions.TestGroups.Default)
+        );
+
         return Task.CompletedTask;
     }
 

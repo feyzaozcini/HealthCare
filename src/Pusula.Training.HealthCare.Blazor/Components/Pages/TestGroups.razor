@@ -1,4 +1,5 @@
 ﻿@page "/test-groups"
+
 @using Pusula.Training.HealthCare.Permissions
 @using Pusula.Training.HealthCare.Shared
 @using Pusula.Training.HealthCare.TestGroupItems
@@ -36,8 +37,7 @@
 
     @*Sol Panel*@
     <div class="col-2">
-        <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="false" RowHeight="40" Height="459px">
-            <GridPageSettings PageSize="10"></GridPageSettings>
+        <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
             <GridColumns>
                 <!-- Grup Adı Sütunu -->
                 <GridColumn Field="@nameof(TestGroup.Name)" HeaderText="Test Grupları" Width="70">
@@ -66,8 +66,7 @@
     @*Sağ Panel*@
     <div class="col-10">
         @*Data Grid*@
-        <SfGrid DataSource="@TestGroupItemsList" AllowPaging="true" AllowSorting="true" RowHeight="40" Height="400px">
-            <GridPageSettings PageSize="10"></GridPageSettings>
+        <SfGrid DataSource="@TestGroupItemsList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
             <GridColumns>
                 <GridColumn Field=@nameof(TestGroupItem.Code) HeaderText="Test Kodu" Width="25"></GridColumn>
                 <GridColumn HeaderText="Test Grubu" Width="25">

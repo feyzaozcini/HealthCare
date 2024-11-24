@@ -106,7 +106,7 @@ public partial class TestGroups
             Code = TestGroupItemsFilter?.Code,
             TestType = TestGroupItemsFilter?.TestType,
             Description = TestGroupItemsFilter?.Description,
-            MaxResultCount = 20,
+            MaxResultCount = TestGroupItemsFilter!.MaxResultCount,
             SkipCount = (CurrentPage - 1) * PageSize,
             TestGroupId = SelectedTestGroupId ?? Guid.Empty
         };

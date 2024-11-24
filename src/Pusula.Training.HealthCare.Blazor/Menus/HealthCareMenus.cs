@@ -10,4 +10,5 @@ public class HealthCareMenus
     public const string Protocols = Prefix + ".Protocols";
     public const string Departments = Prefix + ".Departments";
     public const string TestGroups = Prefix + ".TestGroups";
+    public const string TestRequests = Prefix + ".TestRequests";
 }
