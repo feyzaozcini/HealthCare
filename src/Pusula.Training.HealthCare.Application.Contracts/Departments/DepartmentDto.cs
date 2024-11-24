@@ -11,5 +11,5 @@ public class DepartmentDto : FullAuditedEntityDto<Guid>, IHasConcurrencyStamp
 
     public string ConcurrencyStamp { get; set; } = null!;
 
-    public List<string> DoctorDepartments { get; set; } = new();
+    public List<Guid> DoctorDepartments { get; set; } = new();
 }

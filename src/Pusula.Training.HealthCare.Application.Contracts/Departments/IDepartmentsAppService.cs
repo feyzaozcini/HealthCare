@@ -1,3 +1,4 @@
+using Pusula.Training.HealthCare.Doctors;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,4 +19,6 @@ public interface IDepartmentsAppService : IApplicationService
     Task DeleteByIdsAsync(List<Guid> departmentIds);
     Task DeleteAllAsync(GetDepartmentsInput input);
     Task<Shared.DownloadTokenResultDto> GetDownloadTokenAsync();
+    Task<DepartmentWithDoctorsDto> GetWithDoctorsAsync(Guid id);
+    Task<List<DoctorDto>> GetDoctorsByDepartmentIdAsync(Guid departmentId);
 }

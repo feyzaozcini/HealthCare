@@ -1,4 +1,5 @@
-﻿using Pusula.Training.HealthCare.Patients;
+﻿using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,8 @@ namespace Pusula.Training.HealthCare.Doctors
 {
     public interface IDoctorsAppService : IApplicationService
     {
+        Task<DoctorWithDepartmentDto> GetWithDepartmentsAsync(Guid id);
+
         Task<DoctorDto> CreateAsync(DoctorCreateDto input);
         Task<PagedResultDto<DoctorWithNavigationPropertiesDto>> GetListAsync(GetDoctorsInput input);
 
@@ -22,16 +25,21 @@ namespace Pusula.Training.HealthCare.Doctors
 
         Task<PagedResultDto<LookupDto<Guid>>> GetTitleLookupAsync(LookupRequestDto input);
 
+        Task<PagedResultDto<LookupDto<Guid>>> GetDepartmentLookupAsync(LookupRequestDto input);
+
         Task DeleteAsync(Guid id);
 
         Task<DoctorDto> UpdateAsync(DoctorUpdateDto input);
 
         Task<IRemoteStreamContent> GetListAsExcelFileAsync(DoctorExcelDownloadDto input);
+
         Task DeleteByIdsAsync(List<Guid> doctorIds);
 
         Task DeleteAllAsync(GetDoctorsInput input);
+
         Task<Pusula.Training.HealthCare.Shared.DownloadTokenResultDto> GetDownloadTokenAsync();
 
         Task<DoctorDto> GetDoctorWithUserIdAsync(Guid userId);
+
     }
 }

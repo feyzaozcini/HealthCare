@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Polly;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.DoctorDepartments;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
@@ -14,13 +15,31 @@ using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.Identity;
+using static Volo.Abp.Identity.Settings.IdentitySettingNames;
 
 namespace Pusula.Training.HealthCare.Doctors
 {
     public class EfCoreDoctorRepository(IDbContextProvider<HealthCareDbContext> dbContextProvider)
     : EfCoreRepository<HealthCareDbContext, Doctor, Guid>(dbContextProvider), IDoctorRepository
     {
-       
+        public async Task<Doctor> GetWithDepartmentsAsync(Guid doctorId)
+        {
+            var dbContext = await GetDbContextAsync();
+            return await dbContext.Doctors
+                .Include(d => d.DoctorDepartments)
+                .ThenInclude(dd => dd.Department)
+                .FirstOrDefaultAsync(d => d.Id == doctorId);
+        }
+
+        public async Task<List<Department>> GetDepartmentsByDoctorIdAsync(Guid doctorId)
+        {
+            var dbContext = await GetDbContextAsync();
+            return await dbContext.DoctorDepartments
+                .Where(dd => dd.DoctorId == doctorId)
+                .Select(dd => dd.Department)
+                .ToListAsync();
+        }
+
         public async Task DeleteAllAsync(string? filterText = null, 
             Guid? userId = null, 
             Guid? titleId = null, 
@@ -36,11 +55,11 @@ namespace Pusula.Training.HealthCare.Doctors
             var ids = query.Select(x => x.Doctor.Id);
             await DeleteManyAsync(ids, cancellationToken: GetCancellationToken(cancellationToken));
         }
-       
 
-       
-        public async Task<DoctorWithNavigationProperties> GetWithNavigationProperties(Guid id, 
-            CancellationToken cancellationToken = default)
+
+
+        public async Task<DoctorWithNavigationProperties> GetWithNavigationProperties(Guid id,
+        CancellationToken cancellationToken = default)
         {
             var dbContext = await GetDbContextAsync();
             return (await GetDbSetAsync()).Where(b => b.Id == id)
@@ -51,12 +70,12 @@ namespace Pusula.Training.HealthCare.Doctors
                     Title = dbContext.Set<Title>().FirstOrDefault(c => c.Id == doctor.TitleId)!,
                     DoctorDepartments = dbContext.Set<DoctorDepartment>()
                 .Where(c => c.DoctorId == doctor.Id)
-                .Select(dd => dd.Department.Name)
                 .ToList()
                 })
                 .FirstOrDefault()!;
         }
-      
+
+
         public async Task<List<DoctorWithNavigationProperties>> GetListWithNavigationPropertiesAsync(string? filterText = null, 
             Guid? userId = null, 
             Guid? titleId = null, 
@@ -106,6 +125,15 @@ namespace Pusula.Training.HealthCare.Doctors
             return await query.LongCountAsync(GetCancellationToken(cancellationToken));
         }
 
+        public async Task<List<DoctorDepartment>> GetDoctorDepartmentsAsync(Guid doctorId, CancellationToken cancellationToken = default)
+        {
+            var dbContext = await GetDbContextAsync();
+
+            return await dbContext.Set<DoctorDepartment>()
+                .Where(dd => dd.DoctorId == doctorId)
+                .Include(dd => dd.Department) 
+                .ToListAsync(cancellationToken);
+        }
 
         protected virtual IQueryable<Doctor> ApplyFilter(
             IQueryable<Doctor> query,
@@ -134,12 +162,12 @@ namespace Pusula.Training.HealthCare.Doctors
          from title in titles.DefaultIfEmpty()
          join user in (await GetDbContextAsync()).Users on doctor.UserId equals user.Id into users
          from user in users.DefaultIfEmpty()
-         select new DoctorWithNavigationProperties
-         {
-             Doctor = doctor,
-             Title = title,
+                   select new DoctorWithNavigationProperties
+                   {
+                       Doctor = doctor,
+                       Title = title,
              User = user
-         };
+                   };
 
         protected virtual IQueryable<DoctorWithNavigationProperties> ApplyFilter(
             IQueryable<DoctorWithNavigationProperties> query,

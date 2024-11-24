@@ -21,6 +21,11 @@ namespace Pusula.Training.HealthCare.Controllers.Doctors
 
     public class DoctorController(IDoctorsAppService doctorsAppService) : HealthCareController, IDoctorsAppService
     {
+        [HttpGet("{id}/with-departments")]
+        public async Task<DoctorWithDepartmentDto> GetWithDepartmentsAsync(Guid id)
+        {
+            return await doctorsAppService.GetWithDepartmentsAsync(id);
+        }
         [HttpPost]
         public Task<DoctorDto> CreateAsync(DoctorCreateDto input)
         {
@@ -54,8 +59,13 @@ namespace Pusula.Training.HealthCare.Controllers.Doctors
         {
             return doctorsAppService.GetAsync(id);
         }
+        [HttpGet]
+        [Route("department-lookup")]
+        public Task<PagedResultDto<LookupDto<Guid>>> GetDepartmentLookupAsync(LookupRequestDto input)
+        {
+            throw new NotImplementedException();
+        }
 
-       
         [HttpGet]
         [Route("by-user/{userId}")]
         public Task<DoctorDto> GetDoctorWithUserIdAsync(Guid userId)
@@ -70,7 +80,12 @@ namespace Pusula.Training.HealthCare.Controllers.Doctors
             throw new NotImplementedException();
         }
 
-
+        [HttpGet]
+        [Route("identityUser-lookup")]
+        public Task<PagedResultDto<LookupDto<Guid>>> GetIdentityUserLookupAsync(LookupRequestDto input)
+        {
+            throw new NotImplementedException();
+        }
 
         [HttpGet]
         [Route("as-excel-file")]
@@ -80,10 +95,7 @@ namespace Pusula.Training.HealthCare.Controllers.Doctors
         }
 
         [HttpGet]
-        public Task<PagedResultDto<DoctorWithNavigationPropertiesDto>> GetListAsync(GetDoctorsInput input)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<PagedResultDto<DoctorWithNavigationPropertiesDto>> GetListAsync(GetDoctorsInput input) => doctorsAppService.GetListAsync(input);
 
         [HttpGet]
         [Route("title-lookup")]

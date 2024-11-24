@@ -6,10 +6,11 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Volo.Abp.AuditLogging;
+using Volo.Abp.Domain.Entities;
 namespace Pusula.Training.HealthCare.Doctors
 {
-    public class DoctorDto
+    public class DoctorDto : Entity<Guid>
     {
         [Required]
         public string Name { get; set; } = null!;
@@ -31,10 +32,12 @@ namespace Pusula.Training.HealthCare.Doctors
 
         public Guid UserId { get; set; }
 
+        public Guid TitleId { get; set; }
+
         public DateTime BirthDate { get; set; }
 
         public Gender Gender { get; set; }
 
-        public List<string> DoctorDepartments { get; set; } = new();
+        public List<Guid> DoctorDepartments { get; set; } 
     }
 }

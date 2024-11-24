@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
@@ -83,5 +84,15 @@ public class DepartmentController : HealthCareController, IDepartmentsAppService
     public virtual Task DeleteAllAsync(GetDepartmentsInput input)
     {
         return _departmentsAppService.DeleteAllAsync(input);
+    }
+    [HttpGet("{id}/with-doctors")]
+    public virtual async Task<DepartmentWithDoctorsDto> GetWithDoctorsAsync(Guid id)
+    {
+        return await _departmentsAppService.GetWithDoctorsAsync(id);
+    }
+    [HttpGet("{departmentId}/doctors")]
+    public async Task<List<DoctorDto>> GetDoctorsByDepartmentIdAsync(Guid departmentId)
+    {
+        return await _departmentsAppService.GetDoctorsByDepartmentIdAsync(departmentId);
     }
 }
