@@ -1,0 +1,199 @@
+﻿@page "/lab-request"
+@using Pusula.Training.HealthCare.TestGroupItems
+@using Pusula.Training.HealthCare.TestGroups
+@using Syncfusion.Blazor.Calendars
+
+
+@inject ITestGroupItemsAppService TestGroupItemsAppService
+@inject ITestGroupsAppService TestGroupsAppService
+
+@*Patient Details Bar*@
+<div class="w-100 mb-1">
+    <SfToolbar CssClass="e-fill e-flat">
+        <ToolbarItems>
+            <!-- Ortadaki Metin -->
+            <ToolbarItem Align="ItemAlign.Center">
+                <Template>
+                    <div class="d-flex align-items-center">
+                        <span class="fw-bold fs-5">Kaan YOLCU</span>
+                        <span class="ms-2 fs-6">| 28 Yıl, Mapfre Sigorta A.Ş. (Tss-Gosb)</span>
+                    </div>
+                </Template>
+            </ToolbarItem>
+            <!-- Sağa Yaslanan Buton -->
+            <ToolbarItem Align="ItemAlign.Right">
+                <Template>
+                    <SfButton CssClass="e-flat e-small e-icon-left" IconCss="e-icons e-clock" Content="İstem Tarihçesi"></SfButton>
+                </Template>
+            </ToolbarItem>
+        </ToolbarItems>
+    </SfToolbar>
+</div>
+
+@*TestList Bar*@
+<div class="d-flex flex-row">
+    <div class="col-2">
+        <SfTextBox Placeholder="Test Ara"
+                   FloatLabelType="FloatLabelType.Never"
+                   @bind-Value="TestGroupItemsFilter!.FilterText"
+                   Width="100%"
+                   Input="@(async (args) => await SearchAsync(args))">
+        </SfTextBox>
+    </div>
+    <div class="col-10">
+        <SfToolbar>
+            <ToolbarItems>
+                <ToolbarItem Align="ItemAlign.Left">
+                    <Template>
+                        <span class="fw-bold fs-5">
+                            @SelectedGroupName
+                        </span>
+                    </Template>
+                </ToolbarItem>
+            </ToolbarItems>
+        </SfToolbar>
+    </div>
+</div>
+
+@*Test Groups & Items Data Grid*@
+<div class="d-flex flex-row">
+    @*Sol*@
+    <div class="col-2">
+        <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
+            <GridColumns>
+                <GridColumn Field="@nameof(TestGroup.Name)" HeaderText="Laboratuvar" Width="70" HeaderTextAlign="TextAlign.Left">
+                    <Template Context="group">
+                        @if (group is TestGroupDto testGroup)
+                        {
+                            <SfButton CssClass="e-link" Content="@testGroup.Name" OnClick="(() => FilterTestGroupItems(testGroup.Id))"></SfButton>
+                        }
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+    @*Sağ*@
+    <div class="col-10">
+        <SfGrid DataSource="@TestGroupItemsList" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
+            <GridColumns>
+                <GridColumn Width="5%" TextAlign="TextAlign.Center">
+                    <Template>
+                        <SfCheckBox TValue="bool"
+                                    CssClass="e-small"
+                                    Checked="false"
+                                    Changed="args => OnCheckboxChanged(args, ((TestGroupItemDto)context).Id)">
+                        </SfCheckBox>
+                    </Template>
+                </GridColumn>
+                <GridColumn HeaderText="Test Adı - Kodu" Width="40%" TextAlign="TextAlign.Left">
+                    <Template>
+                        @if (context is TestGroupItemDto testGroupItem)
+                        {
+                            <span>@testGroupItem.Name - @testGroupItem.Code</span>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field=@nameof(TestGroupItem.TestType) HeaderText="Test Tipi" Width="30%" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn HeaderText="Açıklama" Width="25%" TextAlign="TextAlign.Center">
+                    <Template>
+                        @if (context is TestGroupItemDto testGroupItem)
+                        {
+                            <SfButton CssClass="e-small e-link"
+                                      OnClick="(() => OpenDescriptionModal(testGroupItem.Description))"
+                                      Style="@(string.IsNullOrEmpty(testGroupItem.Description) ? "display:none;" : "")">
+                                <i class="fa-regular fa-file"></i>
+                            </SfButton>
+                        }
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+</div>
+@*Data Grid Bottom Bar*@
+<div class="mt-0 border-bottom pb-2">
+    <SfToolbar>
+        <ToolbarItems>
+            <ToolbarItem Align="ItemAlign.Right">
+                <Template>
+                    <SfButton CssClass="e-outline e-icon-left"
+                              Content="Planla"
+                              IconCss="e-icons e-clock"
+                              OnClick="OnPlanningClick">
+                    </SfButton>
+                </Template>
+            </ToolbarItem>
+            <ToolbarItem Align="ItemAlign.Right">
+                <Template>
+                    <SfButton CssClass="e-outline e-icon-left"
+                              Content="Ekle"
+                              IconCss="e-icons e-align-bottom"
+                              OnClick="OnAddClick">
+                    </SfButton>
+                </Template>
+            </ToolbarItem>
+        </ToolbarItems>
+    </SfToolbar>
+</div>
+
+@*Patient Test Requests*@
+<div class="container-fluid py-2">
+    <div class="d-flex justify-content-end">
+    </div>
+    <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-start gap-3">
+            <SfTextBox Placeholder="Test Ara"
+                       FloatLabelType="FloatLabelType.Never"
+                       Width="50%">
+            </SfTextBox>
+
+            <SfDateRangePicker TValue="DateTime?"
+                               Min='@MinDate'
+                               Max='@MaxDate'
+                               AllowEdit="false"
+                               StartDate="@DateTime.Today"
+                               EndDate="@DateTime.Today.AddDays(1)">
+            </SfDateRangePicker>
+
+            <SfDropDownList TItem="string"
+                            TValue="string"
+                            Width="50%"
+                            Placeholder="Order Tipi Seçin"
+                            DataSource="OrderTypes">
+            </SfDropDownList>
+        </div>
+
+        <div class="col-md-3 text-end">
+            <SfButton CssClass="e-warning e-icon-left e-medium"
+                      Content="İstem Yazdır"
+                      IconCss="e-icons e-print"
+                      OnClick="OnPrintClick">
+            </SfButton>
+        </div>
+    </div>
+</div>
+
+@*Requests List*@
+<SfGrid TValue="object" DataSource="new List<object>()" Width="100%" Height="100%">
+    <GridColumns>
+        <GridColumn HeaderText="İstem Tipi" Width="15"></GridColumn>
+        <GridColumn HeaderText="İstem Bilgisi" Width="20"></GridColumn>
+        <GridColumn HeaderText="İsteyen" Width="15"></GridColumn>
+        <GridColumn HeaderText="İstem Tarihi" Width="15"></GridColumn>
+        <GridColumn HeaderText="Tedavi Baş. Tarihi" Width="15"></GridColumn>
+        <GridColumn HeaderText="Tedavi Bit. Tarihi" Width="15"></GridColumn>
+        <GridColumn HeaderText="İstem Durumu" Width="15"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@*Description Detail Modal*@
+<SfDialog @ref="DescriptionDialog" IsModal="true" ShowCloseIcon="true" Width="400px" Header="Açıklama" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <p>@SelectedDescription</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="e-small e-secondary" Content="Kapat" OnClick="CloseDescriptionModal"></SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>

@@ -102,6 +102,7 @@
     "Permission:Villages": "Villages",
     "Villages": "Villages",
     "Village": "Village",
-    "Menu:TestGroups":  "Lab Tests"
+    "Menu:TestGroups": "Lab Tests",
+    "Menu:TestRequests": "Test Requests"
   }
 }
