@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using MiniExcelLibs;
+using Polly;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.DoctorDepartments;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
+using Pusula.Training.HealthCare.Titles;
 using Pusula.Training.HealthCare.UserProfiles;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -21,6 +25,7 @@ using Volo.Abp.Content;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.EventBus.Distributed;
 using Volo.Abp.Identity;
+using Volo.Abp.ObjectMapping;
 using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
 
 namespace Pusula.Training.HealthCare.Doctors
@@ -31,9 +36,17 @@ namespace Pusula.Training.HealthCare.Doctors
         UserProfileManager userProfileManager,
         UserManager<IdentityUser> userManager,
         IDistributedCache<DoctorDownloadTokenCacheItem, string> downloadTokenCache,
-        IDistributedEventBus distributedEventBus
+        ITitleRepository titleRepository,
+        IDepartmentRepository departmentRepository
         ) : HealthCareAppService, IDoctorsAppService
     {
+
+        public virtual async Task<DoctorWithDepartmentDto> GetWithDepartmentsAsync(Guid id)
+        {
+            var doctor = await doctorRepository.GetWithDepartmentsAsync(id);
+            return ObjectMapper.Map<Doctor, DoctorWithDepartmentDto>(doctor);
+        }
+
         [Authorize(HealthCarePermissions.Doctors.Create)]
         public async Task<DoctorDto> CreateAsync(DoctorCreateDto input)
         {
@@ -73,7 +86,7 @@ namespace Pusula.Training.HealthCare.Doctors
 
 
 
-        public async  Task<DoctorDto> GetAsync(Guid id)
+        public async Task<DoctorDto> GetAsync(Guid id)
         {
             // Doktorun navigasyon verileriyle birlikte bilgisini al
             var doctorWithNavProps = await doctorRepository.GetWithNavigationProperties(id);
@@ -83,19 +96,19 @@ namespace Pusula.Training.HealthCare.Doctors
                 throw new EntityNotFoundException($"Doctor with id '{id}' not found.");
             }
 
-            
             var doctorDto = ObjectMapper.Map<DoctorWithNavigationProperties, DoctorDto>(doctorWithNavProps);
 
             
-            doctorDto.DoctorDepartments = doctorWithNavProps.DoctorDepartments
-                .ToList();
+doctorDto.DoctorDepartments = doctorWithNavProps.DoctorDepartments
+    .Select(dd => dd.DepartmentId)
+    .ToList();
 
             return doctorDto;
         }
 
 
 
-        public async Task<DoctorDto> GetDoctorWithUserIdAsync(Guid userId)
+    public async Task<DoctorDto> GetDoctorWithUserIdAsync(Guid userId)
         {
             // İlk olarak UserId ile tek bir Doctor kaydı bul
             var doctor = await doctorRepository.GetAsync(d => d.UserId == userId);
@@ -118,6 +131,7 @@ namespace Pusula.Training.HealthCare.Doctors
 
             // DoctorDepartments'ı da mapliyoruz
             doctorDto.DoctorDepartments = doctorWithNavProps.DoctorDepartments
+                .Select(dd => dd.DepartmentId)
                 .ToList();
 
             return doctorDto;
@@ -168,19 +182,60 @@ namespace Pusula.Training.HealthCare.Doctors
             return new RemoteStreamContent(memoryStream, "Doctors.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 
-        public Task<PagedResultDto<DoctorWithNavigationPropertiesDto>> GetListAsync(GetDoctorsInput input)
+        public virtual async Task<PagedResultDto<DoctorWithNavigationPropertiesDto>> GetListAsync(GetDoctorsInput input)
         {
-            throw new NotImplementedException();
+            var totalCount = await doctorRepository.GetCountAsync(input.FilterText, input.UserId, input.TitleId, input.IdentityNumber, input.BirthDateMax, input.BirthDateMax, input.Gender);
+
+            var items = await doctorRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.UserId, input.TitleId, input.IdentityNumber, input.BirthDateMin, input.BirthDateMax, input.Gender, input.Sorting, input.MaxResultCount, input.SkipCount);
+
+            return new PagedResultDto<DoctorWithNavigationPropertiesDto>
+            {
+                TotalCount = totalCount,
+                Items = ObjectMapper.Map<List<DoctorWithNavigationProperties>, List<DoctorWithNavigationPropertiesDto>>(items)
+            };
         }
 
-        public Task<PagedResultDto<LookupDto<Guid>>> GetTitleLookupAsync(LookupRequestDto input)
+
+        public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetTitleLookupAsync(LookupRequestDto input)
         {
-            throw new NotImplementedException();
+            var query = (await titleRepository.GetQueryableAsync())
+                           .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
+                               x => x.Name != null && x.Name.Contains(input.Filter!));
+
+            var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Title>();
+            var totalCount = query.Count();
+            return new PagedResultDto<LookupDto<Guid>>
+            {
+                TotalCount = totalCount,
+                Items = ObjectMapper.Map<List<Title>, List<LookupDto<Guid>>>(lookupData)
+            };
         }
 
-        public Task<DoctorWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id)
+        public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetDepartmentLookupAsync(LookupRequestDto input)
         {
-            throw new NotImplementedException();
+            var query = (await departmentRepository.GetQueryableAsync())
+                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
+                    x => x.Name != null && x.Name.Contains(input.Filter!));
+
+            var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Department>();
+            var totalCount = query.Count();
+            return new PagedResultDto<LookupDto<Guid>>
+            {
+                TotalCount = totalCount,
+                Items = ObjectMapper.Map<List<Department>, List<LookupDto<Guid>>>(lookupData)
+            };
+        }
+
+       /* public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetIdentityUserLookupAsync(LookupRequestDto input)
+        {
+            
+        }*/
+
+        public virtual async Task<DoctorWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id)
+        {
+            var doctor = await doctorRepository.GetWithNavigationProperties(id);
+            
+            return ObjectMapper.Map<DoctorWithNavigationProperties, DoctorWithNavigationPropertiesDto>(doctor);
         }
 
         public async Task<DoctorDto> UpdateAsync(DoctorUpdateDto input)

@@ -2,21 +2,30 @@
 
 @using Microsoft.AspNetCore.Components
 @using Pusula.Training.HealthCare.Patients
+@using Pusula.Training.HealthCare.Departments
+@using Pusula.Training.HealthCare.Doctors
 @using Pusula.Training.HealthCare.Blazor.Containers
 @inject Microsoft.AspNetCore.Components.NavigationManager UriHelper
 @inject NavigationManager NavigationManager
 @inject PatientStateContainer StateService
+@inject DoctorStateContainer DoctorStateService
+@inject DepartmentStateContainer DepartmentStateService
+@inherits HealthCareComponentBase
+@inject IDoctorsAppService DoctorsAppService
+@inject IDepartmentsAppService DepartmentsAppService
+
 <div class="stepper-container" style="max-width: 1500px; margin: 0 auto; padding: 40px;">
     <div class="card">
         <div class="card-body">
             <h3 class="card-title text-center">Doktor ve Departman Seçimi</h3>
+
             <!-- Seçilen Veriler -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card selected-card">
                         <h5>Seçilenler</h5>
-                        <p><strong>Doktor:</strong> @selectedDoctor?.Name </p>
-                        <p><strong>Departman:</strong> @selectedDepartment?.Name  </p>
+                        <p><strong>Doktor:</strong> @($"{SelectedDoctor?.Title.Name} {SelectedDoctor?.User.Name} {SelectedDoctor?.User.Surname}")</p>
+                        <p><strong>Departman:</strong> @SelectedDepartment?.Name</p>
                         <button class="btn btn-outline-danger btn-sm" @onclick="ClearSelections" style="width: 100%;">Seçimi Temizle</button>
                     </div>
                 </div>
@@ -25,33 +34,22 @@
             <!-- Doktor ve Departman Seçim Alanları -->
             <div class="row mb-4">
                 <div class="col-md-6">
-                    <!-- Doktor Seçimi -->
                     <h4>Hekim</h4>
-                    <div class="mb-3">
-                        <input type="text" class="form-control" id="doctorSearch" @bind="doctorSearchText" @oninput="FilterDoctors" />
-                    </div>
-
-                    <!-- Doktor Listesi -->
+                    <input type="text" class="form-control" @bind="DoctorSearchText" @oninput="FilterDoctors" placeholder="Doktor ara..." />
                     <ul class="list-group">
-                        @foreach (var doctor in filteredDoctors)
+                        @foreach (var doctor in FilteredDoctors)
                         {
                             <li class="list-group-item @GetSelectedClass(doctor)" @onclick="() => SelectDoctor(doctor)">
-                                @doctor.Name
+                                @($"{doctor.Title?.Name} {doctor.User?.Name} {doctor.User?.Surname}")
                             </li>
                         }
                     </ul>
                 </div>
-
                 <div class="col-md-6">
-                    <!-- Departman Seçimi -->
-                    <h4>Departmanlar</h4>
-                    <div class="mb-3">
-                        <input type="text" class="form-control" id="departmentSearch" @bind="departmentSearchText" @oninput="FilterDepartments" />
-                    </div>
-
-                    <!-- Departman Listesi -->
+                    <h4>Departman</h4>
+                    <input type="text" class="form-control" @bind="DepartmentSearchText" @oninput="FilterDepartments" placeholder="Departman ara..." />
                     <ul class="list-group">
-                        @foreach (var department in filteredDepartments)
+                        @foreach (var department in FilteredDepartments)
                         {
                             <li class="list-group-item @GetSelectedClass(department)" @onclick="() => SelectDepartment(department)">
                                 @department.Name
@@ -61,91 +59,140 @@
                 </div>
             </div>
 
-            <!-- Adım 2: Seçilen Verileri Göster -->
             <div class="d-flex justify-content-between mt-4">
-                <button class="btn btn-primary" @onclick="ProceedToAppointments" disabled="@(selectedDoctor == null || selectedDepartment == null)">İleri</button>
+                <button class="btn btn-primary" @onclick="ProceedToAppointments" disabled="@(SelectedDoctor == null || SelectedDepartment == null)">İleri</button>
             </div>
         </div>
     </div>
 </div>
 
 @code {
-    private string doctorSearchText = string.Empty;
-    private List<Doctor> allDoctors = new List<Doctor>
-    {
-        new Doctor { Id = 1, Name = "Dr. Ahmet Yılmaz" },
-        new Doctor { Id = 2, Name = "Dr. Ayşe Kara" },
-        new Doctor { Id = 3, Name = "Dr. Mehmet Can" },
-        new Doctor { Id = 4, Name = "Dr. Fatma Özdemir" },
-        new Doctor { Id = 5, Name = "Dr. Ali Aksoy" },
-        new Doctor { Id = 6, Name = "Dr. Ahmet Yılmaz" },
-        new Doctor { Id = 7, Name = "Dr. Ayşe Kara" },
-        new Doctor { Id = 8, Name = "Dr. Mehmet Can" },
-        new Doctor { Id = 9, Name = "Dr. Fatma Özdemir" },
-        new Doctor { Id = 10, Name = "Dr. Ali Aksoy" }
-    };
-    private List<Doctor> filteredDoctors;
-    private Doctor selectedDoctor;
+    private string DoctorSearchText = string.Empty;
+    private string DepartmentSearchText = string.Empty;
 
-    private string departmentSearchText = string.Empty;
-    private List<Department> allDepartments = new List<Department>
-    {
-        new Department { Id = 1, Name = "Kardiyoloji" },
-        new Department { Id = 2, Name = "Dermatoloji" },
-        new Department { Id = 3, Name = "Pediatri" },
-        new Department { Id = 4, Name = "Nöroloji" }
-    };
-    private List<Department> filteredDepartments;
-    private Department selectedDepartment;
+    private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
+    private List<DepartmentDto> AllDepartments = new();
 
-    protected override void OnInitialized()
+    private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
+    private List<DepartmentDto> FilteredDepartments = new();
+
+    private DoctorWithNavigationPropertiesDto SelectedDoctor;
+    private DepartmentDto SelectedDepartment;
+
+    protected override async Task OnInitializedAsync()
     {
-        filteredDoctors = allDoctors;
-        filteredDepartments = allDepartments;
+        await LoadInitialDataAsync();
     }
 
-    private void FilterDoctors() => filteredDoctors = allDoctors.Where(d => d.Name.Contains(doctorSearchText, StringComparison.OrdinalIgnoreCase)).ToList();
+    private async Task LoadInitialDataAsync()
+    {
+        var doctorResult = await DoctorsAppService.GetListAsync(new GetDoctorsInput());
+        if (doctorResult?.Items != null)
+        {
+            AllDoctors = doctorResult.Items.ToList();
+            FilteredDoctors = AllDoctors;
+        }
 
-    private void FilterDepartments() => filteredDepartments = allDepartments.Where(d => d.Name.Contains(departmentSearchText, StringComparison.OrdinalIgnoreCase)).ToList();
+        var departmentResult = await DepartmentsAppService.GetListAsync(new GetDepartmentsInput());
+        if (departmentResult?.Items != null)
+        {
+            AllDepartments = departmentResult.Items.ToList();
+            FilteredDepartments = AllDepartments;
+        }
+    }
 
-    private void SelectDoctor(Doctor doctor) => selectedDoctor = doctor;
+    private void FilterDoctors()
+    {
+        FilteredDoctors = AllDoctors
+        .Where(d => string.IsNullOrEmpty(DoctorSearchText) ||
+                    d.User.Name.Contains(DoctorSearchText, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+        StateHasChanged();
+    }
 
-    private void SelectDepartment(Department department) => selectedDepartment = department;
+    private void FilterDepartments()
+    {
+        FilteredDepartments = FilteredDepartments
+            .Where(d => string.IsNullOrEmpty(DepartmentSearchText) ||
+                        d.Name.Contains(DepartmentSearchText, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
+    private async Task SelectDoctor(DoctorWithNavigationPropertiesDto doctor)
+    {
+        SelectedDoctor = doctor;
+
+        if (doctor != null)
+        {
+            var doctorWithDepartments = await DoctorsAppService.GetWithDepartmentsAsync(doctor.Doctor.Id);
+            if (doctorWithDepartments?.Departments != null)
+            {
+                FilteredDepartments = doctorWithDepartments.Departments
+                    .Select(dd => new DepartmentDto { Id = dd.Id, Name = dd.Name })
+                    .ToList();
+            }
+        }
+        else
+        {
+            FilteredDepartments.Clear();
+        }
+    }
+
+    private async Task SelectDepartment(DepartmentDto department)
+    {
+        SelectedDepartment = department;
+
+        /*if (department != null)
+        {
+            var departmentWithDoctors = await DepartmentsAppService.GetWithDoctorsAsync(department.Id);
+            if (departmentWithDoctors?.Doctors != null)
+            {
+                FilteredDoctors = departmentWithDoctors.Doctors
+                    .Select(dd => new DoctorWithNavigationPropertiesDto
+                        {
+                            Doctor = dd.Doctor,
+                            Title = dd.Title,
+                            User = dd.User,
+                        })
+                    .ToList();
+            }
+        }
+        else
+        {
+            FilteredDoctors.Clear();
+        }*/
+    }
 
     private void ClearSelections()
     {
-        selectedDoctor = null;
-        selectedDepartment = null;
+        SelectedDoctor = null;
+        SelectedDepartment = null;
+        DoctorSearchText = string.Empty;
+        DepartmentSearchText = string.Empty;
+        FilteredDoctors = AllDoctors;
+        FilteredDepartments = AllDepartments;
     }
 
-    private void GoToStep3() => Console.WriteLine($"Seçilen Doktor: {selectedDoctor.Name}, Seçilen Departman: {selectedDepartment.Name}");
-    
-
-    private void ProceedToAppointments()
-    {
-        
-        // Appointment sayfasına yönlendir
-        NavigationManager.NavigateTo("/appointment");
-    }
     private string GetSelectedClass(object item)
     {
-        if (item is Doctor && selectedDoctor == item) return "selected-item";
-        if (item is Department && selectedDepartment == item) return "selected-item";
+        if (item is DoctorWithNavigationPropertiesDto doctor && SelectedDoctor == doctor)
+            return "selected-item";
+        if (item is DepartmentDto department && SelectedDepartment == department)
+            return "selected-item";
         return string.Empty;
     }
 
-    public class Doctor
+    private void ProceedToAppointments()
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class Department
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        //Seçilen Departman ve Doctor bilgileri Randevu Özet Kartına Aktarılır
+        DoctorStateService.SelectedDoctor = SelectedDoctor;
+        DepartmentStateService.SelectedDepartment = SelectedDepartment;
+        NavigationManager.NavigateTo("/appointment");
     }
 }
+
+
+
 
 <style>
     .stepper-container {
@@ -277,19 +324,10 @@
         margin: auto; /* Ortala */
     }
 
-        .patient-card .avatar {
-            width: 50px; /* Avatar boyutu */
-            height: 50px;
-            object-fit: cover;
-        }
-
-        .patient-card .card-body {
-            padding: 20px;
-        }
-
-        .patient-card h5 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
+    ul.list-group {
+        max-height: 350px;
+        height: 350px; /* Sabit yükseklik */
+        overflow-y: auto;
+    }
 </style>
 

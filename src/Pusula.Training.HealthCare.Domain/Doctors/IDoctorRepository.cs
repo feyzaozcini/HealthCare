@@ -1,4 +1,5 @@
-﻿using Pusula.Training.HealthCare.Patients;
+﻿using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Patients;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,9 @@ namespace Pusula.Training.HealthCare.Doctors
 {
     public interface IDoctorRepository : IRepository<Doctor,Guid>
     {
+
+        Task<Doctor> GetWithDepartmentsAsync(Guid doctorId);
+        Task<List<Department>> GetDepartmentsByDoctorIdAsync(Guid doctorId);
         Task<DoctorWithNavigationProperties> GetWithNavigationProperties(
             Guid id,
             CancellationToken cancellationToken = default);

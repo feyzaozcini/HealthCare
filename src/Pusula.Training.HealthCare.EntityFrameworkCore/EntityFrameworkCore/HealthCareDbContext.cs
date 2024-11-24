@@ -65,6 +65,7 @@ public class HealthCareDbContext :
     public DbSet<District> Districts { get; set; } = null!;
     public DbSet<Village> Villages { get; set; } = null!;
     public DbSet<Appointment> Appointments { get; set; } = null!;
+    public DbSet<DoctorDepartment> DoctorDepartments { get; set; } = null!;
 
 
 

@@ -14,6 +14,7 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Authorization;
 using Volo.Abp.Caching;
 using Volo.Abp.Content;
+using Volo.Abp.ObjectMapping;
 
 namespace Pusula.Training.HealthCare.Departments
 {
@@ -23,6 +24,16 @@ namespace Pusula.Training.HealthCare.Departments
         DepartmentManager departmentManager, IDistributedCache<DepartmentDownloadTokenCacheItem, string> downloadTokenCache) 
         : HealthCareAppService, IDepartmentsAppService
     {
+        public virtual async Task<DepartmentWithDoctorsDto> GetWithDoctorsAsync(Guid id)
+        {
+            var department = await departmentRepository.GetWithDoctorsAsync(id);
+            return ObjectMapper.Map<Department, DepartmentWithDoctorsDto>(department);
+        }
+        public virtual async Task<List<DoctorDto>> GetDoctorsByDepartmentIdAsync(Guid departmentId)
+        {
+            var doctors = await departmentRepository.GetDoctorsByDepartmentIdAsync(departmentId);
+            return ObjectMapper.Map<List<Doctor>, List<DoctorDto>>(doctors);
+        }
         public virtual async Task<PagedResultDto<DepartmentDto>> GetListAsync(GetDepartmentsInput input)
         {
             var totalCount = await departmentRepository.GetCountAsync(input.FilterText, input.Name);

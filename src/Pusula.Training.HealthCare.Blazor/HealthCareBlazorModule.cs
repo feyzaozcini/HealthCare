@@ -126,6 +126,8 @@ public class HealthCareBlazorModule : AbpModule
         context.Services.AddSyncfusionBlazor();
 
         context.Services.AddScoped<PatientStateContainer>();
+        context.Services.AddScoped<DoctorStateContainer>();
+        context.Services.AddScoped<DepartmentStateContainer>();
 
         ConfigureAuthentication(context);
         ConfigureUrls(configuration);

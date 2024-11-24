@@ -18,6 +18,7 @@ namespace Pusula.Training.HealthCare.Doctors
 
         public Title Title { get; set; } = null!;
 
-        public ICollection<string> DoctorDepartments { get; set; } = new List<string>();
+        public List<DoctorDepartment> DoctorDepartments { get; set; } 
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using Pusula.Training.HealthCare.Titles;
+﻿using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Titles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace Pusula.Training.HealthCare.Doctors
         public TitleDto Title { get; set; } = null!;
 
         public IdentityUserDto User { get; set; } = null!;
+
+        //public List<Guid> DoctorDepartments { get; set; }
 
     }
 }
