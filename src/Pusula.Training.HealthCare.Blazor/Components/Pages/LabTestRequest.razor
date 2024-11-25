@@ -142,15 +142,13 @@
     </div>
     <div class="d-flex justify-content-between">
         <div class="d-flex justify-content-start gap-3">
-            <SfTextBox Placeholder="Test Ara"
+            <SfTextBox Placeholder="Ara"
                        FloatLabelType="FloatLabelType.Never"
                        Width="50%">
             </SfTextBox>
-
             <SfDateRangePicker TValue="DateTime?"
-                               Min='@MinDate'
-                               Max='@MaxDate'
                                AllowEdit="false"
+                               Width="50%"
                                StartDate="@DateTime.Today"
                                EndDate="@DateTime.Today.AddDays(1)">
             </SfDateRangePicker>

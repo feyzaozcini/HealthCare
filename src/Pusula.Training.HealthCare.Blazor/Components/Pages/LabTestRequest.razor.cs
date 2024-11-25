@@ -26,13 +26,9 @@ public partial class LabTestRequest
 
     private string SelectedDescription = string.Empty;
     private Guid? SelectedTestGroupId { get; set; } = null;
-    private Guid? SelectedTestGroupItemId;
     private string SelectedOrderType { get; set; } = string.Empty;
     private string SelectedGroupName { get; set; } = "Laboratuvar";
     private List<Guid> SelectedIds = new List<Guid>();
-
-    private DateTime MinDate = DateTime.Today.AddMonths(-1); 
-    private DateTime MaxDate = DateTime.Today.AddMonths(1);  
 
     private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
     private int CurrentPage { get; set; } = 1;
@@ -40,6 +36,9 @@ public partial class LabTestRequest
 
     private SfDialog? DescriptionDialog;
 
+    private DateTime[] FilterByDateRange = { DateTime.Today, DateTime.Today.AddDays(30) };
+
+    
     protected override async Task OnInitializedAsync()
     {
         TestGroupsFilter = new GetTestGroupsInput();
@@ -156,5 +155,15 @@ public partial class LabTestRequest
         });
 
         TestGroupItemsList = result.Items.ToList();
+    }
+    private void DecreaseMonth()
+    {
+        FilterByDateRange[0] = FilterByDateRange[0].AddMonths(-1);
+        FilterByDateRange[1] = FilterByDateRange[1].AddMonths(-1);
+    }
+    private void IncreaseMonth()
+    {
+        FilterByDateRange[0] = FilterByDateRange[0].AddMonths(1);
+        FilterByDateRange[1] = FilterByDateRange[1].AddMonths(1);
     }
 }

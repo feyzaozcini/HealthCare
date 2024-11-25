@@ -156,13 +156,13 @@ public class EfCoreTestGroupItemRepository(IDbContextProvider<HealthCareDbContex
                 x => x.TestGroup.Name.Contains(filterText!) ||
                      x.TestGroupItem.Name.Contains(filterText!) ||
                      x.TestGroupItem.Code.Contains(filterText!) ||
-                     x.TestGroupItem.Description.Contains(filterText!) ||
+                     x.TestGroupItem.Description!.Contains(filterText!) ||
                      x.TestGroupItem.TestType.Contains(filterText!))
             .WhereIf(testGroupId.HasValue, x => x.TestGroup.Id == testGroupId)
             .WhereIf(!string.IsNullOrWhiteSpace(name), x => x.TestGroupItem.Name.Contains(name!))
             .WhereIf(!string.IsNullOrWhiteSpace(code), x => x.TestGroupItem.Code.Contains(code!))
             .WhereIf(!string.IsNullOrWhiteSpace(testType), x => x.TestGroupItem.TestType.Contains(testType!))
-            .WhereIf(!string.IsNullOrWhiteSpace(description), x => x.TestGroupItem.Description.Contains(description!))
+            .WhereIf(!string.IsNullOrWhiteSpace(description), x => x.TestGroupItem.Description!.Contains(description!))
             .WhereIf(turnaroundTime.HasValue, x => x.TestGroupItem.TurnaroundTime == turnaroundTime);
     }
 

@@ -32,7 +32,6 @@ public partial class TestGroups
     private SfToast? ToastObj;
     private string ErrorMessage = string.Empty;
 
-    private SfGrid<TestGroupItemDto> DefaultGrid = null!;
 
     private string SelectedDescription = string.Empty;
     private Guid? SelectedTestGroupId { get; set; } = null;
