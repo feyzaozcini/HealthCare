@@ -81,7 +81,7 @@ public class HealthCareEntityFrameworkCoreModule : AbpModule
 
 
 
-           options.AddRepository<Doctor, EfCoreDoctorRepository>();
+            options.AddRepository<Doctor, EfCoreDoctorRepository>();
             options.AddRepository<DiagnosisGroup, EfCoreDiagnosisGroupRepository>();
             options.AddRepository<Diagnosis, EfCoreDiagnosisRepository>();
             options.AddRepository<Anamnesis, EfCoreAnamnesisRepository>();

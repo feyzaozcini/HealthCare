@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
+using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.Handlers;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
+using Pusula.Training.HealthCare.Villages;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -51,18 +53,19 @@ public partial class Patients
     private DataGridEntityActionsColumn<PatientWithNavigationPropertiesDto> EntityActionsColumn { get; set; } = new();
     protected string SelectedCreateTab = "Patient-create-tab";
     protected string SelectedEditTab = "Patient-edit-tab";
-
-    private IReadOnlyList<LookupDto<Guid>> CountriesCollection { get; set; } = [];
-    private IReadOnlyList<LookupDto<Guid>> CitiesCollection { get; set; } = [];
-    private IReadOnlyList<LookupDto<Guid>> DistrictsCollection { get; set; } = [];
-    private IReadOnlyList<LookupDto<Guid>> VillagesCollection { get; set; } = [];
     private IReadOnlyList<LookupDto<Guid>> CompaniesCollection { get; set; } = [];
     private IReadOnlyList<LookupDto<Gender>> GendersCollection { get; set; } = new List<LookupDto<Gender>>();
     private IReadOnlyList<LookupDto<Type>> TypesCollection { get; set; } = new List<LookupDto<Type>>();
     private IReadOnlyList<LookupDto<BloodType>> BloodTypesCollection { get; set; } = new List<LookupDto<BloodType>>();
     private List<PatientWithNavigationPropertiesDto> SelectedPatients { get; set; } = [];
-
-    private List<CountryDto> CountryList { get; set; } = new List<CountryDto>();
+    private List<CountryDto> SecondaryCountryList { get; set; } = new List<CountryDto>();
+    private List<CityDto> SecondaryCityList { get; set; } = new List<CityDto>();
+    private List<DistrictDto> SecondaryDistrictList { get; set; } = new List<DistrictDto>();
+    private List<VillageDto> SecondaryVillageList { get; set; } = new List<VillageDto>();
+    private List<CountryDto> PrimaryCountryList { get; set; } = new List<CountryDto>();
+    private List<CityDto> PrimaryCityList { get; set; } = new List<CityDto>();
+    private List<DistrictDto> PrimaryDistrictList { get; set; } = new List<DistrictDto>();
+    private List<VillageDto> PrimaryVillageList { get; set; } = new List<VillageDto>();
     private GetCountriesInput? CountriesFilter { get; set; }
     private bool AllPatientsSelected { get; set; }
     private IReadOnlyList<GetCountryLookupDto<Guid>> CountriesCodeCollection { get; set; } = [];
@@ -93,7 +96,7 @@ public partial class Patients
         }
     }
 
-    private async Task GetCountriesAsync()
+    private async Task GetPrimaryCountriesAsync()
     {
 
         var input = new GetCountriesInput
@@ -101,93 +104,206 @@ public partial class Patients
             FilterText = CountriesFilter!.FilterText,
             Name = CountriesFilter.Name,
             Code = CountriesFilter.Code,
-            Sorting = CountriesFilter.Sorting,
             MaxResultCount = 200,
             SkipCount = (CurrentPage-1)*PageSize
         };
 
         var result = await countriesAppService.GetListAsync(input);
-        CountryList = result.Items.ToList();
+        PrimaryCountryList = result.Items.ToList();
+        StateHasChanged();
+
     }
-    private async Task OnCountryChanged(ChangeEventArgs e)
+
+    private async Task GetSecondaryCountriesAsync()
+    {
+
+        var input = new GetCountriesInput
+        {
+            FilterText = CountriesFilter!.FilterText,
+            Name = CountriesFilter.Name,
+            Code = CountriesFilter.Code,
+            MaxResultCount = 200,
+            SkipCount = (CurrentPage - 1) * PageSize
+        };
+
+        var result = await countriesAppService.GetListAsync(input);
+        SecondaryCountryList = result.Items.ToList();
+        StateHasChanged();
+
+    }
+    private async Task OnPrimaryCountryChanged(ChangeEventArgs e)
     {
         // Seçilen ülke ID'sini al
         if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
         {
+            NewPatient.PrimaryCountryId = selectedCountryId;
+
             // Eðer "Select" öðesi (Guid.Empty) seçildiyse, veriyi sýfýrlýyoruz
             if (selectedCountryId == Guid.Empty)
             {
                 // Veriyi sýfýrlýyoruz çünkü "Select" seçildi
-                CitiesCollection = new List<LookupDto<Guid>>();
-                DistrictsCollection = new List<LookupDto<Guid>>(); // Ýlçeleri sýfýrla
-                VillagesCollection = new List<LookupDto<Guid>>();
-                SelectedCountryCode = null;  // Baþlangýçta boþ býrakýyoruz
+                PrimaryCityList = new List<CityDto>();
+                PrimaryDistrictList = new List<DistrictDto>();
+                PrimaryVillageList = new List<VillageDto>();
 
-                // UI'nin yeniden render edilmesini saðlýyoruz
-                StateHasChanged();
-                return;
             }
-
-            // Seçilen ülkeyi CountriesCodeCollection içinden bul
-            var selectedCountry = CountriesCodeCollection.FirstOrDefault(c => c.Id == selectedCountryId);
-
-            if (selectedCountry != null)
+            else
             {
-                // Ülkeye baðlý city'leri alýyoruz
                 var cities = await cityRepository.GetListAsync(c => c.CountryId == selectedCountryId);
 
                 // City'leri ilgili property'ye atýyoruz
-                CitiesCollection = cities.Select(c => new LookupDto<Guid> { Id = c.Id, DisplayName = c.Name }).ToList();
+                PrimaryCityList = cities.OrderBy(c => c.Name).Select(c => new CityDto { Id = c.Id, Name = c.Name }).ToList();
 
-                // Seçilen ülke kodunu güncelliyoruz
-                SelectedCountryCode = selectedCountry.Code;
-
-                // UI'nin yeniden render edilmesi için
-                StateHasChanged();
+                PrimaryDistrictList = new List<DistrictDto>();
+                PrimaryVillageList = new List<VillageDto>();
             }
-        }
-    }
 
-    private async Task OnCityChanged(ChangeEventArgs e)
-    {
-        // Seçilen ülke ID'sini al
-        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCityId))
-        {
-                // Ülkeye baðlý city'leri alýyoruz
-                var districts = await districtRepository.GetListAsync(d => d.CityId == selectedCityId);
-
-                // City'leri ilgili property'ye atýyoruz
-                DistrictsCollection = districts.Select(d => new LookupDto<Guid> { Id = d.Id, DisplayName = d.Name }).ToList();
-
-                // UI'nin yeniden render edilmesi için
-                StateHasChanged();
-        }
-    }
-
-    private async Task OnDistrictChanged(ChangeEventArgs e)
-    {
-        // Seçilen ülke ID'sini al
-        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedDistrictId))
-        {
-            // Ülkeye baðlý city'leri alýyoruz
-            var villages = await villageRepository.GetListAsync(v => v.DistrictId == selectedDistrictId);
-
-            // City'leri ilgili property'ye atýyoruz
-            VillagesCollection = villages.Select(v => new LookupDto<Guid> { Id = v.Id, DisplayName = v.Name }).ToList();
-
-            // UI'nin yeniden render edilmesi için
             StateHasChanged();
         }
     }
 
+    private async Task OnPrimaryCityChanged(ChangeEventArgs e)
+    {
+        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCityId))
+        {
+            NewPatient.PrimaryCityId = selectedCityId;
+
+            if (selectedCityId == Guid.Empty)
+            {
+                PrimaryDistrictList = new List<DistrictDto>();
+                PrimaryVillageList = new List<VillageDto>();
+
+            }
+            else
+            {
+                var districts = await districtRepository.GetListAsync(d => d.CityId == selectedCityId);
+
+                PrimaryDistrictList = districts.OrderBy(d => d.Name).Select(d => new DistrictDto { Id = d.Id, Name = d.Name }).ToList();
+
+                PrimaryVillageList = new List<VillageDto>();
+
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnPrimaryDistrictChanged(ChangeEventArgs e)
+    {
+        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedDistrictId))
+        {
+            NewPatient.PrimaryDistrictId = selectedDistrictId;
+
+            if (selectedDistrictId == Guid.Empty)
+            {
+                PrimaryVillageList = new List<VillageDto>();
+                StateHasChanged();
+
+            }
+            else
+            {
+                var villages = await villageRepository.GetListAsync(v => v.DistrictId == selectedDistrictId);
+
+                PrimaryVillageList = villages.OrderBy(v => v.Name).Select(v => new VillageDto { Id = v.Id, Name = v.Name }).ToList();
+                StateHasChanged();
+
+            }
+
+        }
+    }
+
+    private async Task OnSecondaryCountryChanged(ChangeEventArgs e)
+    {
+        // Seçilen ülke ID'sini al
+        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
+        {
+            NewPatient.SecondaryCountryId = selectedCountryId;
+
+            // Eðer "Select" öðesi (Guid.Empty) seçildiyse, veriyi sýfýrlýyoruz
+            if (selectedCountryId == Guid.Empty)
+            {
+                // Veriyi sýfýrlýyoruz çünkü "Select" seçildi
+                SecondaryCityList = new List<CityDto>();
+                SecondaryDistrictList = new List<DistrictDto>();
+                SecondaryVillageList = new List<VillageDto>();
+
+            }
+            else
+            {
+                var cities = await cityRepository.GetListAsync(c => c.CountryId == selectedCountryId);
+
+                // City'leri ilgili property'ye atýyoruz
+                SecondaryCityList = cities.OrderBy(c => c.Name).Select(c => new CityDto { Id = c.Id, Name = c.Name }).ToList();
+
+                SecondaryDistrictList = new List<DistrictDto>();
+                SecondaryVillageList = new List<VillageDto>();
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnSecondaryCityChanged(ChangeEventArgs e)
+    {
+        // Seçilen ülke ID'sini al
+        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCityId))
+        {
+            NewPatient.SecondaryCityId = selectedCityId;
+
+            if (selectedCityId == Guid.Empty)
+            {
+                SecondaryDistrictList = new List<DistrictDto>();
+                SecondaryVillageList = new List<VillageDto>();
+
+            }
+            else
+            {
+                var districts = await districtRepository.GetListAsync(d => d.CityId == selectedCityId);
+
+                SecondaryDistrictList = districts.OrderBy(d => d.Name).Select(d => new DistrictDto { Id = d.Id, Name = d.Name }).ToList();
+
+                SecondaryVillageList = new List<VillageDto>();
+
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnSecondaryDistrictChanged(ChangeEventArgs e)
+    {
+        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedDistrictId))
+        {
+            NewPatient.SecondaryDistrictId = selectedDistrictId;
+
+            if (selectedDistrictId == Guid.Empty)
+            {
+                SecondaryVillageList = new List<VillageDto>();
+                StateHasChanged();
+
+            }
+            else
+            {
+                var villages = await villageRepository.GetListAsync(v => v.DistrictId == selectedDistrictId);
+
+                SecondaryVillageList = villages.OrderBy(v => v.Name).Select(v => new VillageDto { Id = v.Id, Name = v.Name }).ToList();
+                StateHasChanged();
+
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.WhenAll(
-       SetPermissionsAsync(),
-       GetCountryCodeCollectionLookupAsync(),
-       GetCompanyCollectionLookupAsync()
-   );
+
+        CountriesFilter = new GetCountriesInput();
+
+        await GetSecondaryCountriesAsync();
+        await GetPrimaryCountriesAsync();
+        await SetPermissionsAsync();
+        await GetCountryCodeCollectionLookupAsync();
+        await GetCompanyCollectionLookupAsync();
+   
 
         GendersCollection = Enum.GetValues(typeof(Gender))
        .Cast<Gender>()
@@ -261,10 +377,7 @@ public partial class Patients
         Filter.SkipCount = (CurrentPage - 1) * PageSize;
         Filter.Sorting = CurrentSorting;
 
-        //Filter = FilterValidator.ValidateFilters(Filter);
-
-        //if (Filter == null) return;
-
+      
         if (Filter == null)
         {
             PatientList = [];
@@ -333,16 +446,16 @@ public partial class Patients
 
             PassportNumber = "",
 
-            CountryId = CountriesCodeCollection.Select(x => x.Id).FirstOrDefault(),
+            //PrimaryCountryId = CountriesCodeCollection.Select(x => x.Id).FirstOrDefault(),
 
             //CompanyId = CompaniesCollection.Select(x => x.Id).FirstOrDefault()
         };
 
-        var selectedCountry = CountriesCodeCollection.FirstOrDefault(c => c.Id == NewPatient.CountryId);
-        if (selectedCountry != null)
-        {
-            SelectedCountryCode = selectedCountry.Code;
-        }
+        //var selectedCountry = CountriesCodeCollection.FirstOrDefault(c => c.Id == NewPatient.PrimaryCountryId);
+        //if (selectedCountry != null)
+        //{
+        //    SelectedCountryCode = selectedCountry.Code;
+        //}
 
         SelectedCreateTab = "Patient-create-tab";
 
@@ -421,24 +534,11 @@ public partial class Patients
 
         }
     }
-    //protected virtual Task OnCityChanged(ChangeEventArgs e)
-    //{
-    //    Guid? cityId = (Guid?)e.Value;
-    //    Filter.CityId = cityId;
-    //    return Task.CompletedTask;
-    //}
-
-    //protected virtual Task OnDistrictChanged(ChangeEventArgs e)
-    //{
-    //    Guid? districtId = (Guid?)e.Value;
-    //    Filter.DistrictId = districtId;
-    //    return Task.CompletedTask;
-    //}
 
     protected virtual Task OnVillageChanged(ChangeEventArgs e)
     {
         Guid? villageId = (Guid?)e.Value;
-        Filter.VillageId = villageId;
+        Filter.PrimaryVillageId = villageId;
         return Task.CompletedTask;
     }
 

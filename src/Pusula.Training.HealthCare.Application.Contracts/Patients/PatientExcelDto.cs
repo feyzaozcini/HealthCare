@@ -13,5 +13,14 @@ public class PatientExcelDto
     public Gender Gender { get; set; }
     public Type type { get; set; }
     public string? PatientCompany { get; set; }
-    public string? PatientCountry { get; set; }
+    public string? PrimaryCountry { get; set; }
+    public string? PrimaryCity { get; set; }
+    public string? PrimaryDistrict { get; set; }
+    public string? PrimaryVillage { get; set; }
+    public string? PrimaryAddressDescription { get; set; }
+    public string? SecondaryCountry { get; set; }
+    public string? SecondaryCity { get; set; }
+    public string? SecondaryDistrict { get; set; }
+    public string? SecondaryVillage { get; set; }
+    public string? SecondaryAddressDescription { get; set; }
 }

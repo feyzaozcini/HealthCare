@@ -13,11 +13,15 @@ namespace Pusula.Training.HealthCare.Patients
 {
     public class PatientWithNavigationPropertiesDto
     {
-        public PatientDto Patient { get; set; } = null!;
-        public CountryDto Country { get; set; } = null!;
-        public CityDto City { get; set; } = null!;
-        public DistrictDto District { get; set; } = null!;
-        public VillageDto Village { get; set; } = null!;
-        public PatientCompanyDto PatientCompany { get; set; } = null!;
+        public PatientDto? Patient { get; set; }
+        public CountryDto? PrimaryCountry { get; set; } 
+        public CityDto? PrimaryCity { get; set; } 
+        public DistrictDto? PrimaryDistrict { get; set; } 
+        public VillageDto? PrimaryVillage { get; set; } 
+        public CountryDto? SecondaryCountry { get; set; } 
+        public CityDto? SecondaryCity { get; set; } 
+        public DistrictDto? SecondaryDistrict { get; set; } 
+        public VillageDto? SecondaryVillage { get; set; }
+        public PatientCompanyDto? PatientCompany { get; set; } 
     }
 }

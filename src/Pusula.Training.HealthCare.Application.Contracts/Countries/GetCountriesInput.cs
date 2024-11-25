@@ -16,5 +16,10 @@ public class GetCountriesInput : PagedAndSortedResultRequestDto
 
     public GetCountriesInput()
     {
+        FilterText = string.Empty;
+        Name = string.Empty;
+        Code = string.Empty;
+        MaxResultCount = 200;
+        SkipCount = 0;
     }
 }

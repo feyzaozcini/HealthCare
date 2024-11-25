@@ -43,9 +43,22 @@ namespace Pusula.Training.HealthCare.Patients
         //Hasta Türleri
         public virtual Type Type { get; set; }
 
-        public virtual Guid CompanyId { get; set; }
+        public virtual Guid? CompanyId { get; set; }
 
-        public virtual Guid CountryId { get; set; }
+        public virtual Guid? PrimaryCountryId { get; set; }
+        public virtual Guid? PrimaryCityId { get; set; }
+        public virtual Guid? PrimaryDistrictId { get; set; }
+        public virtual Guid? PrimaryVillageId { get; set; }
+        public virtual string? PrimaryAddressDescription { get; set; }
+
+
+        public virtual Guid? SecondaryCountryId { get; set; }
+        public virtual Guid? SecondaryCityId { get; set; }
+        public virtual Guid? SecondaryDistrictId { get; set; }
+        public virtual Guid? SecondaryVillageId { get; set; }
+        public virtual string? SecondaryAddressDescription { get; set; }
+
+
 
         protected Patient()
         {
@@ -54,9 +67,14 @@ namespace Pusula.Training.HealthCare.Patients
             BirthDate = DateTime.Now;
             Email = string.Empty;
             MobilePhoneNumber = string.Empty;
+
+            //Gender = Gender.Unspecified;
         }
 
-        public Patient(Guid id, Guid companyId,Guid countryId,string firstName, string lastName, DateTime birthDate, string identityNumber, string passportNumber, string email, string mobilePhoneNumber, string emergencyPhoneNumber, Gender gender, string motherName, string fatherName, BloodType bloodType, Type type)
+        public Patient(Guid id, Guid? companyId,string firstName, string lastName, DateTime birthDate, string identityNumber, string passportNumber,
+            string email, string mobilePhoneNumber, string emergencyPhoneNumber, Gender gender, string motherName, string fatherName, BloodType bloodType,
+            Type type, Guid? primaryCountryId, Guid? primaryCityId, Guid? primaryDistrictId, Guid? primaryVillageId, string primaryAddressDescription,
+            Guid? secondaryCountryId, Guid? secondaryCityId, Guid? secondaryDistrictId, Guid? secondaryVillageId, string secondaryAddressDescription)
         {
 
             Id = id;
@@ -65,18 +83,17 @@ namespace Pusula.Training.HealthCare.Patients
             Check.NotNull(lastName, nameof(lastName));
             Check.Length(lastName, nameof(lastName), PatientConsts.LastNameMaxLength, 0);
             Check.Length(identityNumber, nameof(identityNumber), PatientConsts.IdentityNumberMaxLength, 0);
-            Check.Length(passportNumber, nameof(passportNumber), PatientConsts.PassportNumberMaxLength, 0);
+            Check.Length(passportNumber, nameof(passportNumber), PatientConsts.PassportNumberMaxLength, PatientConsts.PassportNumberMinLength);
             Check.NotNull(email, nameof(email));
             Check.Length(email, nameof(email), PatientConsts.EmailAddressMaxLength, 0);
             Check.NotNull(mobilePhoneNumber, nameof(mobilePhoneNumber));
-            Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.MobilePhoneNumberMaxLength, 0);
-            Check.Length(emergencyPhoneNumber, nameof(emergencyPhoneNumber), PatientConsts.EmergencyPhoneNumberMaxLength, 0);
+            Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.PhoneNumberMaxLength, PatientConsts.PhoneNumberMinLength);
+            Check.Length(emergencyPhoneNumber, nameof(emergencyPhoneNumber), PatientConsts.PhoneNumberMaxLength, PatientConsts.PhoneNumberMinLength);
             Check.Length(motherName, nameof(motherName), PatientConsts.FirstNameMaxLength, 0);
             Check.Length(fatherName, nameof(fatherName), PatientConsts.FirstNameMaxLength, 0);
 
             Id = id;
             CompanyId = companyId;
-            CountryId = countryId;
             FirstName = firstName;
             LastName = lastName;
             BirthDate = birthDate;
@@ -85,11 +102,21 @@ namespace Pusula.Training.HealthCare.Patients
             Email = email;
             MobilePhoneNumber = mobilePhoneNumber;
             EmergencyPhoneNumber = emergencyPhoneNumber;
-            //No = no;
+            Gender = gender;
             MotherName = motherName;
             FatherName = fatherName;
             BloodType = bloodType;
             Type = type;
+            PrimaryCountryId = primaryCountryId;
+            PrimaryCityId = primaryCityId;
+            PrimaryDistrictId = primaryDistrictId;
+            PrimaryVillageId = primaryVillageId;
+            PrimaryAddressDescription = primaryAddressDescription;
+            SecondaryCountryId = secondaryCountryId;
+            SecondaryCityId = secondaryCityId;
+            SecondaryDistrictId = secondaryDistrictId;
+            SecondaryVillageId = secondaryVillageId;
+            SecondaryAddressDescription = secondaryAddressDescription;
         }
     }
 }
