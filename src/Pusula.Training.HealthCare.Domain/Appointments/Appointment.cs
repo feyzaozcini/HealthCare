@@ -62,7 +62,7 @@ namespace Pusula.Training.HealthCare.Appointments
         }
         public void SetAppointmentStatus(AppointmentStatus appointmentStatus)
         {
-            Check.Range((int)appointmentStatus, nameof(appointmentStatus), 1, 10);
+            //Check.Range((int)appointmentStatus, nameof(appointmentStatus), 1, 10);
             AppointmentStatus = appointmentStatus;
         }
         public void SetPatientId(Guid patientId)

@@ -20,8 +20,6 @@ namespace Pusula.Training.HealthCare.Appointments
             Check.NotNull(appointmentTyeId, nameof(appointmentTyeId));
             Check.NotNull(startDate, nameof(startDate));
             Check.NotNull(endDate, nameof(endDate));
-            Check.Length(note, nameof(note), AppointmentConst.NoteMaxLength);
-            Check.Range((int)appointmentStatus, nameof(appointmentStatus), 1, 10);
 
             var appointment = new Appointment(
                 GuidGenerator.Create(),
