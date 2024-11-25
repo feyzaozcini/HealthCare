@@ -1,6 +1,8 @@
 ﻿using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Districts;
+using Pusula.Training.HealthCare.TestGroupItems;
+using Pusula.Training.HealthCare.TestGroups;
 using Pusula.Training.HealthCare.Villages;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,8 @@ namespace Pusula.Training.HealthCare
         ICityRepository cityRepository,
         IDistrictRepository districtRepository,
         IVillageRepository villageRepository,
+        ITestGroupRepository testGroupRepository,
+        ITestGroupItemRepository testGroupItemRepository,
         IGuidGenerator guidGenerator) : IDataSeedContributor, ITransientDependency
     {
         public async Task SeedAsync(DataSeedContext context)
@@ -33,7 +37,11 @@ namespace Pusula.Training.HealthCare
             var cities = await SeedCitiesAsync(countries);
             var districts = await SeedDistrictsAsync(cities);
             await SeedVillagesAsync(districts);
+
+            var testGroups = await SeedTestGroupsAsync();
+            var testGroupItems = await SeedTestGroupItemsAsync(testGroups);
         }
+
 
         // Ülkeler
         private async Task<List<Guid>> SeedCountriesAsync()
@@ -938,5 +946,551 @@ namespace Pusula.Training.HealthCare
             await villageRepository.InsertManyAsync(villages, true);
 
         }
+
+
+        #region TestGroups
+
+        private async Task<List<Guid>> SeedTestGroupsAsync()
+        {
+            if (await testGroupRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+
+            var testGroups = new List<TestGroup>
+            {
+                new TestGroup(Guid.NewGuid(), "Hematology"),
+                new TestGroup(Guid.NewGuid(), "Chemistry"),
+                new TestGroup(Guid.NewGuid(), "Pathology"),
+                new TestGroup(Guid.NewGuid(), "Microbiology")
+            };
+
+            await testGroupRepository.InsertManyAsync(testGroups, true);
+
+            return testGroups.Select(d => d.Id).ToList();
+
+        }
+        #endregion
+
+        #region TestGroupItems
+
+        private async Task<List<Guid>> SeedTestGroupItemsAsync(List<Guid> testGroupKeys)
+        {
+            if (await testGroupItemRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+
+            var testGroupItems = new List<TestGroupItem>
+            {
+               new TestGroupItem(
+                guidGenerator.Create(),
+                testGroupKeys.ElementAt(0),
+                "Eosinophils/100 leukocytes in Sputum by Manual count",
+                "10327-5",
+                "Laboratory",
+                "Measures the components of blood.",
+                24
+               ),
+               new TestGroupItem(
+                guidGenerator.Create(),
+                testGroupKeys.ElementAt(0),
+                "Lymphocytes/100 leukocytes in Cerebral spinal fluid by Manual count",
+                "10328-3",
+                "Laboratory",
+                null,
+                8
+               ),
+               new TestGroupItem(
+                guidGenerator.Create(),
+                testGroupKeys.ElementAt(0),
+                "Monocytes/100 leukocytes in Cerebral spinal fluid by Manual count",
+                "10329-1",
+                "Laboratory",
+                null,
+                7
+               ),
+               new TestGroupItem(
+                guidGenerator.Create(),
+                testGroupKeys.ElementAt(0),
+                "Monocytes/100 leukocytes in Body fluid by Manual count",
+                "10330-9",
+                "Laboratory",
+                null,
+                7
+               ),
+                new TestGroupItem(
+            guidGenerator.Create(),
+                testGroupKeys.ElementAt(0),
+            "Hemoglobin A [Units/volume] in Blood by Electrophoresis",
+            "10346-5",
+            "Hematology",
+            "Measures Hemoglobin A in blood by electrophoresis.",
+            24
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+                testGroupKeys.ElementAt(0),
+            "Bite cells [Presence] in Blood by Light microscopy",
+            "10371-3",
+            "Hematology",
+            "Detects bite cells in blood using light microscopy.",
+            36
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(0),
+            "Blister cells [Presence] in Blood by Light microscopy",
+            "10372-1",
+            "Hematology",
+            "Detects blister cells in blood using light microscopy.",
+            48
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(0),
+            "Fragments [Presence] in Blood by Light microscopy",
+            "10373-9",
+            "Hematology",
+            null,
+            30
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(0),
+            "Helmet cells [Presence] in Blood by Light microscopy",
+            "10374-7",
+            "Hematology",
+            null,
+            36
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(0),
+            "Oval macrocytes [Presence] in Blood by Light microscopy",
+            "10376-2",
+            "Hematology",
+            "Detects oval macrocytes in blood using light microscopy.",
+            24
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(0),
+            "Pencil cells [Presence] in Blood by Light microscopy",
+            "10377-0",
+            "Hematology",
+            "Detects pencil cells in blood using light microscopy.",
+            36
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(0),
+            "Polychromasia [Presence] in Blood by Light microscopy",
+            "10378-8",
+            "Hematology",
+            "Detects polychromasia in blood using light microscopy.",
+            48
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(0),
+            "Erythrocytes.dual population [Presence] in Blood by Light microscopy",
+            "10379-6",
+            "Hematology",
+            "Detects dual population erythrocytes in blood using light microscopy.",
+            30
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(0),
+            "Stomatocytes [Presence] in Blood by Light microscopy",
+            "10380-4",
+            "Hematology",
+            "Detects stomatocytes in blood using light microscopy.",
+            36
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(0),
+            "Target cells [Presence] in Blood by Light microscopy",
+            "10381-2",
+            "Hematology",
+            "Detects target cells in blood using light microscopy.",
+            42
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(0),
+            "Complement C1 esterase inhibitor.functional/Complement C1 esterase inhibitor.total in Serum or Plasma",
+            "10634-4",
+            "Hematology",
+            "Measures functional and total levels of Complement C1 esterase inhibitor in serum or plasma.",
+            72
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Intravascular space",
+            "10226-9",
+            "Hematology",
+            "Determines the oxygen content in intravascular space.",
+            24
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Aortic root",
+            "10232-7",
+            "Hematology",
+            "Determines the oxygen content in the aortic root.",
+            36
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Left atrium",
+            "10233-5",
+            "Hematology",
+            "Determines the oxygen content in the left atrium.",
+            48
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Right atrium",
+            "10234-3",
+            "Hematology",
+            "Determines the oxygen content in the right atrium.",
+            30
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in High right atrium",
+            "10235-0",
+            "Hematology",
+            "Determines the oxygen content in the high right atrium.",
+            42
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Low right atrium",
+            "10236-8",
+            "Hematology",
+            "Determines the oxygen content in the low right atrium.",
+            54
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Mid right atrium",
+            "10237-6",
+            "Hematology",
+            "Measures oxygen content in the mid-right atrium of the heart.",
+            2
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Left ventricle",
+            "10238-4",
+            "Hematology",
+            "Measures oxygen content in the left ventricle of the heart.",
+            2
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Right ventricular outflow tract",
+            "10239-2",
+            "Hematology",
+            "Measures oxygen content in the right ventricular outflow tract.",
+            3
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Right ventricle",
+            "10240-0",
+            "Hematology",
+            "Measures oxygen content in the right ventricle of the heart.",
+            3
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Coronary sinus",
+            "10241-8",
+            "Hematology",
+            "Measures oxygen content in the coronary sinus.",
+            4
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(1),
+            "Oxygen content in Ductus",
+            "10242-6",
+            "Hematology",
+            "Measures oxygen content in the ductus arteriosus or ductus venosus.",
+            4
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "Actin Ag Test",
+            "10457-0",
+            "Immunohistochemistry",
+            "Test for presence of Actin antigen in tissue.",
+            24
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "ALP Placenta Ag Test",
+            "10458-8",
+            "Immunohistochemistry",
+            "Test for placental alkaline phosphatase antigen in tissue.",
+            48
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "AFP Ag Test",
+            "10459-6",
+            "Immunohistochemistry",
+            "Test for Alpha-1-Fetoprotein antigen in tissue.",
+            12
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "Alpha Lactalbumin Ag Test",
+            "10460-4",
+            "Immunohistochemistry",
+            "Test for Lactalbumin alpha antigen in tissue.",
+            36
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "A1ACT Ag Test",
+            "10461-2",
+            "Immunohistochemistry",
+            "Test for Alpha-1-Antichymotrypsin antigen in tissue.",
+            48
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "A1AT Ag Test",
+            "10462-0",
+            "Immunohistochemistry",
+            "Test for Alpha 1 antitrypsin antigen in tissue.",
+            24
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "ALA Ag Test",
+            "10463-8",
+            "Immunohistochemistry",
+            "Test for Amyloid A component antigen in tissue.",
+            18
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "ALP Ag Test",
+            "10464-6",
+            "Immunohistochemistry",
+            "Test for Amyloid P component antigen in tissue.",
+            36
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "AL Prealbumin Ag Test",
+            "10465-3",
+            "Immunohistochemistry",
+            "Test for Amyloid prealbumin antigen in tissue.",
+            24
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "Beta-2-Microglobulin Ag Test",
+            "10467-9",
+            "Immunohistochemistry",
+            "Test for Beta-2-Microglobulin antigen in tissue.",
+            30
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "Calcitonin Ag Test",
+            "10468-7",
+            "Immunohistochemistry",
+            "Test for Calcitonin antigen in tissue.",
+            18
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "Carcinoembryonic Ag Test",
+            "10469-5",
+            "Immunohistochemistry",
+            "Test for Carcinoembryonic antigen in tissue.",
+            24
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "Jones MS Stn Test",
+            "10792-0",
+            "Histology",
+            "Microscopic observation in tissue by Methenamine silver stain Jones.",
+            20
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "MG Stn Test",
+            "10793-8",
+            "Histology",
+            "Microscopic observation in tissue by Methyl green stain.",
+            12
+        ),
+        new TestGroupItem(
+            guidGenerator.Create(),
+            testGroupKeys.ElementAt(2),
+            "MG-Pyronine Y Stn Test",
+            "10794-6",
+            "Histology",
+            "Microscopic observation in tissue by Methyl green-pyronine Y stain.",
+            18
+        ),
+        new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "Bab microti Bld Smear",
+        code: "10347-3",
+        testType: "Microscopy",
+        description: "Babesia microti identified in Blood by Light microscopy",
+        turnaroundTime: 12
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "B parapert Ab Ser Ql",
+        code: "10348-1",
+        testType: "Serology",
+        description: "Bordetella parapertussis Ab [Presence] in Serum",
+        turnaroundTime: 24
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "Brucella Ab Ser-aCnc",
+        code: "10349-9",
+        testType: "Serology",
+        description: "Brucella sp Ab [Units/volume] in Serum",
+        turnaroundTime: 48
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "HSV IgM Titr Ser EIA",
+        code: "10350-7",
+        testType: "Immunoassay",
+        description: "Herpes simplex virus IgM Ab [Titer] in Serum by Immunoassay",
+        turnaroundTime: 36
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "HCV RNA SerPl Amp Prb-aCnc",
+        code: "10676-5",
+        testType: "Molecular Biology",
+        description: "Hepatitis C virus RNA [Units/volume] (viral load) in Serum or Plasma by Probe with amplification",
+        turnaroundTime: 72
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "HSV1 Ag Tiss Ql ImStn",
+        code: "10677-3",
+        testType: "Immunostaining",
+        description: "Herpes simplex virus 1 Ag [Presence] in Tissue by Immune stain",
+        turnaroundTime: 48
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "HSV1+2 Ag Tiss Ql ImStn",
+        code: "10678-1",
+        testType: "Immunostaining",
+        description: "Herpes simplex virus 1+2 Ag [Presence] in Tissue by Immune stain",
+        turnaroundTime: 60
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "Trypanos Bld Thick Film",
+        code: "10731-8",
+        testType: "Microscopy",
+        description: "Trypanosoma sp identified in Blood by Thick film",
+        turnaroundTime: 24
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "Trypanos Bld Thin Film",
+        code: "10732-6",
+        testType: "Microscopy",
+        description: "Trypanosoma sp identified in Blood by Thin film",
+        turnaroundTime: 18
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "Trypanos Bld Wet Prep",
+        code: "10733-4",
+        testType: "Microscopy",
+        description: "Trypanosoma sp identified in Blood by Wet preparation",
+        turnaroundTime: 12
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "VZV Skin EM",
+        code: "10734-2",
+        testType: "Electron Microscopy",
+        description: "Varicella zoster virus identified in Skin by Electron microscopy",
+        turnaroundTime: 96
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "Viral Seq Ser Seq",
+        code: "10735-9",
+        testType: "Sequencing",
+        description: "Viral sequencing [Identifier] in Serum by Sequencing",
+        turnaroundTime: 120
+    ),
+    new TestGroupItem(
+        id: guidGenerator.Create(),
+        testGroupId: testGroupKeys.ElementAt(3),
+        name: "Virus CSF EM",
+        code: "10736-7",
+        testType: "Electron Microscopy",
+        description: "Virus identified in Cerebral spinal fluid by Electron microscopy",
+                turnaroundTime: 96
+    )
+            };
+
+            await testGroupItemRepository.InsertManyAsync(testGroupItems, true);
+
+            return testGroupItems.Select(c => c.Id).ToList();
+        }
+
+        #endregion
+
     }
 }
