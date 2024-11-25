@@ -37,6 +37,7 @@ using Pusula.Training.HealthCare.ExaminationDiagnoses;
 using Pusula.Training.HealthCare.PhysicalExaminations;
 using Pusula.Training.HealthCare.PshychologicalStates;
 using Pusula.Training.HealthCare.FallRisks;
+using System;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -147,16 +148,26 @@ public class HealthCareDbContext :
                 b.Property(x => x.IdentityNumber).HasColumnName(nameof(Patient.IdentityNumber)).HasMaxLength(PatientConsts.IdentityNumberMaxLength);
                 b.Property(x => x.PassportNumber).HasColumnName(nameof(Patient.PassportNumber));
                 b.Property(x => x.Email).HasColumnName(nameof(Patient.Email)).IsRequired().HasMaxLength(PatientConsts.EmailAddressMaxLength);
-                b.Property(x => x.MobilePhoneNumber).HasColumnName(nameof(Patient.MobilePhoneNumber)).IsRequired().HasMaxLength(PatientConsts.MobilePhoneNumberMaxLength);
-                b.Property(x => x.EmergencyPhoneNumber).HasColumnName(nameof(Patient.EmergencyPhoneNumber)).HasMaxLength(PatientConsts.MobilePhoneNumberMaxLength);
+                b.Property(x => x.MobilePhoneNumber).HasColumnName(nameof(Patient.MobilePhoneNumber)).IsRequired().HasMaxLength(PatientConsts.PhoneNumberMaxLength);
+                b.Property(x => x.EmergencyPhoneNumber).HasColumnName(nameof(Patient.EmergencyPhoneNumber)).HasMaxLength(PatientConsts.PhoneNumberMaxLength);
                 b.Property(x => x.Gender).HasColumnName(nameof(Patient.Gender)).IsRequired();
                 b.Property(x => x.No).HasColumnName(nameof(Patient.No)).IsRequired().HasDefaultValueSql("nextval('\"PatientNoSequence\"')");
                 b.Property(x => x.MotherName).HasColumnName(nameof(Patient.MotherName));
                 b.Property(x => x.FatherName).HasColumnName(nameof(Patient.FatherName));
                 b.Property(x => x.BloodType).HasColumnName(nameof(Patient.BloodType));
                 b.Property(x => x.Type).HasColumnName(nameof(Patient.Type)).IsRequired();
-                b.HasOne<PatientCompany>().WithMany().IsRequired().HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Country>().WithMany().IsRequired().HasForeignKey(x => x.CountryId).OnDelete(DeleteBehavior.NoAction);
+                b.Property(x => x.PrimaryAddressDescription).HasColumnName(nameof(Patient.PrimaryAddressDescription));
+                b.Property(x => x.SecondaryAddressDescription).HasColumnName(nameof(Patient.SecondaryAddressDescription));
+                b.HasOne<PatientCompany>().WithMany().IsRequired(false).HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Country>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryCountryId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<City>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryCityId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<District>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryDistrictId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Village>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryVillageId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Country>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryCountryId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<City>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryCityId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<District>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryDistrictId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Village>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryVillageId).OnDelete(DeleteBehavior.NoAction);
+
             });
 
             builder.Entity<Department>(b =>
