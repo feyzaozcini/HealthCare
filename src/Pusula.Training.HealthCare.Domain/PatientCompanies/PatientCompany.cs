@@ -12,18 +12,23 @@ namespace Pusula.Training.HealthCare.PatientCompanies
     public class PatientCompany : FullAuditedAggregateRoot<Guid>
     {
         [NotNull]
-        public virtual string Name { get; set; }
+        public virtual string Name { get; private set; }
 
         protected PatientCompany() 
         {
-            Name=string.Empty;
+
         }
 
         public PatientCompany(Guid id,string name)
         {
             Id = id;
-            Check.NotNullOrWhiteSpace(name,nameof(name));
-            Check.Length(name,nameof(name),PatientCompanyConsts.NameMaxLength,PatientCompanyConsts.NameMinLength);
+            SetName(name);
+        }
+
+        public void SetName(string name)
+        {
+            Check.NotNullOrWhiteSpace(name, nameof(name));
+            Check.Length(name, nameof(name), PatientCompanyConsts.NameMaxLength, PatientCompanyConsts.NameMinLength);
             Name = name;
         }
     }
