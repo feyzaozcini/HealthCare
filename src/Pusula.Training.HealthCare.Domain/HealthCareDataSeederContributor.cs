@@ -1117,7 +1117,7 @@ namespace Pusula.Training.HealthCare
         new TestGroupItem(
             guidGenerator.Create(),
             testGroupKeys.ElementAt(0),
-            "Complement C1 esterase inhibitor.functional/Complement C1 esterase inhibitor.total in Serum or Plasma",
+            "Complement C1 esterase inhibitor.total in Serum or Plasma",
             "10634-4",
             "Hematology",
             "Measures functional and total levels of Complement C1 esterase inhibitor in serum or plasma.",
