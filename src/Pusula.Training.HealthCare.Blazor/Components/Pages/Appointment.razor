@@ -62,7 +62,7 @@
     </div>
 </div>
 
-<SfSchedule TValue="AppointmentCreateDto" Width="100%" Height="650px" @bind-SelectedDate="@CurrentDate">
+<SfSchedule TValue="FlatAppointmentDto" Width="100%" Height="650px"  @ref="SfScheduleInstance" >
     <ScheduleTemplates>
         <EditorTemplate>
             <table class="custom-event-editor" width="100%" cellpadding="5">
@@ -79,24 +79,24 @@
                     <tr>
                         <td class="e-textlabel">Start Date</td>
                         <td colspan="4">
-                            <SfDateTimePicker @bind-Value="@NewAppointment.StartDate"></SfDateTimePicker>
+                            <SfDateTimePicker @bind-Value="@NewAppointment.StartDate" TValue="DateTime"></SfDateTimePicker>
                         </td>
                     </tr>
                     <tr>
                         <td class="e-textlabel">End Date</td>
                         <td colspan="4">
-                            <SfDateTimePicker @bind-Value="@NewAppointment.EndDate"></SfDateTimePicker>
+                            <SfDateTimePicker @bind-Value="@NewAppointment.EndDate" TValue="DateTime"></SfDateTimePicker>
                         </td>
                     </tr>
                     <tr>
                         <td class="e-textlabel">Status</td>
                         <td colspan="4">
-                            <SfDropDownList DataSource="@AppointmentStatusCollection"
-                                            Placeholder="Choose Status"
-                                            @bind-Value="@NewAppointment.AppointmentStatus">
-                                <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
-                            </SfDropDownList>
-                        </td>
+                    <SfDropDownList DataSource="@AppointmentStatusCollection"
+                                    Placeholder="Choose Status"
+                                    @bind-Value="@NewAppointment.AppointmentStatus">
+                        <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
+                    </SfDropDownList>
+                    </td>
                     </tr>
                     <tr>
                         <td class="e-textlabel">Note</td>
@@ -106,7 +106,7 @@
                     </tr>
                     <tr>
                         <td colspan="5">
-                            <SfButton OnClick="CreateAppointment">Create Appointment</SfButton>
+                            <SfButton OnClick="CreateAndCloseModal">Create Appointment</SfButton>
                         </td>
                     </tr>
                 </tbody>
@@ -114,7 +114,8 @@
         </EditorTemplate>
     </ScheduleTemplates>
 
-    <ScheduleEventSettings DataSource="@AppointmentList"></ScheduleEventSettings>
+    <ScheduleEventSettings TValue="FlatAppointmentDto" DataSource="@AppointmentList" EnableTooltip="true">
+    </ScheduleEventSettings>
     <ScheduleViews>
         <ScheduleView Option="View.Day"></ScheduleView>
         <ScheduleView Option="View.Week"></ScheduleView>
@@ -123,14 +124,17 @@
 </SfSchedule>
 @code {
 
-    private DateTime CurrentDate = DateTime.Now;
+    private SfSchedule<FlatAppointmentDto> SfScheduleInstance;
+    //private DateTime CurrentDate { get; set; } = DateTime.Now;
     private AppointmentCreateDto NewAppointment { get; set; } = new AppointmentCreateDto();
     private IReadOnlyList<LookupDto<Guid>> PatientsCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<Guid>> DoctorsCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<Guid>> DepartmentsCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<Guid>> AppointmentTypesCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<AppointmentStatus>> AppointmentStatusCollection { get; set; } = new List<LookupDto<AppointmentStatus>>();
-    private List<AppointmentWithNavigationPropertiesDto> AppointmentList { get; set; } = new List<AppointmentWithNavigationPropertiesDto>();
+    private List<FlatAppointmentDto> AppointmentList { get; set; } = new List<FlatAppointmentDto>();
+    
+
     protected override async Task OnInitializedAsync()
     {
         // Fetch lookup data
@@ -144,19 +148,59 @@
             .Cast<AppointmentStatus>()
             .Select(b => new LookupDto<AppointmentStatus> { Id = b, DisplayName = b.ToString() })
             .ToList();
+
+        await LoadAppointmentsAsync();
+    }
+
+    private async Task LoadAppointmentsAsync()
+    {
+        var input = new GetAppointmentsInput
+            {
+                StartDate = null,
+                EndDate = null,
+                Note = null,
+                AppointmentStatus = null, //
+                PatientId = null,
+                //DoctorId = null,
+                DepartmentId = null,
+                AppointmentTypeId = null,
+                //PatientId = StateService.SelectedPatient.Id, 
+                DoctorId = DoctorStateService.SelectedDoctor.Doctor.Id,//Doctorun randevularını getirme filtresi
+                //DepartmentId = DepartmentStateService.SelectedDepartment.Id
+            };
+
+        var result = await AppointmentsAppService.GetListAsync(input);
+
+        AppointmentList = result.Items.Select(a => new FlatAppointmentDto
+            {
+                Id = a.Appointment.Id,
+                Subject = a.AppointmentType.Name,
+                StartTime = a.Appointment.StartDate,
+                EndTime = a.Appointment.EndDate
+            }).ToList();
+
+    }
+
+    private async Task CreateAndCloseModal()
+    {
+        await CreateAppointment();// Randevu oluşturma işlemini çağır
+        await LoadAppointmentsAsync(); // Verileri yeniden yükle
+       // await SfScheduleInstance.Refresh(); // Takvimi güncelle
+        SfScheduleInstance.CloseEditor(); // Modalı kapat
     }
 
     private async Task CreateAppointment()
     {
+        /*DateTime Date = this.SfScheduleInstance.SelectedDate;
+        DateTime Start = new DateTime(Date.Year, Date.Month, Date.Day, DateTime.Now.Hour, 0, 0);*/
         try
         {
-            // Call your service to create the appointment
-            var createdAppointment = await AppointmentsAppService.CreateAsync(NewAppointment);
+            NewAppointment.DoctorId = DoctorStateService.SelectedDoctor.Doctor.Id;
+            NewAppointment.PatientId = StateService.SelectedPatient.Id;
+            NewAppointment.DepartmentId = DepartmentStateService.SelectedDepartment.Id;
 
-            if (createdAppointment != null)
-            {
-                NewAppointment = new AppointmentCreateDto();
-            }
+            // Call your service to create the appointment
+            var createdAppointment = await AppointmentsAppService.CreateAsync(NewAppointment);   
         }
         catch (Exception ex)
         {
