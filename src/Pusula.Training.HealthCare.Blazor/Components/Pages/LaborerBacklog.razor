@@ -1,0 +1,50 @@
+﻿@page "/laborer-backlog"
+
+<div class="d-flex flex-row">
+    <SfGrid DataSource="@GridData" Width="100%" Height="750px" AllowResizing="false" GridLines="@GridLine.Both" AllowFiltering="true">
+        <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Menu"></GridFilterSettings>
+        <GridColumns>
+            <GridColumn Field="PatientName" HeaderText="Hasta Adı-Soyadı" MinWidth="150" MaxWidth="300" IsPrimaryKey="true">
+                <HeaderTemplate>
+                    <i class="fa fa-user me-2"></i>Hasta Adı-Soyadı
+                </HeaderTemplate>
+            </GridColumn>
+            <GridColumn Field="Info" HeaderText="İstem Bilgisi" MinWidth="150" MaxWidth="300">
+                <HeaderTemplate>
+                    <i class="fa fa-info-circle me-2"></i>İstem Bilgisi
+                </HeaderTemplate>
+            </GridColumn>
+            <GridColumn Field="DoctorName" HeaderText="İsteyen Doktor" MinWidth="150" MaxWidth="300">
+                <HeaderTemplate>
+                    <i class="fa fa-user-md me-2"></i>İsteyen Doktor
+                </HeaderTemplate>
+            </GridColumn>
+            <GridColumn Field="Date" HeaderText="İstem Tarihi" MinWidth="150" MaxWidth="300" Format="MM/dd/yyyy hh:mm tt" AllowEditing="false">
+                <HeaderTemplate>
+                    <i class="fa fa-calendar me-2"></i>İstem Tarihi
+                </HeaderTemplate>
+                <FilterTemplate>
+                    @{
+                        <SfDateRangePicker Placeholder="Choose a Range" Width="500" ShowClearButton="true"
+                                           @bind-StartDate="StartDate" @bind-EndDate="EndDate" TValue="DateTime">
+                            <DateRangePickerEvents TValue="DateTime">
+                            </DateRangePickerEvents>
+                        </SfDateRangePicker>
+                    }
+                </FilterTemplate>
+            </GridColumn>
+            <GridColumn Field="Status" HeaderText="İstem Durumu" Width="150">
+                <HeaderTemplate>
+                    <i class="fa fa-file-alt me-2"></i>Durum
+                </HeaderTemplate>
+            </GridColumn>
+            <GridColumn Field="Result" HeaderText="Sonuç" MinWidth="150" MaxWidth="600">
+                <HeaderTemplate>
+                    <i class="fa fa-file-alt me-2"></i>Sonuç
+                </HeaderTemplate>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
+</div>
+
+
