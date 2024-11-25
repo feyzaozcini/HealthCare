@@ -24,11 +24,10 @@ namespace Pusula.Training.HealthCare.PatientCompanies
 
         public virtual async Task<PatientCompany> UpdateAsync(Guid id,string name, [CanBeNull] string? concurrencyStamp = null)
         {
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), PatientCompanyConsts.NameMaxLength, PatientCompanyConsts.NameMinLength);
+           
 
             var patientCompany = await patientCompanyRepository.GetAsync(id);
-            patientCompany.Name = name;
+            patientCompany.SetName(name);
 
             patientCompany.SetConcurrencyStampIfNotNull(concurrencyStamp);
             return await patientCompanyRepository.UpdateAsync(patientCompany);

@@ -14,12 +14,12 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
             Check.NotNull(name, nameof(name));
             Check.Length(name, nameof(name), AppointmentTypeConst.NameMaxLength, AppointmentTypeConst.NameMinLength);
 
-            var testGroup = new AppointmentType(
+            var appointmentType = new AppointmentType(
              GuidGenerator.Create(),
             name
             );
 
-            return await appointmentTypeRepository.InsertAsync(testGroup);
+            return await appointmentTypeRepository.InsertAsync(appointmentType);
         }
 
         public virtual async Task<AppointmentType> UpdateAsync(
@@ -27,9 +27,9 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
         string name
             )
         {
-            var testGroup = await appointmentTypeRepository.GetAsync(id);
-            testGroup.SetName(name);
-            return await appointmentTypeRepository.UpdateAsync(testGroup);
+            var appointmentType = await appointmentTypeRepository.GetAsync(id);
+            appointmentType.SetName(name);
+            return await appointmentTypeRepository.UpdateAsync(appointmentType);
         }
     }
 }

@@ -1,8 +1,14 @@
-﻿using Pusula.Training.HealthCare.Cities;
+﻿using Microsoft.VisualBasic;
+using Pusula.Training.HealthCare.AppointmentTypes;
+using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
+using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Districts;
+using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.TestGroupItems;
 using Pusula.Training.HealthCare.TestGroups;
+using Pusula.Training.HealthCare.Titles;
 using Pusula.Training.HealthCare.Villages;
 using System;
 using System.Collections.Generic;
@@ -14,6 +20,7 @@ using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Guids;
+using Volo.Abp.Identity;
 
 
 namespace Pusula.Training.HealthCare
@@ -25,6 +32,10 @@ namespace Pusula.Training.HealthCare
         IVillageRepository villageRepository,
         ITestGroupRepository testGroupRepository,
         ITestGroupItemRepository testGroupItemRepository,
+        IDepartmentRepository departmentRepository,
+        ITitleRepository titleRepository,
+        IAppointmentTypeRepository appointmentTypeRepository,
+        IPatientCompanyRepository patientCompanyRepository,
         IGuidGenerator guidGenerator) : IDataSeedContributor, ITransientDependency
     {
         public async Task SeedAsync(DataSeedContext context)
@@ -40,6 +51,11 @@ namespace Pusula.Training.HealthCare
 
             var testGroups = await SeedTestGroupsAsync();
             var testGroupItems = await SeedTestGroupItemsAsync(testGroups);
+
+            var departments = await SeedDepartmentsAsync();
+            var titles = await SeedTitlesAsync();
+            var appointmentTypes = await SeedAppointmentTypesAsync();
+            var patientCompanies = await SeedPatientCompaniesAsync();
         }
 
 
@@ -1488,6 +1504,79 @@ namespace Pusula.Training.HealthCare
             await testGroupItemRepository.InsertManyAsync(testGroupItems, true);
 
             return testGroupItems.Select(c => c.Id).ToList();
+        }
+
+        #endregion
+
+        #region Departments
+        private async Task<List<Guid>> SeedDepartmentsAsync()
+        {
+            if (await departmentRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+            var departments = new List<Department>
+            {
+                new Department(guidGenerator.Create(), "Cardiology"),
+                new Department(guidGenerator.Create(), "Neurology"),
+                new Department(guidGenerator.Create(), "General Surgery"),
+                new Department(guidGenerator.Create(), "Dermatology"),
+                new Department(guidGenerator.Create(), "Psychiatry"),
+                new Department(guidGenerator.Create(), "Pediatrics")
+            };
+            await departmentRepository.InsertManyAsync(departments, true);
+            return departments.Select(d => d.Id).ToList();
+
+        }
+        #endregion
+
+        #region Titles
+        private async Task<List<Guid>> SeedTitlesAsync()
+        {
+            if (await titleRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+            var titles = new List<Title>
+            {
+                new Title(guidGenerator.Create(), "Prof. "),
+                new Title(guidGenerator.Create(), "Doç. Dr."),
+                new Title(guidGenerator.Create(), "Uz. Dr."),
+                new Title(guidGenerator.Create(), "Op. Dr."),
+                new Title(guidGenerator.Create(), "Asist. Dr.")
+            };
+            await titleRepository.InsertManyAsync(titles, true);
+            return titles.Select(t => t.Id).ToList();
+        }
+        #endregion
+
+        #region AppointmentTypes
+        private async Task<List<Guid>> SeedAppointmentTypesAsync()
+        {
+            if (await appointmentTypeRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+            var appointmentTypes = new List<AppointmentType>
+            {
+                new AppointmentType(guidGenerator.Create(), "Examination"),
+                new AppointmentType(guidGenerator.Create(), "Consultation"),
+                new AppointmentType(guidGenerator.Create(), "Follow-up"),
+                new AppointmentType(guidGenerator.Create(), "Treatment"),
+                new AppointmentType(guidGenerator.Create(), "Vaccination")
+            };
+            await appointmentTypeRepository.InsertManyAsync(appointmentTypes, true);
+            return appointmentTypes.Select(a => a.Id).ToList();
+        }
+        #endregion
+
+        #region Companies
+        private async Task<List<Guid>> SeedPatientCompaniesAsync()
+        {
+            if (await patientCompanyRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+            var companies = new List<PatientCompany>
+            {
+                new PatientCompany(guidGenerator.Create(), "Pusula"),
+                new PatientCompany(guidGenerator.Create(), "Kendine İyi Bak"),
+                new PatientCompany(guidGenerator.Create(), "Sağlık Hizmetleri A.Ş."),
+            };
+            await patientCompanyRepository.InsertManyAsync(companies, true);
+            return companies.Select(c => c.Id).ToList();
         }
 
         #endregion
