@@ -29,8 +29,10 @@ namespace Pusula.Training.HealthCare.Protocols
     {
         public virtual async Task<PagedResultDto<ProtocolWithNavigationPropertiesDto>> GetListAsync(GetProtocolsInput input)
         {
-            var totalCount = await protocolRepository.GetCountAsync(input.FilterText, input.Type, input.StartTimeMin, input.StartTimeMax, input.EndTime, input.PatientId, input.DepartmentId);
-            var items = await protocolRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.Type, input.StartTimeMin, input.StartTimeMax, input.EndTime, input.PatientId, input.DepartmentId, input.Sorting, input.MaxResultCount, input.SkipCount);
+            var totalCount = await protocolRepository.GetCountAsync(input.FilterText, input.Type, input.StartTimeMin, input.StartTimeMax, input.EndTime, input.PatientId, input.DepartmentId,input.DoctorId);
+
+            var items = await protocolRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.Type, input.StartTimeMin, input.StartTimeMax, input.EndTime, input.PatientId, input.DepartmentId,input.DoctorId, input.Sorting, input.MaxResultCount, input.SkipCount);
+            
 
             return new PagedResultDto<ProtocolWithNavigationPropertiesDto>
             {
@@ -99,7 +101,7 @@ namespace Pusula.Training.HealthCare.Protocols
             }
 
             var protocol = await protocolManager.CreateAsync(
-            input.PatientId, input.DepartmentId, input.Type, input.StartTime, input.EndTime
+            input.PatientId, input.DepartmentId, input.Type, input.StartTime,input.DoctorId, input.EndTime
             );
 
             return ObjectMapper.Map<Protocol, ProtocolDto>(protocol);
@@ -119,7 +121,7 @@ namespace Pusula.Training.HealthCare.Protocols
 
             var protocol = await protocolManager.UpdateAsync(
             id,
-            input.PatientId, input.DepartmentId, input.Type, input.StartTime, input.EndTime, input.ConcurrencyStamp
+            input.PatientId, input.DepartmentId, input.Type, input.StartTime,input.DoctorId, input.EndTime, input.ConcurrencyStamp
             );
 
             return ObjectMapper.Map<Protocol, ProtocolDto>(protocol);

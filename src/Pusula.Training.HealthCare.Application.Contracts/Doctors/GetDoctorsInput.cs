@@ -16,6 +16,10 @@ namespace Pusula.Training.HealthCare.Doctors
         public string? IdentityNumber { get; set; }      
         public DateTime? BirthDateMin { get; set; }     
         public DateTime? BirthDateMax { get; set; }    
-        public Gender? Gender { get; set; }        
+        public Gender? Gender { get; set; }
+
+        public GetDoctorsInput()
+        {
+        }
     }
 }

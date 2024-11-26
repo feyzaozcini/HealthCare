@@ -98,31 +98,6 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         appointmentPermission.AddChild(HealthCarePermissions.Appointments.Delete, L("Permission:Delete"));
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         var diagnosisGroupPermission = myGroup.AddPermission(HealthCarePermissions.DiagnosisGroups.Default, L("Permission:DiagnosisGroups"));
         diagnosisGroupPermission.AddChild(HealthCarePermissions.DiagnosisGroups.Create, L("Permission:Create"));
         diagnosisGroupPermission.AddChild(HealthCarePermissions.DiagnosisGroups.Edit, L("Permission:Edit"));

@@ -59,7 +59,7 @@ namespace Pusula.Training.HealthCare.Doctors
 
 
         public async Task<DoctorWithNavigationProperties> GetWithNavigationProperties(Guid id,
-        CancellationToken cancellationToken = default)
+CancellationToken cancellationToken = default)
         {
             var dbContext = await GetDbContextAsync();
             return (await GetDbSetAsync()).Where(b => b.Id == id)

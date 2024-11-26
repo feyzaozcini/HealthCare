@@ -1,4 +1,5 @@
 ﻿using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Patients;
 using System;
 using System.Collections.Generic;

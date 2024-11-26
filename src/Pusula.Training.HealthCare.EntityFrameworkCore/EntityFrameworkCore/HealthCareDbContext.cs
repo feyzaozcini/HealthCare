@@ -186,6 +186,7 @@ public class HealthCareDbContext :
                 b.Property(x => x.EndTime).HasColumnName(nameof(Protocol.EndTime));
                 b.HasOne<Patient>().WithMany().IsRequired().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne<Department>().WithMany().IsRequired().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Doctor>().WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
             });
 
             builder.Entity<PatientCompany>(b =>

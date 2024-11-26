@@ -1,0 +1,114 @@
+﻿@page "/doctors"
+@using Pusula.Training.HealthCare.Permissions
+@using Pusula.Training.HealthCare.Shared
+@using Pusula.Training.HealthCare.Doctors
+@using Volo.Abp.Identity
+@using Pusula.Training.HealthCare.Titles
+@using Syncfusion.Blazor.Navigations
+@using Microsoft.AspNetCore.Authorization
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@inject IDoctorsAppService DoctorsAppService
+
+
+
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+
+    <div style="width: 30%;">
+        <SfTextBox Placeholder="Ad,Soyad"
+                   FloatLabelType="FloatLabelType.Never"
+                   @bind-Value="FilterText"
+                   Width="100%"
+                   Input="@(async (args) => await OnSearchAsync(args))">
+        </SfTextBox>
+    </div>
+
+
+    <div>
+        <SfButton CssClass="e-primary" Content="Yeni Doktor" @onclick="OpenCreateModal" />
+    </div>
+</div>
+
+
+@* CREATEMODAL Static for now *@
+<SfDialog IsModal="true" Width="400px" @bind-Visible="IsModalVisible" ShowCloseIcon="true" Header="Yeni Doktor">
+    <div>
+        <!-- Statik form -->
+        <div class="mb-3">
+            <label for="name">İsim</label>
+            <SfTextBox Placeholder="İsim" />
+        </div>
+        <div class="mb-3">
+            <label for="surname">Soyisim</label>
+            <SfTextBox Placeholder="Soyisim" />
+        </div>
+        <div class="mb-3">
+            <label for="email">Email</label>
+            <SfTextBox Placeholder="example@mail.com" />
+        </div>
+        <div class="mb-3">
+            <label for="phone">Telefon Numarası</label>
+            <SfMaskedTextBox Mask="000-000-0000" Placeholder="Telefon Numarası" />
+        </div>
+        <div class="mb-3">
+            <label for="gender">Cinsiyet</label>
+            <SfDropDownList TValue="string" TItem="string" DataSource="@Genders" Placeholder="Cinsiyet Seçin" />
+        </div>
+        <div class="mb-3">
+            <label for="tckn">T.C. Kimlik No</label>
+            <SfMaskedTextBox Mask="00000000000" Placeholder="T.C. Kimlik No" />
+        </div>
+        <div class="mb-3">
+            <label for="birthdate">Doğum Tarihi</label>
+            <SfDatePicker Placeholder="Gün.Ay.Yıl" TValue="DateTime?" />
+        </div>
+        <div class="d-flex justify-content-end">
+            <SfButton CssClass="e-primary" Content="Kaydet" />
+        </div>
+    </div>
+</SfDialog>
+
+
+
+<SfGrid DataSource="@DoctorsList" AllowPaging="true">
+    <GridColumns>
+
+        <GridColumn HeaderText="Doktor">
+            <Template>
+                @if (context is DoctorWithNavigationPropertiesDto doctor)
+                {
+                    @($"{doctor.Title?.Name ?? "Dr."} {doctor.User.Name} {doctor.User.Surname} ")
+                }
+            </Template>
+        </GridColumn>
+
+
+        <GridColumn Field="User.Email" HeaderText="Email"></GridColumn>
+
+
+        <GridColumn Field="User.PhoneNumber" HeaderText="Telefon No"></GridColumn>
+
+       @*  <GridColumn HeaderText="Detaylar" Width="120">
+            <Template>
+                @if (context is DoctorWithNavigationPropertiesDto doctor)
+                {
+                    <SfButton CssClass="e-primary" Content="Detaylar" @onclick="(() => NavigateToDoctorDetails(doctor.Doctor.Id))">
+                    </SfButton>
+                }
+            </Template>
+        </GridColumn> *@
+
+        <GridColumn HeaderText="Detaylar" Width="120">
+            <Template>
+                @if (context is DoctorWithNavigationPropertiesDto doctor)
+                {
+                    <SfButton CssClass="e-primary" Content="Detaylar" @onclick="(() => NavigateToDoctorProtocols(doctor))">
+                    </SfButton>
+                }
+            </Template>
+        </GridColumn>
+    </GridColumns>
+</SfGrid>
+
