@@ -326,6 +326,7 @@
                 <ModalTitle>@L["NewPatient"]</ModalTitle>
                 <CloseButton Clicked="CloseCreatePatientModalAsync" />
             </ModalHeader>
+
             <ModalBody>
                 <Validations @ref="@NewPatientValidations"
                              Mode="ValidationMode.Manual"
@@ -345,7 +346,12 @@
                             </Select>
                         </Field>
                     </Validation> *@
-
+                    @if (currentStep == 1)
+                            {
+                    <Heading Size="HeadingSize.Is5" Class="text-center">
+                        @L["Personal Information"]
+                    </Heading>
+                    <div Class="mb-3"></div>
                     <Row>
                         <Column ColumnSize="ColumnSize.Is3">
                             <Validation MessageLocalizer="@LH.Localize">
@@ -399,7 +405,7 @@
                             </Validation>
                         </Column>
                     </Row>
-
+                    
                     <Row>
                         <Column ColumnSize="ColumnSize.Is3">
                             <Validation MessageLocalizer="@LH.Localize">
@@ -420,37 +426,24 @@
                         <Column ColumnSize="ColumnSize.Is3">
                             <Validation MessageLocalizer="@LH.Localize">
                                 <Field>
-                                    <FieldLabel>@L["BloodType"]</FieldLabel>
-                                    <Select TValue="BloodType" @bind-SelectedValue="NewPatient.BloodType">
-                                        <SelectItem Value="0" selected>@L["Select"]</SelectItem>
-                                        @foreach (var bloodType in BloodTypesCollection)
-                                        {
-                                            <SelectItem TValue="BloodType" Value="@bloodType.Id">
-                                                @bloodType.DisplayName
-                                            </SelectItem>
-                                        }
-                                    </Select>
+                                    <FieldLabel>@L["BirthDate"] *</FieldLabel>
+                                    <DateEdit TValue="DateTime" InputMode="DateInputMode.Date" @bind-Date="@NewPatient.BirthDate">
+                                        <Feedback>
+                                            <ValidationError />
+                                        </Feedback>
+                                    </DateEdit>
                                 </Field>
                             </Validation>
                         </Column>
 
-                        <Column ColumnSize="ColumnSize.Is3">
-                            <Validation MessageLocalizer="@LH.Localize">
-                                <Field>
-                                    <FieldLabel>@L["Type"] *</FieldLabel>
-                                    <Select TValue="Pusula.Training.HealthCare.Patients.Type" @bind-SelectedValue="NewPatient.Type">
-                                        @foreach (var type in TypesCollection)
-                                        {
-                                            <SelectItem TValue="Pusula.Training.HealthCare.Patients.Type" Value="@type.Id">
-                                                @type.DisplayName
-                                            </SelectItem>
-                                        }
-                                    </Select>
-                                </Field>
-                            </Validation>
-                        </Column>
+                        
                     </Row>
+                    <div Class="mb-3"></div>
 
+                    <Heading Size="HeadingSize.Is5" Class="text-center">
+                        @L["Contact Information"]
+                        <div Class="mb-3"></div>
+                    </Heading>
                     <Row>
                         @* <Column ColumnSize="ColumnSize.Is3">
                             <Field>
@@ -490,33 +483,73 @@
                         <Column ColumnSize="ColumnSize.Is3">
                             <Validation MessageLocalizer="@LH.Localize">
                                 <Field>
-                                    <FieldLabel>@L["BirthDate"] *</FieldLabel>
-                                    <DateEdit TValue="DateTime" InputMode="DateInputMode.Date" @bind-Date="@NewPatient.BirthDate">
+                                    <FieldLabel>@L["EmailAddress"]</FieldLabel>
+                                    <TextEdit @bind-Text="@NewPatient.Email" MaxLength="PatientConsts.EmailAddressMaxLength" Role="TextRole.Email">
                                         <Feedback>
                                             <ValidationError />
                                         </Feedback>
-                                    </DateEdit>
+                                    </TextEdit>
                                 </Field>
                             </Validation>
                         </Column>
 
-                        
-                        </Row>
-
-                        <Row>
                         <Column ColumnSize="ColumnSize.Is3">
-                    <Validation MessageLocalizer="@LH.Localize">
-                        <Field>
-                            <FieldLabel>@L["EmailAddress"]</FieldLabel>
-                            <TextEdit @bind-Text="@NewPatient.Email" MaxLength="PatientConsts.EmailAddressMaxLength" Role="TextRole.Email">
-                                <Feedback>
-                                    <ValidationError />
-                                </Feedback>
-                            </TextEdit>
-                        </Field>
-                    </Validation>
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["Company"]</FieldLabel>
+                                    <Select TValue="Guid?" @bind-SelectedValue="@NewPatient.CompanyId">
+                                        <SelectItem Value="@Guid.Empty" selected>@L["Select"]</SelectItem>
+                                        @foreach (var company in CompaniesCollection)
+                                        {
+                                            <SelectItem TValue="Guid?" Value="@(company.Id)">
+                                                @(company.DisplayName)
+                                            </SelectItem>
+                                        }
+                                    </Select>
+                                </Field>
+                            </Validation>
                         </Column>
-                        
+                        </Row>
+                    <div Class="mb-3"></div>
+
+                    <Heading Size="HeadingSize.Is5" Class="text-center">
+                        @L["Additional Information"]
+                    </Heading>
+                    <div Class="mb-3"></div>
+                    <Row>
+                        <Column ColumnSize="ColumnSize.Is3">
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["BloodType"]</FieldLabel>
+                                    <Select TValue="BloodType" @bind-SelectedValue="NewPatient.BloodType">
+                                        <SelectItem Value="0" selected>@L["Select"]</SelectItem>
+                                        @foreach (var bloodType in BloodTypesCollection)
+                                        {
+                                            <SelectItem TValue="BloodType" Value="@bloodType.Id">
+                                                @bloodType.DisplayName
+                                            </SelectItem>
+                                        }
+                                    </Select>
+                                </Field>
+                            </Validation>
+                        </Column>
+
+                        <Column ColumnSize="ColumnSize.Is3">
+                            <Validation MessageLocalizer="@LH.Localize">
+                                <Field>
+                                    <FieldLabel>@L["Type"] *</FieldLabel>
+                                    <Select TValue="Pusula.Training.HealthCare.Patients.Type" @bind-SelectedValue="NewPatient.Type">
+                                        @foreach (var type in TypesCollection)
+                                        {
+                                            <SelectItem TValue="Pusula.Training.HealthCare.Patients.Type" Value="@type.Id">
+                                                @type.DisplayName
+                                            </SelectItem>
+                                        }
+                                    </Select>
+                                </Field>
+                            </Validation>
+                        </Column>
+
                         <Column ColumnSize="ColumnSize.Is3">
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
@@ -542,26 +575,16 @@
                         </Field>
                     </Validation>
                     </Column>
-
-                         <Column ColumnSize="ColumnSize.Is3">
-                             <Validation MessageLocalizer="@LH.Localize"> 
-                                <Field>
-                                    <FieldLabel>@L["Company"]</FieldLabel>
-                                    <Select TValue="Guid?" @bind-SelectedValue="@NewPatient.CompanyId" >
-                                        <SelectItem Value="@Guid.Empty" selected>@L["Select"]</SelectItem>
-                                        @foreach (var company in CompaniesCollection)
-                                        {
-                                            <SelectItem TValue="Guid?" Value="@(company.Id)">
-                                                @(company.DisplayName)
-                                            </SelectItem>
-                                        }
-                                    </Select>
-                                </Field>
-                             </Validation> 
-                        </Column> 
+                        
                     </Row>
-
-                     <Row>
+                    }
+                    else if (currentStep == 2)
+                    {
+                    <Heading Size="HeadingSize.Is5" Class="text-center">
+                        @L["Primary Address"]
+                        <div Class="mb-3"></div>
+                    </Heading>
+                    <Row>
                         <Column ColumnSize="ColumnSize.Is3">
                             <Validation MessageLocalizer="@LH.Localize">
                                 <Field>
@@ -652,7 +675,12 @@
                             </Field>
                         </Validation>
                     </Row>
+                    <div Class="mb-3"></div>
 
+                    <Heading Size="HeadingSize.Is5" Class="text-center">
+                        @L["Secondary Address"]
+                        <div Class="mb-3"></div>
+                    </Heading>
                     <Row>
                         <Column ColumnSize="ColumnSize.Is3">
                             <Validation MessageLocalizer="@LH.Localize">
@@ -744,18 +772,37 @@
                                 </TextEdit>
                             </Field>
                         </Validation>
-                    </Row> 
-
+                    </Row>
+                    }
                 </Validations>
             </ModalBody>
             <ModalFooter>
-                <Button Color="Color.Secondary"
-                        Clicked="CloseCreatePatientModalAsync">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; gap: 10px;">
+
+                    <Button Color="Color.Danger"
+                        Clicked="CloseCreatePatientModalAsync" Style="margin-left: 0; margin-right: auto;">
                     @L["Cancel"]
                 </Button>
+
+                <!-- Previous Step Button -->
+                <Button Color="Color.Light" Clicked="@PreviousStep" Disabled="@(currentStep == 1)" Style="margin-left: 0; margin-right: auto;">
+                    @L["Back"]
+                </Button>
+                </div>
+                        <div style="display: flex; gap: 10px;">
+
+                <!-- Next Step Button -->
+                <Button Color="Color.Success" Clicked="@NextStep" Disabled="@(currentStep == 2)">
+                    @L["Next"]
+                </Button>
+
                 <SubmitButton Form="CreatePatientForm" Clicked="CreatePatientAsync" />
                 @*//<suite-custom-code-block-6>*@
                 @*//</suite-custom-code-block-6>*@
+                    </div>
+                </div>
+
             </ModalFooter>
         </Form>
         @*//<suite-custom-code-block-7>*@
