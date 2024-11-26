@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -279,5 +280,7 @@ doctorDto.DoctorDepartments = doctorWithNavProps.DoctorDepartments
 
             return doctorDto;
         }
+
+     
     }
 }

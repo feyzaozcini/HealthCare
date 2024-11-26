@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp;
 using JetBrains.Annotations;
+using Pusula.Training.HealthCare.Doctors;
 
 namespace Pusula.Training.HealthCare.Titles
 {
@@ -14,6 +15,7 @@ namespace Pusula.Training.HealthCare.Titles
         [NotNull]
         public virtual string Name { get; set; }
 
+        //public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>(); // Navigasyon Özelliği
         protected Title()
         {
             Name = string.Empty;

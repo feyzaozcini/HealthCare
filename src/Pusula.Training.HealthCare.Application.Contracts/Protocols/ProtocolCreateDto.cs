@@ -12,4 +12,5 @@ public class ProtocolCreateDto
     public string? EndTime { get; set; }
     public Guid PatientId { get; set; }
     public Guid DepartmentId { get; set; }
+    public Guid DoctorId { get; set; }
 }

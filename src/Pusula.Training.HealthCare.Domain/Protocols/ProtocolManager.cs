@@ -10,17 +10,18 @@ namespace Pusula.Training.HealthCare.Protocols;
 public class ProtocolManager(IProtocolRepository protocolRepository) : DomainService
 {
     public virtual async Task<Protocol> CreateAsync(
-    Guid patientId, Guid departmentId, string type, DateTime startTime, string? endTime = null)
+    Guid patientId, Guid departmentId, string type, DateTime startTime,Guid doctorId, string? endTime = null)
     {
         Check.NotNull(patientId, nameof(patientId));
         Check.NotNull(departmentId, nameof(departmentId));
+        Check.NotNull(doctorId, nameof(doctorId));
         Check.NotNullOrWhiteSpace(type, nameof(type));
         Check.Length(type, nameof(type), ProtocolConsts.TypeMaxLength, ProtocolConsts.TypeMinLength);
         Check.NotNull(startTime, nameof(startTime));
 
         var protocol = new Protocol(
          GuidGenerator.Create(),
-         patientId, departmentId, type, startTime, endTime
+         patientId, departmentId, type, startTime,doctorId, endTime
          );
 
         return await protocolRepository.InsertAsync(protocol);
@@ -28,7 +29,7 @@ public class ProtocolManager(IProtocolRepository protocolRepository) : DomainSer
 
     public virtual async Task<Protocol> UpdateAsync(
         Guid id,
-        Guid patientId, Guid departmentId, string type, DateTime startTime, string? endTime = null, [CanBeNull] string? concurrencyStamp = null
+        Guid patientId, Guid departmentId, string type, DateTime startTime, Guid doctorId, string? endTime = null, [CanBeNull] string? concurrencyStamp = null
     )
     {
         Check.NotNull(patientId, nameof(patientId));
@@ -36,6 +37,7 @@ public class ProtocolManager(IProtocolRepository protocolRepository) : DomainSer
         Check.NotNullOrWhiteSpace(type, nameof(type));
         Check.Length(type, nameof(type), ProtocolConsts.TypeMaxLength, ProtocolConsts.TypeMinLength);
         Check.NotNull(startTime, nameof(startTime));
+        Check.NotNull(doctorId, nameof(doctorId));
 
         var protocol = await protocolRepository.GetAsync(id);
 
@@ -44,6 +46,7 @@ public class ProtocolManager(IProtocolRepository protocolRepository) : DomainSer
         protocol.Type = type;
         protocol.StartTime = startTime;
         protocol.EndTime = endTime;
+        protocol.DoctorId = doctorId;
 
         protocol.SetConcurrencyStampIfNotNull(concurrencyStamp);
         return await protocolRepository.UpdateAsync(protocol);

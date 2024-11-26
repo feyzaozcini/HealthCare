@@ -10,6 +10,12 @@ using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
+using System.ComponentModel.Design;
+using Polly;
+using Pusula.Training.HealthCare.DoctorDepartments;
+using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.Titles;
+using Volo.Abp.Identity;
 
 namespace Pusula.Training.HealthCare.Protocols;
 
@@ -18,7 +24,7 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
 {
     public virtual async Task DeleteAllAsync(
         string? filterText = null,
-                    string? type = null,
+        string? type = null,
         DateTime? startTimeMin = null,
         DateTime? startTimeMax = null,
         string? endTime = null,
@@ -55,30 +61,41 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
         string? endTime = null,
         Guid? patientId = null,
         Guid? departmentId = null,
+        Guid? doctorId=null,
         string? sorting = null,
         int maxResultCount = int.MaxValue,
         int skipCount = 0,
         CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
-        query = ApplyFilter(query, filterText, type, startTimeMin, startTimeMax, endTime, patientId, departmentId);
+        
+        query = ApplyFilter(query, filterText, type, startTimeMin, startTimeMax, endTime, patientId,doctorId, departmentId);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? ProtocolConsts.GetDefaultSorting(true) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
 
     protected virtual async Task<IQueryable<ProtocolWithNavigationProperties>> GetQueryForNavigationPropertiesAsync()
     {
+
+        var dbContext = await GetDbContextAsync();
+
+
         return from protocol in (await GetDbSetAsync())
                join patient in (await GetDbContextAsync()).Set<Patient>() on protocol.PatientId equals patient.Id into patients
                from patient in patients.DefaultIfEmpty()
+               join doctor in (await GetDbContextAsync()).Set<Doctor>() on protocol.DoctorId equals doctor.Id into doctors
+               from doctor in doctors.DefaultIfEmpty()
                join department in (await GetDbContextAsync()).Set<Department>() on protocol.DepartmentId equals department.Id into departments
                from department in departments.DefaultIfEmpty()
                select new ProtocolWithNavigationProperties
                {
                    Protocol = protocol,
                    Patient = patient,
-                   Department = department
+                   Department = department,
+                   Doctor=doctor
+
                };
+
     }
 
     protected virtual IQueryable<ProtocolWithNavigationProperties> ApplyFilter(
@@ -89,16 +106,20 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
         DateTime? startTimeMax = null,
         string? endTime = null,
         Guid? patientId = null,
+        Guid? doctorId = null,
         Guid? departmentId = null)
     {
         return query
-            .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Protocol.Type!.Contains(filterText!) || e.Protocol.EndTime!.Contains(filterText!))
+            .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Protocol.Type!.Contains(filterText!) || e.Protocol.EndTime!.Contains(filterText!) || e.Patient.FirstName!.StartsWith(filterText!) || e.Patient.LastName!.StartsWith(filterText!) || e.Patient.No!.ToString().StartsWith(filterText!))
                 .WhereIf(!string.IsNullOrWhiteSpace(type), e => e.Protocol.Type.Contains(type!))
                 .WhereIf(startTimeMin.HasValue, e => e.Protocol.StartTime >= startTimeMin!.Value)
                 .WhereIf(startTimeMax.HasValue, e => e.Protocol.StartTime <= startTimeMax!.Value)
                 .WhereIf(!string.IsNullOrWhiteSpace(endTime), e => e.Protocol.EndTime != null && e.Protocol.EndTime.Contains(endTime!))
                 .WhereIf(patientId != null && patientId != Guid.Empty, e => e.Patient != null && e.Patient.Id == patientId)
-                .WhereIf(departmentId != null && departmentId != Guid.Empty, e => e.Department != null && e.Department.Id == departmentId);
+                .WhereIf(departmentId != null && departmentId != Guid.Empty, e => e.Department != null && e.Department.Id == departmentId)
+                .WhereIf(doctorId != null && doctorId != Guid.Empty, e => e.Doctor != null && e.Doctor != null && e.Doctor.Id == doctorId);
+
+
     }
 
     public virtual async Task<List<Protocol>> GetListAsync(
@@ -107,12 +128,13 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
         DateTime? startTimeMin = null,
         DateTime? startTimeMax = null,
         string? endTime = null,
+        Guid? doctorId = null,
         string? sorting = null,
         int maxResultCount = int.MaxValue,
         int skipCount = 0,
         CancellationToken cancellationToken = default)
     {
-        var query = ApplyFilter((await GetQueryableAsync()), filterText, type, startTimeMin, startTimeMax, endTime);
+        var query = ApplyFilter((await GetQueryableAsync()), filterText, type, startTimeMin, startTimeMax,doctorId, endTime);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? ProtocolConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
@@ -125,10 +147,13 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
         string? endTime = null,
         Guid? patientId = null,
         Guid? departmentId = null,
+        Guid? doctorId = null,
         CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
-        query = ApplyFilter(query, filterText, type, startTimeMin, startTimeMax, endTime, patientId, departmentId);
+      
+        query = ApplyFilter(query, filterText, type, startTimeMin, startTimeMax, endTime, patientId,doctorId, departmentId);
+       
         return await query.LongCountAsync(GetCancellationToken(cancellationToken));
     }
 
@@ -138,6 +163,7 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
         string? type = null,
         DateTime? startTimeMin = null,
         DateTime? startTimeMax = null,
+        Guid? doctorId= null,
         string? endTime = null)
     {
         return query
@@ -145,6 +171,8 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
                 .WhereIf(!string.IsNullOrWhiteSpace(type), e => e.Type.Contains(type!))
                 .WhereIf(startTimeMin.HasValue, e => e.StartTime >= startTimeMin!.Value)
                 .WhereIf(startTimeMax.HasValue, e => e.StartTime <= startTimeMax!.Value)
-                .WhereIf(!string.IsNullOrWhiteSpace(endTime), e => e.EndTime != null && e.EndTime.Contains(endTime!));
+                .WhereIf(!string.IsNullOrWhiteSpace(endTime), e => e.EndTime != null && e.EndTime.Contains(endTime!))
+                .WhereIf(doctorId.HasValue, e => e.DoctorId == doctorId);
+
     }
 }

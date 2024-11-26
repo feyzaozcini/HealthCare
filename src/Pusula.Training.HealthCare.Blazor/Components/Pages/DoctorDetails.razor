@@ -1,0 +1,108 @@
+﻿@page "/doctor-details/{doctorId:guid}"
+@using Pusula.Training.HealthCare.Permissions
+@using Pusula.Training.HealthCare.Shared
+@using Pusula.Training.HealthCare.Protocols
+@using Volo.Abp.Identity
+@using Pusula.Training.HealthCare.Titles
+@using Syncfusion.Blazor.Navigations
+@using Microsoft.AspNetCore.Authorization
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Calendars
+@using Pusula.Training.HealthCare.Blazor.Containers
+@inject DoctorStateContainer DoctorStateService
+@inject IProtocolsAppService ProtocolsAppService
+@inject NavigationManager NavigationManager
+
+
+<h3>DoctorDetails</h3>
+
+
+
+
+@*  PAGE HEADER *@
+#<!-- #region name  PAGE HEADER-->
+
+<div class="container-fluid bg-light py-3 border-bottom">
+    <div class="row align-items-center">
+        <!-- Search Bar -->
+        <div class="col-md-4">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Arama Yap" />
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Date Picker -->
+        <div class="col-md-3">
+            <SfDatePicker TValue="DateTime" Placeholder="Tarih Seçin" @bind-Value="selectedDate" CssClass="form-control" />
+        </div>
+
+        <!-- Buttons -->
+        <div class="col-md-5 text-end">
+            <button class="btn btn-primary me-2">İş Listesi</button>
+            <button class="btn btn-success">Randevular</button>
+        </div>
+    </div>
+</div>
+
+<!-- #endregion -->
+
+<SfGrid DataSource="@ProtocolsList" AllowPaging="true">
+    <GridColumns>
+        <!-- Cinsiyet -->
+        <GridColumn HeaderText="Cinsiyet" Width="100">
+            <Template>
+                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                {
+                    var genderText = protocol.Patient.Gender == 0 ? "Kadın" : "Erkek";
+                    @genderText
+                }
+            </Template>
+        </GridColumn>
+
+        <!-- Hasta No -->
+        <GridColumn HeaderText="Hasta No" Width="100">
+            <Template>
+                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                {
+                    @protocol.Patient.No
+                }
+            </Template>
+        </GridColumn>
+
+        <!-- Hasta Adı ve Soyadı -->
+        <GridColumn HeaderText="Hasta Adı ve Soyadı" Width="200">
+            <Template>
+                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                {
+                    @($"{protocol.Patient.FirstName} {protocol.Patient.LastName}")
+                }
+            </Template>
+        </GridColumn>
+
+        <!-- Hasta Doğum Tarihi ve Yaşı -->
+        <GridColumn HeaderText="Doğum Tarihi (Yaş)" Width="150">
+            <Template>
+                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                {
+                    var birthDate = protocol.Patient.BirthDate;
+                    var age = DateTime.Now.Year - birthDate.Year;
+                    if (DateTime.Now < birthDate.AddYears(age)) age--;
+                    @($"{birthDate:dd.MM.yyyy} ({age} yaşında)")
+                }
+            </Template>
+        </GridColumn>
+
+        <!-- Protokol No -->
+        <GridColumn HeaderText="Protokol No" Width="150">
+            <Template>
+                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                {
+                    @protocol.Protocol.Id
+                }
+            </Template>
+        </GridColumn>
+    </GridColumns>
+</SfGrid>

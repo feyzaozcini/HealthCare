@@ -30,6 +30,7 @@ public interface IProtocolRepository : IRepository<Protocol, Guid>
         string? endTime = null,
         Guid? patientId = null,
         Guid? departmentId = null,
+        Guid? doctorId = null,
         string? sorting = null,
         int maxResultCount = int.MaxValue,
         int skipCount = 0,
@@ -42,6 +43,7 @@ public interface IProtocolRepository : IRepository<Protocol, Guid>
                 DateTime? startTimeMin = null,
                 DateTime? startTimeMax = null,
                 string? endTime = null,
+                Guid? doctorId = null,
                 string? sorting = null,
                 int maxResultCount = int.MaxValue,
                 int skipCount = 0,
@@ -56,5 +58,6 @@ public interface IProtocolRepository : IRepository<Protocol, Guid>
         string? endTime = null,
         Guid? patientId = null,
         Guid? departmentId = null,
+        Guid? doctorId = null,
         CancellationToken cancellationToken = default);
 }
