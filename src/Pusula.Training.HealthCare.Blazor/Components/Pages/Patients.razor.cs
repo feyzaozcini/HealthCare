@@ -70,6 +70,8 @@ public partial class Patients
     private bool AllPatientsSelected { get; set; }
     private IReadOnlyList<GetCountryLookupDto<Guid>> CountriesCodeCollection { get; set; } = [];
 
+    private int currentStep = 1; // Ýlk adým ile baþla
+
     private string SelectedCountryCode;
 
     
@@ -670,5 +672,21 @@ public partial class Patients
         AllPatientsSelected = false;
 
         await GetPatientsAsync();
+    }
+
+    private void NextStep()
+    {
+        if (currentStep < 2)
+        {
+            currentStep++; // Bir sonraki adýma geç
+        }
+    }
+
+    private void PreviousStep()
+    {
+        if (currentStep > 1)
+        {
+            currentStep--; // Bir önceki adýma dön
+        }
     }
 }
