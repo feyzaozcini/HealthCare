@@ -175,6 +175,7 @@ public class HealthCareDbContext :
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Departments", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
                 b.Property(x => x.Name).HasColumnName(nameof(Department.Name)).IsRequired().HasMaxLength(DepartmentConsts.NameMaxLength);
+                b.HasMany(x => x.Doctors).WithOne().HasForeignKey(x => x.DepartmentId).IsRequired();
             });
 
             builder.Entity<Protocol>(b =>
@@ -201,6 +202,7 @@ public class HealthCareDbContext :
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Titles", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
                 b.Property(x => x.Name).HasColumnName(nameof(Title.Name)).IsRequired().HasMaxLength(TitleConsts.NameMaxLength);
+
             });
 
             builder.Entity<DepartmentService>(b =>
@@ -219,8 +221,19 @@ public class HealthCareDbContext :
                 b.Property(x => x.IdentityNumber).HasColumnName(nameof(Doctor.IdentityNumber)).IsRequired();
                 b.Property(x => x.UserId).HasColumnName(nameof(Doctor.UserId)).IsRequired();
                 b.Property(x => x.TitleId).HasColumnName(nameof(Doctor.TitleId)).IsRequired();
-                b.HasOne<IdentityUser>().WithOne().HasForeignKey<Doctor>(x => x.UserId).IsRequired();
-                b.HasOne<Title>().WithMany().HasForeignKey(x => x.TitleId).OnDelete(DeleteBehavior.NoAction);
+                //b.HasOne<IdentityUser>().WithOne().HasForeignKey<Doctor>(x => x.UserId).IsRequired();
+                //b.HasOne<Title>().WithMany().HasForeignKey(x => x.TitleId).OnDelete(DeleteBehavior.NoAction);
+                b.HasMany(e => e.DoctorDepartments).WithOne().HasForeignKey(x => x.DoctorId).IsRequired();
+                b.HasOne(x => x.User) // Navigasyon özelliği bağlanıyor
+        .WithOne()
+        .HasForeignKey<Doctor>(x => x.UserId)
+        .IsRequired()  
+        .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne(d => d.Title)
+     .WithMany(t => t.Doctors)
+     .HasForeignKey(d => d.TitleId)
+     .IsRequired();
 
             });
 
@@ -331,7 +344,7 @@ public class HealthCareDbContext :
                     .IsRequired();
 
                 b.HasOne(dd => dd.Department)
-                    .WithMany(d => d.DoctorDepartments)
+                    .WithMany(d => d.Doctors)
                     .HasForeignKey(dd => dd.DepartmentId)
                     .IsRequired();
             });

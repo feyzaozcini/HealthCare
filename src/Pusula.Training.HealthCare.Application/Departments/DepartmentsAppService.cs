@@ -24,15 +24,20 @@ namespace Pusula.Training.HealthCare.Departments
         DepartmentManager departmentManager, IDistributedCache<DepartmentDownloadTokenCacheItem, string> downloadTokenCache) 
         : HealthCareAppService, IDepartmentsAppService
     {
-        public virtual async Task<DepartmentWithDoctorsDto> GetWithDoctorsAsync(Guid id)
+        /*public virtual async Task<DepartmentWithDoctorsDto> GetWithDoctorsAsync(Guid id)
         {
             var department = await departmentRepository.GetWithDoctorsAsync(id);
             return ObjectMapper.Map<Department, DepartmentWithDoctorsDto>(department);
-        }
-        public virtual async Task<List<DoctorDto>> GetDoctorsByDepartmentIdAsync(Guid departmentId)
+        }*/
+        public virtual async Task<List<DoctorWithNavigationPropertiesDto>> GetDoctorsByDepartmentIdAsync(Guid departmentId)
         {
             var doctors = await departmentRepository.GetDoctorsByDepartmentIdAsync(departmentId);
-            return ObjectMapper.Map<List<Doctor>, List<DoctorDto>>(doctors);
+
+            // DTO'ya dönüþtür
+            var doctorDtos = ObjectMapper.Map<List<DoctorWithNavigationProperties>, List<DoctorWithNavigationPropertiesDto>>(doctors);
+
+            return doctorDtos;
+            //return new ListResultDto<DoctorWithNavigationPropertiesDto>(doctorDtos);
         }
         public virtual async Task<PagedResultDto<DepartmentDto>> GetListAsync(GetDepartmentsInput input)
         {
@@ -62,18 +67,10 @@ namespace Pusula.Training.HealthCare.Departments
         {
 
             var department = await departmentManager.CreateAsync(
-            input.Name
+            input.Name,
+            input.DoctorIds
             );
-            foreach (var doctorId in input.DoctorIds)
-            {
-                var departmentDoctor = new DoctorDepartment
-                {
-                    DepartmentId = department.Id,
-                    DoctorId = doctorId
-                };
-
-                department.DoctorDepartments.Add(departmentDoctor);
-            }
+            
             return ObjectMapper.Map<Department, DepartmentDto>(department);
         }
 

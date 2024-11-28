@@ -11,6 +11,7 @@ namespace Pusula.Training.HealthCare.Departments
     public class DepartmentWithDoctorsDto : FullAuditedEntityDto<Guid>
     {
         public string Name { get; set; } = null!;
+
         public List<DoctorWithNavigationPropertiesDto> Doctors { get; set; } = null!;
         
     }

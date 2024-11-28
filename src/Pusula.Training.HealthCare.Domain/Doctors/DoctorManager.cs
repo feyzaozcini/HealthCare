@@ -1,5 +1,6 @@
 ﻿using Pusula.Training.HealthCare.Patients;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
@@ -13,7 +14,8 @@ namespace Pusula.Training.HealthCare.Doctors
         Guid titleId,
         string identityNumber,
         DateTime birthDate,
-        Gender gender)
+        Gender gender,
+        List<Guid> departmentIds)
         {
             Check.NotNull(birthDate, nameof(birthDate));
             Check.NotNull(gender, nameof(gender));
@@ -24,9 +26,9 @@ namespace Pusula.Training.HealthCare.Doctors
 
 
             var doctor = new Doctor(GuidGenerator.Create(), userId, birthDate, gender, titleId, identityNumber);
+            await SetDepartments(doctor, departmentIds);
 
-                return await doctorRepository.InsertAsync(doctor);
-
+            return await doctorRepository.InsertAsync(doctor);
         }
 
         public virtual async Task<Doctor> UpdateAsync(
@@ -51,6 +53,19 @@ namespace Pusula.Training.HealthCare.Doctors
             doctor.SetGender(gender);
             doctor.SetIdentityNumber(identityNumber);
             return await doctorRepository.UpdateAsync(doctor);
+        }
+
+        public virtual async Task SetDepartments(
+        Doctor doctor,
+        List<Guid> departmentsIds
+        )
+        {
+            doctor.DoctorDepartments.Clear();
+
+            foreach (var departmentId in departmentsIds)
+            {
+                doctor.AddDepartment(departmentId);
+            }
         }
     }
 }

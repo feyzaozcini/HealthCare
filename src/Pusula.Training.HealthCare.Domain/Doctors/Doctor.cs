@@ -1,9 +1,11 @@
 ﻿using JetBrains.Annotations;
-using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.DoctorDepartments;
 using Pusula.Training.HealthCare.Patients;
+using Pusula.Training.HealthCare.Titles;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Identity;
@@ -27,6 +29,11 @@ namespace Pusula.Training.HealthCare.Doctors
         [NotNull]
         public virtual Guid TitleId { get; set; }
 
+        public virtual Title Title { get; set; }    
+
+        public virtual IdentityUser User { get; set; }
+
+
         public virtual ICollection<DoctorDepartment> DoctorDepartments { get; set; }
 
 
@@ -35,7 +42,7 @@ namespace Pusula.Training.HealthCare.Doctors
             BirthDate = DateTime.Now;
             Gender = Gender.Unspecified;
             IdentityNumber = string.Empty;
-            DoctorDepartments = new List<DoctorDepartment>();
+            DoctorDepartments = new Collection<DoctorDepartment>();
 
         }
 
@@ -55,7 +62,7 @@ namespace Pusula.Training.HealthCare.Doctors
             Check.NotNull(titleId, nameof(titleId));
             TitleId = titleId;
 
-            DoctorDepartments = new List<DoctorDepartment>();
+            DoctorDepartments = new Collection<DoctorDepartment>();
         }
 
         public void SetGender(Gender gender)
@@ -76,6 +83,23 @@ namespace Pusula.Training.HealthCare.Doctors
             Check.Length(identityNumber, nameof(identityNumber), DoctorConsts.IdentityNumberMaxLength);
             Check.NotNull(identityNumber, nameof(identityNumber));
             IdentityNumber = identityNumber;
+        }
+
+
+        //Many To Many Deparmtment ekleme metodu 
+        public void AddDepartment(Guid departmentId)
+        {
+            if (DoctorDepartments.Any(dd => dd.DepartmentId == departmentId))
+            {
+                return;
+            }
+
+            DoctorDepartments.Add(new DoctorDepartment(Id, departmentId));
+        }
+
+        private bool IsInDoctor(Guid departmentId)
+        {
+            return DoctorDepartments.Any(dd => dd.DepartmentId == departmentId);
         }
     }
 }

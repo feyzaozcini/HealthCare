@@ -35,6 +35,8 @@ namespace Pusula.Training.HealthCare.Doctors
 
         public Guid TitleId { get; set; }
 
+        public string TitleName { get; set; }
+
         public DateTime BirthDate { get; set; }
 
         public Gender Gender { get; set; }

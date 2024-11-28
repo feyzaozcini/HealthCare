@@ -9,58 +9,35 @@ using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
 using Pusula.Training.HealthCare.Doctors;
-using Pusula.Training.HealthCare.DoctorDepartments;
 
 namespace Pusula.Training.HealthCare.Departments;
 
 public class EfCoreDepartmentRepository(IDbContextProvider<HealthCareDbContext> dbContextProvider)
     : EfCoreRepository<HealthCareDbContext, Department, Guid>(dbContextProvider), IDepartmentRepository
 {
-    public async Task<Department?> GetWithDoctorsAsync(Guid departmentId)
+    public async Task<List<DoctorWithNavigationProperties>> GetDoctorsByDepartmentIdAsync(Guid departmentId)
     {
-        var dbContext = await GetDbContextAsync();
+        var dbContext = await GetDbContextAsync(); 
 
-        var department = await dbContext.Departments
-            .Include(d => d.DoctorDepartments)
-            .ThenInclude(dd => dd.Doctor)
-            .FirstOrDefaultAsync(d => d.Id == departmentId);
-
-        if (department != null)
-        {
-            foreach (var doctorDepartment in department.DoctorDepartments)
+        // Doktorlarý ve iliþkili bilgilerini getir
+        var doctors = await dbContext.DoctorDepartments
+            .Where(dd => dd.DepartmentId == departmentId) // Departmana göre filtrele
+            .Select(dd => new
             {
-                var doctor = await dbContext.Doctors
-                    .Where(doc => doc.Id == doctorDepartment.DoctorId)
-                    .Select(doc => new DoctorWithNavigationProperties
-                    {
-                        Doctor = doc,
-                        User = dbContext.Users.FirstOrDefault(u => u.Id == doc.UserId) ,
-                        Title = dbContext.Titles.FirstOrDefault(t => t.Id == doc.TitleId),
-                        DoctorDepartments = dbContext.DoctorDepartments
-                            .Where(dd => dd.DoctorId == doc.Id)
-                            .ToList()
-                    })
-                    .FirstOrDefaultAsync();
-
-                if (doctor != null)
-                {
-                    doctorDepartment.Doctor = doctor.Doctor;
-                }
-            }
-        }
-
-        return department;
-    }
-
-    public async Task<List<Doctor>> GetDoctorsByDepartmentIdAsync(Guid departmentId)
-    {
-        var dbContextProvider = await GetDbContextAsync();
-        return await dbContextProvider.DoctorDepartments
-            .Where(dd => dd.DepartmentId == departmentId)
-            .Select(dd => dd.Doctor)
+                Doctor = dd.Doctor,
+                Title = dbContext.Titles.FirstOrDefault(t => t.Id == dd.Doctor.TitleId), // Title'ý getir
+                User = dbContext.Users.FirstOrDefault(u => u.Id == dd.Doctor.UserId)    // User'ý getir
+            })
             .ToListAsync();
-    }
 
+        // Sonucu DoctorWithNavigationProperties'e dönüþtür
+        return doctors.Select(d => new DoctorWithNavigationProperties
+        {
+            Doctor = d.Doctor,
+            Title = d.Title!,
+            User = d.User!
+        }).ToList();
+    }
     public virtual async Task DeleteAllAsync(
         string? filterText = null,
         string? name = null,
@@ -81,6 +58,7 @@ public class EfCoreDepartmentRepository(IDbContextProvider<HealthCareDbContext> 
         CancellationToken cancellationToken = default)
     {
         var query = ApplyFilter((await GetQueryableAsync()), filterText, name);
+        query = query.Include(d => d.Doctors).ThenInclude(dd => dd.Doctor);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? DepartmentConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
@@ -100,6 +78,7 @@ public class EfCoreDepartmentRepository(IDbContextProvider<HealthCareDbContext> 
         string? name = null)
     {
         return query
+                .Include(d => d.Doctors) // Include Doctors
                 .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Name!.Contains(filterText!))
                 .WhereIf(!string.IsNullOrWhiteSpace(name), e => e.Name.Contains(name!));
     }

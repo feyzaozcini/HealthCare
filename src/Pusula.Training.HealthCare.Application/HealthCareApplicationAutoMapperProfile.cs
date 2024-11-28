@@ -58,14 +58,14 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Department, DepartmentWithDoctorsDto>();
         CreateMap<Department, DepartmentWithDoctorsDto>()
             .ForMember(dest => dest.Doctors,
-                       opt => opt.MapFrom(src => src.DoctorDepartments));
+                       opt => opt.MapFrom(src => src.Doctors));
 
         CreateMap<Department, DepartmentWithDoctorsDto>();
         CreateMap<Department, DepartmentDto>()
-            .ForMember(dest => dest.DoctorDepartments, opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DoctorId).ToList()));
+            .ForMember(dest => dest.DoctorDepartments, opt => opt.MapFrom(src => src.Doctors.Select(dd => dd.DoctorId).ToList()));
 
         CreateMap<Department, DepartmentWithDoctorsDto>()
-            .ForMember(dest => dest.Doctors, opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.Doctor).ToList()));
+            .ForMember(dest => dest.Doctors, opt => opt.MapFrom(src => src.Doctors.Select(dd => dd.Doctor).ToList()));
 
         CreateMap<PatientCompany, PatientCompanyDto>();
         CreateMap<PatientCompany, PatientCompanyExcelDto>();
@@ -137,14 +137,24 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         .ForMember(dest => dest.TitleId, opt => opt.MapFrom(src => src.Doctor.TitleId))
         .ForMember(dest => dest.DoctorDepartments, opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()));
         CreateMap<Doctor, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.UserId.ToString()));
-        CreateMap<Doctor, DoctorDto>()
-    .ForMember(dest => dest.DoctorDepartments,
-               opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()));
+    //    CreateMap<Doctor, DoctorDto>()
+    //.ForMember(dest => dest.DoctorDepartments,
+    //           opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()));
         CreateMap<DepartmentWithDoctorsDto, DoctorWithNavigationPropertiesDto>();
         CreateMap<DoctorWithNavigationPropertiesDto,DepartmentWithDoctorsDto>();
+        CreateMap<DoctorWithNavigationProperties, DoctorWithNavigationPropertiesDto>();
 
+        CreateMap<Doctor, DoctorDto>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
+            .ForMember(dest => dest.SurName, opt => opt.MapFrom(src => src.User.Surname))
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
+            .ForMember(dest => dest.DoctorDepartments,
+               opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()))
+            .ForMember(dest => dest.TitleName, opt => opt.MapFrom(src => src.Title.Name));
+            
 
-        
         CreateMap<DoctorCreateDto, Doctor>();
         CreateMap<DoctorWithNavigationProperties, DoctorWithNavigationPropertiesDto>()
    .ForMember(dest => dest.Doctor, opt => opt.MapFrom(src => src.Doctor))
