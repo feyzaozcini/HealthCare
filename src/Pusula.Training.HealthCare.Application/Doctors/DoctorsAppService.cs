@@ -53,19 +53,7 @@ namespace Pusula.Training.HealthCare.Doctors
         {
             var user = await userProfileManager.CreateUserWithPropertiesAsync(input.UserName, input.Name, input.SurName, input.Email, input.Password, input.Role, input.PhoneNumber, true);
 
-            var doctor = await doctorManager.CreateAsync(user.Id,input.TitleId,input.IdentityNumber, input.BirthDate, input.Gender);
-
-            // DoctorDepartment ilişkisi kuruluyor
-            foreach (var departmentId in input.DepartmentIds)
-            {
-                var doctorDepartment = new DoctorDepartment
-                {
-                    DoctorId = doctor.Id,
-                    DepartmentId = departmentId
-                };
-
-                doctor.DoctorDepartments.Add(doctorDepartment);
-            }
+            var doctor = await doctorManager.CreateAsync(user.Id,input.TitleId,input.IdentityNumber, input.BirthDate, input.Gender,input.DepartmentIds);
 
             var doctorDto = ObjectMapper.Map<Doctor, DoctorDto>(doctor);
             ObjectMapper.Map(user, doctorDto);
@@ -96,13 +84,7 @@ namespace Pusula.Training.HealthCare.Doctors
             {
                 throw new EntityNotFoundException($"Doctor with id '{id}' not found.");
             }
-
             var doctorDto = ObjectMapper.Map<DoctorWithNavigationProperties, DoctorDto>(doctorWithNavProps);
-
-            
-doctorDto.DoctorDepartments = doctorWithNavProps.DoctorDepartments
-    .Select(dd => dd.DepartmentId)
-    .ToList();
 
             return doctorDto;
         }
@@ -157,8 +139,8 @@ doctorDto.DoctorDepartments = doctorWithNavProps.DoctorDepartments
             };
         }
 
-        [AllowAnonymous]
 
+        [AllowAnonymous]
         public async Task<IRemoteStreamContent> GetListAsExcelFileAsync(DoctorExcelDownloadDto input)
         {
             var downloadToken = await downloadTokenCache.GetAsync(input.DownloadToken);
@@ -195,7 +177,6 @@ doctorDto.DoctorDepartments = doctorWithNavProps.DoctorDepartments
                 Items = ObjectMapper.Map<List<DoctorWithNavigationProperties>, List<DoctorWithNavigationPropertiesDto>>(items)
             };
         }
-
 
         public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetTitleLookupAsync(LookupRequestDto input)
         {

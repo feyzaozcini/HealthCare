@@ -16,7 +16,8 @@ namespace Pusula.Training.HealthCare.Titles
         [NotNull]
         public virtual string Name { get; private set; }
 
-        //public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>(); // Navigasyon Özelliği
+
+        public virtual ICollection<Doctor> Doctors { get; set; } = new List<Doctor>(); // Navigasyon Özelliği
         protected Title()
         {
             Name = string.Empty;

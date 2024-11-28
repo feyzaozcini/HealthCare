@@ -9,8 +9,9 @@ namespace Pusula.Training.HealthCare.Departments;
 
 public interface IDepartmentRepository : IRepository<Department, Guid>
 {
-    Task<Department> GetWithDoctorsAsync(Guid departmentId);
-    Task<List<Doctor>> GetDoctorsByDepartmentIdAsync(Guid departmentId);
+    //Task<Department> GetWithDoctorsAsync(Guid departmentId);
+
+    Task<List<DoctorWithNavigationProperties>> GetDoctorsByDepartmentIdAsync(Guid departmentId);
 
     Task DeleteAllAsync(
         string? filterText = null,

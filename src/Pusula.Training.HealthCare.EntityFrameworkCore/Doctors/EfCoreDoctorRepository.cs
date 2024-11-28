@@ -107,6 +107,7 @@ CancellationToken cancellationToken = default)
             CancellationToken cancellationToken = default)
         {
             var query = ApplyFilter(await GetQueryableAsync(), filterText, birthDateMin, birthDateMax, gender, identityNumber, userId, titleId);
+            query = query.Include(d => d.DoctorDepartments).ThenInclude(dd => dd.Department);
             query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? DoctorConsts.GetDefaultSorting(true) : sorting);
             return await query.Page(skipCount, maxResultCount).ToListAsync(cancellationToken);
         }
@@ -146,6 +147,7 @@ CancellationToken cancellationToken = default)
             Guid? titleId = null)
         {
             return query
+            .Include(e => e.DoctorDepartments)
            .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.IdentityNumber.Contains(filterText!))
            .WhereIf(birthDateMin.HasValue, e => e.BirthDate >= birthDateMin!.Value)
            .WhereIf(birthDateMax.HasValue, e => e.BirthDate <= birthDateMax!.Value)

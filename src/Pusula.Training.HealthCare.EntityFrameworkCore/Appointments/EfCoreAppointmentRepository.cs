@@ -146,7 +146,10 @@ namespace Pusula.Training.HealthCare.Appointments
             from appointment in (await GetDbSetAsync())
             join patient in (await GetDbContextAsync()).Set<Patient>() on appointment.PatientId equals patient.Id into patients
             from patient in patients.DefaultIfEmpty()
-            join doctor in (await GetDbContextAsync()).Set<Doctor>() on appointment.DoctorId equals doctor.Id into doctors
+            join doctor in (await GetDbContextAsync()).Set<Doctor>()
+            .Include(d => d.User)
+            .Include(d => d.Title)
+            on appointment.DoctorId equals doctor.Id into doctors
             from doctor in doctors.DefaultIfEmpty()
             join department in (await GetDbContextAsync()).Set<Department>() on appointment.DepartmentId equals department.Id into departments
             from department in departments.DefaultIfEmpty()

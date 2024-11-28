@@ -85,13 +85,13 @@ public class DepartmentController : HealthCareController, IDepartmentsAppService
     {
         return _departmentsAppService.DeleteAllAsync(input);
     }
-    [HttpGet("{id}/with-doctors")]
+    /*[HttpGet("{id}/with-doctors")]
     public virtual async Task<DepartmentWithDoctorsDto> GetWithDoctorsAsync(Guid id)
     {
         return await _departmentsAppService.GetWithDoctorsAsync(id);
-    }
+    }*/
     [HttpGet("{departmentId}/doctors")]
-    public async Task<List<DoctorDto>> GetDoctorsByDepartmentIdAsync(Guid departmentId)
+    public async Task<List<DoctorWithNavigationPropertiesDto>> GetDoctorsByDepartmentIdAsync(Guid departmentId)
     {
         return await _departmentsAppService.GetDoctorsByDepartmentIdAsync(departmentId);
     }

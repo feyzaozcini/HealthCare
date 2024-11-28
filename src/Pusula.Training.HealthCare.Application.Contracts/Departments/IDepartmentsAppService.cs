@@ -19,6 +19,6 @@ public interface IDepartmentsAppService : IApplicationService
     Task DeleteByIdsAsync(List<Guid> departmentIds);
     Task DeleteAllAsync(GetDepartmentsInput input);
     Task<Shared.DownloadTokenResultDto> GetDownloadTokenAsync();
-    Task<DepartmentWithDoctorsDto> GetWithDoctorsAsync(Guid id);
-    Task<List<DoctorDto>> GetDoctorsByDepartmentIdAsync(Guid departmentId);
+    //Task<DepartmentWithDoctorsDto> GetWithDoctorsAsync(Guid id);
+    Task<List<DoctorWithNavigationPropertiesDto>> GetDoctorsByDepartmentIdAsync(Guid departmentId);
 }
