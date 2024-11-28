@@ -17,6 +17,7 @@ using Volo.Abp.Domain.Entities;
 using Volo.Abp;
 using Volo.Abp.ObjectMapping;
 using MiniExcelLibs;
+using Pusula.Training.HealthCare.Exceptions;
 
 namespace Pusula.Training.HealthCare.Villages
 {
@@ -41,51 +42,28 @@ namespace Pusula.Training.HealthCare.Villages
             };
         }
 
-        public virtual async Task<VillageDto> GetAsync(Guid id)
-        {
-            return ObjectMapper.Map<Village, VillageDto>(await villageRepository.GetAsync(id));
-        }
+        public virtual async Task<VillageDto> GetAsync(Guid id) => ObjectMapper.Map<Village, VillageDto>(await villageRepository.GetAsync(id));
+
 
         [Authorize(HealthCarePermissions.Villages.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            var village = await villageRepository.FindAsync(id);
-            if (village == null)
-            {
-                throw new EntityNotFoundException(typeof(Village), id);
-            }
-
+            HealthCareException.ThrowIfNull(await villageRepository.FindAsync(id), HealthCareException.VILLAGE_NOT_FOUND_MESSAGE);
             await villageRepository.DeleteAsync(id);
         }
 
+
         [Authorize(HealthCarePermissions.Villages.Create)]
-        public virtual async Task<VillageDto> CreateAsync(VillageCreateDto input)
-        {
+        public virtual async Task<VillageDto> CreateAsync(VillageCreateDto input) => ObjectMapper.Map<Village, VillageDto>(await villageManager.CreateAsync(input.DistrictId, input.Name));
 
-            var village = await villageManager.CreateAsync(
-                input.DistrictId,
-                input.Name
-                );
-
-            return ObjectMapper.Map<Village, VillageDto>(village);
-        }
 
         [Authorize(HealthCarePermissions.Villages.Edit)]
-        public virtual async Task<VillageDto> UpdateAsync(Guid id, VillageUpdateDto input)
-        {
-            var village = await villageManager.UpdateAsync(
-                id,
-                input.Name
-            );
+        public virtual async Task<VillageDto> UpdateAsync(Guid id, VillageUpdateDto input) => ObjectMapper.Map<Village, VillageDto>(await villageManager.UpdateAsync(id, input.Name));
 
-            return ObjectMapper.Map<Village, VillageDto>(village);
-        }
 
         [Authorize(HealthCarePermissions.Villages.Delete)]
-        public virtual async Task DeleteByIdsAsync(List<Guid> villageIds)
-        {
-            await villageRepository.DeleteManyAsync(villageIds);
-        }
+        public virtual async Task DeleteByIdsAsync(List<Guid> villageIds) => await villageRepository.DeleteManyAsync(villageIds);
+
 
         [Authorize(HealthCarePermissions.Villages.Delete)]
         public virtual async Task DeleteAllAsync(GetVillagesInput input)
@@ -101,6 +79,7 @@ namespace Pusula.Training.HealthCare.Villages
             var idsToDelete = villages.Select(c => c.Id).ToList();
             await villageRepository.DeleteManyAsync(idsToDelete);
         }
+
 
         [AllowAnonymous]
         public virtual async Task<IRemoteStreamContent> GetListAsExcelFileAsync(VillageExcelDownloadDto input)
@@ -119,6 +98,7 @@ namespace Pusula.Training.HealthCare.Villages
 
             return new RemoteStreamContent(memoryStream, "Villages.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
+
 
         public virtual async Task<DownloadTokenResultDto> GetDownloadTokenAsync()
         {

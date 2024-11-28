@@ -17,13 +17,13 @@ namespace Pusula.Training.HealthCare.DepartmentServices
         public virtual async Task<DepartmentService> CreateAsync(
         string name)
         {
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), DepartmentServiceConsts.NameMaxLength);
 
             var departmentService = new DepartmentService(
              GuidGenerator.Create(),
              name
              );
+
+            departmentService.SetName(name);
 
             return await departmentServiceRepository.InsertAsync(departmentService);
         }
@@ -33,14 +33,11 @@ namespace Pusula.Training.HealthCare.DepartmentServices
             string name, [CanBeNull] string? concurrencyStamp = null
         )
         {
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), DepartmentServiceConsts.NameMaxLength);
 
             var departmentService = await departmentServiceRepository.GetAsync(id);
-
-            departmentService.Name = name;
-
+            departmentService.SetName(name);
             departmentService.SetConcurrencyStampIfNotNull(concurrencyStamp);
+
             return await departmentServiceRepository.UpdateAsync(departmentService);
         }
 

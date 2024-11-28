@@ -14,17 +14,15 @@ public class CountryManager(ICountryRepository countryRepository) : DomainServic
         string code
         )
     {
-        Check.NotNull(name, nameof(name));
-        Check.Length(name, nameof(name), CountryConsts.NameMaxLength);
-
-        Check.NotNull(code, nameof(code));
-        Check.Length(code, nameof(code), CountryConsts.CodeMaxLength, CountryConsts.CodeMinLength);
 
         var country = new Country(
          GuidGenerator.Create(),
          name,
          code
          );
+
+        country.SetName(name);
+        country.SetCode(code);
 
         return await countryRepository.InsertAsync(country);
     }
@@ -35,15 +33,11 @@ public class CountryManager(ICountryRepository countryRepository) : DomainServic
         string code
     )
     {
-        Check.NotNull(name, nameof(name));
-        Check.Length(name, nameof(name), CountryConsts.NameMaxLength);
-
-        Check.NotNull(code, nameof(code));
-        Check.Length(code, nameof(code), CountryConsts.CodeMaxLength, CountryConsts.CodeMinLength);
 
         var country = await countryRepository.GetAsync(id);
-        country.Name = name;
-        country.Code = code;
+        country.SetName(name);
+        country.SetCode(code);
+
         return await countryRepository.UpdateAsync(country);
     }
 }

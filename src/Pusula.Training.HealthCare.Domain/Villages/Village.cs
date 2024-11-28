@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp;
 using JetBrains.Annotations;
+using Pusula.Training.HealthCare.Cities;
+using Pusula.Training.HealthCare.Countries;
 
 namespace Pusula.Training.HealthCare.Villages
 {
     public class Village : AuditedEntity<Guid>
     {
         [NotNull]
-        public virtual string Name { get; set; }
-        public virtual Guid DistrictId { get; set; }
+        public virtual string Name { get; private set; }
+        public virtual Guid DistrictId { get; private set; }
 
         protected Village()
         {
@@ -24,11 +26,17 @@ namespace Pusula.Training.HealthCare.Villages
         public Village(Guid id, Guid districtId, string name)
         {
             Id = id;
+            SetName(name);
+            SetDistrictId(districtId);
+        }
+
+        public void SetName(string name)
+        {
             Check.NotNull(name, nameof(name));
             Check.Length(name, nameof(name), VillageConsts.NameMaxLength, 0);
             Name = name;
-
-            DistrictId = districtId;
         }
+
+        public void SetDistrictId(Guid districtId) => DistrictId = Check.NotNull(districtId, nameof(districtId));
     }
 }

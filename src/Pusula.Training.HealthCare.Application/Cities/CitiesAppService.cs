@@ -17,6 +17,7 @@ using Volo.Abp.Domain.Entities;
 using Volo.Abp;
 using Volo.Abp.ObjectMapping;
 using MiniExcelLibs;
+using Pusula.Training.HealthCare.Exceptions;
 
 namespace Pusula.Training.HealthCare.Cities
 {
@@ -41,51 +42,29 @@ namespace Pusula.Training.HealthCare.Cities
             };
         }
 
-        public virtual async Task<CityDto> GetAsync(Guid id)
-        {
-            return ObjectMapper.Map<City, CityDto>(await cityRepository.GetAsync(id));
-        }
+
+        public virtual async Task<CityDto> GetAsync(Guid id) => ObjectMapper.Map<City, CityDto>(await cityRepository.GetAsync(id));
+
 
         [Authorize(HealthCarePermissions.Cities.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            var city = await cityRepository.FindAsync(id);
-            if (city == null)
-            {
-                throw new EntityNotFoundException(typeof(City), id);
-            }
-
+            HealthCareException.ThrowIfNull(await cityRepository.FindAsync(id), HealthCareException.CITY_NOT_FOUND_MESSAGE);
             await cityRepository.DeleteAsync(id);
         }
 
+
         [Authorize(HealthCarePermissions.Cities.Create)]
-        public virtual async Task<CityDto> CreateAsync(CityCreateDto input)
-        {
+        public virtual async Task<CityDto> CreateAsync(CityCreateDto input) => ObjectMapper.Map<City, CityDto>(await cityManager.CreateAsync(input.CountryId, input.Name));
 
-            var city = await cityManager.CreateAsync(
-                input.CountryId,
-                input.Name
-                );
-
-            return ObjectMapper.Map<City, CityDto>(city);
-        }
 
         [Authorize(HealthCarePermissions.Cities.Edit)]
-        public virtual async Task<CityDto> UpdateAsync(Guid id, CityUpdateDto input)
-        {
-            var city = await cityManager.UpdateAsync(
-                id,
-                input.Name
-            );
+        public virtual async Task<CityDto> UpdateAsync(Guid id, CityUpdateDto input) => ObjectMapper.Map<City, CityDto>(await cityManager.UpdateAsync(id, input.Name));
 
-            return ObjectMapper.Map<City, CityDto>(city);
-        }
 
         [Authorize(HealthCarePermissions.Cities.Delete)]
-        public virtual async Task DeleteByIdsAsync(List<Guid> cityIds)
-        {
-            await cityRepository.DeleteManyAsync(cityIds);
-        }
+        public virtual async Task DeleteByIdsAsync(List<Guid> cityIds) => await cityRepository.DeleteManyAsync(cityIds);
+
 
         [Authorize(HealthCarePermissions.Cities.Delete)]
         public virtual async Task DeleteAllAsync(GetCitiesInput input)

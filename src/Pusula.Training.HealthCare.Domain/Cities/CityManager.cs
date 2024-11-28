@@ -18,15 +18,15 @@ namespace Pusula.Training.HealthCare.Cities
         Guid countryId,
         string name)
         {
-            Check.NotNull(countryId, nameof(countryId));
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), CityConsts.NameMaxLength);
-
+            
             var city = new City(
              GuidGenerator.Create(),
              countryId,
              name
              );
+
+            city.SetName(name);
+            city.SetCountryId(countryId);
 
             return await cityRepository.InsertAsync(city);
         }
@@ -36,12 +36,8 @@ namespace Pusula.Training.HealthCare.Cities
             string name
         )
         {
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), CityConsts.NameMaxLength);
-
             var city = await cityRepository.GetAsync(id);
-
-            city.Name = name;
+            city.SetName(name);
 
             return await cityRepository.UpdateAsync(city);
         }

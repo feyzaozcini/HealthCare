@@ -17,6 +17,8 @@ using Volo.Abp.Authorization;
 using Volo.Abp.Caching;
 using Volo.Abp.Content;
 using Volo.Abp.Domain.Entities;
+using Pusula.Training.HealthCare.Exceptions;
+using Pusula.Training.HealthCare.Villages;
 
 namespace Pusula.Training.HealthCare.Countries;
 
@@ -42,24 +44,16 @@ public class CountriesAppService(
         };
     }
 
-    public virtual async Task<CountryDto> GetAsync(Guid id)
-    {
-        return ObjectMapper.Map<Country, CountryDto>(await countryRepository.GetAsync(id));
-    }
 
+    public virtual async Task<CountryDto> GetAsync(Guid id) => ObjectMapper.Map<Country, CountryDto>(await countryRepository.GetAsync(id));
+
+    
     [Authorize(HealthCarePermissions.Countries.Delete)]
     public virtual async Task DeleteAsync(Guid id)
     {
-        var country = await countryRepository.FindAsync(id);
-        if (country == null)
-        {
-            throw new EntityNotFoundException(typeof(Country), id);
-        }
-
+        HealthCareException.ThrowIfNull(await countryRepository.FindAsync(id), HealthCareException.COUNTRY_NOT_FOUND_MESSAGE);
         await countryRepository.DeleteAsync(id);
     }
-
-
 
 
     [Authorize(HealthCarePermissions.Countries.Create)]
@@ -74,33 +68,19 @@ public class CountriesAppService(
         return ObjectMapper.Map<Country, CountryDto>(country);
     }
 
+
     [Authorize(HealthCarePermissions.Countries.Edit)]
-    public virtual async Task<CountryDto> UpdateAsync(Guid id, CountryUpdateDto input)
-    {
-        var country = await countryManager.UpdateAsync(
-            id,
-            input.Name,
-            input.Code
-        );
-
-        return ObjectMapper.Map<Country, CountryDto>(country);
-    }
-
-    [Authorize(HealthCarePermissions.Countries.Delete)]
-    public virtual async Task DeleteByIdsAsync(List<Guid> countryIds)
-    {
-        await countryRepository.DeleteManyAsync(countryIds);
-    }
+    public virtual async Task<CountryDto> UpdateAsync(Guid id, CountryUpdateDto input) => ObjectMapper.Map<Country, CountryDto>(await countryManager.UpdateAsync(id, input.Name, input.Code));
 
 
     [Authorize(HealthCarePermissions.Countries.Delete)]
-    public virtual async Task DeleteAllAsync(GetCountriesInput input)
-    {
-        await countryRepository.DeleteAllAsync(input.FilterText, input.Name, input.Code);
-    }
+    public virtual async Task DeleteByIdsAsync(List<Guid> countryIds) => await countryRepository.DeleteManyAsync(countryIds);
+
+
+    [Authorize(HealthCarePermissions.Countries.Delete)]
+    public virtual async Task DeleteAllAsync(GetCountriesInput input) => await countryRepository.DeleteAllAsync(input.FilterText, input.Name, input.Code);
 
     
-
     [AllowAnonymous]
     public virtual async Task<IRemoteStreamContent> GetListAsExcelFileAsync(CountryExcelDownloadDto input)
     {

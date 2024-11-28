@@ -8,9 +8,9 @@ namespace Pusula.Training.HealthCare.Patients
 {
     public enum Type
     {
-        Unknown = 0,
-        Normal = 1,
-        VIP = 2,
-        Foreigner = 3
+        Unknown = 0,  // Bilinmeyen   
+        Normal = 1,   // Normal
+        VIP = 2,      // VIP
+        Foreigner = 3 // Yabancı
     }
 }
