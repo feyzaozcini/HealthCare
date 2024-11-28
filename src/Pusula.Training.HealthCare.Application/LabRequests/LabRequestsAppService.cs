@@ -1,15 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.Core;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
-using Pusula.Training.HealthCare.TestGroupItems;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
-using Volo.Abp.ObjectMapping;
 
 namespace Pusula.Training.HealthCare.LabRequests;
 
@@ -18,7 +17,7 @@ namespace Pusula.Training.HealthCare.LabRequests;
 public class LabRequestsAppService(
     ILabRequestRepository labRequestRepository,
     LabRequestManager labRequestManager,
-    IDistributedCache<LabRequestDownloadTokenCacheItem, string> downloadTokenCache
+    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache
     ) : HealthCareAppService, ILabRequestsAppService
 {
     [Authorize(HealthCarePermissions.LabRequests.Create)]
@@ -62,7 +61,7 @@ public class LabRequestsAppService(
 
         await downloadTokenCache.SetAsync(
             token,
-            new LabRequestDownloadTokenCacheItem { Token = token },
+            new DownloadTokenCacheItem { Token = token },
             new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)

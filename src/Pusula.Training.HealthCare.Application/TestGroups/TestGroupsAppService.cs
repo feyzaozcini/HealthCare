@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.Core;
 using Pusula.Training.HealthCare.Core.Rules.Patients;
 using Pusula.Training.HealthCare.Core.Rules.TestGroups;
 using Pusula.Training.HealthCare.Patients;
@@ -23,7 +24,7 @@ public class TestGroupsAppService(
     ITestGroupRepository testGroupRepository,
     TestGroupManager testGroupManager,
     ITestGroupBusinessRules testGroupBusinessRules,
-    IDistributedCache<TestGroupDownloadTokenCacheItem, string> downloadTokenCache)
+    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache)
     : HealthCareAppService, ITestGroupsAppService
 {
     [Authorize(HealthCarePermissions.TestGroups.Create)]
@@ -41,18 +42,15 @@ public class TestGroupsAppService(
     [Authorize(HealthCarePermissions.TestGroups.Delete)]
     public virtual async Task<TestGroupsDeletedDto> DeleteAsync(Guid id)
     {
-        TestGroup? testGroup = await testGroupRepository.GetAsync(
-            predicate: t => t.Id == id
-            );
-
         await testGroupBusinessRules.ValidateTestGroupDeletableAsync(id);
 
         await testGroupRepository.DeleteAsync(id);
 
-        TestGroupsDeletedDto response = ObjectMapper.Map<TestGroup, TestGroupsDeletedDto>(testGroup);
-        response.Message = TestGroupConsts.TestGroupDeletedMessage;
-
-        return response;
+        return new TestGroupsDeletedDto
+        {
+            Id = id,
+            Message = TestGroupConsts.TestGroupDeletedMessage
+        };
     }
 
     public virtual async Task<TestGroupDto> GetAsync(Guid id)
@@ -66,7 +64,7 @@ public class TestGroupsAppService(
 
         await downloadTokenCache.SetAsync(
             token,
-            new TestGroupDownloadTokenCacheItem { Token = token },
+            new DownloadTokenCacheItem { Token = token },
             new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)

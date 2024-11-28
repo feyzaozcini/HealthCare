@@ -27,6 +27,8 @@ using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.Villages;
 using Pusula.Training.HealthCare.Appointments;
 using System.Linq;
+using Pusula.Training.HealthCare.TestValueRanges;
+using Pusula.Training.HealthCare.TestProcesses;
 
 namespace Pusula.Training.HealthCare;
 
@@ -192,56 +194,6 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Appointment, AppointmentWithNavigationPropertiesDto>();
         CreateMap<AppointmentWithNavigationProperties, AppointmentWithNavigationPropertiesDto>();
         CreateMap<AppointmentDto, AppointmentWithNavigationPropertiesDto>();
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         CreateMap<DiagnosisGroup, DiagnosisGroupDto>().ReverseMap();
@@ -281,6 +233,18 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<PshychologicalStateCreateDto, PshychologicalState>().ReverseMap();
         CreateMap<PshychologicalStateUpdateDto, PshychologicalState>().ReverseMap();
         CreateMap<PshychologicalStateWithNavigationDto, PshychologicalStateWithNavigationProperties>().ReverseMap();
+
+        CreateMap<TestValueRange, TestValueRangeDto>().ReverseMap();
+        CreateMap<TestValueRange, TestValueRangesCreateDto>().ReverseMap();
+        CreateMap<TestValueRange, TestValueRangesUpdateDto>().ReverseMap();
+        CreateMap<TestValueRange, TestValueRangesDeletedDto>().ReverseMap();
+        CreateMap<TestValueRange, GetTestValueRangesInput>().ReverseMap();
+
+        CreateMap<TestProcess, TestProcessDto>().ReverseMap();
+        CreateMap<TestProcess, TestProcessesCreateDto>().ReverseMap();
+        CreateMap<TestProcess, TestProcessesUpdateDto>().ReverseMap();
+        CreateMap<TestProcess, TestProcessesDeletedDto>().ReverseMap();
+        CreateMap<TestProcess, GetTestProcessesInput>().ReverseMap();
 
     }
 }

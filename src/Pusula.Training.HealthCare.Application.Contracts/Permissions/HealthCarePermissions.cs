@@ -138,6 +138,20 @@ public static class HealthCarePermissions
         public const string Delete = Default + ".Delete";
     }
 
+    public static class TestProcesses
+    {
+        public const string Default = GroupName + ".TestProcesses";
+        public const string Edit = Default + ".Edit";
+        public const string Create = Default + ".Create";
+        public const string Delete = Default + ".Delete";
+    }
+    public static class TestValueRanges
+    {
+        public const string Default = GroupName + ".TestValueRanges";
+        public const string Edit = Default + ".Edit";
+        public const string Create = Default + ".Create";
+        public const string Delete = Default + ".Delete";
+    }
 
 
 
