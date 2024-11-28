@@ -12,9 +12,9 @@ namespace Pusula.Training.HealthCare.Countries;
 public class Country: AuditedEntity<Guid>
 {
     [NotNull]
-    public string Name { get; set; }
+    public string Name { get; private set; }
     [NotNull]
-    public string Code { get; set; }
+    public string Code { get; private set; }
 
     protected Country()
     {
@@ -25,11 +25,19 @@ public class Country: AuditedEntity<Guid>
     public Country(Guid id, string name, string code)
     {
         Id = id;
+        SetName(name);
+        SetName(code);
+    }
 
+    public void SetName(string name)
+    {
         Check.NotNull(name, nameof(name));
-        Check.Length(name, nameof(name), CountryConsts.NameMaxLength);
+        Check.Length(name, nameof(name), CountryConsts.NameMaxLength, 0);
         Name = name;
+    }
 
+    public void SetCode(string code)
+    {
         Check.NotNull(code, nameof(code));
         Check.Length(code, nameof(code), CountryConsts.CodeMaxLength, CountryConsts.CodeMinLength);
         Code = code;

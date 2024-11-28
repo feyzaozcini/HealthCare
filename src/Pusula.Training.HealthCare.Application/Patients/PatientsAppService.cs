@@ -105,12 +105,12 @@ namespace Pusula.Training.HealthCare.Patients
         [Authorize(HealthCarePermissions.Patients.Create)]
         public virtual async Task<PatientDto> CreateAsync(PatientCreateDto input)
         {
+            await patientBusinessRules.IdentityNumberCannotBeDuplicatedWhenInserted(input.IdentityNumber);
+
             var patient = await patientManager.CreateAsync(input.CompanyId, input.FirstName, input.LastName, input.BirthDate, input.IdentityNumber, input.PassportNumber,
                 input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.MotherName, input.FatherName, input.BloodType, input.Type,
                 input.PrimaryCountryId,input.PrimaryCityId,input.PrimaryDistrictId,input.PrimaryVillageId,input.PrimaryAddressDescription!,input.SecondaryCountryId,
                 input.SecondaryCityId,input.SecondaryDistrictId,input.SecondaryVillageId,input.SecondaryAddressDescription!);
-
-            await patientBusinessRules.IdentityNumberCannotBeDuplicatedWhenInserted(input.IdentityNumber);
 
             return ObjectMapper.Map<Patient, PatientDto>(patient);
         }

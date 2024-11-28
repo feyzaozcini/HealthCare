@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Services;
 using Volo.Abp;
+using Pusula.Training.HealthCare.Cities;
 
 namespace Pusula.Training.HealthCare.Titles
 {
@@ -12,24 +13,21 @@ namespace Pusula.Training.HealthCare.Titles
     {
         public virtual async Task<Title> CreateAsync(string name)
         {
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), TitleConsts.NameMaxLength, TitleConsts.NameMinLength);
 
             var title = new Title(
                 Guid.NewGuid(),
                 name
             );
 
+            title.SetName(name);
+
             return await titleRepository.InsertAsync(title);
         }
 
         public virtual async Task<Title> UpdateAsync(Guid id, string name)
         {
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), TitleConsts.NameMaxLength, TitleConsts.NameMinLength);
-
             var title = await titleRepository.GetAsync(id);
-            title.Name = name;
+            title.SetName(name);
 
             return await titleRepository.UpdateAsync(title);
         }

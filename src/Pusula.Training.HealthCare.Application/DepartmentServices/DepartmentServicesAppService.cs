@@ -37,39 +37,20 @@ namespace Pusula.Training.HealthCare.DepartmentServices
             };
         }
 
-        public virtual async Task<DepartmentServiceDto> GetAsync(Guid id)
-        {
-            return ObjectMapper.Map<DepartmentService, DepartmentServiceDto>(await departmentServiceRepository.GetAsync(id));
-        }
+        public virtual async Task<DepartmentServiceDto> GetAsync(Guid id) => ObjectMapper.Map<DepartmentService, DepartmentServiceDto>(await departmentServiceRepository.GetAsync(id));
+
 
         [Authorize(HealthCarePermissions.DepartmentServices.Delete)]
-        public virtual async Task DeleteAsync(Guid id)
-        {
-            await departmentServiceRepository.DeleteAsync(id);
-        }
+        public virtual async Task DeleteAsync(Guid id) => await departmentServiceRepository.DeleteAsync(id);
+
 
         [Authorize(HealthCarePermissions.DepartmentServices.Create)]
-        public virtual async Task<DepartmentServiceDto> CreateAsync(DepartmentServiceCreateDto input)
-        {
+        public virtual async Task<DepartmentServiceDto> CreateAsync(DepartmentServiceCreateDto input) => ObjectMapper.Map<DepartmentService, DepartmentServiceDto>(await departmentServiceManager.CreateAsync(input.Name));
 
-            var departmentService = await departmentServiceManager.CreateAsync(
-            input.Name
-            );
-
-            return ObjectMapper.Map<DepartmentService, DepartmentServiceDto>(departmentService);
-        }
 
         [Authorize(HealthCarePermissions.DepartmentServices.Edit)]
-        public virtual async Task<DepartmentServiceDto> UpdateAsync(Guid id, DepartmentServiceUpdateDto input)
-        {
+        public virtual async Task<DepartmentServiceDto> UpdateAsync(Guid id, DepartmentServiceUpdateDto input) => ObjectMapper.Map<DepartmentService, DepartmentServiceDto>(await departmentServiceManager.UpdateAsync(id, input.Name, input.ConcurrencyStamp));
 
-            var departmentService = await departmentServiceManager.UpdateAsync(
-            id,
-            input.Name, input.ConcurrencyStamp
-            );
-
-            return ObjectMapper.Map<DepartmentService, DepartmentServiceDto>(departmentService);
-        }
 
         [AllowAnonymous]
         public virtual async Task<IRemoteStreamContent> GetListAsExcelFileAsync(DepartmentServiceExcelDownloadDto input)
@@ -89,17 +70,15 @@ namespace Pusula.Training.HealthCare.DepartmentServices
             return new RemoteStreamContent(memoryStream, "DepartmentServices.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 
-        [Authorize(HealthCarePermissions.DepartmentServices.Delete)]
-        public virtual async Task DeleteByIdsAsync(List<Guid> departmentServiceIds)
-        {
-            await departmentServiceRepository.DeleteManyAsync(departmentServiceIds);
-        }
 
         [Authorize(HealthCarePermissions.DepartmentServices.Delete)]
-        public virtual async Task DeleteAllAsync(GetDepartmentServicesInput input)
-        {
-            await departmentServiceRepository.DeleteAllAsync(input.FilterText, input.Name);
-        }
+        public virtual async Task DeleteByIdsAsync(List<Guid> departmentServiceIds) => await departmentServiceRepository.DeleteManyAsync(departmentServiceIds);
+
+        
+        [Authorize(HealthCarePermissions.DepartmentServices.Delete)]
+        public virtual async Task DeleteAllAsync(GetDepartmentServicesInput input) => await departmentServiceRepository.DeleteAllAsync(input.FilterText, input.Name);
+
+        
         public virtual async Task<DownloadTokenResultDto> GetDownloadTokenAsync()
         {
             var token = Guid.NewGuid().ToString("N");

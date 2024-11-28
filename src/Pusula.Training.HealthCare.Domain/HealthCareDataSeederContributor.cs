@@ -58,8 +58,7 @@ namespace Pusula.Training.HealthCare
             var patientCompanies = await SeedPatientCompaniesAsync();
         }
 
-
-        // Ülkeler
+        #region Countries
         private async Task<List<Guid>> SeedCountriesAsync()
         {
             if (await countryRepository.GetCountAsync() > 0)
@@ -269,8 +268,9 @@ namespace Pusula.Training.HealthCare
             return countries.Select(co => co.Id).ToList();
 
         }
+        #endregion
 
-        // Şehirler
+        #region Cities
         private async Task<List<Guid>> SeedCitiesAsync(List<Guid> countryKeys)
         {
             if (await cityRepository.GetCountAsync() > 0)
@@ -367,8 +367,9 @@ namespace Pusula.Training.HealthCare
             return cities.Select(c => c.Id).ToList();
 
         }
+        #endregion
 
-        // İlçeler
+        #region Districts
         private async Task<List<Guid>> SeedDistrictsAsync(List<Guid> cityKeys)
         {
             if (await districtRepository.GetCountAsync() > 0)
@@ -425,8 +426,9 @@ namespace Pusula.Training.HealthCare
             return districts.Select(d => d.Id).ToList();
 
         }
+        #endregion
 
-        // Köyler
+        #region Villages
         private async Task SeedVillagesAsync(List<Guid> districtKeys)
         {
             if (await villageRepository.GetCountAsync() > 0)
@@ -962,7 +964,7 @@ namespace Pusula.Training.HealthCare
             await villageRepository.InsertManyAsync(villages, true);
 
         }
-
+        #endregion
 
         #region TestGroups
 

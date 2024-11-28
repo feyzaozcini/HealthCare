@@ -15,8 +15,8 @@ namespace Pusula.Training.HealthCare.Cities
     public class City : AuditedEntity<Guid>
     {
         [NotNull]
-        public virtual string Name { get; set; }
-        public virtual Guid CountryId { get; set; }
+        public virtual string Name { get; private set; }
+        public virtual Guid CountryId { get; private set; }
 
         protected City()
         {
@@ -26,11 +26,17 @@ namespace Pusula.Training.HealthCare.Cities
         public City(Guid id, Guid countryId, string name)
         {
             Id = id;
+            SetName(name);
+            SetCountryId(countryId);
+        }
+
+        public void SetName(string name)
+        {
             Check.NotNull(name, nameof(name));
             Check.Length(name, nameof(name), CityConsts.NameMaxLength, 0);
             Name = name;
-
-            CountryId = countryId;
         }
+
+        public void SetCountryId(Guid countryId) => CountryId = Check.NotNull(countryId, nameof(countryId));
     }
 }

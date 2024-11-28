@@ -35,26 +35,21 @@ namespace Pusula.Training.HealthCare.Titles
             };
         }
 
+
         public virtual async Task<TitleDto> GetAsync(Guid id) => ObjectMapper.Map<Title, TitleDto>(await titleRepository.GetAsync(id));
 
-        [Authorize(HealthCarePermissions.Titles.Create)]
-        public virtual async Task<TitleDto> CreateAsync(TitleCreateDto input)
-        {
-            var title = await titleManager.CreateAsync(input.Name);
 
-            return ObjectMapper.Map<Title, TitleDto>(title);
-        }
+        [Authorize(HealthCarePermissions.Titles.Create)]
+        public virtual async Task<TitleDto> CreateAsync(TitleCreateDto input) => ObjectMapper.Map<Title, TitleDto>(await titleManager.CreateAsync(input.Name));
+
 
         [Authorize(HealthCarePermissions.Titles.Edit)]
-        public virtual async Task<TitleDto> UpdateAsync(TitleUpdateDto input)
-        {
-            var title = await titleManager.UpdateAsync(input.Id, input.Name);
+        public virtual async Task<TitleDto> UpdateAsync(TitleUpdateDto input) => ObjectMapper.Map<Title, TitleDto>(await titleManager.UpdateAsync(input.Id, input.Name));
 
-            return ObjectMapper.Map<Title, TitleDto>(title);
-        }
 
         [Authorize(HealthCarePermissions.Titles.Delete)]
         public virtual void DeleteAsync(Guid id) => titleManager.DeleteAsync(id);
+
 
         [AllowAnonymous]
         public virtual async Task<IRemoteStreamContent> GetListAsExcelFileAsync(TitleExcelDownloadDto input)
@@ -71,10 +66,15 @@ namespace Pusula.Training.HealthCare.Titles
             return new RemoteStreamContent(memoryStream, "Title.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }
 
+
         [Authorize(HealthCarePermissions.Titles.Delete)]
         public virtual async Task DeleteByIdsAsync(List<Guid> titleIds) => await titleRepository.DeleteManyAsync(titleIds);
+
+
         [Authorize(HealthCarePermissions.Titles.Delete)]
         public virtual async Task DeleteAllAsync(GetTitlesInput input) => await titleRepository.DeleteAllAsync(input.FilterText, input.Name);
+
+
         public virtual async Task<DownloadTokenResultDto> GetDownloadTokenAsync()
         {
             var token = Guid.NewGuid().ToString("N");

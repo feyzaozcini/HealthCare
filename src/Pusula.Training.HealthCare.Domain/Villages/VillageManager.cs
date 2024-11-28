@@ -16,15 +16,15 @@ namespace Pusula.Training.HealthCare.Villages
         Guid districtId,
         string name)
         {
-            Check.NotNull(districtId, nameof(districtId));
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), VillageConsts.NameMaxLength);
 
             var village = new Village(
              GuidGenerator.Create(),
              districtId,
              name
              );
+
+            village.SetName(name);
+            village.SetDistrictId(districtId);
 
             return await villageRepository.InsertAsync(village);
         }
@@ -34,12 +34,8 @@ namespace Pusula.Training.HealthCare.Villages
             string name
         )
         {
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), VillageConsts.NameMaxLength);
-
             var village = await villageRepository.GetAsync(id);
-
-            village.Name = name;
+            village.SetName(name);
 
             return await villageRepository.UpdateAsync(village);
         }
