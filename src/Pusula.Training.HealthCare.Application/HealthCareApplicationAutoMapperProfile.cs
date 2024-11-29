@@ -30,6 +30,9 @@ using System.Linq;
 using Pusula.Training.HealthCare.TestValueRanges;
 using Pusula.Training.HealthCare.TestProcesses;
 
+using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
+
+
 namespace Pusula.Training.HealthCare;
 
 public class HealthCareApplicationAutoMapperProfile : Profile
@@ -173,7 +176,8 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<AppointmentType, AppointmentTypeDeleteDto>();
         CreateMap<AppointmentType, AppointmentTypeDto>();
         CreateMap<AppointmentType, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
-
+        CreateMap<AppointmentType, AppointmentTypeDto>()
+            .ForMember(dest => dest.DoctorAppointmentTypes, opt => opt.MapFrom(src => src.DoctorAppointmentTypes.Select(dd => dd.DoctorId).ToList()));
         CreateMap<Title, TitleDto>();
         CreateMap<Title, TitleExcelDto>();
         CreateMap<TitleDto, TitleUpdateDto>();

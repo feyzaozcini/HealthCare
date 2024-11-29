@@ -54,7 +54,7 @@ namespace Pusula.Training.HealthCare
 
             var departments = await SeedDepartmentsAsync();
             var titles = await SeedTitlesAsync();
-            var appointmentTypes = await SeedAppointmentTypesAsync();
+            //var appointmentTypes = await SeedAppointmentTypesAsync();
             var patientCompanies = await SeedPatientCompaniesAsync();
         }
 
@@ -1549,21 +1549,7 @@ namespace Pusula.Training.HealthCare
         #endregion
 
         #region AppointmentTypes
-        private async Task<List<Guid>> SeedAppointmentTypesAsync()
-        {
-            if (await appointmentTypeRepository.GetCountAsync() > 0)
-                return new List<Guid>();
-            var appointmentTypes = new List<AppointmentType>
-            {
-                new AppointmentType(guidGenerator.Create(), "Examination"),
-                new AppointmentType(guidGenerator.Create(), "Consultation"),
-                new AppointmentType(guidGenerator.Create(), "Follow-up"),
-                new AppointmentType(guidGenerator.Create(), "Treatment"),
-                new AppointmentType(guidGenerator.Create(), "Vaccination")
-            };
-            await appointmentTypeRepository.InsertManyAsync(appointmentTypes, true);
-            return appointmentTypes.Select(a => a.Id).ToList();
-        }
+        
         #endregion
 
         #region Companies

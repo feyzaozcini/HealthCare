@@ -13,6 +13,10 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
 
         public string? Name { get; set; }
 
+        public int? DurationInMinutes { get; set; }
+
+        public List<Guid>? DoctorAppointmentTypes { get; set; }
+
         public GetAppointmentTypesInput()
         {
         }
