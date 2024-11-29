@@ -26,10 +26,9 @@ public class LabRequestsAppService(
         var labRequests = await labRequestManager.CreateAsync(
            input.ProtocolId,
            input.DoctorId,
-           input.TestGroupItemId,
-           input.Name,
            input.Date,
-           input.Status
+           input.Status,
+           input.Description
            );
 
         return ObjectMapper.Map<LabRequest, LabRequestDto>(labRequests);
@@ -38,16 +37,13 @@ public class LabRequestsAppService(
     [Authorize(HealthCarePermissions.LabRequests.Delete)]
     public virtual async Task<LabRequestDeletedDto> DeleteAsync(Guid id)
     {
-        LabRequest? labRequest = await labRequestRepository.GetAsync(
-            predicate: l => l.Id == id
-            );
-
         await labRequestRepository.DeleteAsync(id);
 
-        LabRequestDeletedDto response = ObjectMapper.Map<LabRequest, LabRequestDeletedDto>(labRequest);
-        response.Message = LabRequestConsts.LabRequestDeletedMessage;
-
-        return response;
+        return new LabRequestDeletedDto
+        {
+            Id = id,
+            Message = LabRequestConsts.LabRequestDeletedMessage
+        };
     }
 
     public virtual async Task<LabRequestDto> GetAsync(Guid id)
@@ -79,19 +75,17 @@ public class LabRequestsAppService(
             input.FilterText,
             input.ProtocolId,
             input.DoctorId,
-            input.TestGroupItemId,
-            input.Name,
             input.Date,
-            input.Status
+            input.Status,
+            input.Description
             );
         var items = await labRequestRepository.GetListAsync(
             input.FilterText,
             input.ProtocolId,
             input.DoctorId,
-            input.TestGroupItemId,
-            input.Name,
             input.Date,
             input.Status,
+            input.Description,
             input.Sorting,
             input.MaxResultCount,
             input.SkipCount
@@ -104,6 +98,41 @@ public class LabRequestsAppService(
         };
     }
 
+    public virtual async Task<PagedResultDto<LabRequestDto>> GetListWithNavigationPropertiesAsync(GetLabRequestsInput input)
+    {
+        var totalCount = await labRequestRepository.GetCountAsync(
+            input.FilterText,
+            input.ProtocolId,
+            input.DoctorId,
+            input.Date,
+            input.Status,
+            input.Description
+            );
+        var items = await labRequestRepository.GetListWithNavigationPropertiesAsync(
+            input.FilterText,
+            input.ProtocolId,
+            input.DoctorId,
+            input.Date,
+            input.Status,
+            input.Description,
+            input.Sorting,
+            input.MaxResultCount,
+            input.SkipCount
+            );
+
+        return new PagedResultDto<LabRequestDto>
+        {
+            TotalCount = totalCount,
+            Items = ObjectMapper.Map<List<LabRequest>, List<LabRequestDto>>(items)
+        };
+    }
+
+    public async Task<LabRequestDto> GetWithNavigationPropertiesAsync(Guid id)
+    {
+        var labRequest = await labRequestRepository.GetWithNavigationPropertiesAsync(id);
+        return ObjectMapper.Map<LabRequest, LabRequestDto>(labRequest);
+    }
+
     [Authorize(HealthCarePermissions.LabRequests.Edit)]
     public virtual async Task<LabRequestDto> UpdateAsync(LabRequestUpdateDto input)
     {
@@ -111,10 +140,9 @@ public class LabRequestsAppService(
                     input.Id,
                     input.ProtocolId,
                     input.DoctorId,
-                    input.TestGroupItemId,
-                    input.Name,
                     input.Date,
-                    input.Status
+                    input.Status,
+                    input.Description
                     );
 
         return ObjectMapper.Map<LabRequest, LabRequestDto>(labRequest);

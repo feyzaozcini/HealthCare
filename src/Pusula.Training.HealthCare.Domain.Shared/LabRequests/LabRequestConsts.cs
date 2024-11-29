@@ -14,9 +14,8 @@ public static class LabRequestConsts
         return string.Format(DefaultSorting, withEntityName ? "LabRequest." : string.Empty);
     }
 
-    public const int NameMaxLength = 100;
-    public const int NameMinLength = 2;
-    public const RequestStatusEnum DefaultStatus = RequestStatusEnum.Pending; // Varsayılan durum
+    public const int DescriptionMaxLength = 500;
+    public const RequestStatusEnum DefaultStatus = RequestStatusEnum.InProgress; // Varsayılan durum
 
     //public const int MaxRequestsPerDay = 100; // Örneğin, bir gün için maksimum talep sayısı
 

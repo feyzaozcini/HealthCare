@@ -6,11 +6,33 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Pusula.Training.HealthCare.Migrations
 {
     /// <inheritdoc />
-    public partial class TestValueRanges_TestProcess_Added : Migration
+    public partial class TestProcess_TestValueRanges_Created : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_AppLabRequests_AppTestGroupItems_TestGroupItemId",
+                table: "AppLabRequests");
+
+            migrationBuilder.DropIndex(
+                name: "IX_AppLabRequests_TestGroupItemId",
+                table: "AppLabRequests");
+
+            migrationBuilder.DropColumn(
+                name: "Name",
+                table: "AppLabRequests");
+
+            migrationBuilder.DropColumn(
+                name: "TestGroupItemId",
+                table: "AppLabRequests");
+
+            migrationBuilder.AddColumn<string>(
+                name: "Description",
+                table: "AppLabRequests",
+                type: "text",
+                nullable: true);
+
             migrationBuilder.CreateTable(
                 name: "AppTestProcesses",
                 columns: table => new
@@ -68,6 +90,17 @@ namespace Pusula.Training.HealthCare.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppLabRequests_DoctorId",
+                table: "AppLabRequests",
+                column: "DoctorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppLabRequests_ProtocolId",
+                table: "AppLabRequests",
+                column: "ProtocolId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AppTestProcesses_LabRequestId",
                 table: "AppTestProcesses",
@@ -82,16 +115,80 @@ namespace Pusula.Training.HealthCare.Migrations
                 name: "IX_AppTestValueRanges_TestGroupItemId",
                 table: "AppTestValueRanges",
                 column: "TestGroupItemId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AppLabRequests_AppDoctors_DoctorId",
+                table: "AppLabRequests",
+                column: "DoctorId",
+                principalTable: "AppDoctors",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AppLabRequests_AppProtocols_ProtocolId",
+                table: "AppLabRequests",
+                column: "ProtocolId",
+                principalTable: "AppProtocols",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_AppLabRequests_AppDoctors_DoctorId",
+                table: "AppLabRequests");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_AppLabRequests_AppProtocols_ProtocolId",
+                table: "AppLabRequests");
+
             migrationBuilder.DropTable(
                 name: "AppTestProcesses");
 
             migrationBuilder.DropTable(
                 name: "AppTestValueRanges");
+
+            migrationBuilder.DropIndex(
+                name: "IX_AppLabRequests_DoctorId",
+                table: "AppLabRequests");
+
+            migrationBuilder.DropIndex(
+                name: "IX_AppLabRequests_ProtocolId",
+                table: "AppLabRequests");
+
+            migrationBuilder.DropColumn(
+                name: "Description",
+                table: "AppLabRequests");
+
+            migrationBuilder.AddColumn<string>(
+                name: "Name",
+                table: "AppLabRequests",
+                type: "character varying(100)",
+                maxLength: 100,
+                nullable: false,
+                defaultValue: "");
+
+            migrationBuilder.AddColumn<Guid>(
+                name: "TestGroupItemId",
+                table: "AppLabRequests",
+                type: "uuid",
+                nullable: false,
+                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AppLabRequests_TestGroupItemId",
+                table: "AppLabRequests",
+                column: "TestGroupItemId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_AppLabRequests_AppTestGroupItems_TestGroupItemId",
+                table: "AppLabRequests",
+                column: "TestGroupItemId",
+                principalTable: "AppTestGroupItems",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
     }
 }

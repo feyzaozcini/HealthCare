@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
+using Pusula.Training.HealthCare.Exceptions;
 using Pusula.Training.HealthCare.TestGroups;
 using System;
 using System.Collections.Generic;
@@ -68,22 +69,24 @@ public class EfCoreTestGroupItemRepository(IDbContextProvider<HealthCareDbContex
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
 
-    public virtual async Task<TestGroupItemWithNavigationProperties> GetWithNavigationPropertiesAsync(
+    public virtual async Task<TestGroupItem> GetWithNavigationPropertiesAsync(
      Guid id,
      CancellationToken cancellationToken = default)
     {
-        var dbContext = await GetDbContextAsync();
-
-        return (await GetDbSetAsync()).Where(b => b.Id == id)
-            .Select(testGroupItem => new TestGroupItemWithNavigationProperties
-            {
-                TestGroupItem = testGroupItem,
-                TestGroup = dbContext.Set<TestGroup>().FirstOrDefault(c => c.Id == testGroupItem.TestGroupId)!,
-            })
-            .FirstOrDefault()!;
+        var query = await GetQueryForNavigationPropertiesAsync();
+        var testGroupItem = await query.FirstOrDefaultAsync(tg => tg.Id == id, cancellationToken);
+        HealthCareException.ThrowIf(testGroupItem == null);
+        return testGroupItem!;
     }
 
-    public async Task<List<TestGroupItemWithNavigationProperties>> GetListWithNavigationPropertiesAsync(
+    protected virtual async Task<IQueryable<TestGroupItem>> GetQueryForNavigationPropertiesAsync()
+    {
+        var dbSet = await GetDbSetAsync();
+        return dbSet
+            .Include(tp => tp.TestGroup);
+    }
+
+    public async Task<List<TestGroupItem>> GetListWithNavigationPropertiesAsync(
     string? filterText = null,
     Guid? testGroupId = null,
     string? name = null,
@@ -97,21 +100,10 @@ public class EfCoreTestGroupItemRepository(IDbContextProvider<HealthCareDbContex
     CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
-        query = ApplyFilter(query, filterText, name, testGroupId, code, testType, description, turnaroundTime);
+        query = ApplyFilter(query, filterText, name, code, testType, description, turnaroundTime, testGroupId);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? TestGroupItemConsts.GetDefaultSorting(true) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
-
-
-    protected virtual async Task<IQueryable<TestGroupItemWithNavigationProperties>> GetQueryForNavigationPropertiesAsync() =>
-    from testGroupItem in (await GetDbSetAsync())
-    join testGroup in (await GetDbContextAsync()).Set<TestGroup>() on testGroupItem.TestGroupId equals testGroup.Id into testGroups
-    from testGroup in testGroups.DefaultIfEmpty()
-    select new TestGroupItemWithNavigationProperties
-    {
-        TestGroupItem = testGroupItem,
-        TestGroup = testGroup
-    };
 
     protected virtual IQueryable<TestGroupItem> ApplyFilter(
     IQueryable<TestGroupItem> query,

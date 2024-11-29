@@ -8,8 +8,7 @@ namespace Pusula.Training.HealthCare.LabRequests;
 
 public enum RequestStatusEnum
 {
-    Pending = 1,     // Bekliyor
-    InProgress = 2,  // İşlemde
-    Completed = 3,   // Tamamlandı
-    Cancelled = 4    // İptal Edildi
+    InProgress = 1,  // İşlemde
+    Completed = 2,   // Tamamlandı
+    Cancelled = 3    // İptal Edildi
 }

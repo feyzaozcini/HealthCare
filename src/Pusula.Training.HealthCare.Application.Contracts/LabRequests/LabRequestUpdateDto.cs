@@ -12,12 +12,13 @@ public class LabRequestUpdateDto
     [Required]
     public Guid DoctorId { get; set; }
     [Required]
-    public Guid TestGroupItemId { get; set; }
-    [Required]
-    [StringLength(LabRequestConsts.NameMaxLength)]
-    public string Name { get; set; } = null!;
     public DateTime Date { get; set; }
     [Required]
     public RequestStatusEnum Status { get; set; }
+    [StringLength(LabRequestConsts.DescriptionMaxLength)]
+    public string? Description { get; set; }
 
+    public LabRequestUpdateDto()
+    {
+    }
 }

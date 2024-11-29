@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
+using Pusula.Training.HealthCare.Exceptions;
 using Pusula.Training.HealthCare.TestProcesses;
 using System;
 using System.Collections.Generic;
@@ -7,6 +9,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -43,18 +46,41 @@ public class EfCoreTestValueRangeRepository(IDbContextProvider<HealthCareDbConte
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? TestValueRangeConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
-
-    public async Task<List<TestValueRange>> GetTestValueRangesWithNavigationPropertiesAsync()
+    //Seçilen ID'ye göre bağlı olduğu entity'lerin verisini getirir.
+    public async Task<TestValueRange> GetWithNavigationPropertiesAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
-        return await query.ToListAsync();
+
+        var testValueRange = await query.FirstOrDefaultAsync(tvr => tvr.Id == id, cancellationToken);
+
+        HealthCareException.ThrowIf(testValueRange == null);
+
+        return testValueRange!;
     }
 
+    //Bağlı olduğu entity'ler ile beraber tüm verileri getirir.
+    public async Task<List<TestValueRange>> GetListWithNavigationPropertiesAsync(
+        string? filterText = null,
+        Guid? testGroupItemId = null,
+        decimal? minValue = null,
+        decimal? maxValue = null,
+        TestUnitTypes? unit = null,
+        string? sorting = null,
+        int maxResultCount = int.MaxValue,
+        int skipCount = 0,
+        CancellationToken cancellationToken = default)
+    {
+        var query = await GetQueryForNavigationPropertiesAsync();
+        query = ApplyFilter((await GetQueryableAsync()), filterText, testGroupItemId, minValue, maxValue, unit);
+        query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? TestValueRangeConsts.GetDefaultSorting(false) : sorting);
+        return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
+    }
     protected virtual async Task<IQueryable<TestValueRange>> GetQueryForNavigationPropertiesAsync()
     {
         var dbSet = await GetDbSetAsync();
         return dbSet
-            .Include(tvr => tvr.TestGroupItem); 
+            .Include(tvr => tvr.TestGroupItem)
+            .ThenInclude(tvr => tvr.TestGroup); 
     }
 
     protected virtual IQueryable<TestValueRange> ApplyFilter(
@@ -77,5 +103,4 @@ public class EfCoreTestValueRangeRepository(IDbContextProvider<HealthCareDbConte
             .WhereIf(maxValue.HasValue, tvr => tvr.MaxValue == maxValue!.Value)
             .WhereIf(unit.HasValue, tvr => tvr.Unit == unit!.Value);
     }
-
 }

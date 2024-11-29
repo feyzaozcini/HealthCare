@@ -9,10 +9,9 @@ public class LabRequestManager(ILabRequestRepository labRequestRepository) : Dom
     public virtual async Task<LabRequest> CreateAsync(
         Guid protocolId,
         Guid doctorId,
-        Guid testGroupItemId,
-        string name,
         DateTime date,
-        RequestStatusEnum status
+        RequestStatusEnum status,
+        string? description
         )
     {
        
@@ -20,10 +19,9 @@ public class LabRequestManager(ILabRequestRepository labRequestRepository) : Dom
          GuidGenerator.Create(),
          protocolId,
          doctorId,
-         testGroupItemId,
-         name,
          date,
-         status
+         status,
+         description
         );
 
         return await labRequestRepository.InsertAsync(labRequest);
@@ -33,20 +31,18 @@ public class LabRequestManager(ILabRequestRepository labRequestRepository) : Dom
         Guid id,
         Guid protocolId,
         Guid doctorId,
-        Guid testGroupItemId,
-        string name,
         DateTime date,
-        RequestStatusEnum status
+        RequestStatusEnum status,
+        string? description
         )
     {
         var labRequest = await labRequestRepository.GetAsync(id);
 
         labRequest.SetProtocolId(protocolId);
         labRequest.SetDoctorId(doctorId);
-        labRequest.SetTestGroupItemId(testGroupItemId);
-        labRequest.SetName(name);
         labRequest.SetDate(date);
         labRequest.SetRequestStatus(status);
+        labRequest.SetDescription(description);
 
         return await labRequestRepository.UpdateAsync(labRequest);
     }

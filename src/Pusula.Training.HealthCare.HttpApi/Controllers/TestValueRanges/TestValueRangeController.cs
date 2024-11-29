@@ -33,7 +33,15 @@ public class TestValueRangeController(ITestValueRangesAppService testValueRanges
 
     [HttpGet]
     public Task<PagedResultDto<TestValueRangeDto>> GetListAsync(GetTestValueRangesInput input) => testValueRangesAppService.GetListAsync(input);
-    
+
+    [HttpGet]
+    [Route("get-list-with-navigation")]
+    public Task<PagedResultDto<TestValueRangeDto>> GetListWithNavigationPropertiesAsync(GetTestValueRangesInput input) => testValueRangesAppService.GetListWithNavigationPropertiesAsync(input);
+
+    [HttpGet]
+    [Route("get-with-navigation")]
+    public Task<TestValueRangeDto> GetWithNavigationPropertiesAsync(Guid id) => testValueRangesAppService.GetWithNavigationPropertiesAsync(id);
+
     [HttpPut]
     public Task<TestValueRangeDto> UpdateAsync(TestValueRangesUpdateDto input) => testValueRangesAppService.UpdateAsync(input);
 }

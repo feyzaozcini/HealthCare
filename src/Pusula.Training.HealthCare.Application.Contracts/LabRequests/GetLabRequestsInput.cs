@@ -12,11 +12,9 @@ public class GetLabRequestsInput : PagedAndSortedResultRequestDto
     public string? FilterText { get; set; }
     public Guid ProtocolId { get; set; }
     public Guid DoctorId { get; set; }
-    public Guid TestGroupItemId { get; set; }
-
-    public string? Name { get; set; }
     public DateTime? Date { get; set; }
     public RequestStatusEnum? Status { get; set; }
+    public string? Description { get; set; }
 
     public GetLabRequestsInput()
     {

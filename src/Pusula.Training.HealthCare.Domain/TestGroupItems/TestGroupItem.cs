@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Pusula.Training.HealthCare.TestGroups;
 using System;
 using System.Xml.Linq;
 using Volo.Abp;
@@ -9,6 +10,7 @@ namespace Pusula.Training.HealthCare.TestGroupItems;
 public class TestGroupItem : AuditedEntity<Guid>
 {
     public Guid TestGroupId { get; private set; } // Set yalnızca sınıf içinde erişilebilir.
+    public TestGroup TestGroup { get; private set; } 
 
     [NotNull]
     public string Name { get; private set; } = null!;

@@ -683,6 +683,10 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("DeletionTime");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("Description");
+
                     b.Property<Guid>("DoctorId")
                         .HasColumnType("uuid")
                         .HasColumnName("DoctorId");
@@ -701,12 +705,6 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("LastModifierId");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("Name");
-
                     b.Property<Guid>("ProtocolId")
                         .HasColumnType("uuid")
                         .HasColumnName("ProtocolId");
@@ -715,12 +713,11 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("Status");
 
-                    b.Property<Guid>("TestGroupItemId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("TestGroupItemId");
+                    b.HasIndex("DoctorId");
+
+                    b.HasIndex("ProtocolId");
 
                     b.ToTable("AppLabRequests", (string)null);
                 });
@@ -1230,7 +1227,6 @@ namespace Pusula.Training.HealthCare.Migrations
             modelBuilder.Entity("Pusula.Training.HealthCare.TestProcesses.TestProcess", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreationTime")
@@ -1281,7 +1277,6 @@ namespace Pusula.Training.HealthCare.Migrations
             modelBuilder.Entity("Pusula.Training.HealthCare.TestValueRanges.TestValueRange", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreationTime")
@@ -3342,11 +3337,21 @@ namespace Pusula.Training.HealthCare.Migrations
 
             modelBuilder.Entity("Pusula.Training.HealthCare.LabRequests.LabRequest", b =>
                 {
-                    b.HasOne("Pusula.Training.HealthCare.TestGroupItems.TestGroupItem", null)
+                    b.HasOne("Pusula.Training.HealthCare.Doctors.Doctor", "Doctor")
                         .WithMany()
-                        .HasForeignKey("TestGroupItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Pusula.Training.HealthCare.Protocols.Protocol", "Protocol")
+                        .WithMany()
+                        .HasForeignKey("ProtocolId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Protocol");
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.Patients.Patient", b =>
@@ -3437,11 +3442,13 @@ namespace Pusula.Training.HealthCare.Migrations
 
             modelBuilder.Entity("Pusula.Training.HealthCare.TestGroupItems.TestGroupItem", b =>
                 {
-                    b.HasOne("Pusula.Training.HealthCare.TestGroups.TestGroup", null)
+                    b.HasOne("Pusula.Training.HealthCare.TestGroups.TestGroup", "TestGroup")
                         .WithMany()
                         .HasForeignKey("TestGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("TestGroup");
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.TestProcesses.TestProcess", b =>

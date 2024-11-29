@@ -18,11 +18,11 @@ public interface ITestGroupItemRepository : IRepository<TestGroupItem, Guid>
         int? turnaroundTime = null,
         CancellationToken cancellationToken = default);
 
-    Task<TestGroupItemWithNavigationProperties> GetWithNavigationPropertiesAsync(
+    Task<TestGroupItem> GetWithNavigationPropertiesAsync(
     Guid id,
     CancellationToken cancellationToken = default);
 
-    Task<List<TestGroupItemWithNavigationProperties>> GetListWithNavigationPropertiesAsync(
+    Task<List<TestGroupItem>> GetListWithNavigationPropertiesAsync(
         string? filterText = null,
         Guid? testGroupId = null,
         string? name = null,
