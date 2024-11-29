@@ -26,7 +26,7 @@ public class Country: AuditedEntity<Guid>
     {
         Id = id;
         SetName(name);
-        SetName(code);
+        SetCode(code);
     }
 
     public void SetName(string name)
