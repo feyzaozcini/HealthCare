@@ -1,0 +1,47 @@
+﻿@page "/appointment-types"
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Popups
+@using Pusula.Training.HealthCare.AppointmentTypes
+@using Pusula.Training.HealthCare.Doctors
+@inject IAppointmentTypeAppService AppointmentTypeAppService
+
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <SfGrid DataSource="@AppointmentTypeList" AllowPaging="true" Toolbar="@(new string[] {"Add", "Edit", "Delete"})">
+            <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog" />
+            <GridColumns>
+                <GridColumn Field="Name" HeaderText="Appointment Type" Width="150"></GridColumn>
+                <GridColumn Field="DurationInMinutes" HeaderText="Duration (min)" TextAlign="TextAlign.Right" Width="140"></GridColumn>
+                
+            </GridColumns>
+        </SfGrid>
+    </div>
+</div>
+
+<!-- Modal -->
+
+@code {
+    private List<AppointmentTypeDto> AppointmentTypeList = new();
+    private List<DoctorWithNavigationPropertiesDto> DoctorList = new();
+    private bool IsDoctorModalOpen = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // AppointmentType listesini yükle
+        var result = await AppointmentTypeAppService.GetListAsync(new GetAppointmentTypesInput());
+        AppointmentTypeList = result.Items.ToList();
+    }
+
+    private async Task ShowDoctors(Guid appointmentTypeId)
+    {
+        // Modal'ı göster ve doktor listesini yükle
+        var doctors = await AppointmentTypeAppService.GetDoctorsByAppointmentTypeIdAsync(appointmentTypeId);
+        DoctorList = doctors;
+        IsDoctorModalOpen = true;
+    }
+
+    private void OnVisibleChange(bool visible)
+    {
+        IsDoctorModalOpen = visible;
+    }
+}

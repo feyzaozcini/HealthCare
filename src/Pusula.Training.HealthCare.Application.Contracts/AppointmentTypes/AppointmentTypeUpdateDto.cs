@@ -13,5 +13,8 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
 
         [Required]
         public string Name { get; set; } = null!;
+
+        [Required]
+        public int DurationInMinutes { get; set; }
     }
 }

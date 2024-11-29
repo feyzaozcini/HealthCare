@@ -12,5 +12,10 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
         [Required]
         [StringLength(AppointmentTypeConst.NameMaxLength)]
         public string Name { get; set; } = null!;
+
+        [Required]
+        public int DurationInMinutes { get; set; }
+
+        public List<Guid> DoctorIds { get; set; }
     }
 }

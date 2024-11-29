@@ -41,6 +41,12 @@ using System;
 using Pusula.Training.HealthCare.TestProcesses;
 using Pusula.Training.HealthCare.TestValueRanges;
 
+
+
+
+
+using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
+
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
 [ReplaceDbContext(typeof(IIdentityDbContext))]
@@ -69,7 +75,7 @@ public class HealthCareDbContext :
     public DbSet<Village> Villages { get; set; } = null!;
     public DbSet<Appointment> Appointments { get; set; } = null!;
     public DbSet<DoctorDepartment> DoctorDepartments { get; set; } = null!;
-
+    public DbSet<DoctorAppoinmentType> DoctorAppoinmentTypes { get; set; } = null!;
 
 
 
@@ -396,6 +402,9 @@ public class HealthCareDbContext :
                     .HasColumnName(nameof(AppointmentType.Name))
                     .IsRequired()
                     .HasMaxLength(AppointmentTypeConst.NameMaxLength);
+
+                b.Property(x => x.DurationInMinutes).HasColumnName(nameof(AppointmentType.DurationInMinutes)).IsRequired();
+                b.HasMany(x => x.DoctorAppointmentTypes).WithOne().HasForeignKey(x => x.AppoinmentTypeId).IsRequired();
             });
 
             builder.Entity<DoctorDepartment>(b =>
@@ -441,7 +450,26 @@ public class HealthCareDbContext :
                 b.HasOne<City>().WithMany().IsRequired().HasForeignKey(x => x.CityId).OnDelete(DeleteBehavior.NoAction);
             });
 
+            builder.Entity<DoctorAppoinmentType>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "DoctorAppoinmentTypes", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
 
+                // Composite Key
+                b.HasKey(dd => new { dd.DoctorId, dd.AppoinmentTypeId });
+
+                // İşlemler appointment type ile yapılacak
+
+                b.HasOne(dd => dd.Doctor)
+                    .WithMany()
+                    .HasForeignKey(dd => dd.DoctorId)
+                    .IsRequired();
+
+                b.HasOne(dd => dd.AppoinmentType)
+                    .WithMany(d => d.DoctorAppointmentTypes)
+                    .HasForeignKey(dd => dd.AppoinmentTypeId)
+                    .IsRequired();
+            });
 
 
 

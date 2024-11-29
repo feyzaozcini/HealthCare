@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Pusula.Training.HealthCare.Migrations
 {
     [DbContext(typeof(HealthCareDbContext))]
-    partial class HealthCareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241129090033_Appointment_Type_Duration_Added")]
+    partial class Appointment_Type_Duration_Added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1225,102 +1228,6 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AppTestGroups", (string)null);
-                });
-
-            modelBuilder.Entity("Pusula.Training.HealthCare.TestProcesses.TestProcess", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<Guid>("LabRequestId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("LabRequestId");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<decimal?>("Result")
-                        .HasColumnType("numeric")
-                        .HasColumnName("Result");
-
-                    b.Property<DateTime?>("ResultDate")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("ResultDate");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("Status");
-
-                    b.Property<Guid>("TestGroupItemId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("TestGroupItemId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LabRequestId");
-
-                    b.HasIndex("TestGroupItemId");
-
-                    b.ToTable("AppTestProcesses", (string)null);
-                });
-
-            modelBuilder.Entity("Pusula.Training.HealthCare.TestValueRanges.TestValueRange", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<decimal>("MaxValue")
-                        .HasColumnType("numeric")
-                        .HasColumnName("MaxValue");
-
-                    b.Property<decimal>("MinValue")
-                        .HasColumnType("numeric")
-                        .HasColumnName("MinValue");
-
-                    b.Property<Guid>("TestGroupItemId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("TestGroupItemId");
-
-                    b.Property<int>("Unit")
-                        .HasColumnType("integer")
-                        .HasColumnName("Unit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TestGroupItemId");
-
-                    b.ToTable("AppTestValueRanges", (string)null);
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.Titles.Title", b =>
@@ -3442,36 +3349,6 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasForeignKey("TestGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Pusula.Training.HealthCare.TestProcesses.TestProcess", b =>
-                {
-                    b.HasOne("Pusula.Training.HealthCare.LabRequests.LabRequest", "LabRequest")
-                        .WithMany()
-                        .HasForeignKey("LabRequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Pusula.Training.HealthCare.TestGroupItems.TestGroupItem", "TestGroupItem")
-                        .WithMany()
-                        .HasForeignKey("TestGroupItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("LabRequest");
-
-                    b.Navigation("TestGroupItem");
-                });
-
-            modelBuilder.Entity("Pusula.Training.HealthCare.TestValueRanges.TestValueRange", b =>
-                {
-                    b.HasOne("Pusula.Training.HealthCare.TestGroupItems.TestGroupItem", "TestGroupItem")
-                        .WithMany()
-                        .HasForeignKey("TestGroupItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TestGroupItem");
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.Villages.Village", b =>

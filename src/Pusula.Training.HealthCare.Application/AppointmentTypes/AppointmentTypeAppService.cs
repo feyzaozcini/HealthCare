@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Appointments;
+using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -25,7 +27,9 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
         public virtual async Task<AppointmentTypeDto> CreateAsync(AppointmentTypeCreateDto input)
         {
             var appointmentType = await appointmentTypeManager.CreateAsync(
-            input.Name
+            input.Name,
+            input.DurationInMinutes,
+            input.DoctorIds
             );
 
             return ObjectMapper.Map<AppointmentType, AppointmentTypeDto>(appointmentType);
@@ -73,7 +77,7 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
         public virtual async Task<PagedResultDto<AppointmentTypeDto>> GetListAsync(GetAppointmentTypesInput input)
         {
             var totalCount = await appointmentTypeRepository.GetCountAsync(input.FilterText, input.Name);
-            var items = await appointmentTypeRepository.GetListAsync(input.FilterText, input.Name, input.Sorting, input.MaxResultCount, input.SkipCount);
+            var items = await appointmentTypeRepository.GetListAsync(input.FilterText, input.Name,input.DurationInMinutes ,input.Sorting, input.MaxResultCount, input.SkipCount);
 
             return new PagedResultDto<AppointmentTypeDto>
             {
@@ -82,12 +86,22 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
             };
         }
 
+        public virtual async Task<List<DoctorWithNavigationPropertiesDto>> GetDoctorsByAppointmentTypeIdAsync(Guid appointmentTypeId)
+        {
+            var doctors = await appointmentTypeRepository.GetDoctorsByAppointmentTypeIdAsync(appointmentTypeId);
+
+            var doctorDtos = ObjectMapper.Map<List<DoctorWithNavigationProperties>, List<DoctorWithNavigationPropertiesDto>>(doctors);
+
+            return doctorDtos;
+        }
+
         [Authorize(HealthCarePermissions.AppointmentTypes.Edit)]
         public virtual async Task<AppointmentTypeDto> UpdateAsync(AppointmentTypeUpdateDto input)
         {
             var appointmentType = await appointmentTypeManager.UpdateAsync(
                     input.Id,
-                    input.Name
+                    input.Name,
+                    input.DurationInMinutes
                     );
 
             return ObjectMapper.Map<AppointmentType, AppointmentTypeDto>(appointmentType);
