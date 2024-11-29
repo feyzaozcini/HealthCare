@@ -38,6 +38,8 @@ using Pusula.Training.HealthCare.PhysicalExaminations;
 using Pusula.Training.HealthCare.PshychologicalStates;
 using Pusula.Training.HealthCare.FallRisks;
 using System;
+using Pusula.Training.HealthCare.TestProcesses;
+using Pusula.Training.HealthCare.TestValueRanges;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -317,6 +319,73 @@ public class HealthCareDbContext :
                     .HasColumnName(nameof(LabRequest.DoctorId))
                     .IsRequired();
             });
+
+            builder.Entity<TestProcess>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "TestProcesses", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+
+                b.Property(x => x.LabRequestId)
+                    .HasColumnName(nameof(TestProcess.LabRequestId))
+                    .IsRequired();
+
+                b.Property(x => x.TestGroupItemId)
+                    .HasColumnName(nameof(TestProcess.TestGroupItemId))
+                    .IsRequired();
+
+                b.Property(x => x.Status)
+                    .HasColumnName(nameof(TestProcess.Status))
+                    .IsRequired();
+
+                b.Property(x => x.Result)
+                    .HasColumnName(nameof(TestProcess.Result))
+                    .IsRequired(false);
+
+                b.Property(x => x.ResultDate)
+                    .HasColumnName(nameof(TestProcess.ResultDate))
+                    .IsRequired(false);
+
+                b.HasOne(x => x.LabRequest)
+                    .WithMany()
+                    .HasForeignKey(x => x.LabRequestId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                b.HasOne(x => x.TestGroupItem)
+                    .WithMany()
+                    .HasForeignKey(x => x.TestGroupItemId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<TestValueRange>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "TestValueRanges", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+
+                b.Property(x => x.TestGroupItemId)
+                    .HasColumnName(nameof(TestValueRange.TestGroupItemId))
+                    .IsRequired();
+
+                b.Property(x => x.MinValue)
+                    .HasColumnName(nameof(TestValueRange.MinValue))
+                    .IsRequired();
+
+                b.Property(x => x.MaxValue)
+                    .HasColumnName(nameof(TestValueRange.MaxValue))
+                    .IsRequired();
+
+                b.Property(x => x.Unit)
+                    .HasColumnName(nameof(TestValueRange.Unit))
+                    .IsRequired();
+
+                b.HasOne(x => x.TestGroupItem)
+                    .WithMany()
+                    .HasForeignKey(x => x.TestGroupItemId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
 
             builder.Entity<AppointmentType>(b =>
             {

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Pusula.Training.HealthCare.Migrations
 {
     [DbContext(typeof(HealthCareDbContext))]
-    partial class HealthCareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241128213727_TestValueRanges_TestProcess_Added")]
+    partial class TestValueRanges_TestProcess_Added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3243,7 +3246,7 @@ namespace Pusula.Training.HealthCare.Migrations
             modelBuilder.Entity("Pusula.Training.HealthCare.DoctorDepartments.DoctorDepartment", b =>
                 {
                     b.HasOne("Pusula.Training.HealthCare.Departments.Department", "Department")
-                        .WithMany("Doctors")
+                        .WithMany("DoctorDepartments")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3267,13 +3270,11 @@ namespace Pusula.Training.HealthCare.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Volo.Abp.Identity.IdentityUser", "User")
+                    b.HasOne("Volo.Abp.Identity.IdentityUser", null)
                         .WithOne()
                         .HasForeignKey("Pusula.Training.HealthCare.Doctors.Doctor", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.ExaminationDiagnoses.ExaminationDiagnosis", b =>
@@ -3587,7 +3588,7 @@ namespace Pusula.Training.HealthCare.Migrations
 
             modelBuilder.Entity("Pusula.Training.HealthCare.Departments.Department", b =>
                 {
-                    b.Navigation("Doctors");
+                    b.Navigation("DoctorDepartments");
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.Doctors.Doctor", b =>

@@ -120,8 +120,7 @@ public class HealthCareBlazorModule : AbpModule
         context.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF1cX2hIf0x0TXxbf1x0ZF1MZVlbQXFPMyBoS35RckRiW35eeHFQQ2dZVUFy");
-        //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF1cX2hIf0x0TXxbf1x0ZF1MZVlbQXFPMyBoS35RckRiW35eeHFQQ2dZVUFy");
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF1cX2hIfExwWmFZfVpgdl9GZFZTRGYuP1ZhSXxXd0RhUH9ccHBXRmdVUUA=");
         //context.Services.AddSyncfusionBlazor();
         context.Services.AddSyncfusionBlazor();
 

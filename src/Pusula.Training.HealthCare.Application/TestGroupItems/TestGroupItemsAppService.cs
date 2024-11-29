@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.Core;
 using Pusula.Training.HealthCare.Core.Rules.TestGroupItems;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
@@ -23,7 +24,7 @@ public class TestGroupItemsAppService(
     ITestGroupItemRepository testGroupItemRepository,
     ITestGroupItemBusinessRules testGroupItemBusinessRules,
     TestGroupItemManager testGroupItemManager,
-    IDistributedCache<TestGroupItemDownloadTokenCacheItem, string> downloadTokenCache)
+    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache)
     : HealthCareAppService, ITestGroupItemsAppService
 {
     [Authorize(HealthCarePermissions.TestGroupItems.Create)]
@@ -73,7 +74,7 @@ public class TestGroupItemsAppService(
 
         await downloadTokenCache.SetAsync(
             token,
-            new TestGroupItemDownloadTokenCacheItem { Token = token },
+            new DownloadTokenCacheItem { Token = token },
             new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)

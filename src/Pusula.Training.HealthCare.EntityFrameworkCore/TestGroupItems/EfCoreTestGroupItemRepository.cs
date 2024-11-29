@@ -1,8 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
-using Pusula.Training.HealthCare.PatientCompanies;
-using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.TestGroups;
 using System;
 using System.Collections.Generic;

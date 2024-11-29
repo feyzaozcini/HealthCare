@@ -112,6 +112,16 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         examinationsPermission.AddChild(HealthCarePermissions.Examinations.Create, L("Permission:Create"));
         examinationsPermission.AddChild(HealthCarePermissions.Examinations.Edit, L("Permission:Edit"));
         examinationsPermission.AddChild(HealthCarePermissions.Examinations.Delete, L("Permission:Delete"));
+
+        var testProcessesPermission = myGroup.AddPermission(HealthCarePermissions.TestProcesses.Default, L("Permission:TestProcesses"));
+        testProcessesPermission.AddChild(HealthCarePermissions.TestProcesses.Create, L("Permission:Create"));
+        testProcessesPermission.AddChild(HealthCarePermissions.TestProcesses.Edit, L("Permission:Edit"));
+        testProcessesPermission.AddChild(HealthCarePermissions.TestProcesses.Delete, L("Permission:Delete"));
+
+        var testValueRangesPermission = myGroup.AddPermission(HealthCarePermissions.TestValueRanges.Default, L("Permission:TestValueRanges"));
+        testValueRangesPermission.AddChild(HealthCarePermissions.TestValueRanges.Create, L("Permission:Create"));
+        testValueRangesPermission.AddChild(HealthCarePermissions.TestValueRanges.Edit, L("Permission:Edit"));
+        testValueRangesPermission.AddChild(HealthCarePermissions.TestValueRanges.Delete, L("Permission:Delete"));
     }
 
     private static LocalizableString L(string name)
