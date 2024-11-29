@@ -1,11 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
+using Pusula.Training.HealthCare.Exceptions;
+using Pusula.Training.HealthCare.TestValueRanges;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -44,11 +47,25 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
 
-    //Bağlı olduğu entity'ler ile birlikte tüm verileri getirir.
-    public async Task<List<TestProcess>> GetTestProcessesWithNavigationPropertiesAsync()
+    //Seçilen ID'ye göre bağlı olduğu entity'lerin verisini getirir.
+    public async Task<TestProcess> GetWithNavigationPropertiesAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
-        return await query.ToListAsync();
+
+        var testProcess = await query.FirstOrDefaultAsync(tp => tp.Id == id, cancellationToken);
+
+        HealthCareException.ThrowIf(testProcess == null);
+
+        return testProcess!;
+    }
+
+    //Bağlı olduğu entity'ler ile beraber tüm verileri getirir.
+    public async Task<List<TestProcess>> GetListWithNavigationPropertiesAsync(string? filterText = null, Guid? labRequestId = null, Guid? testGroupItemId = null, TestProcessStates? status = null, decimal? result = null, DateTime? resultDate = null, string? sorting = null, int maxResultCount = int.MaxValue, int skipCount = 0, CancellationToken cancellationToken = default)
+    {
+        var query = await GetQueryForNavigationPropertiesAsync();
+        query = ApplyFilter((await GetQueryableAsync()), filterText, labRequestId, testGroupItemId, status, result, resultDate);
+        query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? TestProcessConsts.GetDefaultSorting(false) : sorting);
+        return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
 
     protected virtual async Task<IQueryable<TestProcess>> GetQueryForNavigationPropertiesAsync()

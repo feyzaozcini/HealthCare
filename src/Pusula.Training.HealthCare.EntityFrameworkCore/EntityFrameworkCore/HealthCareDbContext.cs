@@ -64,6 +64,8 @@ public class HealthCareDbContext :
     public DbSet<TestGroup> TestGroups { get; set; } = null!;
     public DbSet<TestGroupItem> TestGroupItems { get; set; } = null!;
     public DbSet<LabRequest> LabRequests { get; set; } = null!;
+    public DbSet<TestValueRange> TestValueRanges { get; set; } = null!;
+    public DbSet<TestProcess> TestProcesses { get; set; } = null!;
     public DbSet<AppointmentType> AppointmentTypes { get; set; } = null!;
     public DbSet<District> Districts { get; set; } = null!;
     public DbSet<Village> Villages { get; set; } = null!;
@@ -267,7 +269,7 @@ public class HealthCareDbContext :
                     .HasColumnName(nameof(TestGroupItem.TurnaroundTime))
                     .IsRequired();
 
-                b.HasOne<TestGroup>()
+                b.HasOne(x=> x.TestGroup)
                     .WithMany()
                     .HasForeignKey(x => x.TestGroupId)
                     .IsRequired()
@@ -279,11 +281,6 @@ public class HealthCareDbContext :
                 b.ToTable(HealthCareConsts.DbTablePrefix + "LabRequests", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
 
-                b.Property(x => x.Name)
-                    .HasColumnName(nameof(LabRequest.Name))
-                    .IsRequired()
-                    .HasMaxLength(LabRequestConsts.NameMaxLength);
-
                 b.Property(x => x.Date)
                     .HasColumnName(nameof(LabRequest.Date))
                     .IsRequired();
@@ -291,13 +288,6 @@ public class HealthCareDbContext :
                 b.Property(x => x.Status)
                     .HasColumnName(nameof(LabRequest.Status))
                     .IsRequired();
-
-                b.HasOne<TestGroupItem>()
-                    .WithMany()
-                    .HasForeignKey(x => x.TestGroupItemId)
-                    .IsRequired()
-                    .OnDelete(DeleteBehavior.Cascade);
-
                 b.Property(x => x.ProtocolId)
                     .HasColumnName(nameof(LabRequest.ProtocolId))
                     .IsRequired();
@@ -305,6 +295,22 @@ public class HealthCareDbContext :
                 b.Property(x => x.DoctorId)
                     .HasColumnName(nameof(LabRequest.DoctorId))
                     .IsRequired();
+
+                b.Property(x => x.Description)
+                    .HasColumnName(nameof(LabRequest.Description))
+                    .IsRequired(false);
+
+                b.HasOne(x => x.Doctor) 
+                    .WithMany()       
+                    .HasForeignKey(x => x.DoctorId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Restrict); 
+
+                b.HasOne(x => x.Protocol)
+                    .WithMany()         
+                    .HasForeignKey(x => x.ProtocolId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Restrict); 
             });
 
             builder.Entity<TestProcess>(b =>

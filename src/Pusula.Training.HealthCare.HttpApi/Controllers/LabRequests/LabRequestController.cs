@@ -38,6 +38,14 @@ public class LabRequestController(ILabRequestsAppService labRequestsAppService)
     [HttpGet]
     public Task<PagedResultDto<LabRequestDto>> GetListAsync(GetLabRequestsInput input) => labRequestsAppService.GetListAsync(input);
 
+    [HttpGet]
+    [Route("get-list-with-navigation")]
+    public Task<PagedResultDto<LabRequestDto>> GetListWithNavigationPropertiesAsync(GetLabRequestsInput input) => labRequestsAppService.GetListWithNavigationPropertiesAsync(input);
+
+    [HttpGet]
+    [Route("get-with-navigation")]
+    public Task<LabRequestDto> GetWithNavigationPropertiesAsync(Guid id) => labRequestsAppService.GetWithNavigationPropertiesAsync(id);
+
     [HttpPut]
     public Task<LabRequestDto> UpdateAsync(LabRequestUpdateDto input) => labRequestsAppService.UpdateAsync(input);
 }

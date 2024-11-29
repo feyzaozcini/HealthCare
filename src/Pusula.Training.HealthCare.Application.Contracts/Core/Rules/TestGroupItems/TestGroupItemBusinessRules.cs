@@ -11,6 +11,4 @@ public interface ITestGroupItemBusinessRules : IBusinessRules
     Task TestGroupItemCodeDuplicatedAsync(string code);
     Task TestGroupItemNameDuplicatedAsync(string name);
     Task ValidateMinimumTurnaroundTimeAsync(decimal turnaroundTime);
-    Task ValidateTestGroupChangeAllowedAsync(Guid testItemId, Guid newGroupId);
-    Task ValidateTestDeletableAsync(Guid testItemId);
 }

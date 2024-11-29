@@ -245,6 +245,16 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<TestProcess, TestProcessesUpdateDto>().ReverseMap();
         CreateMap<TestProcess, TestProcessesDeletedDto>().ReverseMap();
         CreateMap<TestProcess, GetTestProcessesInput>().ReverseMap();
+        CreateMap<TestProcess, GetTestProcessWithNavigationPropertiesDto>()
+            .ForMember(dest => dest.LabRequestCreatedDate, opt=> opt.MapFrom(x=> x.LabRequest.CreationTime))
+            .ForMember(dest => dest.LabRequestStatus, opt=> opt.MapFrom(x=> x.LabRequest.Status))
+            .ForMember(dest => dest.LabRequestDescription, opt=> opt.MapFrom(x=> x.LabRequest.Description))
+            .ForMember(dest => dest.TestGroupItemName, opt=> opt.MapFrom(x=> x.TestGroupItem.Name))
+            .ForMember(dest => dest.TestGroupItemCode, opt=> opt.MapFrom(x=> x.TestGroupItem.Code))
+            .ForMember(dest => dest.TestGroupItemType, opt=> opt.MapFrom(x=> x.TestGroupItem.TestType))
+            .ForMember(dest => dest.TestGroupItemDescription, opt=> opt.MapFrom(x=> x.TestGroupItem.Description))
+            .ForMember(dest => dest.TestGroupItemTurnaroundTime, opt=> opt.MapFrom(x=> x.TestGroupItem.TurnaroundTime))
+            .ReverseMap();
 
     }
 }

@@ -22,24 +22,6 @@ public class TestGroupItemBusinessRules(ITestGroupItemRepository testGroupItemRe
         );
     }
 
-    //Teste ait talepler varsa test silinemez.
-    public async Task ValidateTestDeletableAsync(Guid testItemId)
-    {
-        HealthCareException.ThrowIf(
-            HealthCareDomainErrorCodes.TestCannotBeDeletedDueToRequests,
-            await labRequestRepository.AnyAsync(lr => lr.TestGroupItemId == testItemId)
-        );
-    }
-
-    //Teste ait talepler varsa grubu güncellenemez.
-    public async Task ValidateTestGroupChangeAllowedAsync(Guid testItemId, Guid newGroupId)
-    {
-        HealthCareException.ThrowIf(
-            HealthCareDomainErrorCodes.TestGroupCannotBeChangedDueToActiveRequests,
-            await labRequestRepository.AnyAsync(lr => lr.TestGroupItemId == testItemId)
-        );
-    }
-
     //Testin sonuçlanma süresi 0 saatten az olamaz.
     public Task ValidateMinimumTurnaroundTimeAsync(decimal turnaroundTime)
     {

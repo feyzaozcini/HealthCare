@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Core;
+using Pusula.Training.HealthCare.LabRequests;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
+using Pusula.Training.HealthCare.TestProcesses;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -92,6 +94,40 @@ public class TestValueRangesAppService(
             TotalCount = totalCount,
             Items = ObjectMapper.Map<List<TestValueRange>, List<TestValueRangeDto>>(items)
         };
+    }
+
+    public async Task<PagedResultDto<TestValueRangeDto>> GetListWithNavigationPropertiesAsync(GetTestValueRangesInput input)
+    {
+        var totalCount = await testValueRangeRepository.GetCountAsync(
+            input.FilterText,
+            input.TestGroupItemId,
+            input.MinValue,
+            input.MaxValue,
+            input.Unit
+            );
+
+        var items = await testValueRangeRepository.GetListWithNavigationPropertiesAsync(
+            input.FilterText,
+            input.TestGroupItemId,
+            input.MinValue,
+            input.MaxValue,
+            input.Unit,
+            input.Sorting,
+            input.MaxResultCount,
+            input.SkipCount
+            );
+
+        return new PagedResultDto<TestValueRangeDto>
+        {
+            TotalCount = totalCount,
+            Items = ObjectMapper.Map<List<TestValueRange>, List<TestValueRangeDto>>(items)
+        };
+    }
+
+    public async Task<TestValueRangeDto> GetWithNavigationPropertiesAsync(Guid id)
+    {
+        var testValueRange = await testValueRangeRepository.GetWithNavigationPropertiesAsync(id);
+        return ObjectMapper.Map<TestValueRange, TestValueRangeDto>(testValueRange);
     }
 
     [Authorize(HealthCarePermissions.TestValueRanges.Edit)]

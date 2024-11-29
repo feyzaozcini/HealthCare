@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
+using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
 
 namespace Pusula.Training.HealthCare.Controllers.TestGroupItems;
 
@@ -36,7 +37,7 @@ public class TestGroupItemController(ITestGroupItemsAppService testGroupItemsApp
     [HttpGet]
 
     [Route("with-navigation-properties/{id}")]
-    public Task<TestGroupItemWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id) => testGroupItemsAppService.GetWithNavigationPropertiesAsync(id);
+    public Task<TestGroupItemDto> GetWithNavigationPropertiesAsync(Guid id) => testGroupItemsAppService.GetWithNavigationPropertiesAsync(id);
 
     [HttpPut]
     public Task<TestGroupItemDto> UpdateAsync(TestGroupItemsUpdateDto input) => testGroupItemsAppService.UpdateAsync(input);

@@ -100,6 +100,42 @@ public class TestProcessesAppService(
         };
     }
 
+    public async Task<PagedResultDto<TestProcessDto>> GetListWithNavigationPropertiesAsync(GetTestProcessesInput input)
+    {
+        var totalCount = await testProcessRepository.GetCountAsync(
+            input.FilterText,
+            input.TestGroupItemId,
+            input.LabRequestId,
+            input.Status,
+            input.Result,
+            input.ResultDate
+            );
+
+        var items = await testProcessRepository.GetListWithNavigationPropertiesAsync(
+            input.FilterText,
+            input.TestGroupItemId,
+            input.LabRequestId,
+            input.Status,
+            input.Result,
+            input.ResultDate,
+            input.Sorting,
+            input.MaxResultCount,
+            input.SkipCount
+            );
+
+        return new PagedResultDto<TestProcessDto>
+        {
+            TotalCount = totalCount,
+            Items = ObjectMapper.Map<List<TestProcess>, List<TestProcessDto>>(items)
+        };
+    }
+
+    public async Task<TestProcessDto> GetWithNavigationPropertiesAsync(Guid id)
+    {
+        var testProcess = await testProcessRepository.GetWithNavigationPropertiesAsync(id);
+        return ObjectMapper.Map<TestProcess, TestProcessDto>(testProcess);
+    }
+
     [Authorize(HealthCarePermissions.TestProcesses.Edit)]
     public async Task<TestProcessDto> UpdateAsync(TestProcessesUpdateDto input)
     {

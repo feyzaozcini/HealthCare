@@ -35,6 +35,14 @@ public class TestProcessController(ITestProcessesAppService testProcessesAppServ
     [HttpGet]
     public Task<PagedResultDto<TestProcessDto>> GetListAsync(GetTestProcessesInput input) => testProcessesAppService.GetListAsync(input);
 
+    [HttpGet]
+    [Route("get-list-with-navigation-properties")]
+    public Task<PagedResultDto<TestProcessDto>> GetListWithNavigationPropertiesAsync(GetTestProcessesInput input) => testProcessesAppService.GetListWithNavigationPropertiesAsync(input);
+
+    [HttpGet]
+    [Route("get-with-navigation-properties")]
+    public Task<TestProcessDto> GetWithNavigationPropertiesAsync(Guid id) => testProcessesAppService.GetWithNavigationPropertiesAsync(id);
+
     [HttpPut]
     public Task<TestProcessDto> UpdateAsync(TestProcessesUpdateDto input) => testProcessesAppService.UpdateAsync(input);
 }
