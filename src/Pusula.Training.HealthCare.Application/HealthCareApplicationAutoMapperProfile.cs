@@ -127,9 +127,10 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<City, CityExcelDto>();
         CreateMap<City, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
 
-        //CreateMap<Doctor, DoctorDto>();
+        
         CreateMap<IdentityUser, DoctorDto>()
-           .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id));
+         .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
+         .ForMember(dest => dest.Id, opt => opt.Ignore());
         CreateMap<DoctorWithNavigationProperties, DoctorDto>()
         .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
         .ForMember(dest => dest.SurName, opt => opt.MapFrom(src => src.User.Surname))
@@ -150,6 +151,8 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<DoctorWithNavigationProperties, DoctorWithNavigationPropertiesDto>();
 
         CreateMap<Doctor, DoctorDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.UserId))
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
             .ForMember(dest => dest.SurName, opt => opt.MapFrom(src => src.User.Surname))
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
@@ -158,8 +161,8 @@ public class HealthCareApplicationAutoMapperProfile : Profile
             .ForMember(dest => dest.DoctorDepartments,
                opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()))
             .ForMember(dest => dest.TitleName, opt => opt.MapFrom(src => src.Title.Name));
-            
 
+       
         CreateMap<DoctorCreateDto, Doctor>();
         CreateMap<DoctorWithNavigationProperties, DoctorWithNavigationPropertiesDto>()
    .ForMember(dest => dest.Doctor, opt => opt.MapFrom(src => src.Doctor))

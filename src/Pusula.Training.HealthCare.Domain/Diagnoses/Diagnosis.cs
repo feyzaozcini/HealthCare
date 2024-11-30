@@ -34,7 +34,7 @@ namespace Pusula.Training.HealthCare.Diagnoses
 
             Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.Length(name, nameof(name), DiagnosisConsts.NameMaxLength, DiagnosisConsts.NameMinLength);
-
+            Id = id;
             Code = code;
             Name = name;
             GroupId = groupId;

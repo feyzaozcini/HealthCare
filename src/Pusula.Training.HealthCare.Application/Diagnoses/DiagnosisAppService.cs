@@ -27,7 +27,7 @@ namespace Pusula.Training.HealthCare.Diagnoses
         {
             var totalCount = await diagnosisRepository.GetCountAsync(input.FilterText, input.Name, input.Code, input.GroupId);
 
-            var items = await diagnosisRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.Name, input.Code, input.GroupId,input.Sorting,input.MaxResultCount,input.SkipCount);
+            var items = await diagnosisRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.Code, input.Name, input.GroupId,input.Sorting,input.MaxResultCount,input.SkipCount);
 
             return new PagedResultDto<DiagnosisWithNavigationPropertiesDto>
             {

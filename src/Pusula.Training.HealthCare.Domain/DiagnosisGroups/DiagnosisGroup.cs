@@ -33,7 +33,7 @@ namespace Pusula.Training.HealthCare.DiagnosisGroups
 
             Check.NotNullOrWhiteSpace(name, nameof(name));
             Check.Length(name, nameof(name), DiagnosisGroupConsts.NameMaxLength, DiagnosisGroupConsts.NameMinLength);
-
+            Id = id;
             Code = code;
             Name = name;
         }

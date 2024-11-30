@@ -1,0 +1,40 @@
+﻿@page "/icd-list"
+@using Pusula.Training.HealthCare.Diagnoses
+@using Pusula.Training.HealthCare.DiagnosisGroups
+
+
+@inject IDiagnosisAppService DiagnosisAppService
+@inject IDiagnosisGroupsAppService DiagnosisGroupAppservice
+
+<h3>DiagnosisList</h3>
+
+<div class="d-flex flex-row">
+    <!-- Sol Taraf (Diagnosis Groups) -->
+    <div class="col-2">
+        <SfGrid DataSource="@DiagnosisGroupsList" Width="100%" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
+            <GridColumns>
+                <GridColumn Field="Name" HeaderText="Tanı Grupları" Width="70" HeaderTextAlign="TextAlign.Left">
+                    <Template Context="group">
+                        @if (group is DiagnosisGroupDto diagnosisGroup)
+                        {
+                            <SfButton CssClass="e-link" Content="@diagnosisGroup.Name" OnClick="(() => FilterIcdListByGroup(diagnosisGroup.Id))"></SfButton>
+                        }
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+
+
+    <!-- Sağ Taraf (Diagnosis - ICD List) -->
+    <div class="col-10">
+        <SfGrid DataSource="@IcdList" AllowPaging="true" AllowSorting="true" RowHeight="35" Height="300px">
+            <GridColumns>
+                <GridColumn HeaderText="Kod" Field="Diagnosis.Code" Width="20%" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn HeaderText="Tanı Adı" Field="Diagnosis.Name" Width="80%" TextAlign="TextAlign.Left"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+</div>
+
+

@@ -103,6 +103,13 @@
     "Villages": "Villages",
     "Village": "Village",
     "Menu:TestGroups": "Lab Tests",
-    "Menu:TestRequests": "Test Requests"
+    "Menu:TestRequests": "Test Requests",
+    "Menu:Treatment": "Treatment",
+    "Menu:Definitions": "Definitions",
+    "Menu:IcdList": "ICD List",
+    "Menu:Operations": "Operations",
+    "Menu:DoctorTaskList": "Doctor Task List",
+    "Menu:Reports": "Reports",
+    "Menu:DiagnosisReport": "Diagnosis Report"
   }
 }

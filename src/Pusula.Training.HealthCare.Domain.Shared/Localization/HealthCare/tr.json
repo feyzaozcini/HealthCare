@@ -8,6 +8,13 @@
     "Countries": "Ülkeler",
     "Menu:Countries": "Ülkeler",
     "Menu:TestGroups": "Laboratuvar Testleri",
-    "Menu:TestRequests": "Tetkik İstemler"
+    "Menu:TestRequests": "Tetkik İstemler",
+    "Menu:Treatment": "Tedavi",
+    "Menu:Definitions": "Tanımlar",
+    "Menu:IcdList": "ICD Listesi",
+    "Menu:Operations": "İşlemler",
+    "Menu:DoctorTaskList": "Hekim İş Listesi",
+    "Menu:Reports": "Rapor",
+    "Menu:DiagnosisReport": "Tanı Raporu"
   }
 }
