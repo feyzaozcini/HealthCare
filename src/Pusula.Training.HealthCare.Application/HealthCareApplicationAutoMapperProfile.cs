@@ -82,7 +82,16 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<LabRequest, LabRequestCreateDto>().ReverseMap();
         CreateMap<LabRequest, LabRequestUpdateDto>().ReverseMap();
         CreateMap<LabRequest, LabRequestDeletedDto>().ReverseMap();
-        CreateMap<LabRequest, LabRequestDto>().ReverseMap();
+        CreateMap<LabRequest, LabRequestDto>()
+            .ForMember(dest => dest.ProtocolType, opt=> opt.MapFrom(x => x.Protocol.Type))
+            .ForMember(dest => dest.ProtocolStartDate, opt=> opt.MapFrom(x => x.Protocol.StartTime))
+            .ForMember(dest => dest.ProtocolEndDate, opt=> opt.MapFrom(x => x.Protocol.EndTime))
+            .ForMember(dest => dest.DoctorName, opt=> opt.MapFrom(x => x.Doctor.User.Name))
+            .ForMember(dest => dest.DoctorSurname, opt=> opt.MapFrom(x => x.Doctor.User.Surname))
+            //.ForMember(dest => dest.PatientName, opt=> opt.MapFrom(x => x.Protocol.Patient.FirstName))
+            //.ForMember(dest => dest.PatientSurname, opt=> opt.MapFrom(x => x.Protocol.Patient.LastName))
+            //.ForMember(dest => dest.PatientNo, opt=> opt.MapFrom(x => x.Protocol.Patient.No))
+            .ReverseMap();
 
         CreateMap<TestGroup, GetTestGroupsInput>().ReverseMap();
         CreateMap<TestGroup, GetTestGroupItemsInput>();
@@ -91,13 +100,15 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<TestGroup, TestGroupsDeletedDto>().ReverseMap();
         CreateMap<TestGroup, TestGroupDto>().ReverseMap();
         CreateMap<TestGroup, LookupDto<Guid>>()
-    .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+            .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
 
         CreateMap<TestGroupItem, GetTestGroupItemsInput>().ReverseMap();
         CreateMap<TestGroupItem, TestGroupItemsCreateDto>().ReverseMap();
         CreateMap<TestGroupItem, TestGroupItemsUpdateDto>().ReverseMap();
         CreateMap<TestGroupItem, TestGroupItemsDeletedDto>().ReverseMap();
-        CreateMap<TestGroupItem, TestGroupItemDto>().ReverseMap();
+        CreateMap<TestGroupItem, TestGroupItemDto>()
+            .ForMember(dest => dest.TestGroupName, opt => opt.MapFrom(x => x.TestGroup.Name))
+            .ReverseMap();
         CreateMap<TestGroupItemWithNavigationProperties, TestGroupItemWithNavigationPropertiesDto>();
 
         CreateMap<DepartmentService, DepartmentServiceDto>();
@@ -251,7 +262,14 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<PshychologicalStateUpdateDto, PshychologicalState>().ReverseMap();
         CreateMap<PshychologicalStateWithNavigationDto, PshychologicalStateWithNavigationProperties>().ReverseMap();
 
-        CreateMap<TestValueRange, TestValueRangeDto>().ReverseMap();
+        CreateMap<TestValueRange, TestValueRangeDto>()
+            .ForMember(dest => dest.TestGroupItemName, opt => opt.MapFrom(x=> x.TestGroupItem.Name))
+            .ForMember(dest => dest.TestGroupItemCode, opt => opt.MapFrom(x=> x.TestGroupItem.Code))
+            .ForMember(dest => dest.TestGroupItemTurnaroundTime, opt => opt.MapFrom(x=> x.TestGroupItem.TurnaroundTime))
+            .ForMember(dest => dest.TestGroupItemDescription, opt => opt.MapFrom(x=> x.TestGroupItem.Description))
+            .ForMember(dest => dest.TestGroupName, opt => opt.MapFrom(x=> x.TestGroupItem.TestGroup.Name))
+            .ReverseMap();
+
         CreateMap<TestValueRange, TestValueRangesCreateDto>().ReverseMap();
         CreateMap<TestValueRange, TestValueRangesUpdateDto>().ReverseMap();
         CreateMap<TestValueRange, TestValueRangesDeletedDto>().ReverseMap();

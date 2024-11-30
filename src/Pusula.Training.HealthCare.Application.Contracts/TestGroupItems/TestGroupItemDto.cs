@@ -13,6 +13,7 @@ public class TestGroupItemDto : AuditedEntityDto<Guid>
     [Required]
     public Guid TestGroupId { get; set; }
 
+    public string TestGroupName { get; set; } = null!;
     [Required]
     public string Name { get; private set; } = null!;
 

@@ -1,9 +1,13 @@
 ﻿@page "/lab-request"
+@inject NavigationManager NavigationManager
+
+@using Pusula.Training.HealthCare.Blazor.Containers
+@using Pusula.Training.HealthCare.LabRequests
 @using Pusula.Training.HealthCare.TestGroupItems
 @using Pusula.Training.HealthCare.TestGroups
 @using Syncfusion.Blazor.Calendars
 
-
+@inject LabRequestStateContainer LabRequestStateContainer
 @inject ITestGroupItemsAppService TestGroupItemsAppService
 @inject ITestGroupsAppService TestGroupsAppService
 
@@ -172,15 +176,15 @@
 </div>
 
 @*Requests List*@
-<SfGrid TValue="object" DataSource="new List<object>()" Width="100%" Height="100%">
+<SfGrid DataSource="@LabRequestDetails" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="500px">
     <GridColumns>
-        <GridColumn HeaderText="İstem Tipi" Width="15"></GridColumn>
-        <GridColumn HeaderText="İstem Bilgisi" Width="20"></GridColumn>
-        <GridColumn HeaderText="İsteyen" Width="15"></GridColumn>
-        <GridColumn HeaderText="İstem Tarihi" Width="15"></GridColumn>
-        <GridColumn HeaderText="Tedavi Baş. Tarihi" Width="15"></GridColumn>
-        <GridColumn HeaderText="Tedavi Bit. Tarihi" Width="15"></GridColumn>
-        <GridColumn HeaderText="İstem Durumu" Width="15"></GridColumn>
+        <GridColumn Field="@nameof(LabRequestStateContainer.SelectedLabRequest.ProtocolType)" HeaderText="İstem Tipi" Width="15"></GridColumn>
+        <GridColumn HeaderText="İsteyen Doktor" Width="20">
+            <Template>
+                @($"{LabRequestStateContainer.SelectedLabRequest.DoctorName} {LabRequestStateContainer.SelectedLabRequest.DoctorSurname}")
+            </Template>
+        </GridColumn>
+        <GridColumn Field="@nameof(LabRequestStateContainer.SelectedLabRequest.ProtocolStartDate)" HeaderText="İstem Tarihi" Width="15"></GridColumn>
     </GridColumns>
 </SfGrid>
 

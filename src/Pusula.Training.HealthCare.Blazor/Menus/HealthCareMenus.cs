@@ -21,4 +21,14 @@ public class HealthCareMenus
     public const string IcdList = Definitions + ".IcdList";
     public const string DoctorTaskList = Operations + ".DoctorTaskList";
     public const string DiagnosisReport = Reports + ".DiagnosisReport";
+
+    public const string Laboratory = Prefix + ".Laboratory";
+    public const string LaboratoryDefinitions = Laboratory + ".Definitions";
+    public const string LaboratoryDefinitionsTests = LaboratoryDefinitions + ".Tests";
+    public const string LaboratoryOperations = Laboratory + ".Operations";
+    public const string LaboratoryOperationsProtocolList = LaboratoryOperations + ".ProtocolList";
+    public const string LaboratoryOperationsTestRequests = LaboratoryOperations + ".TestRequests";
+    public const string LaboratoryReports = Laboratory + ".Reports";
+    public const string LaboratoryReportsTestStatistics = LaboratoryReports + ".TestStatistics";
+    public const string LaboratoryReportsTestResults = LaboratoryReports + ".TestResults";
 }

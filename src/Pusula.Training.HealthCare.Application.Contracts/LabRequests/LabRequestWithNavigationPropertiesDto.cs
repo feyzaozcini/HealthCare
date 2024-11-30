@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Volo.Abp.Application.Dtos;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Pusula.Training.HealthCare.LabRequests;
 
-public class LabRequestDto : AuditedEntityDto<Guid>
+public class LabRequestWithNavigationPropertiesDto
 {
     public Guid Id { get; set; }
     //Protocol
@@ -32,7 +35,7 @@ public class LabRequestDto : AuditedEntityDto<Guid>
     [StringLength(LabRequestConsts.DescriptionMaxLength)]
     public string? Description { get; set; }
 
-    public LabRequestDto()
+    public LabRequestWithNavigationPropertiesDto()
     {
     }
 }

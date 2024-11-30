@@ -15,6 +15,11 @@
     "Menu:Operations": "İşlemler",
     "Menu:DoctorTaskList": "Hekim İş Listesi",
     "Menu:Reports": "Rapor",
-    "Menu:DiagnosisReport": "Tanı Raporu"
+    "Menu:DiagnosisReport": "Tanı Raporu",
+    "Menu:Laboratory": "Laboratuvar",
+    "Menu:Tests": "Tetkikler",
+    "Menu:ProtocolList": "Protokol Listesi",
+    "Menu:TestStatistics": "Tetkik İstatistik Raporu",
+    "Menu:TestResults": "Tetkik Sonuç Raporu"
   }
 }
