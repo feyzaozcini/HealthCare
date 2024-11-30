@@ -11,4 +11,14 @@ public class HealthCareMenus
     public const string Departments = Prefix + ".Departments";
     public const string TestGroups = Prefix + ".TestGroups";
     public const string TestRequests = Prefix + ".TestRequests";
+   
+    public const string Treatment = Prefix + ".Treatment";
+    public const string Definitions = Treatment + ".Definitions";
+    public const string Operations = Treatment + ".Operations";
+    public const string Reports = Treatment + ".Reports";
+
+    // Alt sayfalar
+    public const string IcdList = Definitions + ".IcdList";
+    public const string DoctorTaskList = Operations + ".DoctorTaskList";
+    public const string DiagnosisReport = Reports + ".DiagnosisReport";
 }

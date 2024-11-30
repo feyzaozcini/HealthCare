@@ -3,6 +3,8 @@ using Pusula.Training.HealthCare.AppointmentTypes;
 using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Diagnoses;
+using Pusula.Training.HealthCare.DiagnosisGroups;
 using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.PatientCompanies;
@@ -36,7 +38,9 @@ namespace Pusula.Training.HealthCare
         ITitleRepository titleRepository,
         IAppointmentTypeRepository appointmentTypeRepository,
         IPatientCompanyRepository patientCompanyRepository,
-        IGuidGenerator guidGenerator) : IDataSeedContributor, ITransientDependency
+        IGuidGenerator guidGenerator,
+        DiagnosisGroupDataSeeder diagnosisGroupDataSeeder,
+        DiagnosisDataSeeder diagnosisDataSeeder) : IDataSeedContributor, ITransientDependency
     {
         public async Task SeedAsync(DataSeedContext context)
         {
@@ -56,6 +60,9 @@ namespace Pusula.Training.HealthCare
             var titles = await SeedTitlesAsync();
             //var appointmentTypes = await SeedAppointmentTypesAsync();
             var patientCompanies = await SeedPatientCompaniesAsync();
+
+            var diagnosisGroupKeys = await diagnosisGroupDataSeeder.SeedDiagnosisGroupsAsync();
+            await diagnosisDataSeeder.SeedDiagnosesAsync(diagnosisGroupKeys);
         }
 
         #region Countries

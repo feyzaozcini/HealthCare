@@ -73,9 +73,9 @@ namespace Pusula.Training.HealthCare.Diagnoses
             string? name = null,
             Guid? groupId = null) =>
                 query
-                    .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Name.StartsWith(filterText!) || e.Code.StartsWith(filterText!))
-                    .WhereIf(!string.IsNullOrWhiteSpace(code), e => e.Code.StartsWith(code!))
-                    .WhereIf(!string.IsNullOrWhiteSpace(name), e => e.Name.StartsWith(name!))
+                    .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Name.StartsWith(filterText!) || e.Code.Contains(filterText!))
+                    .WhereIf(!string.IsNullOrWhiteSpace(code), e => e.Code.Contains(code!))
+                    .WhereIf(!string.IsNullOrWhiteSpace(name), e => e.Name.Contains(name!))
                     .WhereIf(groupId.HasValue, e => e.GroupId == groupId);
 
         protected virtual IQueryable<DiagnosisWithNavigationProperties> ApplyFilter(
@@ -86,7 +86,7 @@ namespace Pusula.Training.HealthCare.Diagnoses
             Guid? groupId = null) =>
                 query
                     .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Diagnosis.Name.StartsWith(filterText!) || e.Diagnosis.Code.StartsWith(filterText!))
-                    .WhereIf(!string.IsNullOrWhiteSpace(code), e => e.Diagnosis.Code.StartsWith(code!))
+                    .WhereIf(!string.IsNullOrWhiteSpace(code), e => e.Diagnosis.Code.Contains(code!))
                     .WhereIf(!string.IsNullOrWhiteSpace(name), e => e.Diagnosis.Name.StartsWith(name!))
                     .WhereIf(groupId.HasValue, e => e.Diagnosis.GroupId == groupId);
 

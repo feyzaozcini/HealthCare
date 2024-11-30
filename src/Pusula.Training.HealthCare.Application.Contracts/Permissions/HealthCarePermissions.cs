@@ -153,43 +153,6 @@ public static class HealthCarePermissions
         public const string Delete = Default + ".Delete";
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public static class DiagnosisGroups
     {
         public const string Default = GroupName + ".DiagnosisGroups";

@@ -77,6 +77,48 @@ public class HealthCareMenuContributor : IMenuContributor
                 requiredPermissionName: HealthCarePermissions.TestGroups.Default)
         );
 
+        // Tedavi başlığı ve alt menüleri
+        var treatmentMenu = new ApplicationMenuItem(
+            HealthCareMenus.Treatment,
+            l["Menu:Treatment"],
+            icon: "fa fa-heartbeat"
+        );
+
+        treatmentMenu.AddItem(new ApplicationMenuItem(
+            HealthCareMenus.Definitions,
+            l["Menu:Definitions"],
+            icon: "fa fa-cogs"
+        ).AddItem(new ApplicationMenuItem(
+            HealthCareMenus.IcdList,
+            l["Menu:IcdList"],
+            "/icd-list",
+            icon: "fa fa-list"
+        )));
+
+        treatmentMenu.AddItem(new ApplicationMenuItem(
+            HealthCareMenus.Operations,
+            l["Menu:Operations"],
+            icon: "fa fa-tasks"
+        ).AddItem(new ApplicationMenuItem(
+            HealthCareMenus.DoctorTaskList,
+            l["Menu:DoctorTaskList"],
+            "/doctor-task-list",
+            icon: "fa fa-user-md"
+        )));
+
+        treatmentMenu.AddItem(new ApplicationMenuItem(
+            HealthCareMenus.Reports,
+            l["Menu:Reports"],
+            icon: "fa fa-file-alt"
+        ).AddItem(new ApplicationMenuItem(
+            HealthCareMenus.DiagnosisReport,
+            l["Menu:DiagnosisReport"],
+            "/diagnosis-report",
+            icon: "fa fa-file"
+        )));
+
+        context.Menu.AddItem(treatmentMenu);
+
         return Task.CompletedTask;
     }
 

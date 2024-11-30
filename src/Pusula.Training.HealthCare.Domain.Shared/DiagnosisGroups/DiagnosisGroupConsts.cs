@@ -9,7 +9,7 @@ namespace Pusula.Training.HealthCare.DiagnosisGroups
 {
     public class DiagnosisGroupConsts
     {
-        private const string DefaultSorting = "{0}Code desc";
+        private const string DefaultSorting = "{0}Code asc";
         public static string GetDefaultSorting(bool withEntityName)
         {
             return string.Format(DefaultSorting, withEntityName ? "DiagnosisGroup." : string.Empty);
