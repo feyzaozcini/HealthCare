@@ -9,18 +9,6 @@ public class HealthCareMenus
     public const string Patients = Prefix + ".Patients";
     public const string Protocols = Prefix + ".Protocols";
     public const string Departments = Prefix + ".Departments";
-    public const string TestGroups = Prefix + ".TestGroups";
-    public const string TestRequests = Prefix + ".TestRequests";
-   
-    public const string Treatment = Prefix + ".Treatment";
-    public const string Definitions = Treatment + ".Definitions";
-    public const string Operations = Treatment + ".Operations";
-    public const string Reports = Treatment + ".Reports";
-
-    // Alt sayfalar
-    public const string IcdList = Definitions + ".IcdList";
-    public const string DoctorTaskList = Operations + ".DoctorTaskList";
-    public const string DiagnosisReport = Reports + ".DiagnosisReport";
 
     public const string Laboratory = Prefix + ".Laboratory";
     public const string LaboratoryDefinitions = Laboratory + ".Definitions";
@@ -31,4 +19,14 @@ public class HealthCareMenus
     public const string LaboratoryReports = Laboratory + ".Reports";
     public const string LaboratoryReportsTestStatistics = LaboratoryReports + ".TestStatistics";
     public const string LaboratoryReportsTestResults = LaboratoryReports + ".TestResults";
+
+    public const string Treatment = Prefix + ".Treatment";
+    public const string Definitions = Treatment + ".Definitions";
+    public const string Operations = Treatment + ".Operations";
+    public const string Reports = Treatment + ".Reports";
+
+    // Alt sayfalar
+    public const string IcdList = Definitions + ".IcdList";
+    public const string DoctorTaskList = Operations + ".DoctorTaskList";
+    public const string DiagnosisReport = Reports + ".DiagnosisReport";
 }

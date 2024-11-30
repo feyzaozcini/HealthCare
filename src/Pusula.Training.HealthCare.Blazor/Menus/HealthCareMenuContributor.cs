@@ -35,8 +35,6 @@ public class HealthCareMenuContributor : IMenuContributor
             )
         );
 
-
-
         ConfigureTenantMenu(administration, MultiTenancyConsts.IsEnabled);
 
 
