@@ -71,7 +71,7 @@ public class EfCoreTestValueRangeRepository(IDbContextProvider<HealthCareDbConte
         CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
-        query = ApplyFilter((await GetQueryableAsync()), filterText, testGroupItemId, minValue, maxValue, unit);
+        //query = ApplyFilter((await GetQueryableAsync()), filterText, testGroupItemId, minValue, maxValue, unit);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? TestValueRangeConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
@@ -84,19 +84,24 @@ public class EfCoreTestValueRangeRepository(IDbContextProvider<HealthCareDbConte
     }
 
     protected virtual IQueryable<TestValueRange> ApplyFilter(
-        IQueryable<TestValueRange> query,
-        string? filterText = null,
-        Guid? testGroupItemId = null,
-        decimal? minValue = null,
-        decimal? maxValue = null,
-        TestUnitTypes? unit = null
-    )
+    IQueryable<TestValueRange> query,
+    string? filterText = null,
+    Guid? testGroupItemId = null,
+    decimal? minValue = null,
+    decimal? maxValue = null,
+    TestUnitTypes? unit = null
+)
     {
         return query
             .WhereIf(!string.IsNullOrWhiteSpace(filterText), tvr =>
                 (tvr.MinValue.ToString().Contains(filterText!) ||
-                tvr.MaxValue.ToString().Contains(filterText!) ||
-                tvr.Unit.ToString().Contains(filterText!))
+                 tvr.MaxValue.ToString().Contains(filterText!) ||
+                 tvr.Unit.ToString().Contains(filterText!) ||
+                 (tvr.TestGroupItem != null && tvr.TestGroupItem.Name.Contains(filterText!)) || 
+                 (tvr.TestGroupItem != null && tvr.TestGroupItem.Code.Contains(filterText!)) || 
+                 (tvr.TestGroupItem != null && tvr.TestGroupItem.Description != null && tvr.TestGroupItem.Description.Contains(filterText!)) || 
+                 (tvr.TestGroupItem != null && tvr.TestGroupItem.TestGroup != null && tvr.TestGroupItem.TestGroup.Name.Contains(filterText!)) 
+                )
             )
             .WhereIf(testGroupItemId.HasValue && testGroupItemId != Guid.Empty, tvr => tvr.TestGroupItemId == testGroupItemId!.Value)
             .WhereIf(minValue.HasValue, tvr => tvr.MinValue == minValue!.Value)

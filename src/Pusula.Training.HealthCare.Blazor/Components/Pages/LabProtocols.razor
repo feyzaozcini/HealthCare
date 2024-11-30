@@ -1,0 +1,47 @@
+﻿@page "/lab-protocols"
+
+@using Pusula.Training.HealthCare.Blazor.Containers
+@using Pusula.Training.HealthCare.LabRequests
+
+@inject LabRequestStateContainer LabRequestStateContainer
+@inject NavigationManager NavigationManager
+@inject ILabRequestsAppService LabRequestsAppService
+
+<div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+    <div class="flex-grow-1 d-flex justify-content-center">
+        <SfTextBox Placeholder="Protokol Ara"
+                   FloatLabelType="FloatLabelType.Never"
+                   @bind-Value="LabRequestsFilter!.FilterText"
+                   Width="50%"
+                   Input="OnInputChange">
+        </SfTextBox>
+
+    </div>
+    <div>
+        @if (SelectedLabRequestId != Guid.Empty)
+        {
+            <SfButton OnClick="RedirectToTestRequest" CssClass="e-medium e-success" Content="Test İste"></SfButton>
+        }
+    </div>
+</div>
+
+<SfGrid DataSource="@LabRequestsList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
+    <GridEvents TValue="LabRequestDto" RowSelected="RowSelectHandler"></GridEvents>
+    <GridColumns>
+        <GridColumn Field=@nameof(LabRequestDto.ProtocolType) HeaderText="Protokol Tipi" Width="25"></GridColumn>
+        <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç T." Width="25" TextAlign="TextAlign.Left"></GridColumn>
+        <GridColumn Field=@nameof(LabRequestDto.ProtocolEndDate) HeaderText="Protokol Bitiş T." Width="25" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(LabRequestDto.DoctorName) HeaderText="Doktor Adı" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(LabRequestDto.DoctorSurname) HeaderText="Doktor Soyadı" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(LabRequestDto.Status) HeaderText="Protokol Durumu" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(LabRequestDto.Description) HeaderText="Açıklama" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@* YAPILACAKLAR
+
+- Patient entity'si güncellendikten sonra verileri çekilecek.
+- Test iste butonuna tıklandığında bir modal açılacak ve özet bilgiler gösterildikten sonra, tetkik istem sayfasına git veya iptal et butonu olacak.
+- Eğer seçili bir lab request yoksa, tetkik istem sayfası verisiz olarak gösterilecek veya "Bu sayfayı görüntülemek için bir protokol seçin" uyarısı çıkacak ve "/lab-protocols" sayfasına yönlendirecek.
+
+*@

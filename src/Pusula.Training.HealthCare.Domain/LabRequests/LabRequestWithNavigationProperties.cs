@@ -1,38 +1,22 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using Volo.Abp.Application.Dtos;
+﻿using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.Protocols;
+using System;
 
 namespace Pusula.Training.HealthCare.LabRequests;
 
-public class LabRequestDto : AuditedEntityDto<Guid>
+public class LabRequestWithNavigationProperties
 {
     public Guid Id { get; set; }
-    //Protocol
-    [Required]
     public Guid ProtocolId { get; set; }
     public string ProtocolType { get; set; }
     public DateTime? ProtocolStartDate { get; set; }
     public string? ProtocolEndDate { get; set; }
 
-    //Patient
-
-    //public string PatientName { get; set; }
-    //public string PatientSurname { get; set; }
-    //public int PatientNo { get; set; }
-
-    //Doctor
-    [Required]
     public Guid DoctorId { get; set; }
     public string? DoctorName { get; set; }
     public string? DoctorSurname { get; set; }
-    [Required]
-    public DateTime Date { get; set; }
-    [Required]
-    public RequestStatusEnum Status { get; set; }
-    [StringLength(LabRequestConsts.DescriptionMaxLength)]
-    public string? Description { get; set; }
 
-    public LabRequestDto()
-    {
-    }
+    public DateTime Date { get; set; }
+    public RequestStatusEnum Status { get; set; }
+    public string? Description { get; set; }
 }

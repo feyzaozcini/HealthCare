@@ -8,6 +8,14 @@
     "Countries": "Ülkeler",
     "Menu:Countries": "Ülkeler",
     "Menu:TestGroups": "Laboratuvar Testleri",
-    "Menu:TestRequests": "Tetkik İstemler"
+    "Menu:TestRequests": "Tetkik İstemler",
+    "Menu:Laboratory": "Laboratuvar",
+    "Menu:Definitions": "Tanımlar",
+    "Menu:Tests": "Tetkikler",
+    "Menu:Operations": "İşlemler",
+    "Menu:ProtocolList": "Protokol Listesi",
+    "Menu:Reports": "Raporlar",
+    "Menu:TestStatistics": "Tetkik İstatistik Raporu",
+    "Menu:TestResults": "Tetkik Sonuç Raporu"
   }
 }

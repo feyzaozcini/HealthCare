@@ -103,6 +103,14 @@
     "Villages": "Villages",
     "Village": "Village",
     "Menu:TestGroups": "Lab Tests",
-    "Menu:TestRequests": "Test Requests"
+    "Menu:TestRequests": "Test Requests",
+    "Menu:Laboratory": "Laboratory",
+    "Menu:Definitions": "Definitions",
+    "Menu:Tests": "Tests",
+    "Menu:Operations": "Operations",
+    "Menu:ProtocolList": "Protocol List",
+    "Menu:Reports": "Reports",
+    "Menu:TestStatistics": "Test Statistics Report",
+    "Menu:TestResults": "Test Results Report"
   }
 }
