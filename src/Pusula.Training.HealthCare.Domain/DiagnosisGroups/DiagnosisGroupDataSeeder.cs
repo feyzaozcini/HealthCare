@@ -8,7 +8,7 @@ using Volo.Abp.Guids;
 
 namespace Pusula.Training.HealthCare.DiagnosisGroups
 {
-    internal class DiagnosisGroupDataSeeder(IDiagnosisGroupRepository DiagnosisGroupRepository,
+    public class DiagnosisGroupDataSeeder(IDiagnosisGroupRepository DiagnosisGroupRepository,
         IGuidGenerator GuidGenerator) : ITransientDependency
     {
         public async Task<List<Guid>> SeedDiagnosisGroupsAsync()
