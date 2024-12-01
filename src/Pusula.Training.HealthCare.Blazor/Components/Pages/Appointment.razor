@@ -9,61 +9,65 @@
 @using Syncfusion.Blazor.Inputs
 @using Pusula.Training.HealthCare.Appointments
 @using Pusula.Training.HealthCare.Patients
+@using Pusula.Training.HealthCare.Departments
+@using Pusula.Training.HealthCare.Doctors
 @using Pusula.Training.HealthCare.Blazor.Containers
 @using Pusula.Training.HealthCare.Shared
 
 @inject PatientStateContainer StateService
-@inject DoctorStateContainer DoctorStateService
-@inject DepartmentStateContainer DepartmentStateService
 @inject IAppointmentsAppService AppointmentsAppService
-<div class="card patient-card mb-3">
-    <div class="row g-0 align-items-center" style="height: 150px; max-width: 1100px; margin: auto;">
-        <!-- Avatar Bölümü -->
-        <div class="col-md-2 d-flex align-items-center justify-content-start">
-            <img src="/images/main/avatar.jpg" class="img-fluid rounded-circle avatar" alt="Patient Avatar" />
-        </div>
+@inject IDepartmentsAppService DepartmentsAppService
+@inject IDoctorsAppService DoctorsAppService
 
-        <!-- Hasta Bilgileri -->
-        <div class="col-md-7">
-            <div class="card-body">
-                <h5 class="card-title mb-1">@StateService.SelectedPatient.FirstName @StateService.SelectedPatient.LastName</h5>
-                <p class="card-text text-muted">@StateService.SelectedPatient.IdentityNumber</p>
 
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <span class="fw-bold">Birthdate:</span> @StateService.SelectedPatient.BirthDate.ToShortDateString()
-                        (@(DateTime.Now.Year - StateService.SelectedPatient.BirthDate.Year -
-                           (DateTime.Now.DayOfYear < StateService.SelectedPatient.BirthDate.DayOfYear ? 1 : 0)) Age)
-                    </div>
+<div class="stepper-container" style="max-width: 1500px; margin: 0 auto; padding: 40px;">
+    <div class="card">
+        <div class="card-body">
 
-                    <div class="col-md-6 mb-2">
-                        <span class="fw-bold">Email:</span> @StateService.SelectedPatient.Email
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <span class="fw-bold">Mobile Phone:</span> @StateService.SelectedPatient.MobilePhoneNumber
+            <!-- Hasta Seçim Alanları -->
+            @*<h3 class="card-title text-center">Doktor ve Departman Seçimi</h3>*@
+            <!-- Seçilen Veriler -->
+
+           @* <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card selected-card">
+                        <h5>Seçilenler</h5>
+                        <p><strong>Doktor:</strong> @($"{SelectedDoctor?.Title.Name} {SelectedDoctor?.User.Name} {SelectedDoctor?.User.Surname}")</p>
+                        <p><strong>Departman:</strong> @SelectedDepartment?.Name</p>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="ClearSelections" style="width: 100%;">Seçimi Temizle</button>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div> *@
 
-        <!-- Doktor ve Departman Bilgileri -->
-
-        <div class="col-md-3 text-start">
-            <div class="card-body">
-                <h6 class="fw-bold">Doctor Information</h6>
-                <p>
-                    <span class="fw-bold">Doctor:</span> @DoctorStateService.SelectedDoctor.Title.Name @DoctorStateService.SelectedDoctor.User.Name @DoctorStateService.SelectedDoctor.User.Surname
-                </p>
-                <p>
-                    <span class="fw-bold">Department:</span> @DepartmentStateService.SelectedDepartment.Name
-                </p>
+            <!-- Doktor ve Departman Seçim Alanları -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h4>Departman</h4>
+                    <SfDropDownList TValue="Guid" 
+                        TItem="DepartmentDto" 
+                        Placeholder="Departman seçiniz..." 
+                        DataSource="@FilteredDepartments">
+                        <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="Guid" TItem="DepartmentDto" ValueChange="OnDepartmentValueChange"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
+                <div class="col-md-6">
+                    <h4>Doktor</h4>
+                    <SfDropDownList DataSource="@FilteredDoctors"
+                                    Placeholder="Doktor seçiniz..."
+                                    TItem="DoctorWithNavigationPropertiesDto"
+                                    TValue="Guid">
+                        <DropDownListFieldSettings Value="Doctor.Id" Text="FullName"></DropDownListFieldSettings>
+                        <DropDownListEvents TValue="Guid" TItem="DoctorWithNavigationPropertiesDto" ValueChange="OnDoctorValueChange"></DropDownListEvents>
+                    </SfDropDownList>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<SfSchedule TValue="FlatAppointmentDto" Width="100%" Height="650px"  @ref="SfScheduleInstance" >
-    <ScheduleTemplates>
+<SfSchedule TValue="FlatAppointmentDto" Width="100%" Height="650px" @bind-CurrentView="@CurrentView" @ref="SfScheduleInstance">
+    <ScheduleTemplates >
         <EditorTemplate>
             <table class="custom-event-editor" width="100%" cellpadding="5">
                 <tbody>                    <tr>
@@ -85,7 +89,7 @@
                     <tr>
                         <td class="e-textlabel">End Date</td>
                         <td colspan="4">
-                            <SfDateTimePicker @bind-Value="@NewAppointment.EndDate" TValue="DateTime"></SfDateTimePicker>
+                            <SfDateTimePicker @bind-Value="@NewAppointment.EndDate" TValue="DateTime" Validation="@ValidationRules"></SfDateTimePicker>
                         </td>
                     </tr>
                     <tr>
@@ -104,14 +108,12 @@
                             <SfTextBox Multiline="true" @bind-Value="@NewAppointment.Note"></SfTextBox>
                         </td>
                     </tr>
-                    <tr>
-                        <td colspan="5">
-                            <SfButton OnClick="CreateAndCloseModal">Create Appointment</SfButton>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </EditorTemplate>
+        <EditorFooterTemplate>
+            <button id="saveButton" class="e-control e-btn e-primary" data-ripple="true" @onclick="CreateAndCloseModal">Save</button>
+        </EditorFooterTemplate>
     </ScheduleTemplates>
 
     <ScheduleEventSettings TValue="FlatAppointmentDto" DataSource="@AppointmentList" EnableTooltip="true">
@@ -126,14 +128,29 @@
 
     private SfSchedule<FlatAppointmentDto> SfScheduleInstance;
     //private DateTime CurrentDate { get; set; } = DateTime.Now;
-    private AppointmentCreateDto NewAppointment { get; set; } = new AppointmentCreateDto();
+    View CurrentView = View.WorkWeek;
+    Syncfusion.Blazor.Schedule.ValidationRules ValidationRules = new Syncfusion.Blazor.Schedule.ValidationRules { Required = true };
+    //private AppointmentCreateDto NewAppointment { get; set; } = new AppointmentCreateDto();
+    private AppointmentUpdateDto EditAppointment { get; set; } = new AppointmentUpdateDto();
     private IReadOnlyList<LookupDto<Guid>> PatientsCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<Guid>> DoctorsCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<Guid>> DepartmentsCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<Guid>> AppointmentTypesCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<AppointmentStatus>> AppointmentStatusCollection { get; set; } = new List<LookupDto<AppointmentStatus>>();
     private List<FlatAppointmentDto> AppointmentList { get; set; } = new List<FlatAppointmentDto>();
-    
+    private AppointmentCreateDto NewAppointment { get; set; } = new AppointmentCreateDto
+        {
+            StartDate = DateTime.Now, // Bugünün tarihi
+            EndDate = DateTime.Now.AddHours(1) // 1 saat sonrası
+        };
+    private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
+    private List<DepartmentDto> AllDepartments = new();
+
+    private DoctorWithNavigationPropertiesDto SelectedDoctor;
+    private DepartmentDto SelectedDepartment;
+
+    private List<DepartmentDto> FilteredDepartments = new();
+    private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -149,58 +166,132 @@
             .Select(b => new LookupDto<AppointmentStatus> { Id = b, DisplayName = b.ToString() })
             .ToList();
 
-        await LoadAppointmentsAsync();
+        await LoadInitialDataAsync();
     }
+    private async Task LoadInitialDataAsync()
+    {
 
+        var departmentResult = await DepartmentsAppService.GetListAsync(new GetDepartmentsInput());
+        if (departmentResult?.Items != null)
+        {
+            FilteredDepartments = departmentResult.Items.ToList();
+        }
+
+        var doctorResult = await DoctorsAppService.GetListAsync(new GetDoctorsInput());
+        if(doctorResult?.Items != null)
+        {
+            AllDoctors = doctorResult.Items.ToList();
+            FilteredDoctors = AllDoctors;
+        }
+    }
     private async Task LoadAppointmentsAsync()
     {
         var input = new GetAppointmentsInput
-            {
-                StartDate = null,
-                EndDate = null,
-                Note = null,
-                AppointmentStatus = null, //
-                PatientId = null,
-                //DoctorId = null,
-                DepartmentId = null,
-                AppointmentTypeId = null,
-                //PatientId = StateService.SelectedPatient.Id, 
-                DoctorId = DoctorStateService.SelectedDoctor.Doctor.Id,//Doctorun randevularını getirme filtresi
-                //DepartmentId = DepartmentStateService.SelectedDepartment.Id
-            };
+                {
+                    StartDate = null,
+                    EndDate = null,
+                    Note = null,
+                    AppointmentStatus = null, 
+                    PatientId = null,
+                    AppointmentTypeId = null,
+                    DoctorId = SelectedDoctor?.Doctor?.Id, //Doctorun randevularını getirme filtresi
+                    DepartmentId = SelectedDepartment?.Id //Departmanın randevularını getirme filtresi
+                };
 
         var result = await AppointmentsAppService.GetListAsync(input);
 
         AppointmentList = result.Items.Select(a => new FlatAppointmentDto
-            {
-                Id = a.Appointment.Id,
-                Subject = a.AppointmentType.Name,
-                StartTime = a.Appointment.StartDate,
-                EndTime = a.Appointment.EndDate
-            }).ToList();
+                {
+                    Id = a.Appointment.Id.GetHashCode(),
+                    Subject = a.AppointmentType.Name,
+                    StartTime = a.Appointment.StartDate,
+                    EndTime = a.Appointment.EndDate
+                }).ToList();
 
+    }
+    private async Task OnDepartmentValueChange(ChangeEventArgs<Guid, DepartmentDto> args)
+    {
+        // Seçilen departmanın Id'si
+        Guid selectedDepartmentId = args.Value;
+
+        // Seçilen departman objesi
+        DepartmentDto selectedDepartment = FilteredDepartments.FirstOrDefault(d => d.Id == selectedDepartmentId);
+
+        if (selectedDepartment != null)
+        {
+            await SelectDepartmentAsync(selectedDepartment);
+        }
+    }
+
+    private async Task OnDoctorValueChange(ChangeEventArgs<Guid, DoctorWithNavigationPropertiesDto> args)
+    {
+        // Seçilen departmanın Id'si
+        Guid selectedDoctorId = args.Value;
+
+        // Seçilen departman objesi
+        DoctorWithNavigationPropertiesDto selectedDoctor = FilteredDoctors.FirstOrDefault(d => d.Doctor.Id == selectedDoctorId);
+
+        if (selectedDoctor != null)
+        {
+            await SelectDoctorAsync(selectedDoctor);
+        }
+    }
+
+    private async Task SelectDoctorAsync(DoctorWithNavigationPropertiesDto doctor)
+    {
+        SelectedDoctor = doctor;
+        await LoadAppointmentsAsync();  //Seçilen doktroun randevularını getirmek için çağırıldı
+        await Task.CompletedTask;
+    }
+    private async Task SelectDepartmentAsync(DepartmentDto department)
+    {
+        SelectedDepartment = department;
+
+        if (department != null)
+        {
+            // Seçilen departmana ait doktorları listelemek için
+            var departmentWithDoctors = await DepartmentsAppService.GetDoctorsByDepartmentIdAsync(department.Id);
+            if (departmentWithDoctors != null)
+            {
+                FilteredDoctors = departmentWithDoctors
+                    .Select(dd => new DoctorWithNavigationPropertiesDto
+                        {
+                            Doctor = dd.Doctor,
+                            Title = dd.Title,
+                            User = dd.User,
+                            FullName = $"{dd.Title.Name} {dd.User.Name} {dd.User.Surname}"
+                        })
+                    .ToList();
+
+                await LoadAppointmentsAsync();
+            }
+        }
+        else
+        {
+            FilteredDoctors.Clear();
+        }
+        await Task.CompletedTask;
     }
 
     private async Task CreateAndCloseModal()
     {
         await CreateAppointment();// Randevu oluşturma işlemini çağır
         await LoadAppointmentsAsync(); // Verileri yeniden yükle
-       // await SfScheduleInstance.Refresh(); // Takvimi güncelle
+                                       // await SfScheduleInstance.Refresh(); // Takvimi güncelle
         SfScheduleInstance.CloseEditor(); // Modalı kapat
+
     }
 
     private async Task CreateAppointment()
     {
-        /*DateTime Date = this.SfScheduleInstance.SelectedDate;
-        DateTime Start = new DateTime(Date.Year, Date.Month, Date.Day, DateTime.Now.Hour, 0, 0);*/
         try
         {
-            NewAppointment.DoctorId = DoctorStateService.SelectedDoctor.Doctor.Id;
+            NewAppointment.DoctorId = SelectedDoctor.Doctor.Id;
             NewAppointment.PatientId = StateService.SelectedPatient.Id;
-            NewAppointment.DepartmentId = DepartmentStateService.SelectedDepartment.Id;
-
-            // Call your service to create the appointment
+            NewAppointment.DepartmentId = SelectedDepartment.Id;
+                                                               // Call your service to create the appointment
             var createdAppointment = await AppointmentsAppService.CreateAsync(NewAppointment);   
+       
         }
         catch (Exception ex)
         {
@@ -228,9 +319,23 @@
     {
         AppointmentTypesCollection = (await AppointmentsAppService.GetAppointmentTypeLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
     }
+
+    public class FlatAppointmentDto
+    {
+        public int Id { get; set; }
+        public string Subject { get; set; }
+        public string Location { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public string Description { get; set; }
+        public bool IsAllDay { get; set; }
+        public bool IsBlock { get; set; }
+        public string RecurrenceRule { get; set; }
+        public string RecurrenceException { get; set; }
+        public Nullable<int> RecurrenceID { get; set; }
+    }
+
 }
-
-
 
 <style>
     .patient-card {

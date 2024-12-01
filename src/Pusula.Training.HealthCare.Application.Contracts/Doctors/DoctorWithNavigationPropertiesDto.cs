@@ -17,7 +17,6 @@ namespace Pusula.Training.HealthCare.Doctors
 
         public IdentityUserDto User { get; set; } = null!;
 
-        //public List<Guid> DoctorDepartments { get; set; }
-
+        public string FullName { get; set; } = null!;
     }
 }

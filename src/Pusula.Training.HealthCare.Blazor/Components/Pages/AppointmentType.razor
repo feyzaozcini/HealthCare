@@ -1,47 +1,151 @@
 ﻿@page "/appointment-types"
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.DropDowns
 @using Pusula.Training.HealthCare.AppointmentTypes
 @using Pusula.Training.HealthCare.Doctors
+
+@inject IDoctorsAppService DoctorsAppService
 @inject IAppointmentTypeAppService AppointmentTypeAppService
 
+<div class="row mb-2">
+    <div class="col text-end">
+        <button class="btn btn-success" @onclick="OpenAddModal">+ Add Appointment Type</button>
+    </div>
+</div>
 <div class="col-lg-12 control-section">
     <div class="content-wrapper">
-        <SfGrid DataSource="@AppointmentTypeList" AllowPaging="true" Toolbar="@(new string[] {"Add", "Edit", "Delete"})">
-            <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="@EditMode.Dialog" />
+        <SfGrid DataSource="@AppointmentTypeList" AllowPaging="true" Toolbar="@(new string[] {"Add"})" OnToolbarClick="OnToolbarClick">
+
             <GridColumns>
-                <GridColumn Field="Name" HeaderText="Appointment Type" Width="150"></GridColumn>
-                <GridColumn Field="DurationInMinutes" HeaderText="Duration (min)" TextAlign="TextAlign.Right" Width="140"></GridColumn>
-                
+                <GridColumn Field="Name" HeaderText="Appointment Type" Width="150" />
+                <GridColumn Field="DurationInMinutes" HeaderText="Duration (min)" TextAlign="TextAlign.Center" Width="140" />
+                <GridColumn HeaderText="Doctors" Width="100" TextAlign="TextAlign.Center">
+                    <Template>
+                        <button class="btn btn-primary" @onclick="(() => ShowDoctors((context as AppointmentTypeDto).Id))">👁️</button>
+                    </Template>
+                </GridColumn>
             </GridColumns>
         </SfGrid>
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal for Doctor List -->
+<SfDialog IsModal="true" Width="600px" Visible="@IsDoctorModalOpen" OnClose="OnModalClose" Header="Doctors">
+    <DialogTemplates>
+        <Content>
+            <SfGrid DataSource="@DoctorList" AllowPaging="true">
+                <GridColumns>
+                    <GridColumn Field="Title.Name" HeaderText="Doctor " Width="200" />
+                    <GridColumn Field="User.Name" HeaderText=" Name " Width="200" />
+                    <GridColumn Field="User.Surname" HeaderText=" Surname" Width="200" />
+                </GridColumns>
+            </SfGrid>
+        </Content>
+        <FooterTemplate>
+            <button class="btn btn-secondary" @onclick="() => IsDoctorModalOpen = false">Close</button>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+<!-- Modal for Adding Appointment Type -->
+<SfDialog IsModal="true" Width="600px" Visible="@IsAddModalOpen" Header="Add Appointment Type" OnClose="OnAddModalClose">
+    <DialogTemplates>
+        <Content>
+            <div>
+                <label>Name:</label>
+                <input type="text" class="form-control" @bind="NewAppointmentType.Name" />
+            </div>
+            <div class="mt-2">
+                <label>Duration (Minutes):</label>
+                <input type="number" class="form-control" @bind="NewAppointmentType.DurationInMinutes" />
+            </div>
+            <div class="mt-2">
+                <label>Select Doctors:</label>
+                <SfMultiSelect TValue="List<Guid>" TItem="DoctorListItems" Placeholder="Select Doctors" DataSource="@Doctors" @bind-Value="NewAppointmentType.DoctorIds">
+                    <MultiSelectFieldSettings Text="Name" Value="Id"></MultiSelectFieldSettings>
+                </SfMultiSelect>
+            </div>
+        </Content>
+        <FooterTemplate>
+            <button class="btn btn-primary" @onclick="SaveAppointmentType">Save</button>
+            <button class="btn btn-secondary" @onclick="() => IsAddModalOpen = false">Cancel</button>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
 
 @code {
     private List<AppointmentTypeDto> AppointmentTypeList = new();
     private List<DoctorWithNavigationPropertiesDto> DoctorList = new();
+    private AppointmentTypeCreateDto NewAppointmentType = new();
     private bool IsDoctorModalOpen = false;
+    private bool IsAddModalOpen = false;
+    public List<DoctorListItems> Doctors { get; set; } = new();
 
+    private static readonly MultiSelectFieldSettings DoctorDropDownFields = new()
+
+    {
+         Text = "Name", // Field to display
+         Value = "Id"   // Field to use as value
+    };
     protected override async Task OnInitializedAsync()
     {
-        // AppointmentType listesini yükle
         var result = await AppointmentTypeAppService.GetListAsync(new GetAppointmentTypesInput());
         AppointmentTypeList = result.Items.ToList();
     }
 
     private async Task ShowDoctors(Guid appointmentTypeId)
     {
-        // Modal'ı göster ve doktor listesini yükle
-        var doctors = await AppointmentTypeAppService.GetDoctorsByAppointmentTypeIdAsync(appointmentTypeId);
-        DoctorList = doctors;
+        DoctorList = await AppointmentTypeAppService.GetDoctorsByAppointmentTypeIdAsync(appointmentTypeId);
         IsDoctorModalOpen = true;
     }
 
-    private void OnVisibleChange(bool visible)
+
+    private async Task OpenAddModal()
+    {
+        await LoadDoctors(); // Load doctors
+        NewAppointmentType = new AppointmentTypeCreateDto(); // Initialize new AppointmentType DTO
+        IsAddModalOpen = true; // Open modal
+    }
+
+    private async Task LoadDoctors()
+    {
+        var result = await DoctorsAppService.GetListAsync(new GetDoctorsInput());
+
+        Doctors = result.Items.Select(d => new DoctorListItems
+            {
+                Id = d.Doctor.Id, // Doctor ID
+                Name = $"{d.Doctor.TitleName} {d.Doctor.Name} {d.Doctor.SurName}" // Full name
+            }).ToList();
+    }
+
+    private void OnModalClose(bool visible)
+
     {
         IsDoctorModalOpen = visible;
+    }
+
+    private void OnAddModalClose(bool visible)
+
+    {
+        IsAddModalOpen = visible;
+    }
+
+    private async Task SaveAppointmentType()
+
+    {
+        // Save the new appointment type
+        await AppointmentTypeAppService.CreateAsync(NewAppointmentType);
+        IsAddModalOpen = false; // Close the modal
+        // Refresh the grid
+        var result = await AppointmentTypeAppService.GetListAsync(new GetAppointmentTypesInput());
+        AppointmentTypeList = result.Items.ToList();
+    }
+
+    //Multiselect kısmında kullanmak için ayrı bir dto oluşturuldu
+    public class DoctorListItems
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

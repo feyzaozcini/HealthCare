@@ -37,7 +37,6 @@ namespace Pusula.Training.HealthCare.Departments
             var doctorDtos = ObjectMapper.Map<List<DoctorWithNavigationProperties>, List<DoctorWithNavigationPropertiesDto>>(doctors);
 
             return doctorDtos;
-            //return new ListResultDto<DoctorWithNavigationPropertiesDto>(doctorDtos);
         }
         public virtual async Task<PagedResultDto<DepartmentDto>> GetListAsync(GetDepartmentsInput input)
         {
