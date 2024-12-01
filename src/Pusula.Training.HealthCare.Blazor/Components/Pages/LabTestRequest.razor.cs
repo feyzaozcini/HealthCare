@@ -10,12 +10,15 @@ using Syncfusion.Blazor.Notifications;
 using System.Threading.Tasks;
 using Syncfusion.Blazor.Inputs;
 using System.Linq;
+using Microsoft.AspNetCore.Components;
+using Pusula.Training.HealthCare.LabRequests;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages;
 
 public partial class LabTestRequest
 {
     private List<TestGroupItemDto> TestGroupItemsList { get; set; } = new List<TestGroupItemDto>();
+    private LabRequestDto? LabRequest { get; set; }
     private List<TestGroupDto> TestGroupsList { get; set; } = new List<TestGroupDto>();
     private IReadOnlyList<LookupDto<Guid>> TestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
     private GetTestGroupItemsInput? TestGroupItemsFilter { get; set; }
@@ -38,9 +41,15 @@ public partial class LabTestRequest
 
     private DateTime[] FilterByDateRange = { DateTime.Today, DateTime.Today.AddDays(30) };
 
-    
+    [Parameter]
+    public Guid LabRequestId { get; set; }
+    private List<LabRequestDto> LabRequestDetails { get; set; } = new();
     protected override async Task OnInitializedAsync()
     {
+        LabRequestDetails = new List<LabRequestDto>
+    {
+        LabRequestStateContainer.SelectedLabRequest
+    };
         TestGroupsFilter = new GetTestGroupsInput();
         TestGroupItemsFilter = new GetTestGroupItemsInput();
         await GetTestGroupItemsAsync();
@@ -91,6 +100,7 @@ public partial class LabTestRequest
             TestGroupItemsFilter.TestGroupId = TestGroupNamesCollection.First().Id;
         }
     }
+
     private async Task GetTestGroupItemsAsync()
     {
         var input = new GetTestGroupItemsInput

@@ -97,8 +97,9 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
     {
         var dbSet = await GetDbSetAsync();
         return dbSet
+            .Include(lr => lr.Protocol)
             .Include(lr => lr.Doctor)
-            .Include(lr => lr.Protocol);
+                .ThenInclude(lr => lr.User);
     }
 
     protected virtual IQueryable<LabRequest> ApplyFilter(
@@ -114,8 +115,6 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
             .WhereIf(!string.IsNullOrWhiteSpace(filterText), e =>
                 (e.ProtocolId != Guid.Empty && e.ProtocolId.ToString().Contains(filterText!)) ||
                 (e.DoctorId != Guid.Empty && e.DoctorId.ToString().Contains(filterText!)) ||
-                (e.Date.ToString("yyyy-MM-dd").Contains(filterText!)) ||
-                (e.Status.ToString().Contains(filterText!)) ||
                 (e.Description!.Contains(filterText!))
             )
             .WhereIf(protocolId.HasValue && protocolId != Guid.Empty, e => e.ProtocolId == protocolId!.Value)

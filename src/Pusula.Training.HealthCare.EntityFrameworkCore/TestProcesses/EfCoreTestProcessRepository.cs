@@ -73,7 +73,9 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
         var dbSet = await GetDbSetAsync();
         return dbSet
             .Include(tp => tp.LabRequest) 
-            .Include(tp => tp.TestGroupItem);
+                .ThenInclude(tp => tp.Protocol)
+            .Include(tp => tp.TestGroupItem)
+                .ThenInclude(tp => tp.TestGroup);
     }
 
     protected virtual IQueryable<TestProcess> ApplyFilter(

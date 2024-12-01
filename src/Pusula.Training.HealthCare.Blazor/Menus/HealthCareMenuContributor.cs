@@ -59,23 +59,73 @@ public class HealthCareMenuContributor : IMenuContributor
         //        requiredPermissionName: HealthCarePermissions.Departments.Default)
         //);
 
-        context.Menu.AddItem(
-            new ApplicationMenuItem(
-                HealthCareMenus.TestGroups,
-                l["Menu:TestGroups"],
-                url: "/test-groups",
-                icon: "fa fa-flask",
-                requiredPermissionName: HealthCarePermissions.TestGroups.Default)
+        #region Lab Tabs
+
+        var labMenu = new ApplicationMenuItem(
+            HealthCareMenus.Laboratory,
+            l["Menu:Laboratory"],
+            icon: "fa fa-vials"
         );
 
-        context.Menu.AddItem(
+        labMenu.AddItem(
+        new ApplicationMenuItem(
+            HealthCareMenus.LaboratoryDefinitions,
+            l["Menu:Definitions"],
+            icon: "fa fa-cogs"
+            ).AddItem(
             new ApplicationMenuItem(
-                HealthCareMenus.TestGroups,
-                l["Menu:TestRequests"],
-                url: "/lab-request",
-                icon: "fa fa-receipt",
-                requiredPermissionName: HealthCarePermissions.TestGroups.Default)
-        );
+            HealthCareMenus.LaboratoryDefinitionsTests,
+            l["Menu:Tests"],
+            url: "/test-groups",
+            icon: "fa fa-flask"
+            )
+        ));
+
+        labMenu.AddItem(
+        new ApplicationMenuItem(
+            HealthCareMenus.LaboratoryOperations,
+            l["Menu:Operations"],
+            icon: "fa fa-tools"
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryOperationsProtocolList,
+                    l["Menu:ProtocolList"],
+                    url: "/lab-protocols",
+                    icon: "fa fa-list"
+                )
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryOperationsTestRequests,
+                    l["Menu:TestRequests"],
+                    url: "/lab-request",
+                    icon: "fa fa-receipt"
+                )
+            ));
+
+        labMenu.AddItem(
+        new ApplicationMenuItem(
+                HealthCareMenus.LaboratoryReports,
+                l["Menu:Reports"],
+                icon: "fa fa-chart-bar"
+        ).AddItem(
+            new ApplicationMenuItem(
+                HealthCareMenus.LaboratoryReportsTestStatistics,
+                l["Menu:TestStatistics"],
+                url: "/test-statistics-report",
+                icon: "fa fa-chart-pie"
+                )
+        ).AddItem(
+            new ApplicationMenuItem(
+                HealthCareMenus.LaboratoryReportsTestResults,
+                l["Menu:TestResults"],
+                url: "/test-results-report",
+                icon: "fa fa-file-alt"
+               )
+        )
+    );
+
+        #endregion
+
 
         // Tedavi başlığı ve alt menüleri
         var treatmentMenu = new ApplicationMenuItem(
@@ -118,6 +168,7 @@ public class HealthCareMenuContributor : IMenuContributor
         )));
 
         context.Menu.AddItem(treatmentMenu);
+        context.Menu.AddItem(labMenu);
 
         return Task.CompletedTask;
     }
