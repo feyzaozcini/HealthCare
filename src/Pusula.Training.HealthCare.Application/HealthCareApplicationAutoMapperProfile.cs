@@ -31,6 +31,8 @@ using Pusula.Training.HealthCare.TestValueRanges;
 using Pusula.Training.HealthCare.TestProcesses;
 
 using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
+using Pusula.Training.HealthCare.ProtocolTypes;
+using Pusula.Training.HealthCare.Notes;
 
 
 namespace Pusula.Training.HealthCare;
@@ -291,5 +293,12 @@ public class HealthCareApplicationAutoMapperProfile : Profile
             .ForMember(dest => dest.TestGroupItemTurnaroundTime, opt=> opt.MapFrom(x=> x.TestGroupItem.TurnaroundTime))
             .ReverseMap();
 
+        CreateMap<ProtocolType, ProtocolTypeDto>();
+        CreateMap<ProtocolTypeDto, ProtocolTypeUpdateDto>();
+        CreateMap<ProtocolType, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+
+        CreateMap<Note, NoteDto>();
+        CreateMap<NoteDto, NoteUpdateDto>();
+        CreateMap<Note, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Text));
     }
 }

@@ -111,6 +111,12 @@
     "Menu:ProtocolList": "Protocol List",
     "Menu:Reports": "Reports",
     "Menu:TestStatistics": "Test Statistics Report",
-    "Menu:TestResults": "Test Results Report"
+    "Menu:TestResults": "Test Results Report",
+    "Permission:ProtocolTypes": "ProtocolTypes",
+    "ProtocolTypes": "ProtocolTypes",
+    "ProtocolType": "ProtocolType",
+    "Permission:Notes": "Notes",
+    "Notes": "Notes",
+    "Note": "Note"
   }
 }
