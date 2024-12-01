@@ -16,6 +16,6 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
         [Required]
         public int DurationInMinutes { get; set; }
 
-        public List<Guid> DoctorIds { get; set; }
+        public List<Guid> DoctorIds { get; set; } = new List<Guid>();
     }
 }

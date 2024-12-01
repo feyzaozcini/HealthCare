@@ -15,7 +15,7 @@ namespace Pusula.Training.HealthCare.Appointments
         public string DoctorId { get; set; }
         public string PatientId { get; set; }
         public string DepartmentId { get; set; }
-        public string AppointmentTypeId { get; set; }
+        public Guid AppointmentTypeId { get; set; }
         public string AppointmentStatus { get; set; }
     }
 }
