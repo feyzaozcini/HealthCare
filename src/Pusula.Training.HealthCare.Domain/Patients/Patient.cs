@@ -83,14 +83,10 @@ namespace Pusula.Training.HealthCare.Patients
             Check.NotNull(lastName, nameof(lastName));
             Check.Length(lastName, nameof(lastName), PatientConsts.LastNameMaxLength, 0);
             Check.Length(identityNumber, nameof(identityNumber), PatientConsts.IdentityNumberMaxLength, 0);
-            Check.Length(passportNumber, nameof(passportNumber), PatientConsts.PassportNumberMaxLength, PatientConsts.PassportNumberMinLength);
             Check.NotNull(email, nameof(email));
             Check.Length(email, nameof(email), PatientConsts.EmailAddressMaxLength, 0);
             Check.NotNull(mobilePhoneNumber, nameof(mobilePhoneNumber));
             Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.PhoneNumberMaxLength, PatientConsts.PhoneNumberMinLength);
-            Check.Length(emergencyPhoneNumber, nameof(emergencyPhoneNumber), PatientConsts.PhoneNumberMaxLength, PatientConsts.PhoneNumberMinLength);
-            Check.Length(motherName, nameof(motherName), PatientConsts.FirstNameMaxLength, 0);
-            Check.Length(fatherName, nameof(fatherName), PatientConsts.FirstNameMaxLength, 0);
 
             Id = id;
             CompanyId = companyId;

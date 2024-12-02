@@ -15,13 +15,13 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         string lastName, 
         DateTime birthDate, 
         string identityNumber, 
-        string passportNumber, 
+        string? passportNumber, 
         string email, 
         string mobilePhoneNumber, 
-        string emergencyPhoneNumber, 
+        string? emergencyPhoneNumber, 
         Gender gender,
-        string motherName, 
-        string fatherName, 
+        string? motherName, 
+        string? fatherName, 
         BloodType bloodType, 
         Type type,
         Guid? primaryCountryId,
@@ -42,12 +42,10 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         Check.Length(lastName, nameof(lastName), PatientConsts.LastNameMaxLength, 0);
         Check.NotNull(identityNumber, nameof(identityNumber));
         Check.Length(identityNumber, nameof(identityNumber), PatientConsts.IdentityNumberMaxLength, 0);
-        Check.Length(passportNumber, nameof(passportNumber), PatientConsts.PassportNumberMaxLength, PatientConsts.PassportNumberMinLength);
         Check.NotNull(email, nameof(email));
         Check.Length(email, nameof(email), PatientConsts.EmailAddressMaxLength, 0);
         Check.NotNull(mobilePhoneNumber, nameof(mobilePhoneNumber));
         Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.PhoneNumberMaxLength, PatientConsts.PhoneNumberMinLength);
-        Check.Length(emergencyPhoneNumber, nameof(emergencyPhoneNumber), PatientConsts.PhoneNumberMaxLength, PatientConsts.PhoneNumberMinLength);
         Check.Length(motherName, nameof(motherName), PatientConsts.FirstNameMaxLength, 0);
         Check.Length(fatherName, nameof(fatherName), PatientConsts.FirstNameMaxLength, 0);
 
