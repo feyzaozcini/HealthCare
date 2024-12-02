@@ -21,8 +21,8 @@ public class PatientCreateDto
     [StringLength(PatientConsts.IdentityNumberMaxLength)]
     public string IdentityNumber { get; set; } = null!;
 
-    [StringLength(PatientConsts.PassportNumberMaxLength)]
-    public string PassportNumber { get; set; } = null!;
+    
+    public string PassportNumber { get; set; } = string.Empty;
 
     [EmailAddress]
     [StringLength(PatientConsts.EmailAddressMaxLength)]
@@ -35,7 +35,7 @@ public class PatientCreateDto
 
     [RegularExpression(@"^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$")]
     [StringLength(PatientConsts.PhoneNumberMaxLength)]
-    public string EmergencyPhoneNumber { get; set; } = null!;
+    public string EmergencyPhoneNumber { get; set; } = string.Empty;
 
     [Required]
     public Gender Gender { get; set; }
@@ -43,13 +43,13 @@ public class PatientCreateDto
     //public int No { get; set; }
 
     [StringLength(PatientConsts.FirstNameMaxLength)]
-    public string MotherName { get; set; } = null!;
+    public string MotherName { get; set; } = string.Empty;
 
     [StringLength(PatientConsts.FirstNameMaxLength)]
-    public string FatherName { get; set; } = null!;
+    public string FatherName { get; set; } = string.Empty;
     public BloodType BloodType { get; set; }
 
-    [Required]
+    
     public Type Type { get; set; }
     public Guid? CompanyId { get; set; }
     public Guid? PrimaryCountryId { get; set; }

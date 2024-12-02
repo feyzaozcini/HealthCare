@@ -14,30 +14,15 @@
 @using Pusula.Training.HealthCare.Blazor.Containers
 @using Pusula.Training.HealthCare.Shared
 
-@inject PatientStateContainer StateService
 @inject IAppointmentsAppService AppointmentsAppService
 @inject IDepartmentsAppService DepartmentsAppService
 @inject IDoctorsAppService DoctorsAppService
+@inject IPatientsAppService PatientsAppService
 
 
 <div class="stepper-container" style="max-width: 1500px; margin: 0 auto; padding: 40px;">
     <div class="card">
         <div class="card-body">
-
-            <!-- Hasta Seçim Alanları -->
-            @*<h3 class="card-title text-center">Doktor ve Departman Seçimi</h3>*@
-            <!-- Seçilen Veriler -->
-
-           @* <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card selected-card">
-                        <h5>Seçilenler</h5>
-                        <p><strong>Doktor:</strong> @($"{SelectedDoctor?.Title.Name} {SelectedDoctor?.User.Name} {SelectedDoctor?.User.Surname}")</p>
-                        <p><strong>Departman:</strong> @SelectedDepartment?.Name</p>
-                        <button class="btn btn-outline-danger btn-sm" @onclick="ClearSelections" style="width: 100%;">Seçimi Temizle</button>
-                    </div>
-                </div>
-            </div> *@
 
             <!-- Doktor ve Departman Seçim Alanları -->
             <div class="row mb-4">
@@ -66,11 +51,26 @@
     </div>
 </div>
 
+<!-- Randevu Takvimi Ekranı -->
 <SfSchedule TValue="FlatAppointmentDto" Width="100%" Height="650px" @bind-CurrentView="@CurrentView" @ref="SfScheduleInstance">
     <ScheduleTemplates >
         <EditorTemplate>
             <table class="custom-event-editor" width="100%" cellpadding="5">
-                <tbody>                    <tr>
+                <tbody>
+                    <tr>
+                        <td class="e-textlabel">Patient</td>
+                        <td colspan="4" style="display: flex; align-items: center;">
+                            <SfDropDownList DataSource="@PatientsCollection"
+                                            Placeholder="Select Patient"
+                                            AllowFiltering="true"
+                                            @bind-Value="@NewAppointment.PatientId">
+                                <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
+                                
+                            </SfDropDownList>
+                            <button class="e-btn e-primary" style="margin-left: 10px;" @onclick="OpenPatientDialog">+</button>
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="e-textlabel">Appointment Type</td>
                         <td colspan="4">
                             <SfDropDownList DataSource="@AppointmentTypesCollection"
@@ -124,19 +124,62 @@
         <ScheduleView Option="View.WorkWeek"></ScheduleView>
     </ScheduleViews>
 </SfSchedule>
+
+<!-- Hasta yoksa, yeni hasta kaydı oluşturma Modalı -->
+<SfDialog Height="450px" Width="500px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsPatientDialogOpen" Header="Yeni Hasta Kaydı">
+    <EditForm Model="@NewPatient" OnValidSubmit="CreatePatient">
+        <DataAnnotationsValidator />
+        <div class="mb-2">
+            <SfTextBox Placeholder="FirstName" @bind-Value="NewPatient.FirstName" CssClass="e-field"></SfTextBox>
+            <ValidationMessage For="@(() => NewPatient.FirstName)" />
+        </div>
+        <div class="mb-2">
+            <SfTextBox Placeholder="LastName" @bind-Value="NewPatient.LastName" CssClass="e-field"></SfTextBox>
+            <ValidationMessage For="@(() => NewPatient.LastName)" />
+        </div>
+        <div class="mb-2">
+            <SfDatePicker TValue="DateTime" Placeholder="Doğum Tarihi" @bind-Value="NewPatient.BirthDate" CssClass="e-field"></SfDatePicker>
+            <ValidationMessage For="@(() => NewPatient.BirthDate)" />
+        </div>
+        <div class="mb-2">
+            <SfTextBox Placeholder="Identity Number" @bind-Value="NewPatient.IdentityNumber" CssClass="e-field"></SfTextBox>
+            <ValidationMessage For="@(() => NewPatient.IdentityNumber)" />
+        </div>
+        <div class="mb-2">
+            <SfTextBox Placeholder="Mobile Phone Number" @bind-Value="NewPatient.MobilePhoneNumber" CssClass="e-field"></SfTextBox>
+            <ValidationMessage For="@(() => NewPatient.MobilePhoneNumber)" />
+        </div>
+        <div class="mb-2">
+            <SfTextBox Placeholder="Email" @bind-Value="NewPatient.Email" CssClass="e-field"></SfTextBox>
+            <ValidationMessage For="@(() => NewPatient.Email)" />
+        </div>
+        <div class="mb-2">
+            <SfDropDownList DataSource="@GendersCollection"
+                            Placeholder="Gender"
+                            @bind-Value="@NewPatient.Gender">
+                <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
+            </SfDropDownList>
+        </div>
+        <div style="margin-top: 15px;">
+            <button type="submit" class="e-btn e-success">Kaydet</button>
+            <button type="button" class="e-btn e-danger" @onclick="ClosePatientDialog">İptal</button>
+        </div>
+    </EditForm>
+</SfDialog>
 @code {
 
     private SfSchedule<FlatAppointmentDto> SfScheduleInstance;
     //private DateTime CurrentDate { get; set; } = DateTime.Now;
     View CurrentView = View.WorkWeek;
     Syncfusion.Blazor.Schedule.ValidationRules ValidationRules = new Syncfusion.Blazor.Schedule.ValidationRules { Required = true };
-    //private AppointmentCreateDto NewAppointment { get; set; } = new AppointmentCreateDto();
     private AppointmentUpdateDto EditAppointment { get; set; } = new AppointmentUpdateDto();
     private IReadOnlyList<LookupDto<Guid>> PatientsCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<Guid>> DoctorsCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<Guid>> DepartmentsCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<Guid>> AppointmentTypesCollection { get; set; } = new List<LookupDto<Guid>>();
     private IReadOnlyList<LookupDto<AppointmentStatus>> AppointmentStatusCollection { get; set; } = new List<LookupDto<AppointmentStatus>>();
+    private IReadOnlyList<LookupDto<Gender>> GendersCollection { get; set; } = new List<LookupDto<Gender>>();
+    private IReadOnlyList<LookupDto<Pusula.Training.HealthCare.Patients.Type>> TypesCollection { get; set; } = new List<LookupDto<Pusula.Training.HealthCare.Patients.Type>>();
     private List<FlatAppointmentDto> AppointmentList { get; set; } = new List<FlatAppointmentDto>();
     private AppointmentCreateDto NewAppointment { get; set; } = new AppointmentCreateDto
         {
@@ -152,6 +195,9 @@
     private List<DepartmentDto> FilteredDepartments = new();
     private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
 
+    private PatientCreateDto NewPatient = new();
+    private bool IsPatientDialogOpen = false;
+
     protected override async Task OnInitializedAsync()
     {
         // Fetch lookup data
@@ -165,6 +211,17 @@
             .Cast<AppointmentStatus>()
             .Select(b => new LookupDto<AppointmentStatus> { Id = b, DisplayName = b.ToString() })
             .ToList();
+        //Hasta kaydı için Gender listesi
+        GendersCollection = Enum.GetValues(typeof(Gender))
+            .Cast<Gender>()
+            .Select(b => new LookupDto<Gender> { Id = b, DisplayName = b.ToString() })
+            .ToList();
+        //Hasta kaydı için hasta tipleri 
+        TypesCollection = Enum.GetValues(typeof(Pusula.Training.HealthCare.Patients.Type))
+            .Cast<Pusula.Training.HealthCare.Patients.Type>()
+            .Select(b => new LookupDto<Pusula.Training.HealthCare.Patients.Type> { Id = b, DisplayName = b.ToString() })
+            .ToList();
+
 
         await LoadInitialDataAsync();
     }
@@ -285,7 +342,7 @@
     {
         await CreateAppointment();// Randevu oluşturma işlemini çağır
         await LoadAppointmentsAsync(); // Verileri yeniden yükle
-                                       // await SfScheduleInstance.Refresh(); // Takvimi güncelle
+        // await SfScheduleInstance.Refresh(); // Takvimi güncelle
         SfScheduleInstance.CloseEditor(); // Modalı kapat
 
     }
@@ -295,17 +352,40 @@
         try
         {
             NewAppointment.DoctorId = SelectedDoctor.Doctor.Id;
-            NewAppointment.PatientId = StateService.SelectedPatient.Id;
+            //NewAppointment.PatientId = StateService.SelectedPatient.Id; //Hasta seçimi açılan modaldan yapılacak
             NewAppointment.DepartmentId = SelectedDepartment.Id;
-                                                               // Call your service to create the appointment
+            
             var createdAppointment = await AppointmentsAppService.CreateAsync(NewAppointment);   
-       
         }
         catch (Exception ex)
         {
             // Handle the error
             Console.WriteLine($"Error creating appointment: {ex.Message}");
         }
+    }
+
+    private void OpenPatientDialog()
+    {
+        NewPatient = new PatientCreateDto
+            {
+                BirthDate = DateTime.Now
+            };
+        IsPatientDialogOpen = true;
+    }
+
+    private void ClosePatientDialog()
+    {
+        IsPatientDialogOpen = false;
+        NewPatient = new(); // Form temizliği
+    }
+    private async Task CreatePatient()
+    {
+
+        await PatientsAppService.CreateAsync(NewPatient);
+        // Hasta listesini güncelle
+        await GetPatientCollectionLookupAsync();
+        ClosePatientDialog();
+        await Task.CompletedTask;
     }
 
     private async Task GetPatientCollectionLookupAsync(string? newValue = null)
