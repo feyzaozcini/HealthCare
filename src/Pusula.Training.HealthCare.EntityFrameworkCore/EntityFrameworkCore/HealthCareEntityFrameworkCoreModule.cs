@@ -34,6 +34,7 @@ using Pusula.Training.HealthCare.PhysicalExaminations;
 using Pusula.Training.HealthCare.PshychologicalStates;
 using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Notes;
+using Pusula.Training.HealthCare.Insurances;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -90,6 +91,8 @@ public class HealthCareEntityFrameworkCoreModule : AbpModule
             options.AddRepository<FallRisk, EfCoreFallRiskRepository>();
             options.AddRepository<PhysicalExamination, EfCorePhysicalExaminationRepository>();
             options.AddRepository<PshychologicalState, EfCorePshychologicalStateRepository>();
+            options.AddRepository<Insurance, EfCoreInsuranceRepository>();
+
 
         });
 
