@@ -33,6 +33,7 @@ using Pusula.Training.HealthCare.TestProcesses;
 using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
 using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Notes;
+using Pusula.Training.HealthCare.Insurances;
 
 
 namespace Pusula.Training.HealthCare;
@@ -300,5 +301,9 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Note, NoteDto>();
         CreateMap<NoteDto, NoteUpdateDto>();
         CreateMap<Note, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Text));
+
+        CreateMap<Insurance, InsuranceDto>();
+        CreateMap<InsuranceDto, InsuranceUpdateDto>();
+        CreateMap<Insurance, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
     }
 }

@@ -48,6 +48,7 @@ using Pusula.Training.HealthCare.TestValueRanges;
 using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
 using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Notes;
+using Pusula.Training.HealthCare.Insurances;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -89,6 +90,8 @@ public class HealthCareDbContext :
     public DbSet<PshychologicalState> PshychologicalStates { get; set; } = null!;
     public DbSet<FallRisk> FallRisks { get; set; } = null!;
     public DbSet<Note> Notes { get; set; } = null!;
+    public DbSet<Insurance> Insurances { get; set; } = null!;
+
 
 
     #region Entities from the modules
@@ -212,6 +215,13 @@ public class HealthCareDbContext :
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Notes", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
                 b.Property(x => x.Text).HasColumnName(nameof(Note.Text)).IsRequired().HasMaxLength(NoteConsts.TextMaxLength);
+            });
+
+            builder.Entity<Insurance>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Insurances", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(Insurance.Name)).IsRequired().HasMaxLength(InsuranceConsts.NameMaxLength);
             });
 
             builder.Entity<PatientCompany>(b =>

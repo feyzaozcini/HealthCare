@@ -117,6 +117,9 @@
     "ProtocolType": "ProtocolType",
     "Permission:Notes": "Notes",
     "Notes": "Notes",
-    "Note": "Note"
+    "Note": "Note",
+    "Permission:Insurances": "Insurances",
+    "Insurances": "Insurances",
+    "Insurance": "Insurance"
   }
 }
