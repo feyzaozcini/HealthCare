@@ -32,6 +32,8 @@ using Pusula.Training.HealthCare.ExaminationDiagnoses;
 using Pusula.Training.HealthCare.FallRisks;
 using Pusula.Training.HealthCare.PhysicalExaminations;
 using Pusula.Training.HealthCare.PshychologicalStates;
+using Pusula.Training.HealthCare.ProtocolTypes;
+using Pusula.Training.HealthCare.Notes;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -77,10 +79,8 @@ public class HealthCareEntityFrameworkCoreModule : AbpModule
             options.AddRepository<District, EfCoreDistrictRepository>();
             options.AddRepository<Village, EfCoreVillageRepository>();
             options.AddRepository<Appointment, EfCoreAppointmentTypeRepository>();
-
-
-
-
+            options.AddRepository<ProtocolType, EfCoreProtocolTypeRepository>();
+            options.AddRepository<Note, EfCoreNoteRepository>();
             options.AddRepository<Doctor, EfCoreDoctorRepository>();
             options.AddRepository<DiagnosisGroup, EfCoreDiagnosisGroupRepository>();
             options.AddRepository<Diagnosis, EfCoreDiagnosisRepository>();

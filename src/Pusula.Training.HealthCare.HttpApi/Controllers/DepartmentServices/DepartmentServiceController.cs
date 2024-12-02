@@ -24,32 +24,40 @@ namespace Pusula.Training.HealthCare.Controllers.DepartmentServices
         [HttpGet]
         public virtual Task<PagedResultDto<DepartmentServiceDto>> GetListAsync(GetDepartmentServicesInput input) => departmentServicesAppService.GetListAsync(input);
 
+
         [HttpGet]
         [Route("{id}")]
         public virtual Task<DepartmentServiceDto> GetAsync(Guid id) => departmentServicesAppService.GetAsync(id);
 
+
         [HttpPost]
         public virtual Task<DepartmentServiceDto> CreateAsync(DepartmentServiceCreateDto input) => departmentServicesAppService.CreateAsync(input);
+
 
         [HttpPut]
         [Route("{id}")]
         public virtual Task<DepartmentServiceDto> UpdateAsync(Guid id, DepartmentServiceUpdateDto input) => departmentServicesAppService.UpdateAsync(id, input);
 
+
         [HttpDelete]
         [Route("{id}")]
         public virtual Task DeleteAsync(Guid id) => departmentServicesAppService.DeleteAsync(id);
+
 
         [HttpGet]
         [Route("as-excel-file")]
         public virtual Task<IRemoteStreamContent> GetListAsExcelFileAsync(DepartmentServiceExcelDownloadDto input) => departmentServicesAppService.GetListAsExcelFileAsync(input);
 
+
         [HttpGet]
         [Route("download-token")]
         public virtual Task<DownloadTokenResultDto> GetDownloadTokenAsync() => departmentServicesAppService.GetDownloadTokenAsync();
 
+
         [HttpDelete]
         [Route("")]
         public virtual Task DeleteByIdsAsync(List<Guid> departmentServiceIds) => departmentServicesAppService.DeleteByIdsAsync(departmentServiceIds);
+
 
         [HttpDelete]
         [Route("all")]

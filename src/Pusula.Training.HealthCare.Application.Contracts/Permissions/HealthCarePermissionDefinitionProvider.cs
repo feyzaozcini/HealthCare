@@ -122,6 +122,17 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         testValueRangesPermission.AddChild(HealthCarePermissions.TestValueRanges.Create, L("Permission:Create"));
         testValueRangesPermission.AddChild(HealthCarePermissions.TestValueRanges.Edit, L("Permission:Edit"));
         testValueRangesPermission.AddChild(HealthCarePermissions.TestValueRanges.Delete, L("Permission:Delete"));
+
+        var protocolTypePermission = myGroup.AddPermission(HealthCarePermissions.ProtocolTypes.Default, L("Permission:ProtocolTypes"));
+        protocolTypePermission.AddChild(HealthCarePermissions.ProtocolTypes.Create, L("Permission:Create"));
+        protocolTypePermission.AddChild(HealthCarePermissions.ProtocolTypes.Edit, L("Permission:Edit"));
+        protocolTypePermission.AddChild(HealthCarePermissions.ProtocolTypes.Delete, L("Permission:Delete"));
+
+        var notePermission = myGroup.AddPermission(HealthCarePermissions.Notes.Default, L("Permission:Notes"));
+        notePermission.AddChild(HealthCarePermissions.Notes.Create, L("Permission:Create"));
+        notePermission.AddChild(HealthCarePermissions.Notes.Edit, L("Permission:Edit"));
+        notePermission.AddChild(HealthCarePermissions.Notes.Delete, L("Permission:Delete"));
+
     }
 
     private static LocalizableString L(string name)

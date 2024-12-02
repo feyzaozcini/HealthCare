@@ -46,6 +46,8 @@ using Pusula.Training.HealthCare.TestValueRanges;
 
 
 using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
+using Pusula.Training.HealthCare.ProtocolTypes;
+using Pusula.Training.HealthCare.Notes;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -78,9 +80,7 @@ public class HealthCareDbContext :
     public DbSet<Appointment> Appointments { get; set; } = null!;
     public DbSet<DoctorDepartment> DoctorDepartments { get; set; } = null!;
     public DbSet<DoctorAppoinmentType> DoctorAppoinmentTypes { get; set; } = null!;
-
-
-
+    public DbSet<ProtocolType> ProtocolTypes { get; set; } = null!;
     public DbSet<DiagnosisGroup> DiagnosisGroups { get; set; } = null!;
     public DbSet<Diagnosis> Diagnoses { get; set; } = null!;
     public DbSet<Anamnesis> Anamneses { get; set; } = null!;
@@ -88,7 +88,7 @@ public class HealthCareDbContext :
     public DbSet<PhysicalExamination> PhysicalExaminations { get; set; } = null!;
     public DbSet<PshychologicalState> PshychologicalStates { get; set; } = null!;
     public DbSet<FallRisk> FallRisks { get; set; } = null!;
-
+    public DbSet<Note> Notes { get; set; } = null!;
 
 
     #region Entities from the modules
@@ -198,6 +198,20 @@ public class HealthCareDbContext :
                 b.HasOne<Patient>().WithMany().IsRequired().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne<Department>().WithMany().IsRequired().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne<Doctor>().WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            builder.Entity<ProtocolType>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "ProtocolTypes", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(ProtocolType.Name)).IsRequired().HasMaxLength(ProtocolTypeConsts.NameMaxLength);
+            });
+
+            builder.Entity<Note>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Notes", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Text).HasColumnName(nameof(Note.Text)).IsRequired().HasMaxLength(NoteConsts.TextMaxLength);
             });
 
             builder.Entity<PatientCompany>(b =>
@@ -476,62 +490,6 @@ public class HealthCareDbContext :
                     .HasForeignKey(dd => dd.AppoinmentTypeId)
                     .IsRequired();
             });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             builder.Entity<DiagnosisGroup>(b =>
             {
