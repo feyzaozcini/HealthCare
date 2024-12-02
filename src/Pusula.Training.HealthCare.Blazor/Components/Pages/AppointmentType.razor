@@ -58,7 +58,7 @@
             </div>
             <div class="mt-2">
                 <label>Duration (Minutes):</label>
-                <input type="number" class="form-control" @bind="NewAppointmentType.DurationInMinutes" />
+                <input type="number" class="form-control" @bind="NewAppointmentType.DurationInMinutes" max="45" step="1" oninput="this.value = Math.max(0, Math.min(45, this.value))" />
             </div>
             <div class="mt-2">
                 <label>Select Doctors:</label>
