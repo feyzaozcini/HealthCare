@@ -1,8 +1,11 @@
 ﻿@page "/appointmentslist"
+@using Pusula.Training.HealthCare.Shared
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Cards
 @using Pusula.Training.HealthCare.Appointments
+@using Pusula.Training.HealthCare.Doctors
 @inject IAppointmentsAppService AppointmentAppService
+@inject IDoctorsAppService DoctorAppService
 
 <div class="container">
     <!-- Syncfusion Kartlar -->
@@ -52,44 +55,120 @@
             </SfCard>
         </div>
     </div>
-</div>
 
+    <!-- Doktor Arama Kısmı -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h4>Doktor</h4>
+            <SfDropDownList DataSource="@FilteredDoctors"
+                            Placeholder="Doktor seçiniz..."
+                            AllowFiltering="true"
+                            TItem="DoctorWithNavigationPropertiesDto"
+                            TValue="Guid">
+                <DropDownListFieldSettings Value="Doctor.Id" Text="FullName"></DropDownListFieldSettings>
+                <DropDownListEvents TValue="Guid" TItem="DoctorWithNavigationPropertiesDto" ValueChange="OnDoctorValueChange"></DropDownListEvents>
+            </SfDropDownList>
+        </div>
+    </div>
 
-<!--Appointment List Datagrid-->
-<div class="col-lg-12 control-section">
-    <div class="content-wrapper">
-        <SfGrid DataSource="@Appointments" AllowPaging="true" AllowSorting="true" Height="600">
-            <GridColumns>
-                <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
-                <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="200"></GridColumn>
-                <GridColumn Field="PatientFullName" HeaderText="Patient" Width="200"></GridColumn>
-                <GridColumn Field="StartDate" HeaderText="Start Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
-                <GridColumn Field="EndDate" HeaderText="End Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
-                <GridColumn Field="Status" HeaderText="Status" Width="120">
-                    <Template>
-                        @{
-                            var appointment = context as AppointmentListItem;
-                        }
-                        <span class="@GetStatusClass(appointment.Status)">
-                            @appointment.Status
-                        </span>
-                    </Template>
-                </GridColumn>
-                <GridColumn Field="AppointmentTypeName" HeaderText="Appointment Type" Width="150"></GridColumn>
-            </GridColumns>
-        </SfGrid>
+    <!-- Appointment List Datagrid -->
+    <div class="row">
+        <div class="col-lg-12">
+            <SfGrid DataSource="@Appointments" AllowPaging="true" AllowSorting="true" Height="600">
+                <GridColumns>
+                    <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
+                    <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="200"></GridColumn>
+                    <GridColumn Field="PatientFullName" HeaderText="Patient" Width="200"></GridColumn>
+                    <GridColumn Field="StartDate" HeaderText="Start Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="EndDate" HeaderText="End Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn Field="Status" HeaderText="Status" Width="120">
+                        <Template>
+                            @{
+                                var appointment = context as AppointmentListItem;
+                            }
+                            <span class="@GetStatusClass(appointment.Status)">
+                                @appointment.Status
+                            </span>
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="AppointmentTypeName" HeaderText="Appointment Type" Width="150"></GridColumn>
+                    <GridColumn HeaderText="Actions" Width="100">
+                        <Template>
+                            @{
+                                var appointment = context as AppointmentListItem;
+                            }
+                            <button class="btn btn-sm btn-primary"
+                                    @onclick="() => OpenEditDialog(appointment)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </div>
     </div>
 </div>
+
+<!-- Doktorun randevu statuslerini güncelleyebilmesi için Edit Dialog -->
+<SfDialog @bind-Visible="@IsEditDialogOpen" Width="400px" Header="Edit Appointment Status">
+    <DialogTemplates>
+        <Content>
+            <div>
+                <h5>Change Status for: @SelectedAppointment?.PatientFullName</h5>
+                <SfDropDownList DataSource="@AppointmentStatusCollection"
+                                @bind-Value="@SelectedAppointmentStatus">
+                    <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+        </Content>
+        <FooterTemplate>
+            <button class="btn btn-success" @onclick="UpdateAppointmentStatus">Save</button>
+            <button class="btn btn-secondary" @onclick="CloseDialog">Cancel</button>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+<!-- Doktor Seçimi yapmadan status değişikliği yapılmamaktadır -->
+<SfDialog @bind-Visible="@IsWarningDialogOpen" Width="400px" Header="Uyarı">
+    <DialogTemplates>
+        <Content>
+            <p>Lütfen bir doktor seçin!</p>
+        </Content>
+        <FooterTemplate>
+            <button class="btn btn-primary" @onclick="CloseWarningDialog">Tamam</button>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
 
 @code {
     public List<AppointmentListItem> Appointments { get; set; } = new();
     public int TotalPatients { get; set; }
     public int TotalAppointments { get; set; }
     public int TodaysAppointments { get; set; }
-    
+    private IReadOnlyList<LookupDto<AppointmentStatus>> AppointmentStatusCollection { get; set; } = new List<LookupDto<AppointmentStatus>>();
+    private bool IsEditDialogOpen = false;
+    private AppointmentListItem? SelectedAppointment;
+    private AppointmentStatus SelectedAppointmentStatus;
+    private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
+    private DoctorWithNavigationPropertiesDto SelectedDoctor;
+    private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
+    // Uyarı için değişken
+    private bool IsWarningDialogOpen { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
+        // Appointment Status
+        AppointmentStatusCollection = Enum.GetValues(typeof(AppointmentStatus))
+            .Cast<AppointmentStatus>()
+            .Select(b => new LookupDto<AppointmentStatus> { Id = b, DisplayName = b.ToString() })
+            .ToList();
+
+        await LoadInitialDataAsync();
+    }
+    private async Task LoadInitialDataAsync()
+    {
+
         var result = await AppointmentAppService.GetListAsync(new GetAppointmentsInput());
         Appointments = result.Items.Select(a => new AppointmentListItem
             {
@@ -102,19 +181,152 @@
                 AppointmentTypeName = a.AppointmentType.Name
             }).ToList();
 
-            TotalPatients = Appointments.Select(a => a.PatientFullName).Distinct().Count();
-            TotalAppointments = Appointments.Count;
-            TodaysAppointments = Appointments.Count(a => a.StartDate.Date == DateTime.Today);
+        TotalPatients = Appointments.Select(a => a.PatientFullName).Distinct().Count();
+        TotalAppointments = Appointments.Count;
+        TodaysAppointments = Appointments.Count(a => a.StartDate.Date == DateTime.Today);
+
+        var doctorResult = await DoctorAppService.GetListAsync(new GetDoctorsInput());
+        if (doctorResult?.Items != null)
+        {
+            AllDoctors = doctorResult.Items.ToList();
+            FilteredDoctors = AllDoctors
+            .Select(d => new DoctorWithNavigationPropertiesDto
+                {
+                    Doctor = d.Doctor,
+                    Title = d.Title,
+                    User = d.User,
+                    FullName = $"{d.Title?.Name} {d.User?.Name} {d.User?.Surname}" // FullName oluşturuldu
+                })
+            .ToList();
+        }
     }
+    private async Task LoadAppointmentsAsync()
+    {
+        var input = new GetAppointmentsInput
+            {
+                StartDate = null,
+                EndDate = null,
+                Note = null,
+                AppointmentStatus = null,
+                PatientId = null,
+                AppointmentTypeId = null,
+                DoctorId = SelectedDoctor?.Doctor?.Id, //Doctorun randevularını getirme filtresi
+                DepartmentId = null //Departmanın randevularını getirme filtresi
+            };
 
+        var result = await AppointmentAppService.GetListAsync(input);
+        Appointments = result.Items.Select(a => new AppointmentListItem
+            {
+                Id = a.Appointment.Id,
+                DepartmentName = a.Department.Name,
+                DoctorId = a.Doctor.Id,
+                PatientId = a.Patient.Id,
+                AppointmentTypeId = a.AppointmentType.Id,
+                DepartmentId = a.Department.Id,
+                DoctorFullName = $"{a.Doctor.TitleName} {a.Doctor.Name} {a.Doctor.SurName}",
+                PatientFullName = $"{a.Patient.FirstName} {a.Patient.LastName}",
+                StartDate = a.Appointment.StartDate,
+                EndDate = a.Appointment.EndDate,
+                Status = a.Appointment.AppointmentStatus.ToString(),
+                AppointmentTypeName = a.AppointmentType.Name
+            }).ToList();
 
+        TotalPatients = Appointments.Select(a => a.PatientFullName).Distinct().Count();
+        TotalAppointments = Appointments.Count;
+        TodaysAppointments = Appointments.Count(a => a.StartDate.Date == DateTime.Today);
+    }
+    private async Task OnDoctorValueChange(ChangeEventArgs<Guid, DoctorWithNavigationPropertiesDto> args)
+    {
+        // Seçilen doktor Id'si
+        Guid selectedDoctorId = args.Value;
+
+        // Seçilen doktor objesi
+        DoctorWithNavigationPropertiesDto selectedDoctor = FilteredDoctors.FirstOrDefault(d => d.Doctor.Id == selectedDoctorId);
+
+        if (selectedDoctor != null)
+        {
+            await SelectDoctorAsync(selectedDoctor);
+        }
+    }
+    private async Task SelectDoctorAsync(DoctorWithNavigationPropertiesDto doctor)
+    {
+        SelectedDoctor = doctor;
+        await LoadAppointmentsAsync();  //Seçilen doktroun randevularını getirmek için çağırıldı
+        await Task.CompletedTask;
+    }
     private string GetStatusClass(string status)
     {
-        return status == "Active" ? "status-active" : "status-inactive";
+        if (Enum.TryParse(typeof(AppointmentStatus), status, out var result))
+        {
+            var appointmentStatus = (AppointmentStatus)result;
+
+            return appointmentStatus switch
+            {
+                AppointmentStatus.Scheduled => "status-scheduled",    // Turuncu
+                AppointmentStatus.Confirmed => "status-confirmed",    // Mavi
+                AppointmentStatus.Cancelled => "status-cancelled",    // Kırmızı
+                AppointmentStatus.NoShow => "status-noshow",          // Kırmızı
+                AppointmentStatus.Pending => "status-pending",        // Yeşil
+                AppointmentStatus.InProgress => "status-inprogress",// Yeşil
+                AppointmentStatus.Completed => "status-completed",    // Yeşil
+                AppointmentStatus.Postponed => "status-postponed",    // Kırmızı
+                AppointmentStatus.Failed => "status-failed",          // Kırmızı
+                _ => "status-default",                                // Varsayılan
+            };
+        }
+
+        return "status-default";
     }
 
+    private void OpenEditDialog(AppointmentListItem appointment)
+    {
+        SelectedAppointment = appointment;
+        SelectedAppointmentStatus = Enum.Parse<AppointmentStatus>(appointment.Status);
+        if (SelectedDoctor == null)
+        {
+            // Doktor seçilmemişse uyarıyı aç
+            IsWarningDialogOpen = true;
+            return;
+        }
+        else
+        {
+            IsEditDialogOpen = true;
+        }
+        
+    }
+    private void CloseDialog()
+    {
+        IsEditDialogOpen = false;
+        SelectedAppointment = null;
+    }
+    private async Task UpdateAppointmentStatus()
+    {
+        if (SelectedAppointment == null) return;
+
+        var updateDto = new AppointmentUpdateDto
+            {
+                Id = SelectedAppointment.Id,
+                AppointmentStatus = SelectedAppointmentStatus,
+                StartDate = SelectedAppointment.StartDate,
+                EndDate = SelectedAppointment.EndDate,
+                Note = "", // Gerekirse doldur
+                PatientId = SelectedAppointment.PatientId, // Mevcut değer ile değiştir
+                DoctorId = SelectedAppointment.DoctorId, // Mevcut değer ile değiştir
+                DepartmentId = SelectedAppointment.DepartmentId, // Mevcut değer ile değiştir
+                AppointmentTypeId = SelectedAppointment.AppointmentTypeId // Mevcut değer ile değiştir
+            };
+
+        await AppointmentAppService.UpdateAsync(updateDto);
+        await LoadAppointmentsAsync(); // Randevular yeniden yüklenecek
+        IsEditDialogOpen = false;
+    }
     public class AppointmentListItem
     {
+        public Guid Id { get; set; }
+        public Guid DepartmentId { get; set; }
+        public Guid DoctorId { get; set; }
+        public Guid PatientId { get; set; }
+        public Guid AppointmentTypeId { get; set; }
         public string DepartmentName { get; set; }
         public string DoctorFullName { get; set; }
         public string PatientFullName { get; set; }
@@ -122,6 +334,10 @@
         public DateTime EndDate { get; set; }
         public string Status { get; set; }
         public string AppointmentTypeName { get; set; }
+    }
+     private void CloseWarningDialog()
+    {
+        IsWarningDialogOpen = false;
     }
 }
 
@@ -179,13 +395,43 @@
         margin: 0;
     }
 
-    .status-active {
+    /* Scheduled - Turuncu */
+    .status-scheduled {
+        color: orange;
+        font-weight: bold;
+    }
+
+    /* Confirmed - Mavi */
+    .status-confirmed,
+    .status-completed{
+        color: blue;
+        font-weight: bold;
+    }
+
+    /* Cancelled ve NoShow - Kırmızı */
+    .status-cancelled,
+    .status-noshow {
+        color: red;
+        font-weight: bold;
+    }
+
+    /* Pending ve InProgress - Yeşil */
+    .status-pending,
+    .status-inprogress {
         color: green;
         font-weight: bold;
     }
 
-    .status-inactive {
-        color: red;
+    /* Postponed ve Failed - Kırmızı */
+    .status-postponed,
+    .status-failed {
+        color: darkred;
+        font-weight: bold;
+    }
+
+    /* Varsayılan */
+    .status-default {
+        color: gray;
         font-weight: bold;
     }
 </style>

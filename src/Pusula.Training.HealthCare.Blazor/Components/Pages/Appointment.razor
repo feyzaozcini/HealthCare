@@ -181,7 +181,15 @@
         if(doctorResult?.Items != null)
         {
             AllDoctors = doctorResult.Items.ToList();
-            FilteredDoctors = AllDoctors;
+            FilteredDoctors = AllDoctors
+            .Select(d => new DoctorWithNavigationPropertiesDto
+                {
+                    Doctor = d.Doctor,
+                    Title = d.Title,
+                    User = d.User,
+                    FullName = $"{d.Title?.Name} {d.User?.Name} {d.User?.Surname}" // FullName oluşturuldu
+                })
+            .ToList();
         }
     }
     private async Task LoadAppointmentsAsync()
