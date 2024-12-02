@@ -35,6 +35,69 @@ public class HealthCareMenuContributor : IMenuContributor
             )
         );
 
+        context.Menu.Items.Insert(
+                1,
+                new ApplicationMenuItem(
+                    HealthCareMenus.Laboratory,
+                    l["Menu:Laboratory"],
+                    icon: "fa fa-vials",
+                    order: 1
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryDefinitions,
+                    l["Menu:Definitions"],
+                    icon: "fa fa-cogs"
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryDefinitionsTests,
+                    l["Menu:Tests"],
+                    url: "/test-groups",
+                    icon: "fa fa-flask"
+                    )
+                )
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryOperations,
+                    l["Menu:Operations"],
+                    icon: "fa fa-tools"
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryOperationsProtocolList,
+                    l["Menu:ProtocolList"],
+                    url: "/lab-protocols",
+                    icon: "fa fa-list"
+                )
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryOperationsTestRequests,
+                    l["Menu:TestRequests"],
+                    url: "/lab-request",
+                    icon: "fa fa-receipt"
+                    )
+                )
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryReports,
+                    l["Menu:Reports"],
+                    icon: "fa fa-chart-bar"
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryReportsTestStatistics,
+                    l["Menu:TestStatistics"],
+                    url: "/test-statistics-report",
+                    icon: "fa fa-chart-pie"
+                    )
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryReportsTestResults,
+                    l["Menu:TestResults"],
+                    url: "/test-results-report",
+                    icon: "fa fa-file-alt"
+                )
+            )
+        )
+    );
+
         ConfigureTenantMenu(administration, MultiTenancyConsts.IsEnabled);
 
 
