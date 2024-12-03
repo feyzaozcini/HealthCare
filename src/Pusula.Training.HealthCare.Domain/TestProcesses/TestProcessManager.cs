@@ -19,6 +19,7 @@ public class TestProcessManager(ITestProcessRepository testProcessRepository) : 
        DateTime? resultDate
        )
     {
+
         var testProcess = new TestProcess(
         GuidGenerator.Create(),
         labRequestId,

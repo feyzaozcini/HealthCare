@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
+using Volo.Abp.ObjectMapping;
 
 namespace Pusula.Training.HealthCare.TestProcesses;
 
@@ -28,8 +29,8 @@ public class TestProcessesAppService(
     public virtual async Task<TestProcessDto> CreateAsync(TestProcessesCreateDto input)
     {
         var testProcess = await testProcessManager.CreateAsync(
-            input.TestGroupItemId,
             input.LabRequestId,
+            input.TestGroupItemId,
             input.Status,
             input.Result,
             input.ResultDate
@@ -51,6 +52,9 @@ public class TestProcessesAppService(
     }
 
     public virtual async Task<TestProcessDto> GetAsync(Guid id) => ObjectMapper.Map<TestProcess, TestProcessDto>(await testProcessRepository.GetAsync(id));
+
+    //LabRequestID'ye göre TestProcess Listeleme.
+    public virtual async Task<List<TestProcessDto>> GetByLabRequestIdAsync(Guid labRequestId) => ObjectMapper.Map<List<TestProcess>, List<TestProcessDto>>(await testProcessRepository.GetByLabRequestIdAsync(labRequestId));
 
     public virtual async Task<DownloadTokenResultDto> GetDownloadTokenAsync()
     {

@@ -278,8 +278,14 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<TestValueRange, TestValueRangesDeletedDto>().ReverseMap();
         CreateMap<TestValueRange, GetTestValueRangesInput>().ReverseMap();
 
-        CreateMap<TestProcess, TestProcessDto>().ReverseMap();
+        CreateMap<TestProcess, TestProcessDto>()
+            .ForMember(dest => dest.LabRequestDate, opt => opt.MapFrom(x => x.LabRequest.CreationTime))
+            .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(x => x.LabRequest.Doctor.User.Name))
+            .ForMember(dest => dest.DoctorSurname, opt => opt.MapFrom(x => x.LabRequest.Doctor.User.Surname))
+            .ForMember(dest => dest.TestGroupItemName, opt => opt.MapFrom(x => x.TestGroupItem.Name))
+            .ReverseMap();
         CreateMap<TestProcess, TestProcessesCreateDto>().ReverseMap();
+        CreateMap<TestProcessDto, TestProcessesCreateDto>().ReverseMap();
         CreateMap<TestProcess, TestProcessesUpdateDto>().ReverseMap();
         CreateMap<TestProcess, TestProcessesDeletedDto>().ReverseMap();
         CreateMap<TestProcess, GetTestProcessesInput>().ReverseMap();

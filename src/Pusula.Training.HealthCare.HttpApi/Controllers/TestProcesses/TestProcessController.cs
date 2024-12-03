@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.TestProcesses;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -27,6 +28,10 @@ public class TestProcessController(ITestProcessesAppService testProcessesAppServ
     [HttpGet]
     [Route("{id}")]
     public Task<TestProcessDto> GetAsync(Guid id) => testProcessesAppService.GetAsync(id);
+
+    [HttpGet]
+    [Route("by-lab-request/{labRequestId}")]
+    public Task<List<TestProcessDto>> GetByLabRequestIdAsync(Guid labRequestId) => testProcessesAppService.GetByLabRequestIdAsync(labRequestId);
 
     [HttpGet]
     [Route("download-token")]

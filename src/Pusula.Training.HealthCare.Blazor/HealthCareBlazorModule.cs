@@ -46,6 +46,7 @@ using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 using Syncfusion.Blazor;
 using Pusula.Training.HealthCare.Blazor.Containers;
+using Microsoft.Extensions.Logging;
 
 namespace Pusula.Training.HealthCare.Blazor;
 
@@ -256,6 +257,24 @@ public class HealthCareBlazorModule : AbpModule
         var env = context.GetEnvironment();
         var app = context.GetApplicationBuilder();
 
+        app.Use(async (httpContext, next) =>
+        {
+            var logger = httpContext.RequestServices.GetRequiredService<ILogger<HealthCareBlazorModule>>();
+            try
+            {
+                // Ýstek bilgilerini logla
+                logger.LogInformation("Incoming request: {Method} {Path}", httpContext.Request.Method, httpContext.Request.Path);
+                await next(); // Sonraki middleware'e geç
+                logger.LogInformation("Outgoing response: {StatusCode}", httpContext.Response.StatusCode);
+            }
+            catch (Exception ex)
+            {
+                // Hatalarý logla
+                logger.LogError(ex, "An unhandled exception occurred.");
+                throw;
+            }
+        });
+
         app.UseAbpRequestLocalization();
 
         if (env.IsDevelopment())
@@ -296,5 +315,7 @@ public class HealthCareBlazorModule : AbpModule
                 .AddInteractiveServerRenderMode()
                 .AddAdditionalAssemblies(builder.ServiceProvider.GetRequiredService<IOptions<AbpRouterOptions>>().Value.AdditionalAssemblies.ToArray());
         });
+
+
     }
 }

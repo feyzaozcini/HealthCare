@@ -18,12 +18,12 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
 : EfCoreRepository<HealthCareDbContext, TestProcess, Guid>(dbContextProvider), ITestProcessRepository
 {
     public virtual async Task<long> GetCountAsync(
-        string? filterText = null, 
-        Guid? labRequestId = null, 
-        Guid? testGroupItemId = null, 
-        TestProcessStates? status = null, 
-        decimal? result = null, 
-        DateTime? resultDate = null, 
+        string? filterText = null,
+        Guid? labRequestId = null,
+        Guid? testGroupItemId = null,
+        TestProcessStates? status = null,
+        decimal? result = null,
+        DateTime? resultDate = null,
         CancellationToken cancellationToken = default)
     {
         var query = ApplyFilter((await GetDbSetAsync()), filterText, labRequestId, testGroupItemId, status, result, resultDate);
@@ -31,15 +31,15 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
     }
 
     public virtual async Task<List<TestProcess>> GetListAsync(
-        string? filterText = null, 
-        Guid? labRequestId = null, 
-        Guid? testGroupItemId = null, 
-        TestProcessStates? status = null, 
-        decimal? result = null, 
-        DateTime? resultDate = null, 
-        string? sorting = null, 
-        int maxResultCount = int.MaxValue, 
-        int skipCount = 0, 
+        string? filterText = null,
+        Guid? labRequestId = null,
+        Guid? testGroupItemId = null,
+        TestProcessStates? status = null,
+        decimal? result = null,
+        DateTime? resultDate = null,
+        string? sorting = null,
+        int maxResultCount = int.MaxValue,
+        int skipCount = 0,
         CancellationToken cancellationToken = default)
     {
         var query = ApplyFilter((await GetQueryableAsync()), filterText, labRequestId, testGroupItemId, status, result, resultDate);
@@ -68,15 +68,27 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
 
+    //LabRequestId'ye göre TestProcess listeleme.
+    public virtual async Task<List<TestProcess>> GetByLabRequestIdAsync(Guid labRequestId)
+    {
+        var query = await GetQueryForNavigationPropertiesAsync();
+
+        return await query
+            .Where(tp => tp.LabRequestId == labRequestId)
+            .ToListAsync();
+    }
+
     protected virtual async Task<IQueryable<TestProcess>> GetQueryForNavigationPropertiesAsync()
     {
         var dbSet = await GetDbSetAsync();
         return dbSet
             .Include(tp => tp.LabRequest) 
-                .ThenInclude(tp => tp.Protocol)
-            .Include(tp => tp.TestGroupItem)
-                .ThenInclude(tp => tp.TestGroup);
+                .ThenInclude(lr => lr.Protocol) 
+            .Include(tp => tp.LabRequest.Doctor)
+            .ThenInclude(tp=> tp.User)
+            .Include(tp => tp.TestGroupItem.TestGroup); 
     }
+
 
     protected virtual IQueryable<TestProcess> ApplyFilter(
     IQueryable<TestProcess> query,
@@ -100,6 +112,5 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
             .WhereIf(result.HasValue, e => e.Result == result!.Value)
             .WhereIf(resultDate.HasValue, e => e.ResultDate == resultDate!.Value);
     }
-
 
 }

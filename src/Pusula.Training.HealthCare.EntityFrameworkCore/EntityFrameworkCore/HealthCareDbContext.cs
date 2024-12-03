@@ -371,6 +371,7 @@ public class HealthCareDbContext :
 
                 b.Property(x => x.Status)
                     .HasColumnName(nameof(TestProcess.Status))
+                    .HasConversion<int>()
                     .IsRequired();
 
                 b.Property(x => x.Result)

@@ -75,6 +75,7 @@ public class LabRequestsAppService(
             input.FilterText,
             input.ProtocolId,
             input.DoctorId,
+            input.DoctorName,
             input.Date,
             input.Status,
             input.Description
@@ -83,6 +84,7 @@ public class LabRequestsAppService(
             input.FilterText,
             input.ProtocolId,
             input.DoctorId,
+            input.DoctorName,
             input.Date,
             input.Status,
             input.Description,
@@ -104,6 +106,7 @@ public class LabRequestsAppService(
             input.FilterText,
             input.ProtocolId,
             input.DoctorId,
+            input.DoctorName,
             input.Date,
             input.Status,
             input.Description
@@ -112,6 +115,7 @@ public class LabRequestsAppService(
             input.FilterText,
             input.ProtocolId,
             input.DoctorId,
+            input.DoctorName,
             input.Date,
             input.Status,
             input.Description,
