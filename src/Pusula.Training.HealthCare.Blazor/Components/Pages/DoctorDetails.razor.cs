@@ -14,7 +14,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         public Guid DoctorId { get; set; }
 
         private DateTime selectedDate = DateTime.Now;
-        private List<ProtocolWithNavigationPropertiesDto> ProtocolsList { get; set; } = new();
+        private List<ProtocolDto> ProtocolsList { get; set; } = new();
 
 
         private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
@@ -31,10 +31,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             var input = new GetProtocolsInput
             {
                 FilterText =null,
-                Type = null,
-                StartTimeMin = null,
-                StartTimeMax = null,
-                EndTime =null,
+                StartTime = null,
+                EndTime = null,
+                No = null,
+                ProtocolStatus =null,
+                ProtocolTypeId =null,
+                ProtocolNoteId =null,
+                ProtocolInsuranceId =null,
                 PatientId = null,
                 DepartmentId = null,
                 DoctorId = DoctorId,

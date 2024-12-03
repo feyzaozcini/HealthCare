@@ -55,7 +55,6 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Patient, PatientDeletedDto>();
 
         CreateMap<Protocol, ProtocolDto>();
-        CreateMap<Protocol, ProtocolExcelDto>();
         CreateMap<ProtocolDto, ProtocolUpdateDto>();
         CreateMap<ProtocolWithNavigationProperties, ProtocolWithNavigationPropertiesDto>();
 
@@ -86,7 +85,6 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<LabRequest, LabRequestUpdateDto>().ReverseMap();
         CreateMap<LabRequest, LabRequestDeletedDto>().ReverseMap();
         CreateMap<LabRequest, LabRequestDto>()
-            .ForMember(dest => dest.ProtocolType, opt=> opt.MapFrom(x => x.Protocol.Type))
             .ForMember(dest => dest.ProtocolStartDate, opt=> opt.MapFrom(x => x.Protocol.StartTime))
             .ForMember(dest => dest.ProtocolEndDate, opt=> opt.MapFrom(x => x.Protocol.EndTime))
             .ForMember(dest => dest.DoctorName, opt=> opt.MapFrom(x => x.Doctor.User.Name))

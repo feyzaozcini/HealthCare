@@ -24,7 +24,7 @@ public partial class Protocols
     protected List<Volo.Abp.BlazoriseUI.BreadcrumbItem> BreadcrumbItems = [];
     protected PageToolbar Toolbar { get; } = new PageToolbar();
     protected bool ShowAdvancedFilters { get; set; }
-    private IReadOnlyList<ProtocolWithNavigationPropertiesDto> ProtocolList { get; set; }
+    private IReadOnlyList<ProtocolDto> ProtocolList { get; set; }
     private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
     private int CurrentPage { get; set; } = 1;
     private string CurrentSorting { get; set; } = string.Empty;
@@ -93,7 +93,6 @@ public partial class Protocols
 
     protected virtual ValueTask SetToolbarItemsAsync()
     {
-        Toolbar.AddButton(L["ExportToExcel"], DownloadAsExcelAsync, IconName.Download);
 
         Toolbar.AddButton(L["NewProtocol"], OpenCreateProtocolModalAsync, IconName.Add, requiredPolicyName: HealthCarePermissions.Protocols.Create);
 
@@ -132,18 +131,7 @@ public partial class Protocols
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task DownloadAsExcelAsync()
-    {
-        var token = (await ProtocolsAppService.GetDownloadTokenAsync()).Token;
-        var remoteService = await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("HealthCare") ?? await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
-        var culture = CultureInfo.CurrentUICulture.Name ?? CultureInfo.CurrentCulture.Name;
-        if (!culture.IsNullOrEmpty())
-        {
-            culture = "&culture=" + culture;
-        }
-        await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
-        NavigationManager.NavigateTo($"{remoteService?.BaseUrl.EnsureEndsWith('/') ?? string.Empty}api/app/protocols/as-excel-file?DownloadToken={token}&FilterText={HttpUtility.UrlEncode(Filter.FilterText)}{culture}&Type={HttpUtility.UrlEncode(Filter.Type)}&StartTimeMin={Filter.StartTimeMin?.ToString("O")}&StartTimeMax={Filter.StartTimeMax?.ToString("O")}&EndTime={HttpUtility.UrlEncode(Filter.EndTime)}&PatientId={Filter.PatientId}&DepartmentId={Filter.DepartmentId}", forceLoad: true);
-    }
+  
 
     private async Task OnDataGridReadAsync(DataGridReadDataEventArgs<ProtocolWithNavigationPropertiesDto> e)
     {
@@ -192,8 +180,8 @@ public partial class Protocols
 
         var protocol = await ProtocolsAppService.GetWithNavigationPropertiesAsync(input.Protocol.Id);
 
-        EditingProtocolId = protocol.Protocol.Id;
-        EditingProtocol = ObjectMapper.Map<ProtocolDto, ProtocolUpdateDto>(protocol.Protocol);
+        EditingProtocolId = protocol.Id;
+        EditingProtocol = ObjectMapper.Map<ProtocolDto, ProtocolUpdateDto>(protocol);
 
         await EditingProtocolValidations.ClearAll();
         await EditProtocolModal.Show();
@@ -248,26 +236,26 @@ public partial class Protocols
         }
     }
 
-    protected virtual async Task OnTypeChangedAsync(string? type)
-    {
-        Filter.Type = type;
-        await SearchAsync();
-    }
-    protected virtual async Task OnStartTimeMinChangedAsync(DateTime? startTimeMin)
-    {
-        Filter.StartTimeMin = startTimeMin.HasValue ? startTimeMin.Value.Date : startTimeMin;
-        await SearchAsync();
-    }
-    protected virtual async Task OnStartTimeMaxChangedAsync(DateTime? startTimeMax)
-    {
-        Filter.StartTimeMax = startTimeMax.HasValue ? startTimeMax.Value.Date.AddDays(1).AddSeconds(-1) : startTimeMax;
-        await SearchAsync();
-    }
-    protected virtual async Task OnEndTimeChangedAsync(string? endTime)
-    {
-        Filter.EndTime = endTime;
-        await SearchAsync();
-    }
+    //protected virtual async Task OnTypeChangedAsync(string? type)
+    //{
+    //    Filter.Type = type;
+    //    await SearchAsync();
+    //}
+    //protected virtual async Task OnStartTimeMinChangedAsync(DateTime? startTimeMin)
+    //{
+    //    Filter.StartTimeMin = startTimeMin.HasValue ? startTimeMin.Value.Date : startTimeMin;
+    //    await SearchAsync();
+    //}
+    //protected virtual async Task OnStartTimeMaxChangedAsync(DateTime? startTimeMax)
+    //{
+    //    Filter.StartTimeMax = startTimeMax.HasValue ? startTimeMax.Value.Date.AddDays(1).AddSeconds(-1) : startTimeMax;
+    //    await SearchAsync();
+    //}
+    //protected virtual async Task OnEndTimeChangedAsync(string? endTime)
+    //{
+    //    Filter.EndTime = endTime;
+    //    await SearchAsync();
+    //}
     protected virtual async Task OnPatientIdChangedAsync(Guid? patientId)
     {
         Filter.PatientId = patientId;

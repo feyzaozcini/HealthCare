@@ -16,6 +16,8 @@ using Pusula.Training.HealthCare.DoctorDepartments;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Titles;
 using Volo.Abp.Identity;
+using Pusula.Training.HealthCare.Exceptions;
+using Pusula.Training.HealthCare.Appointments;
 
 namespace Pusula.Training.HealthCare.Protocols;
 
@@ -24,155 +26,148 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
 {
     public virtual async Task DeleteAllAsync(
         string? filterText = null,
-        string? type = null,
-        DateTime? startTimeMin = null,
-        DateTime? startTimeMax = null,
-        string? endTime = null,
+        DateTime? startTime = null,
+        DateTime? endTime = null,
+        ProtocolStatus? protocolStatus = null,
+        Guid? protocolTypeId = null,
+        Guid? protocolNoteId = null,
+        Guid? protocolInsuranceId = null,
         Guid? patientId = null,
         Guid? departmentId = null,
+        Guid? doctorId = null,
+        int? no = null,
         CancellationToken cancellationToken = default)
     {
-        var query = await GetQueryForNavigationPropertiesAsync();
+        //var query = await GetQueryForNavigationPropertiesAsync();
 
-        query = ApplyFilter(query, filterText, type, startTimeMin, startTimeMax, endTime, patientId, departmentId);
+        var query = await GetQueryableAsync();
 
-        var ids = query.Select(x => x.Protocol.Id);
+
+        query = ApplyFilter(query, filterText, startTime, endTime, protocolStatus, protocolTypeId, protocolNoteId, protocolInsuranceId, patientId, departmentId, doctorId, no);
+
+        var ids = query.Select(x => x.Id);
         await DeleteManyAsync(ids, cancellationToken: GetCancellationToken(cancellationToken));
     }
 
-    public virtual async Task<ProtocolWithNavigationProperties> GetWithNavigationPropertiesAsync(Guid id, CancellationToken cancellationToken = default)
+    public virtual async Task<long> GetCountAsync(
+       string? filterText = null,
+       DateTime? startTime = null,
+       DateTime? endTime = null,
+       ProtocolStatus? protocolStatus = null,
+       Guid? protocolTypeId = null,
+       Guid? protocolNoteId = null,
+       Guid? protocolInsuranceId = null,
+       Guid? patientId = null,
+       Guid? departmentId = null,
+       Guid? doctorId = null,
+       int? no = null,
+       CancellationToken cancellationToken = default)
     {
-        var dbContext = await GetDbContextAsync();
+        //var query = await GetQueryForNavigationPropertiesAsync();
 
-        return (await GetDbSetAsync()).Where(b => b.Id == id)
-            .Select(protocol => new ProtocolWithNavigationProperties
-            {
-                Protocol = protocol,
-                Patient = dbContext.Set<Patient>().FirstOrDefault(c => c.Id == protocol.PatientId)!,
-                Department = dbContext.Set<Department>().FirstOrDefault(c => c.Id == protocol.DepartmentId)!
-            }).FirstOrDefault()!;
-    }
+        var query = ApplyFilter(await GetDbSetAsync(), filterText, startTime, endTime, protocolStatus, protocolTypeId, protocolNoteId, protocolInsuranceId, patientId, departmentId, doctorId,no);
 
-    public virtual async Task<List<ProtocolWithNavigationProperties>> GetListWithNavigationPropertiesAsync(
-        string? filterText = null,
-        string? type = null,
-        DateTime? startTimeMin = null,
-        DateTime? startTimeMax = null,
-        string? endTime = null,
-        Guid? patientId = null,
-        Guid? departmentId = null,
-        Guid? doctorId=null,
-        string? sorting = null,
-        int maxResultCount = int.MaxValue,
-        int skipCount = 0,
-        CancellationToken cancellationToken = default)
-    {
-        var query = await GetQueryForNavigationPropertiesAsync();
-        
-        query = ApplyFilter(query, filterText, type, startTimeMin, startTimeMax, endTime, patientId,doctorId, departmentId);
-        query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? ProtocolConsts.GetDefaultSorting(true) : sorting);
-        return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
-    }
-
-    protected virtual async Task<IQueryable<ProtocolWithNavigationProperties>> GetQueryForNavigationPropertiesAsync()
-    {
-
-        var dbContext = await GetDbContextAsync();
-
-
-        return from protocol in (await GetDbSetAsync())
-               join patient in (await GetDbContextAsync()).Set<Patient>() on protocol.PatientId equals patient.Id into patients
-               from patient in patients.DefaultIfEmpty()
-               join doctor in (await GetDbContextAsync()).Set<Doctor>() on protocol.DoctorId equals doctor.Id into doctors
-               from doctor in doctors.DefaultIfEmpty()
-               join department in (await GetDbContextAsync()).Set<Department>() on protocol.DepartmentId equals department.Id into departments
-               from department in departments.DefaultIfEmpty()
-               select new ProtocolWithNavigationProperties
-               {
-                   Protocol = protocol,
-                   Patient = patient,
-                   Department = department,
-                   Doctor=doctor
-
-               };
-
-    }
-
-    protected virtual IQueryable<ProtocolWithNavigationProperties> ApplyFilter(
-        IQueryable<ProtocolWithNavigationProperties> query,
-        string? filterText,
-        string? type = null,
-        DateTime? startTimeMin = null,
-        DateTime? startTimeMax = null,
-        string? endTime = null,
-        Guid? patientId = null,
-        Guid? doctorId = null,
-        Guid? departmentId = null)
-    {
-        return query
-            .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Protocol.Type!.Contains(filterText!) || e.Protocol.EndTime!.Contains(filterText!) || e.Patient.FirstName!.StartsWith(filterText!) || e.Patient.LastName!.StartsWith(filterText!) || e.Patient.No!.ToString().StartsWith(filterText!))
-                .WhereIf(!string.IsNullOrWhiteSpace(type), e => e.Protocol.Type.Contains(type!))
-                .WhereIf(startTimeMin.HasValue, e => e.Protocol.StartTime >= startTimeMin!.Value)
-                .WhereIf(startTimeMax.HasValue, e => e.Protocol.StartTime <= startTimeMax!.Value)
-                .WhereIf(!string.IsNullOrWhiteSpace(endTime), e => e.Protocol.EndTime != null && e.Protocol.EndTime.Contains(endTime!))
-                .WhereIf(patientId != null && patientId != Guid.Empty, e => e.Patient != null && e.Patient.Id == patientId)
-                .WhereIf(departmentId != null && departmentId != Guid.Empty, e => e.Department != null && e.Department.Id == departmentId)
-                .WhereIf(doctorId != null && doctorId != Guid.Empty, e => e.Doctor != null && e.Doctor != null && e.Doctor.Id == doctorId);
-
-
+        return await query.LongCountAsync(GetCancellationToken(cancellationToken));
     }
 
     public virtual async Task<List<Protocol>> GetListAsync(
-        string? filterText = null,
-        string? type = null,
-        DateTime? startTimeMin = null,
-        DateTime? startTimeMax = null,
-        string? endTime = null,
-        Guid? doctorId = null,
-        string? sorting = null,
-        int maxResultCount = int.MaxValue,
-        int skipCount = 0,
-        CancellationToken cancellationToken = default)
+       string? filterText = null,
+       DateTime? startTime = null,
+       DateTime? endTime = null,
+       ProtocolStatus? protocolStatus = null,
+       Guid? protocolTypeId = null,
+       Guid? protocolNoteId = null,
+       Guid? protocolInsuranceId = null,
+       Guid? patientId = null,
+       Guid? departmentId = null,
+       Guid? doctorId = null,
+       int? no = null,
+       string? sorting = null,
+       int maxResultCount = int.MaxValue,
+       int skipCount = 0,
+       CancellationToken cancellationToken = default)
     {
-        var query = ApplyFilter((await GetQueryableAsync()), filterText, type, startTimeMin, startTimeMax,doctorId, endTime);
+        var query = ApplyFilter(await GetQueryableAsync(), filterText, startTime, endTime, protocolStatus, protocolTypeId, protocolNoteId, protocolInsuranceId, patientId, departmentId, doctorId, no);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? ProtocolConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
 
-    public virtual async Task<long> GetCountAsync(
-        string? filterText = null,
-        string? type = null,
-        DateTime? startTimeMin = null,
-        DateTime? startTimeMax = null,
-        string? endTime = null,
-        Guid? patientId = null,
-        Guid? departmentId = null,
-        Guid? doctorId = null,
-        CancellationToken cancellationToken = default)
+    public virtual async Task<List<Protocol>> GetListWithNavigationPropertiesAsync(
+       string? filterText = null,
+       DateTime? startTime = null,
+       DateTime? endTime = null,
+       ProtocolStatus? protocolStatus = null,
+       Guid? protocolTypeId = null,
+       Guid? protocolNoteId = null,
+       Guid? protocolInsuranceId = null,
+       Guid? patientId = null,
+       Guid? departmentId = null,
+       Guid? doctorId = null,
+       int? no = null,
+       string? sorting = null,
+       int maxResultCount = int.MaxValue,
+       int skipCount = 0,
+       CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
-      
-        query = ApplyFilter(query, filterText, type, startTimeMin, startTimeMax, endTime, patientId,doctorId, departmentId);
-       
-        return await query.LongCountAsync(GetCancellationToken(cancellationToken));
+        query = ApplyFilter(query, filterText, startTime, endTime, protocolStatus, protocolTypeId, protocolNoteId, protocolInsuranceId, patientId, departmentId, doctorId, no);
+        query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? ProtocolConsts.GetDefaultSorting(true) : sorting);
+        return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
+    }
+
+    public virtual async Task<Protocol> GetWithNavigationPropertiesAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var query = await GetQueryForNavigationPropertiesAsync();
+        var protocol = await query.FirstOrDefaultAsync(pr => pr.Id == id, cancellationToken);
+        return protocol!;
+    }
+
+    protected virtual async Task<IQueryable<Protocol>> GetQueryForNavigationPropertiesAsync()
+    {
+
+        var dbSet = await GetDbSetAsync();
+        return dbSet
+            .Include(pr => pr.ProtocolType)
+            .Include(pr => pr.Note)
+            .Include(pr => pr.Insurance)
+            .Include(pr => pr.Patient)
+            .Include(pr => pr.Department)
+            .Include(pr => pr.Doctor)
+                .ThenInclude(pr => pr.User);
     }
 
     protected virtual IQueryable<Protocol> ApplyFilter(
-        IQueryable<Protocol> query,
-        string? filterText = null,
-        string? type = null,
-        DateTime? startTimeMin = null,
-        DateTime? startTimeMax = null,
-        Guid? doctorId= null,
-        string? endTime = null)
+       IQueryable<Protocol> query,
+       string? filterText = null,
+       DateTime? startTime = null,
+       DateTime? endTime = null,
+       ProtocolStatus? protocolStatus = null,
+       Guid? protocolTypeId = null,
+       Guid? protocolNoteId = null,
+       Guid? protocolInsuranceId = null,
+       Guid? patientId = null,
+       Guid? departmentId = null,
+       Guid? doctorId = null,
+       int? no = null)
     {
         return query
-                .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Type!.Contains(filterText!) || e.EndTime!.Contains(filterText!))
-                .WhereIf(!string.IsNullOrWhiteSpace(type), e => e.Type.Contains(type!))
-                .WhereIf(startTimeMin.HasValue, e => e.StartTime >= startTimeMin!.Value)
-                .WhereIf(startTimeMax.HasValue, e => e.StartTime <= startTimeMax!.Value)
-                .WhereIf(!string.IsNullOrWhiteSpace(endTime), e => e.EndTime != null && e.EndTime.Contains(endTime!))
-                .WhereIf(doctorId.HasValue, e => e.DoctorId == doctorId);
+                .WhereIf(!string.IsNullOrWhiteSpace(filterText), e =>
+                    e.No.ToString().StartsWith(filterText!) ||
+                    e.Patient.FirstName!.StartsWith(filterText!) ||
+                    e.Patient.LastName!.StartsWith(filterText!) ||
+                    e.Patient.No!.ToString().StartsWith(filterText!))
 
+                .WhereIf(startTime.HasValue, e => e.StartTime >= startTime!.Value)
+                .WhereIf(endTime.HasValue, e => e.EndTime <= endTime!.Value)
+                .WhereIf(no.HasValue, e => e.No.ToString().StartsWith(no!.Value.ToString()))
+                .WhereIf(protocolStatus.HasValue, e => e.ProtocolStatus == protocolStatus!.Value)
+                //.WhereIf(protocolStatus.HasValue, e => e.ProtocolStatus.ToString() == protocolStatus.ToString())
+                .WhereIf(protocolTypeId != null && protocolTypeId != Guid.Empty, e => e.ProtocolTypeId == protocolTypeId)
+                .WhereIf(protocolNoteId != null && protocolNoteId != Guid.Empty, e => e.ProtocolNoteId == protocolNoteId)
+                .WhereIf(protocolInsuranceId != null && protocolInsuranceId != Guid.Empty, e => e.ProtocolInsuranceId == protocolInsuranceId)
+                .WhereIf(patientId != null && patientId != Guid.Empty, e => e.Patient.Id == patientId)
+                .WhereIf(departmentId != null && departmentId != Guid.Empty, e => e.Department.Id == departmentId)
+                .WhereIf(doctorId != null && doctorId != Guid.Empty, e => e.Doctor.Id == doctorId);
+                
     }
 }
