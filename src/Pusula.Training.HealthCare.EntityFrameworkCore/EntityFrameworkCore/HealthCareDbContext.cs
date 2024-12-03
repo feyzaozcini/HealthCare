@@ -150,6 +150,9 @@ public class HealthCareDbContext :
             // Patient tablosu için sequence tanımlama
             builder.HasSequence<int>("PatientNoSequence").StartsAt(10000).IncrementsBy(1);
 
+            builder.HasSequence<int>("ProtocolNoSequence").StartsAt(20000).IncrementsBy(1);
+
+
             // Migrationdan önce kontrol edilmesi gereken tablolar
             builder.Entity<Patient>(b =>
             {
@@ -183,6 +186,29 @@ public class HealthCareDbContext :
 
             });
 
+            builder.Entity<Protocol>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Protocols", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.StartTime).HasColumnName(nameof(Protocol.StartTime));
+                b.Property(x => x.EndTime).HasColumnName(nameof(Protocol.EndTime));
+                b.Property(x => x.ProtocolStatus).HasColumnName(nameof(Protocol.ProtocolStatus));
+                //b.Property(x => x.ProtocolStatus).HasColumnName(nameof(Protocol.ProtocolStatus)).HasConversion<string>();
+                b.Property(x => x.ProtocolTypeId).HasColumnName(nameof(Protocol.ProtocolType));
+                b.Property(x => x.ProtocolNoteId).HasColumnName(nameof(Protocol.Note));
+                b.Property(x => x.ProtocolInsuranceId).HasColumnName(nameof(Protocol.Insurance));
+                b.Property(x => x.PatientId).HasColumnName(nameof(Protocol.Patient));
+                b.Property(x => x.DepartmentId).HasColumnName(nameof(Protocol.Department));
+                b.Property(x => x.DoctorId).HasColumnName(nameof(Protocol.Doctor));
+                b.Property(x => x.No).HasColumnName(nameof(Protocol.No)).IsRequired().HasDefaultValueSql("nextval('\"ProtocolNoSequence\"')");
+                b.HasOne(x => x.ProtocolType).WithMany().IsRequired().HasForeignKey(x => x.ProtocolTypeId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x => x.Note).WithOne().HasForeignKey<Protocol>(x => x.ProtocolNoteId).IsRequired().OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x => x.Insurance).WithMany().IsRequired().HasForeignKey(x => x.ProtocolInsuranceId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x => x.Patient).WithMany().IsRequired().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x => x.Department).WithMany().IsRequired().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x => x.Doctor).WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+            });
+
             builder.Entity<Department>(b =>
             {
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Departments", HealthCareConsts.DbSchema);
@@ -191,17 +217,7 @@ public class HealthCareDbContext :
                 b.HasMany(x => x.Doctors).WithOne().HasForeignKey(x => x.DepartmentId).IsRequired();
             });
 
-            builder.Entity<Protocol>(b =>
-            {
-                b.ToTable(HealthCareConsts.DbTablePrefix + "Protocols", HealthCareConsts.DbSchema);
-                b.ConfigureByConvention();
-                b.Property(x => x.Type).HasColumnName(nameof(Protocol.Type)).IsRequired().HasMaxLength(ProtocolConsts.TypeMaxLength);
-                b.Property(x => x.StartTime).HasColumnName(nameof(Protocol.StartTime));
-                b.Property(x => x.EndTime).HasColumnName(nameof(Protocol.EndTime));
-                b.HasOne<Patient>().WithMany().IsRequired().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Department>().WithMany().IsRequired().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Doctor>().WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
-            });
+           
 
             builder.Entity<ProtocolType>(b =>
             {

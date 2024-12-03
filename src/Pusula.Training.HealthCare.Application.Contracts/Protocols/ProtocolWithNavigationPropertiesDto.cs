@@ -9,6 +9,5 @@ public class ProtocolWithNavigationPropertiesDto
     public ProtocolDto Protocol { get; set; } = null!;
     public PatientDto Patient { get; set; } = null!;
     public DepartmentDto Department { get; set; } = null!;
-
     public DoctorDto Doctor { get; set; } = null!;
 }
