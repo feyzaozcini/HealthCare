@@ -16,25 +16,23 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private List<LabRequestDto> LabRequestsList { get; set; } = new List<LabRequestDto>();
         private GetLabRequestsInput? LabRequestsFilter { get; set; }
 
-        private Guid SelectedLabRequestId { get; set; } = Guid.Empty;
-
         private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
         private int CurrentPage { get; set; } = 1;
         private long TotalCount;
 
-
         protected override async Task OnInitializedAsync()
         {
             LabRequestsFilter = new GetLabRequestsInput(
-                   filterText: null,
-                   protocolId: null,
-                   doctorId: null,
-                   date: null,
-                   status: null,
-                   description: null,
-                   currentPage: CurrentPage,
-                   pageSize: PageSize
-               );
+                filterText: null,
+                protocolId: null,
+                doctorId: null,
+                doctorName: null,
+                date: null,
+                status: null,
+                description: null,
+                currentPage: CurrentPage,
+                pageSize: PageSize
+            );
             await GetLabRequestsAsync();
         }
 
@@ -45,32 +43,23 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             TotalCount = result.TotalCount;
         }
 
-        //Search
         private async Task OnInputChange(InputEventArgs args)
         {
             LabRequestsFilter!.FilterText = args.Value;
             await GetLabRequestsAsync();
         }
 
-        //Seçilen Row'un ID'sini tutar.
         private void RowSelectHandler(RowSelectEventArgs<LabRequestDto> args)
         {
-            SelectedLabRequestId = args.Data?.Id ?? Guid.Empty;
+            LabRequestService.SelectedLabRequest = args.Data;
         }
 
-        //Seçilen LabRequest bilgileri ile Test Ýstem sayfasýna yönlendirir.
         private void RedirectToTestRequest()
         {
-            if (SelectedLabRequestId != Guid.Empty)
+            if (LabRequestService.SelectedLabRequest != null)
             {
-                var selectedLabRequest = LabRequestsList.FirstOrDefault(lr => lr.Id == SelectedLabRequestId);
-                if (selectedLabRequest != null)
-                {
-                    LabRequestStateContainer.SelectedLabRequest = selectedLabRequest;
-                    NavigationManager.NavigateTo("/lab-request");
-                }
+                NavigationManager.NavigateTo("/lab-request");
             }
         }
-
     }
 }

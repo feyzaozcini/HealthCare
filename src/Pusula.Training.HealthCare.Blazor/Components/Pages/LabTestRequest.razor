@@ -1,16 +1,25 @@
 ﻿@page "/lab-request"
-@inject NavigationManager NavigationManager
 
 @using Pusula.Training.HealthCare.Blazor.Containers
 @using Pusula.Training.HealthCare.LabRequests
 @using Pusula.Training.HealthCare.TestGroupItems
 @using Pusula.Training.HealthCare.TestGroups
+@using Pusula.Training.HealthCare.TestProcesses
 @using Syncfusion.Blazor.Calendars
 
-@inject LabRequestStateContainer LabRequestStateContainer
+@inject NavigationManager NavigationManager
+@inject LabRequestStateContainer LabRequestService
 @inject ITestGroupItemsAppService TestGroupItemsAppService
 @inject ITestGroupsAppService TestGroupsAppService
+@inject ILabRequestsAppService LabRequestsAppService
+@inject ITestProcessesAppService TestProcessesAppService
 
+@if (!_isInitialized)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
 @*Patient Details Bar*@
 <div class="w-100 mb-1 border-bottom shadow">
     <SfToolbar CssClass="e-fill e-flat">
@@ -35,6 +44,9 @@
 </div>
 
 @*TestList Bar*@
+
+
+@*Test Groups & Items Data Grid*@
 <div class="d-flex flex-row">
     <div class="col-2">
         <SfTextBox Placeholder="Test Ara"
@@ -43,17 +55,12 @@
                    Width="100%"
                    Input="@(async (args) => await SearchAsync(args))">
         </SfTextBox>
+
     </div>
     <div class="col-10">
         <SfToolbar>
             <ToolbarItems>
-                <ToolbarItem Align="ItemAlign.Left">
-                    <Template>
-                        <span class="fw-bold fs-5">
-                            @SelectedGroupName
-                        </span>
-                    </Template>
-                </ToolbarItem>
+
             </ToolbarItems>
         </SfToolbar>
     </div>
@@ -76,17 +83,20 @@
             </GridColumns>
         </SfGrid>
     </div>
-    @*Sağ*@
+
+    <!-- Sağ: Tabs -->
     <div class="col-10">
         <SfGrid DataSource="@TestGroupItemsList" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
             <GridColumns>
-                <GridColumn Width="5%" TextAlign="TextAlign.Center">
+                <GridColumn Width="3%">
                     <Template>
-                        <SfCheckBox TValue="bool"
-                                    CssClass="e-small"
-                                    Checked="false"
-                                    Changed="args => OnCheckboxChanged(args, ((TestGroupItemDto)context).Id)">
-                        </SfCheckBox>
+                        @if (context is TestGroupItemDto testGroupItem)
+                        {
+                            <SfButton CssClass="e-icon-left e-flat e-small"
+                                      IconCss="e-icons e-plus"
+                                      OnClick="(() => OnAddClick(testGroupItem))">
+                            </SfButton>
+                        }
                     </Template>
                 </GridColumn>
                 <GridColumn HeaderText="Test Adı - Kodu" Width="40%" TextAlign="TextAlign.Left">
@@ -97,14 +107,13 @@
                         }
                     </Template>
                 </GridColumn>
-                <GridColumn Field=@nameof(TestGroupItem.TestType) HeaderText="Test Tipi" Width="30%" TextAlign="TextAlign.Center"></GridColumn>
-                <GridColumn HeaderText="Açıklama" Width="25%" TextAlign="TextAlign.Center">
+                <GridColumn Field="@nameof(TestGroupItem.TestType)" HeaderText="Test Tipi" Width="30%" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn HeaderText="Açıklama" Width="20%" TextAlign="TextAlign.Center">
                     <Template>
                         @if (context is TestGroupItemDto testGroupItem)
                         {
                             <SfButton CssClass="e-small e-link"
-                                      OnClick="(() => OpenDescriptionModal(testGroupItem.Description))"
-                                      Style="@(string.IsNullOrEmpty(testGroupItem.Description) ? "display:none;" : "")">
+                                      OnClick="(() => OpenDescriptionModal(testGroupItem.Description))">
                                 <i class="fa-regular fa-file"></i>
                             </SfButton>
                         }
@@ -117,26 +126,7 @@
 @*Data Grid Bottom Bar*@
 <div class="mt-0 border-bottom pb-2">
     <SfToolbar>
-        <ToolbarItems>
-            <ToolbarItem Align="ItemAlign.Right">
-                <Template>
-                    <SfButton CssClass="e-outline e-icon-left"
-                              Content="Planla"
-                              IconCss="e-icons e-clock"
-                              OnClick="OnPlanningClick">
-                    </SfButton>
-                </Template>
-            </ToolbarItem>
-            <ToolbarItem Align="ItemAlign.Right">
-                <Template>
-                    <SfButton CssClass="e-outline e-icon-left"
-                              Content="Ekle"
-                              IconCss="e-icons e-align-bottom"
-                              OnClick="OnAddClick">
-                    </SfButton>
-                </Template>
-            </ToolbarItem>
-        </ToolbarItems>
+
     </SfToolbar>
 </div>
 
@@ -156,13 +146,6 @@
                                StartDate="@DateTime.Today"
                                EndDate="@DateTime.Today.AddDays(1)">
             </SfDateRangePicker>
-
-            <SfDropDownList TItem="string"
-                            TValue="string"
-                            Width="50%"
-                            Placeholder="Order Tipi Seçin"
-                            DataSource="OrderTypes">
-            </SfDropDownList>
         </div>
 
         <div class="col-md-3 text-end">
@@ -176,15 +159,30 @@
 </div>
 
 @*Requests List*@
-<SfGrid DataSource="@LabRequestDetails" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="500px">
+<SfGrid @ref="TestProcessesGrid" DataSource="@TestProcessesList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="300px" PrintMode="PrintMode.AllPages">
     <GridColumns>
-        <GridColumn Field="@nameof(LabRequestStateContainer.SelectedLabRequest.ProtocolType)" HeaderText="İstem Tipi" Width="15"></GridColumn>
-        <GridColumn HeaderText="İsteyen Doktor" Width="20">
+        <GridColumn Field="@nameof(TestProcessDto.DoctorName)"
+                    HeaderText="İsteyen Doktor Adı"
+                    Width="15">
+        </GridColumn>
+        <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)"
+                    HeaderText="İstenen Test"
+                    Width="25">
+        </GridColumn>
+        <GridColumn Field="@nameof(TestProcessDto.Status)"
+                    HeaderText="İşlem Durumu"
+                    Width="15">
+        </GridColumn>
+        <GridColumn HeaderText="Actions" Width="5" TextAlign="TextAlign.Center">
             <Template>
-                @($"{LabRequestStateContainer.SelectedLabRequest.DoctorName} {LabRequestStateContainer.SelectedLabRequest.DoctorSurname}")
+                @if (context is TestProcessDto testProcess)
+                {
+                    <div class="d-flex justify-content-center">
+                        <SfButton CssClass="e-small e-danger" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(testProcess.Id))"></SfButton>
+                    </div>
+                }
             </Template>
         </GridColumn>
-        <GridColumn Field="@nameof(LabRequestStateContainer.SelectedLabRequest.ProtocolStartDate)" HeaderText="İstem Tarihi" Width="15"></GridColumn>
     </GridColumns>
 </SfGrid>
 
@@ -199,3 +197,18 @@
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
+
+@*Delete Modal*@
+<SfDialog @ref="DeleteTestProcessDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <p>Silmek istediğinize emin misiniz?</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="e-small e-danger" OnClick="ConfirmTestProcessDelete">Evet</SfButton>
+            <SfButton CssClass="e-small e-primary" OnClick="CloseTestProcessDeleteModal">Hayır</SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+}

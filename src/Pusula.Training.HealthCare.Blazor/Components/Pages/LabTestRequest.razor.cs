@@ -12,78 +12,100 @@ using Syncfusion.Blazor.Inputs;
 using System.Linq;
 using Microsoft.AspNetCore.Components;
 using Pusula.Training.HealthCare.LabRequests;
+using Pusula.Training.HealthCare.TestProcesses;
+using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages;
 
 public partial class LabTestRequest
 {
     private List<TestGroupItemDto> TestGroupItemsList { get; set; } = new List<TestGroupItemDto>();
-    private LabRequestDto? LabRequest { get; set; }
-    private List<TestGroupDto> TestGroupsList { get; set; } = new List<TestGroupDto>();
-    private IReadOnlyList<LookupDto<Guid>> TestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
     private GetTestGroupItemsInput? TestGroupItemsFilter { get; set; }
+    private IReadOnlyList<LookupDto<Guid>> TestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
     private GetTestGroupsInput? TestGroupsFilter { get; set; }
-    private List<object> GridData = new() { new object() };
-    private List<string> OrderTypes = new List<string> { "Laboratuvar", "Patoloji", "Ameliyat" };
-
-
+    private List<TestGroupDto> TestGroupsList { get; set; } = new List<TestGroupDto>();
+    private List<TestProcessesCreateDto> CreatedTestProcesses { get; set; } = new();
+    private List<TestProcessDto> TestProcessesList = new();
+    private LabRequestDto? LabRequest { get; set; }
     private string SelectedDescription = string.Empty;
+    private SfGrid<TestProcessDto>? TestProcessesGrid;
+
     private Guid? SelectedTestGroupId { get; set; } = null;
-    private string SelectedOrderType { get; set; } = string.Empty;
-    private string SelectedGroupName { get; set; } = "Laboratuvar";
-    private List<Guid> SelectedIds = new List<Guid>();
+    private Guid? SelectedTestProcessId { get; set; } = null;
 
     private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
     private int CurrentPage { get; set; } = 1;
     private long TotalCount;
 
-    private SfDialog? DescriptionDialog;
+    private SfDialog? DeleteTestProcessDialog;
+    private bool _isInitialized = false;
 
+
+    private SfDialog? DescriptionDialog;
     private DateTime[] FilterByDateRange = { DateTime.Today, DateTime.Today.AddDays(30) };
 
-    [Parameter]
-    public Guid LabRequestId { get; set; }
-    private List<LabRequestDto> LabRequestDetails { get; set; } = new();
     protected override async Task OnInitializedAsync()
     {
-        LabRequestDetails = new List<LabRequestDto>
-    {
-        LabRequestStateContainer.SelectedLabRequest
-    };
+        if (LabRequestService.SelectedLabRequest == null || LabRequestService.SelectedLabRequest.Id == Guid.Empty)
+        {
+            NavigationManager.NavigateTo("/lab-protocols");
+            return;
+        }
+
+        // LabRequest mevcutsa gerekli iþlemleri yap
         TestGroupsFilter = new GetTestGroupsInput();
         TestGroupItemsFilter = new GetTestGroupItemsInput();
+        await LoadTestProcessesAsync();
         await GetTestGroupItemsAsync();
         await GetTestGroupsAsync();
         await LoadLookupsAsync();
-        SelectedIds = new List<Guid> { TestGroupItemsList[0].Id };
-    }
-    private void OnPrintClick()
-    {
-        Console.WriteLine("Ýstem Yazdýr týklandý.");
 
+        _isInitialized = true; 
     }
-    private void OnAddClick()
+
+
+    #region Click Events
+    private async Task OnPrintClick()
     {
-        Console.WriteLine("Test eklendi!");
+        if (TestProcessesGrid != null)
+        {
+            await TestProcessesGrid.PrintAsync();
+        }
     }
+    private async Task OnAddClick(TestGroupItemDto testGroupItem)
+    {
+        var newTestProcess = new TestProcessesCreateDto
+        {
+            LabRequestId = LabRequestService.SelectedLabRequest!.Id,
+            TestGroupItemId = testGroupItem.Id,
+            Status = TestProcessStates.Requested,
+            Result = null,
+            ResultDate = null
+        };
+
+        await TestProcessesAppService.CreateAsync(newTestProcess);
+
+        await LoadTestProcessesAsync();
+
+        if (TestProcessesGrid != null)
+        {
+            await TestProcessesGrid.Refresh();
+        }
+    }
+
     private void OnPlanningClick()
     {
         Console.WriteLine("Planlamaya týklandý!");
     }
-    private void OnCheckboxChanged(bool isChecked, Guid testId)
+
+    #endregion
+
+    #region Get Actions
+    private async Task LoadTestProcessesAsync()
     {
-        if (isChecked)
-        {
-            if (!SelectedIds.Contains(testId))
-            {
-                SelectedIds.Add(testId);
-            }
-        }
-        else
-        {
-            SelectedIds.Remove(testId);
-        }
+        TestProcessesList = await TestProcessesAppService.GetByLabRequestIdAsync(LabRequestService.SelectedLabRequest!.Id);
     }
+
     private async Task LoadLookupsAsync()
     {
         var input = new LookupRequestDto
@@ -136,6 +158,10 @@ public partial class LabTestRequest
     {
         return TestGroupNamesCollection.FirstOrDefault(t => t.Id == testGroupId)?.DisplayName ?? "Unknown";
     }
+
+    #endregion
+
+    #region Modals
     private async Task OpenDescriptionModal(string? description)
     {
         SelectedDescription = description ?? "Açýklama mevcut deðil.";
@@ -146,6 +172,31 @@ public partial class LabTestRequest
         SelectedDescription = string.Empty;
         await DescriptionDialog!.HideAsync();
     }
+
+    private async Task ConfirmTestProcessDelete()
+    {
+
+        if (SelectedTestProcessId.HasValue)
+        {
+            await TestProcessesAppService.DeleteAsync(SelectedTestProcessId.Value);
+            await LoadTestProcessesAsync();
+            StateHasChanged();
+        }
+        await CloseTestProcessDeleteModal();
+    }
+    private async Task OpenTestProcessDeleteModal(Guid id)
+    {
+        SelectedTestProcessId = id;
+        await DeleteTestProcessDialog!.ShowAsync();
+    }
+    private async Task CloseTestProcessDeleteModal()
+    {
+        SelectedTestProcessId = null;
+        await DeleteTestProcessDialog!.HideAsync();
+    }
+    #endregion
+
+    #region Filter
     private async Task SearchAsync(InputEventArgs args)
     {
         CurrentPage = 1;
@@ -157,8 +208,6 @@ public partial class LabTestRequest
         SelectedTestGroupId = groupId;
 
         var selectedGroup = TestGroupsList.FirstOrDefault(g => g.Id == groupId);
-        SelectedGroupName = selectedGroup?.Name ?? "Laboratuvar";
-
         var result = await TestGroupItemsAppService.GetListAsync(new GetTestGroupItemsInput
         {
             TestGroupId = groupId
@@ -176,4 +225,7 @@ public partial class LabTestRequest
         FilterByDateRange[0] = FilterByDateRange[0].AddMonths(1);
         FilterByDateRange[1] = FilterByDateRange[1].AddMonths(1);
     }
+
+    #endregion
+
 }

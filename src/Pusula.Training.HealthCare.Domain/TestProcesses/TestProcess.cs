@@ -7,22 +7,22 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Pusula.Training.HealthCare.TestProcesses;
 
-public class TestProcess : AuditedEntity<Guid>
+public class TestProcess : FullAuditedEntity<Guid>
 {
     [NotNull]
-    public Guid LabRequestId { get; set; }
+    public Guid LabRequestId { get; protected set; }
     public LabRequest LabRequest { get; set; }
 
     [NotNull]
-    public Guid TestGroupItemId { get; set; }
+    public Guid TestGroupItemId { get; protected set; }
     public TestGroupItem TestGroupItem { get; set; }
 
     [NotNull]
-    public TestProcessStates Status { get; set; }
+    public TestProcessStates Status { get; protected set; }
     [CanBeNull]
-    public decimal? Result { get; set; }
+    public decimal? Result { get; protected set; }
     [CanBeNull]
-    public DateTime? ResultDate { get; set; }
+    public DateTime? ResultDate { get; protected set; }
 
     protected TestProcess()
     {
@@ -39,8 +39,8 @@ public class TestProcess : AuditedEntity<Guid>
         SetResultDate(resultDate);
     }
 
-    public void SetLabRequestId(Guid labRequestId) => Check.NotNull(labRequestId, nameof(labRequestId));
-    public void SetTestGroupItemId(Guid testGroupItemId) => Check.NotNull(testGroupItemId, nameof(testGroupItemId));
+    public void SetLabRequestId(Guid labRequestId) => LabRequestId = Check.NotNull(labRequestId, nameof(labRequestId));
+    public void SetTestGroupItemId(Guid testGroupItemId) => TestGroupItemId = Check.NotNull(testGroupItemId, nameof(testGroupItemId));
     public void SetTestProcessStates(TestProcessStates status) => Status = Enum.IsDefined(typeof(TestProcessStates), status) ? status : TestProcessStates.Requested;
     public void SetResult(decimal? result) => Result = result;
     public void SetResultDate(DateTime? resultDate) => ResultDate = resultDate;

@@ -12,6 +12,7 @@ public class GetLabRequestsInput : PagedAndSortedResultRequestDto
     public string? FilterText { get; set; }
     public Guid? ProtocolId { get; set; }
     public Guid? DoctorId { get; set; }
+    public string? DoctorName { get; set; }
     public DateTime? Date { get; set; }
     public RequestStatusEnum? Status { get; set; }
     public string? Description { get; set; }
@@ -24,6 +25,7 @@ public class GetLabRequestsInput : PagedAndSortedResultRequestDto
        string? filterText,
        Guid? protocolId,
        Guid? doctorId,
+       string? doctorName,
        DateTime? date,
        RequestStatusEnum? status,
        string? description,
@@ -33,6 +35,7 @@ public class GetLabRequestsInput : PagedAndSortedResultRequestDto
         FilterText = filterText;
         ProtocolId = protocolId;
         DoctorId = doctorId;
+        DoctorName = doctorName;
         Date = date;
         Status = status;
         Description = description;

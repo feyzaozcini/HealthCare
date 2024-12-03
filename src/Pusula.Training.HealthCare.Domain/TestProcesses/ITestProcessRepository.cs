@@ -46,4 +46,7 @@ public interface ITestProcessRepository : IRepository<TestProcess, Guid>
        int skipCount = 0,
        CancellationToken cancellationToken = default
    );
+
+    Task<List<TestProcess>> GetByLabRequestIdAsync(Guid labRequestId);
+
 }
