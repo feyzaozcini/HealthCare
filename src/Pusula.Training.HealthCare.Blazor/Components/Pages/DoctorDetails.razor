@@ -104,5 +104,17 @@
                 }
             </Template>
         </GridColumn>
+
+        <!-- Göreve Git Butonu -->
+        <GridColumn HeaderText="Göreve Git" Width="120">
+            <Template>
+                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                {
+                    <SfButton CssClass="e-primary" Content="Göreve Git"
+                              @onclick="(() => NavigateToExamination(protocol.Protocol.Id, protocol.Patient.Id))">
+                    </SfButton>
+                }
+            </Template>
+        </GridColumn>
     </GridColumns>
 </SfGrid>

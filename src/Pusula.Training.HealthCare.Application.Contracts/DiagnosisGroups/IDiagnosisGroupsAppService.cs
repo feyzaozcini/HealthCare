@@ -10,11 +10,11 @@ namespace Pusula.Training.HealthCare.DiagnosisGroups
     {
         Task<PagedResultDto<DiagnosisGroupDto>> GetListAsync(GetDiagnosisGroupsInput input);
         Task<DiagnosisGroupDto> GetAsync(Guid id);
-        void DeleteAsync(Guid id);
+        Task DeleteAsync(Guid id);
         Task<DiagnosisGroupDto> CreateAsync(DiagnosisGroupCreateDto input);
         Task<DiagnosisGroupDto> UpdateAsync(DiagnosisGroupUpdateDto input);
         Task DeleteByIdsAsync(List<Guid> diagnosisGroupIds);
         Task DeleteAllAsync(GetDiagnosisGroupsInput input);
-    
+
     }
 }

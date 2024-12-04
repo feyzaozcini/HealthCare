@@ -1,18 +1,10 @@
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Components;
 using Pusula.Training.HealthCare.Doctors;
-using Pusula.Training.HealthCare.Patients;
-using Pusula.Training.HealthCare.TestGroupItems;
-using Pusula.Training.HealthCare.Titles;
-using Pusula.Training.HealthCare.Models;
-using Syncfusion.Blazor.Grids;
-using System;
+using Syncfusion.Blazor.Inputs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.Identity;
-using Microsoft.AspNetCore.Components;
-using Syncfusion.Blazor.Inputs;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -55,7 +47,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 SkipCount = (CurrentPage - 1) * PageSize
             };
 
-           
+
             var result = await DoctorsAppService.GetListAsync(input);
 
             DoctorsList = result.Items.ToList();

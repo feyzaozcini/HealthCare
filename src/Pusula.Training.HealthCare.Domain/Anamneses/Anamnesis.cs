@@ -1,16 +1,11 @@
 ﻿using JetBrains.Annotations;
-using Pusula.Training.HealthCare.Patients;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 
 namespace Pusula.Training.HealthCare.Anamneses
 {
-    public class Anamnesis :AuditedEntity<Guid>,ISoftDelete
+    public class Anamnesis : AuditedEntity<Guid>, ISoftDelete
     {
 
         [NotNull]
@@ -32,21 +27,21 @@ namespace Pusula.Training.HealthCare.Anamneses
             Complaint = string.Empty;
             StartDate = DateTime.Now;
             Story = string.Empty;
-          
+
         }
 
-        public Anamnesis(Guid id,string complaint, DateTime startDate, string story, Guid protocolId)
+        public Anamnesis(Guid id, string complaint, DateTime startDate, string story, Guid protocolId)
         {
-            
+
             Id = id;
             Check.NotNull(complaint, nameof(complaint));
             Check.NotNull(story, nameof(story));
-            
-            
+
+
             Complaint = complaint;
             StartDate = startDate;
             Story = story;
-          
+
             ProtocolId = protocolId;
 
         }

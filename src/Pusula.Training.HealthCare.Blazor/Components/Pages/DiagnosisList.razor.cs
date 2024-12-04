@@ -1,10 +1,10 @@
 using Pusula.Training.HealthCare.Diagnoses;
 using Pusula.Training.HealthCare.DiagnosisGroups;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System;
-using Volo.Abp.Application.Dtos;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Volo.Abp.Application.Dtos;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -20,6 +20,128 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         protected int CurrentPage { get; set; } = 1;
         protected long TotalCount { get; set; }
         protected Guid? SelectedGroupId { get; set; } = null;
+
+        private bool IsDeleteModalVisible { get; set; } = false;
+        private bool IsEditModalVisible { get; set; } = false;
+        private DiagnosisGroupCreateDto DiagnosisGroupCreateDto { get; set; } = new DiagnosisGroupCreateDto();
+
+        private DiagnosisGroupUpdateDto EditDto { get; set; } = new DiagnosisGroupUpdateDto();
+        protected bool IsAddDiagnosisGroupModalVisible { get; set; } = false;
+
+        private DiagnosisCreateDto DiagnosisCreateDto = new DiagnosisCreateDto();
+
+        private bool IsAddDiagnosisModalVisible = false;
+        private string? SearchText { get; set; } = null;
+
+        private Guid? SelectedDiagnosisId = null;
+
+        private bool IsDeleteDiagnosisModalVisible = false;
+
+        private DiagnosisUpdateDto EditDiagnosisDto = new();
+        private bool IsEditDiagnosisModalVisible = false;
+
+        //CREATE DIAGNOSIS GROUP
+        #region CREATE DG
+
+
+
+        protected void OpenAddDiagnosisGroupModal()
+        {
+            IsAddDiagnosisGroupModalVisible = true;
+        }
+
+
+        protected void CloseAddDiagnosisGroupModal()
+        {
+            IsAddDiagnosisGroupModalVisible = false;
+
+            DiagnosisGroupCreateDto = new DiagnosisGroupCreateDto();
+        }
+
+        protected async Task SubmitAddDiagnosisGroup()
+        {
+            await DiagnosisGroupAppservice.CreateAsync(DiagnosisGroupCreateDto);
+
+            await LoadDiagnosisGroupsAsync();
+
+            CloseAddDiagnosisGroupModal();
+        }
+
+        #endregion
+
+        //EDIT DIAGNOSIS GROUP
+        #region EDIT DG
+        private void OpenEditModal(DiagnosisGroupDto group)
+        {
+            EditDto = new DiagnosisGroupUpdateDto
+            {
+                Id = group.Id,
+                Name = group.Name,
+                Code = group.Code
+            };
+
+            IsEditModalVisible = true;
+        }
+
+
+        private void CloseEditModal()
+        {
+
+            IsEditModalVisible = false;
+            EditDto = new DiagnosisGroupUpdateDto();
+        }
+
+        private async Task SubmitEdit()
+        {
+
+            var updatedGroup = await DiagnosisGroupAppservice.UpdateAsync(EditDto);
+
+
+            // Listeyi tamamen yeniden yükle
+            await LoadDiagnosisGroupsAsync();
+            CloseEditModal();
+        }
+
+        #endregion
+
+        //DELETE DIAGNOSIS GROUP
+        #region DELETE DG
+        private void OpenDeleteModal(Guid groupId)
+        {
+            SelectedGroupId = groupId;
+            IsDeleteModalVisible = true;
+        }
+
+
+        private void CloseDeleteModal()
+        {
+            IsDeleteModalVisible = false;
+            SelectedGroupId = null;
+        }
+
+
+        private async Task ConfirmDelete()
+        {
+
+            if (SelectedGroupId.HasValue)
+            {
+
+                await DiagnosisGroupAppservice.DeleteAsync(SelectedGroupId.Value);
+
+
+                await LoadDiagnosisGroupsAsync();
+
+                SelectedGroupId = null;
+
+                CloseDeleteModal();
+            }
+            else
+            {
+                CloseDeleteModal();
+            }
+        }
+
+        #endregion
 
         protected override async Task OnInitializedAsync()
         {
@@ -41,11 +163,11 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             DiagnosisGroupsList = result.Items.ToList();
         }
 
-        protected async Task LoadIcdListAsync()
+        protected async Task LoadIcdListAsync(string? filterText = null)
         {
             var input = new GetDiagnosisInput
             {
-                FilterText = null,
+                FilterText = filterText,
                 Name = null,
                 Code = null,
                 GroupId = SelectedGroupId,
@@ -63,5 +185,107 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             SelectedGroupId = groupId;
             await LoadIcdListAsync();
         }
+
+        private async Task SearchDiagnosis()
+        {
+            await LoadIcdListAsync(SearchText);
+        }
+
+        //DiagnosisCreate
+        #region CREATE ICD
+        protected async Task SubmitAddDiagnosis()
+        {
+            // Backend'e taný ekleme isteði gönder
+            await DiagnosisAppService.CreateAsync(DiagnosisCreateDto);
+
+            // Listeyi yenile
+            await LoadIcdListAsync();
+
+            // Modalý kapat
+            CloseAddDiagnosisModal();
+        }
+
+        private void CloseAddDiagnosisModal()
+        {
+            IsAddDiagnosisModalVisible = false;
+        }
+        protected void OpenAddDiagnosisModal()
+        {
+            // Form modelini sýfýrla
+            DiagnosisCreateDto = new DiagnosisCreateDto();
+
+            // Modalý görünür yap
+            IsAddDiagnosisModalVisible = true;
+        }
+        #endregion
+
+        #region DELETE ICD
+        // Diagnosis Silme Modalýný Aç
+        protected void OpenDeleteDiagnosisModal(Guid diagnosisId)
+        {
+            SelectedDiagnosisId = diagnosisId;
+            IsDeleteDiagnosisModalVisible = true;
+        }
+
+        // Diagnosis Silme Ýþlemini Onayla
+        protected async Task ConfirmDeleteDiagnosisAsync()
+        {
+            if (SelectedDiagnosisId.HasValue)
+            {
+                // Backend'de tanýyý sil
+                await DiagnosisAppService.DeleteAsync(SelectedDiagnosisId.Value);
+
+                // Taný listesini yeniden yükle
+                await LoadIcdListAsync();
+
+                // Modalý kapat
+                CloseDeleteDiagnosisModal();
+            }
+        }
+
+        // Diagnosis Silme Modalýný Kapat
+        protected void CloseDeleteDiagnosisModal()
+        {
+            IsDeleteDiagnosisModalVisible = false;
+            SelectedDiagnosisId = null;
+        }
+
+        #endregion
+
+        #region EDIT ICD
+
+        protected void OpenEditDiagnosisModal(DiagnosisDto diagnosis)
+        {
+            EditDiagnosisDto = new DiagnosisUpdateDto
+            {
+                Id = diagnosis.Id,
+                Name = diagnosis.Name,
+                Code = diagnosis.Code,
+                GroupId = diagnosis.GroupId // Taný grubunu deðiþmeyecek þekilde tutuyoruz
+            };
+
+            IsEditDiagnosisModalVisible = true;
+        }
+
+
+        protected async Task SubmitEditDiagnosis()
+        {
+            await DiagnosisAppService.UpdateAsync(EditDiagnosisDto);
+
+
+            await LoadIcdListAsync();
+
+
+            CloseEditDiagnosisModal();
+        }
+
+
+        protected void CloseEditDiagnosisModal()
+        {
+            IsEditDiagnosisModalVisible = false;
+            EditDiagnosisDto = new DiagnosisUpdateDto();
+        }
+
+        #endregion
     }
 }

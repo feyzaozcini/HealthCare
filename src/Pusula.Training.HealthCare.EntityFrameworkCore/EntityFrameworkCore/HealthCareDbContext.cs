@@ -583,7 +583,8 @@ public class HealthCareDbContext :
                 b.ToTable(HealthCareConsts.DbTablePrefix + "PshychologicalStates", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
                 b.Property(x => x.Description).HasColumnName(nameof(PshychologicalState.Description)).HasMaxLength(PshychologicalStateConsts.DescriptionMaxLength);
-                b.Property(x => x.State).HasColumnName(nameof(PshychologicalState.State));
+                //b.Property(x => x.State).HasColumnName(nameof(PshychologicalState.State));
+                b.Property(x => x.MentalState).HasColumnName(nameof(PshychologicalState.MentalState));
                 b.HasOne<Protocol>().WithOne().HasForeignKey<PshychologicalState>(x => x.ProtocolId).OnDelete(DeleteBehavior.NoAction);
             });
 

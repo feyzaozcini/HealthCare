@@ -31,7 +31,7 @@ namespace Pusula.Training.HealthCare.Diagnoses
             await DeleteManyAsync(ids, cancellationToken: GetCancellationToken(cancellationToken));
         }
 
-        public async  Task<long> GetCountAsync(string? filterText = null, string? name = null, string? code = null, Guid? groupId = null, string? sorting = null, int maxResultCount = int.MaxValue, int skipCount = 0, CancellationToken cancellationToken = default)
+        public async Task<long> GetCountAsync(string? filterText = null, string? name = null, string? code = null, Guid? groupId = null, string? sorting = null, int maxResultCount = int.MaxValue, int skipCount = 0, CancellationToken cancellationToken = default)
         {
             var query = await GetQueryForNavigationPropertiesAsync();
             query = ApplyFilter(query, filterText, code, name, groupId);
@@ -85,7 +85,7 @@ namespace Pusula.Training.HealthCare.Diagnoses
             string? name = null,
             Guid? groupId = null) =>
                 query
-                    .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Diagnosis.Name.StartsWith(filterText!) || e.Diagnosis.Code.StartsWith(filterText!))
+                    .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Diagnosis.Name.StartsWith(filterText!) || e.Diagnosis.Code.StartsWith(filterText!) || e.DiagnosisGroup.Code.StartsWith(filterText!) || e.DiagnosisGroup.Name.StartsWith(filterText!))
                     .WhereIf(!string.IsNullOrWhiteSpace(code), e => e.Diagnosis.Code.Contains(code!))
                     .WhereIf(!string.IsNullOrWhiteSpace(name), e => e.Diagnosis.Name.StartsWith(name!))
                     .WhereIf(groupId.HasValue, e => e.Diagnosis.GroupId == groupId);
