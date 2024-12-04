@@ -228,7 +228,8 @@
                 StartDate = a.Appointment.StartDate,
                 EndDate = a.Appointment.EndDate,
                 Status = a.Appointment.AppointmentStatus.ToString(),
-                AppointmentTypeName = a.AppointmentType.Name
+                AppointmentTypeName = a.AppointmentType.Name,
+                IsBlock=a.Appointment.IsBlock
             }).ToList();
 
         TotalPatients = Appointments.Select(a => a.PatientFullName).Distinct().Count();
@@ -309,11 +310,12 @@
                 AppointmentStatus = SelectedAppointmentStatus,
                 StartDate = SelectedAppointment.StartDate,
                 EndDate = SelectedAppointment.EndDate,
-                Note = "", // Gerekirse doldur
+                Note = "Randevu Güncellendi", // Gerekirse doldur
                 PatientId = SelectedAppointment.PatientId, // Mevcut değer ile değiştir
                 DoctorId = SelectedAppointment.DoctorId, // Mevcut değer ile değiştir
                 DepartmentId = SelectedAppointment.DepartmentId, // Mevcut değer ile değiştir
-                AppointmentTypeId = SelectedAppointment.AppointmentTypeId // Mevcut değer ile değiştir
+                AppointmentTypeId = SelectedAppointment.AppointmentTypeId, // Mevcut değer ile değiştir
+                IsBlock=SelectedAppointment.IsBlock
             };
 
         await AppointmentAppService.UpdateAsync(updateDto);
@@ -334,6 +336,8 @@
         public DateTime EndDate { get; set; }
         public string Status { get; set; }
         public string AppointmentTypeName { get; set; }
+        public bool IsBlock { get; set; }
+        public string Note { get; set; }
     }
      private void CloseWarningDialog()
     {

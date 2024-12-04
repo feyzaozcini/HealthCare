@@ -1,13 +1,16 @@
 ﻿using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Doctors;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
 
 namespace Pusula.Training.HealthCare.AppointmentTypes
 {
-    public class AppointmentTypeManager(IAppointmentTypeRepository appointmentTypeRepository) : DomainService
+    public class AppointmentTypeManager(IAppointmentTypeRepository appointmentTypeRepository
+        ) : DomainService
     {
         public virtual async Task<AppointmentType> CreateAsync(
         string name,
@@ -31,26 +34,29 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
         public virtual async Task<AppointmentType> UpdateAsync(
             Guid id,
         string name,
-        int durationInMinutes
+        int durationInMinutes,
+        List<Guid> doctorIds
             )
         {
             var appointmentType = await appointmentTypeRepository.GetAsync(id);
             appointmentType.SetName(name);
+            appointmentType.SetDurationInMinutes(durationInMinutes);
+            await SetDoctors(appointmentType, doctorIds);
             return await appointmentTypeRepository.UpdateAsync(appointmentType);
         }
 
-
-        public virtual async Task SetDoctors(
-   AppointmentType appointmentType,
-   List<Guid> doctorIds
-)
+        public virtual async Task SetDoctors(AppointmentType appointmentType,List<Guid> doctorIds)
         {
             appointmentType.DoctorAppointmentTypes.Clear();
-
-            foreach (var doctorId in doctorIds)
+            if(doctorIds != null) 
             {
-                appointmentType.AddDoctor(doctorId);
+                foreach (var doctorId in doctorIds)
+                {
+                    appointmentType.AddDoctor(doctorId);
+                }
             }
+            
         }
     }
 }
+

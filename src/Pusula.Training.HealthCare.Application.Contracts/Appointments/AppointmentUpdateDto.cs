@@ -24,6 +24,8 @@ namespace Pusula.Training.HealthCare.Appointments
         [Required]
         public AppointmentStatus AppointmentStatus { get; set; }
 
+        public bool IsBlock { get; set; }
+
         public Guid PatientId { get; set; }
         public Guid DoctorId { get; set; }
         public Guid DepartmentId { get; set; }

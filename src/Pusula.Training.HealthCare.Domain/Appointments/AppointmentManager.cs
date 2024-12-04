@@ -12,7 +12,7 @@ namespace Pusula.Training.HealthCare.Appointments
     public class AppointmentManager(IAppointmentRepository appointmentRepository) : DomainService
     {
         public virtual async Task<Appointment> CreateAsync(
-            Guid patientId, Guid doctorId, Guid departmentId, Guid appointmentTyeId, DateTime startDate, DateTime endDate, String note, AppointmentStatus appointmentStatus)
+            Guid patientId, Guid doctorId, Guid departmentId, Guid appointmentTyeId, DateTime startDate, DateTime endDate, String note, AppointmentStatus appointmentStatus, bool isBlok)
         {
             Check.NotNull(patientId, nameof(patientId));
             Check.NotNull(doctorId, nameof(doctorId));
@@ -27,6 +27,7 @@ namespace Pusula.Training.HealthCare.Appointments
                 endDate,
                 note,
                 appointmentStatus,
+                isBlok,
                 patientId,
                 doctorId,
                 departmentId,
@@ -45,7 +46,8 @@ namespace Pusula.Training.HealthCare.Appointments
             DateTime startDate,
             DateTime endDate,
             String note,
-            AppointmentStatus appointmentStatus
+            AppointmentStatus appointmentStatus,
+            bool isBlok
         )
         {
             var appointment = await appointmentRepository.GetAsync(id);
@@ -53,6 +55,7 @@ namespace Pusula.Training.HealthCare.Appointments
             appointment.SetEndDate(endDate);
             appointment.SetNote(note);
             appointment.SetAppointmentStatus(appointmentStatus);
+            appointment.SetBlock(isBlok);
             appointment.SetPatientId(patientId);
             appointment.SetDoctorId(doctorId);
             appointment.SetDepartmentId(departmentId);

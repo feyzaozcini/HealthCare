@@ -26,6 +26,7 @@ namespace Pusula.Training.HealthCare.Appointments
             DateTime? endDate = null, 
             string? note = null, 
             AppointmentStatus? appointmentStatus = null, 
+            bool isBlock = false,
             Guid? patientId = null, 
             Guid? doctorId = null, 
             Guid? departmentId = null, 
@@ -33,7 +34,7 @@ namespace Pusula.Training.HealthCare.Appointments
             CancellationToken cancellationToken = default)
         {
             var query = await GetQueryForNavigationPropertiesAsync();
-            query = ApplyFilter(query, filterText, startDate, endDate, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
+            query = ApplyFilter(query, filterText, startDate, endDate, note, appointmentStatus,isBlock,patientId, doctorId, departmentId, appointmentTypeId);
 
             var ids = query.Select(x => x.Appointment.Id);
             await DeleteManyAsync(ids, cancellationToken: GetCancellationToken(cancellationToken));
@@ -46,6 +47,7 @@ namespace Pusula.Training.HealthCare.Appointments
             DateTime? endDate = null, 
             string? note = null, 
             AppointmentStatus? appointmentStatus = null, 
+            bool? isBlock = null,
             Guid? patientId = null, 
             Guid? doctorId = null, 
             Guid? departmentId = null, 
@@ -53,7 +55,7 @@ namespace Pusula.Training.HealthCare.Appointments
             CancellationToken cancellationToken = default)
         {
             var query = await GetQueryForNavigationPropertiesAsync();
-            query = ApplyFilter(query, filterText, startDate, endDate, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
+            query = ApplyFilter(query, filterText, startDate, endDate, note, appointmentStatus,isBlock,patientId, doctorId, departmentId, appointmentTypeId);
 
             return await query.LongCountAsync(GetCancellationToken(cancellationToken));
         }
@@ -64,6 +66,7 @@ namespace Pusula.Training.HealthCare.Appointments
             DateTime? endDate = null, 
             string? note = null, 
             AppointmentStatus? appointmentStatus = null,
+            bool? isBlock = null,
             Guid? patientId = null,
             Guid? doctorId = null,
             Guid? departmentId = null,
@@ -73,7 +76,7 @@ namespace Pusula.Training.HealthCare.Appointments
             int skipCount = 0, 
             CancellationToken cancellationToken = default)
         {
-            var query=ApplyFilter(await GetQueryableAsync(), filterText, startDate, endDate, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
+            var query=ApplyFilter(await GetQueryableAsync(), filterText, startDate, endDate, note, appointmentStatus, isBlock,patientId, doctorId, departmentId, appointmentTypeId);
             query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? AppointmentConst.GetDefaultSorting(false) : sorting);
             return await query.Page(skipCount, maxResultCount).ToListAsync(cancellationToken);
         }
@@ -83,7 +86,8 @@ namespace Pusula.Training.HealthCare.Appointments
             DateTime? startDate = null, 
             DateTime? endDate = null, 
             string? note = null, 
-            AppointmentStatus? appointmentStatus = null, 
+            AppointmentStatus? appointmentStatus = null,
+            bool? isBlock = null,
             Guid? patientId = null, 
             Guid? doctorId = null, 
             Guid? departmentId = null, 
@@ -94,7 +98,7 @@ namespace Pusula.Training.HealthCare.Appointments
             CancellationToken cancellationToken = default)
         {
             var query = await GetQueryForNavigationPropertiesAsync();
-            query = ApplyFilter(query, filterText, startDate, endDate, note, appointmentStatus, patientId, doctorId, departmentId, appointmentTypeId);
+            query = ApplyFilter(query, filterText, startDate, endDate, note, appointmentStatus, isBlock,patientId, doctorId, departmentId, appointmentTypeId);
             query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? AppointmentConst.GetDefaultSorting(true) : sorting);
             return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
         }
@@ -126,6 +130,7 @@ namespace Pusula.Training.HealthCare.Appointments
             DateTime? endDate = null,
             string? note = null,
             AppointmentStatus? appointmentStatus = null,
+            bool? isBlock = null,
             Guid? patientId = null,
             Guid? doctorId = null,
             Guid? departmentId = null,
@@ -173,6 +178,7 @@ namespace Pusula.Training.HealthCare.Appointments
             DateTime? endDate = null,
             string? note = null,
             AppointmentStatus? appointmentStatus = null,
+            bool? isBlock = null,
             Guid? patientId = null,
             Guid? doctorId = null,
             Guid? departmentId = null,

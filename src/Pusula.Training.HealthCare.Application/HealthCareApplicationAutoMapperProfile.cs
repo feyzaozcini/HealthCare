@@ -193,6 +193,9 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<AppointmentType, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
         CreateMap<AppointmentType, AppointmentTypeDto>()
             .ForMember(dest => dest.DoctorAppointmentTypes, opt => opt.MapFrom(src => src.DoctorAppointmentTypes.Select(dd => dd.DoctorId).ToList()));
+        CreateMap<AppointmentType, AppointmentTypeUpdateDto>()
+            .ForMember(dest => dest.DoctorIds, opt => opt.MapFrom(src => src.DoctorAppointmentTypes.Select(dd => dd.DoctorId).ToList()));
+
         CreateMap<Title, TitleDto>();
         CreateMap<Title, TitleExcelDto>();
         CreateMap<TitleDto, TitleUpdateDto>();
