@@ -12,6 +12,7 @@ using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
 using Volo.Abp.ObjectMapping;
+using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
 
 namespace Pusula.Training.HealthCare.AppointmentTypes
 {
@@ -98,10 +99,12 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
         [Authorize(HealthCarePermissions.AppointmentTypes.Edit)]
         public virtual async Task<AppointmentTypeDto> UpdateAsync(AppointmentTypeUpdateDto input)
         {
+            await appointmentTypeRepository.RemoveAllDoctorsByAppointmentTypeIdAsync(input.Id);
             var appointmentType = await appointmentTypeManager.UpdateAsync(
                     input.Id,
                     input.Name,
-                    input.DurationInMinutes
+                    input.DurationInMinutes,
+                    input.DoctorIds
                     );
 
             return ObjectMapper.Map<AppointmentType, AppointmentTypeDto>(appointmentType);

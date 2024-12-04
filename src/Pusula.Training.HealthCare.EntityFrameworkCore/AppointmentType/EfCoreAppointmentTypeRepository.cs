@@ -39,6 +39,23 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
             }).ToList();
         }
 
+        //doktorları önce silmek için
+        public async Task RemoveAllDoctorsByAppointmentTypeIdAsync(Guid appointmentTypeId)
+        {
+            var dbContext = await GetDbContextAsync();
+
+            // İlgili AppointmentTypeId için ara tablo kayıtlarını al
+            var doctorAppointmentTypes = await dbContext.DoctorAppoinmentTypes
+                .Where(dd => dd.AppoinmentTypeId == appointmentTypeId)
+                .ToListAsync();
+
+            // Ara tablodaki bu ilişkileri sil
+            dbContext.DoctorAppoinmentTypes.RemoveRange(doctorAppointmentTypes);
+
+            // Veritabanına değişiklikleri kaydet
+            await dbContext.SaveChangesAsync();
+        }
+
 
 
 

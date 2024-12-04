@@ -602,6 +602,7 @@ public class HealthCareDbContext :
                 b.Property(x => x.StartDate).HasColumnName(nameof(Appointment.StartDate)).IsRequired();
                 b.Property(x => x.EndDate).HasColumnName(nameof(Appointment.EndDate)).IsRequired();
                 b.Property(x => x.AppointmentStatus).HasColumnName(nameof(Appointment.AppointmentStatus)).IsRequired();
+                b.Property(x => x.IsBlock).HasColumnName(nameof(Appointment.IsBlock)).IsRequired();
                 b.Property(x => x.Note).HasColumnName(nameof(Appointment.Note)).HasMaxLength(AppointmentConst.NoteMaxLength);
                 b.HasOne<Doctor>().WithMany().HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne<Patient>().WithMany().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);

@@ -35,8 +35,8 @@ namespace Pusula.Training.HealthCare.Appointments
 
         public virtual async Task<PagedResultDto<AppointmentWithNavigationPropertiesDto>> GetListAsync(GetAppointmentsInput input)
         {
-            var totalCount = await appointmentRepository.GetCountAsync(input.FilterText, input.StartDate, input.EndDate, input.Note, input.AppointmentStatus, input.PatientId, input.DoctorId, input.DepartmentId, input.AppointmentTypeId);
-            var items = await appointmentRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.StartDate, input.EndDate, input.Note, input.AppointmentStatus, input.PatientId, input.DoctorId, input.DepartmentId, input.AppointmentTypeId, input.Sorting, input.MaxResultCount, input.SkipCount);
+            var totalCount = await appointmentRepository.GetCountAsync(input.FilterText, input.StartDate, input.EndDate, input.Note, input.AppointmentStatus, input.IsBlock,input.PatientId, input.DoctorId, input.DepartmentId, input.AppointmentTypeId);
+            var items = await appointmentRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.StartDate, input.EndDate, input.Note, input.AppointmentStatus,input.IsBlock,input.PatientId, input.DoctorId, input.DepartmentId, input.AppointmentTypeId, input.Sorting, input.MaxResultCount, input.SkipCount);
 
             return new PagedResultDto<AppointmentWithNavigationPropertiesDto>
             {
@@ -126,7 +126,8 @@ namespace Pusula.Training.HealthCare.Appointments
                 input.StartDate,
                 input.EndDate,
                 input.Note,
-                input.AppointmentStatus
+                input.AppointmentStatus,
+                input.IsBlock
             ));
 
 
@@ -147,7 +148,8 @@ namespace Pusula.Training.HealthCare.Appointments
                 input.StartDate,
                 input.EndDate,
                 input.Note,
-                input.AppointmentStatus
+                input.AppointmentStatus,
+                input.IsBlock
             ));
 
         public virtual async Task<DownloadTokenResultDto> GetDownloadTokenAsync()

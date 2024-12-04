@@ -7,22 +7,24 @@ namespace Pusula.Training.HealthCare.Appointments
 {
     public class Appointment : FullAuditedAggregateRoot<Guid>
     {
-        
+
         [NotNull]
-        public DateTime StartDate { get; private set; } 
+        public DateTime StartDate { get; private set; }
         [NotNull]
         public DateTime EndDate { get; private set; }
         [CanBeNull]
-        public virtual string Note { get; private set; } = null!; 
+        public virtual string Note { get; private set; } = null!;
         [CanBeNull]
         public virtual AppointmentStatus AppointmentStatus { get; private set; }
-        
+
+        public virtual bool IsBlock { get; private set; }
+
         public virtual Guid PatientId { get; private set; }
-       
+
         public virtual Guid DoctorId { get; private set; }
-        
+
         public virtual Guid DepartmentId { get; private set; }
-       
+
         public virtual Guid AppointmentTypeId { get; private set; }
 
         protected Appointment()
@@ -31,20 +33,21 @@ namespace Pusula.Training.HealthCare.Appointments
             EndDate = DateTime.Now;
         }
 
-        public Appointment(Guid id, DateTime startDate, DateTime endDate, string note, AppointmentStatus appointmentStatus, Guid patientId, Guid doctorId, Guid departmentId, Guid appointmentTypeId)
+        public Appointment(Guid id, DateTime startDate, DateTime endDate, string note, AppointmentStatus appointmentStatus, bool isBlok,Guid patientId, Guid doctorId, Guid departmentId, Guid appointmentTypeId)
         {
             Id = id;
             SetStartDate(startDate);
             SetEndDate(endDate);
             SetNote(note);
             SetAppointmentStatus(appointmentStatus);
+            SetBlock(isBlok);
             SetPatientId(patientId);
             SetDoctorId(doctorId);
             SetDepartmentId(departmentId);
             SetAppointmentType(appointmentTypeId);
         }
 
-        
+
         public void SetStartDate(DateTime startDate)
         {
             Check.NotNull(startDate, nameof(startDate));
@@ -85,6 +88,11 @@ namespace Pusula.Training.HealthCare.Appointments
             Check.NotNullOrWhiteSpace(appointmentTypeId.ToString(), nameof(appointmentTypeId));
             AppointmentTypeId = appointmentTypeId;
         }
+        public void SetBlock(bool isBlock)
+        {
+            IsBlock = isBlock;
+        }
 
+        
     }
 }

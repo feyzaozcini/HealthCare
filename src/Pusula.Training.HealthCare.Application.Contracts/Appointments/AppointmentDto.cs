@@ -6,10 +6,9 @@ namespace Pusula.Training.HealthCare.Appointments
 {
     public class AppointmentDto : FullAuditedEntityDto<Guid>
     {
-        [Required]
+        
         public DateTime StartDate { get; set; }
-
-        [Required]
+        
         public DateTime EndDate { get; set; }
 
         [StringLength(AppointmentConst.NoteMaxLength)]
@@ -17,6 +16,8 @@ namespace Pusula.Training.HealthCare.Appointments
 
         [Required]
         public AppointmentStatus AppointmentStatus { get; set; }
+
+        public bool IsBlock { get; set; } 
 
         public Guid PatientId { get; set; }
         public Guid DoctorId { get; set; }

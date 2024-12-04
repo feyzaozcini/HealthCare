@@ -52,9 +52,14 @@
 </div>
 
 <!-- Randevu Takvimi Ekranı -->
-<SfSchedule TValue="FlatAppointmentDto" Width="100%" Height="650px" @bind-CurrentView="@CurrentView" @ref="SfScheduleInstance">
-    <ScheduleTemplates >
-        <EditorTemplate>
+<SfSchedule TValue="FlatAppointmentDto" Width="100%" Height="650px" @bind-SelectedDate="@CurrentDate" @bind-CurrentView="@CurrentView" @ref="SfScheduleInstance" StartHour="09:00" EndHour="18:00">
+    <ScheduleTemplates>
+        <EditorTemplate >
+            @{ 
+                var Data = (context as FlatAppointmentDto);
+                NewAppointment.StartDate = Data.StartTime; 
+                NewAppointment.EndDate = Data.EndTime;
+            }
             <table class="custom-event-editor" width="100%" cellpadding="5">
                 <tbody>
                     <tr>
@@ -83,13 +88,13 @@
                     <tr>
                         <td class="e-textlabel">Start Date</td>
                         <td colspan="4">
-                            <SfDateTimePicker @bind-Value="@NewAppointment.StartDate" TValue="DateTime"></SfDateTimePicker>
+                            <SfDateTimePicker @bind-Value="@(Data.StartTime)" TValue="DateTime"></SfDateTimePicker>
                         </td>
                     </tr>
                     <tr>
                         <td class="e-textlabel">End Date</td>
                         <td colspan="4">
-                            <SfDateTimePicker @bind-Value="@NewAppointment.EndDate" TValue="DateTime" Validation="@ValidationRules"></SfDateTimePicker>
+                            <SfDateTimePicker @bind-Value="@(Data.EndTime)" TValue="DateTime"></SfDateTimePicker>
                         </td>
                     </tr>
                     <tr>
@@ -108,8 +113,15 @@
                             <SfTextBox Multiline="true" @bind-Value="@NewAppointment.Note"></SfTextBox>
                         </td>
                     </tr>
+                    <tr>
+                        <td class="e-textlabel">Is Block</td>
+                        <td colspan="4">
+                            <SfSwitch @bind-Checked="@NewAppointment.IsBlock" TChecked="bool" Label="Block/Unblock"></SfSwitch>
+                        </td>
+                    </tr>
+                    
                 </tbody>
-            </table>
+            </table> 
         </EditorTemplate>
         <EditorFooterTemplate>
             <button id="saveButton" class="e-control e-btn e-primary" data-ripple="true" @onclick="CreateAndCloseModal">Save</button>
@@ -169,7 +181,7 @@
 @code {
 
     private SfSchedule<FlatAppointmentDto> SfScheduleInstance;
-    //private DateTime CurrentDate { get; set; } = DateTime.Now;
+    DateTime CurrentDate = new DateTime(2024, 12, 2);
     View CurrentView = View.WorkWeek;
     Syncfusion.Blazor.Schedule.ValidationRules ValidationRules = new Syncfusion.Blazor.Schedule.ValidationRules { Required = true };
     private AppointmentUpdateDto EditAppointment { get; set; } = new AppointmentUpdateDto();
@@ -182,10 +194,9 @@
     private IReadOnlyList<LookupDto<Pusula.Training.HealthCare.Patients.Type>> TypesCollection { get; set; } = new List<LookupDto<Pusula.Training.HealthCare.Patients.Type>>();
     private List<FlatAppointmentDto> AppointmentList { get; set; } = new List<FlatAppointmentDto>();
     private AppointmentCreateDto NewAppointment { get; set; } = new AppointmentCreateDto
-        {
-            StartDate = DateTime.Now, // Bugünün tarihi
-            EndDate = DateTime.Now.AddHours(1) // 1 saat sonrası
-        };
+    {
+            
+    };
     private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
     private List<DepartmentDto> AllDepartments = new();
 
@@ -256,7 +267,8 @@
                     StartDate = null,
                     EndDate = null,
                     Note = null,
-                    AppointmentStatus = null, 
+                    AppointmentStatus = null,
+                    IsBlock = null,
                     PatientId = null,
                     AppointmentTypeId = null,
                     DoctorId = SelectedDoctor?.Doctor?.Id, //Doctorun randevularını getirme filtresi
@@ -270,7 +282,8 @@
                     Id = a.Appointment.Id.GetHashCode(),
                     Subject = a.AppointmentType.Name,
                     StartTime = a.Appointment.StartDate,
-                    EndTime = a.Appointment.EndDate
+                    EndTime = a.Appointment.EndDate,
+                    IsBlock = a.Appointment.IsBlock,
                 }).ToList();
 
     }
@@ -342,20 +355,18 @@
     {
         await CreateAppointment();// Randevu oluşturma işlemini çağır
         await LoadAppointmentsAsync(); // Verileri yeniden yükle
-        // await SfScheduleInstance.Refresh(); // Takvimi güncelle
+                                       // await SfScheduleInstance.Refresh(); // Takvimi güncelle
         SfScheduleInstance.CloseEditor(); // Modalı kapat
 
-    }
-
+    } 
     private async Task CreateAppointment()
     {
         try
         {
-            NewAppointment.DoctorId = SelectedDoctor.Doctor.Id;
-            //NewAppointment.PatientId = StateService.SelectedPatient.Id; //Hasta seçimi açılan modaldan yapılacak
-            NewAppointment.DepartmentId = SelectedDepartment.Id;
             
-            var createdAppointment = await AppointmentsAppService.CreateAsync(NewAppointment);   
+            NewAppointment.DoctorId = SelectedDoctor.Doctor.Id;
+            NewAppointment.DepartmentId = SelectedDepartment.Id;
+            var createdAppointment = await AppointmentsAppService.CreateAsync(NewAppointment);
         }
         catch (Exception ex)
         {
@@ -382,7 +393,6 @@
     {
 
         await PatientsAppService.CreateAsync(NewPatient);
-        // Hasta listesini güncelle
         await GetPatientCollectionLookupAsync();
         ClosePatientDialog();
         await Task.CompletedTask;
@@ -422,7 +432,6 @@
         public string RecurrenceException { get; set; }
         public Nullable<int> RecurrenceID { get; set; }
     }
-
 }
 
 <style>
