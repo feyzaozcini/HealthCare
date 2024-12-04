@@ -1,23 +1,70 @@
 ﻿@page "/icd-list"
 @using Pusula.Training.HealthCare.Diagnoses
 @using Pusula.Training.HealthCare.DiagnosisGroups
-
-
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Buttons
+@using Microsoft.AspNetCore.Components.Forms
+@using Syncfusion.Blazor.DataForm
 @inject IDiagnosisAppService DiagnosisAppService
 @inject IDiagnosisGroupsAppService DiagnosisGroupAppservice
 
 <h3>DiagnosisList</h3>
 
+<div class="mb-3 d-flex align-items-center">
+    <SfTextBox Placeholder="Tanı Ara" @bind-Value="SearchText" Width="300px" />
+    <SfButton CssClass="e-primary ms-2" Content="Ara" OnClick="SearchDiagnosis" />
+</div>
+
+@* DATAGRID *@
 <div class="d-flex flex-row">
     <!-- Sol Taraf (Diagnosis Groups) -->
-    <div class="col-2">
+    <div class="col-3">
+        <!-- Ekleme Butonu -->
+        <div class="mb-2">
+            <SfButton CssClass="e-primary" Content="Tanı Grubu Ekle" OnClick="OpenAddDiagnosisGroupModal"></SfButton>
+        </div>
         <SfGrid DataSource="@DiagnosisGroupsList" Width="100%" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
             <GridColumns>
                 <GridColumn Field="Name" HeaderText="Tanı Grupları" Width="70" HeaderTextAlign="TextAlign.Left">
                     <Template Context="group">
                         @if (group is DiagnosisGroupDto diagnosisGroup)
                         {
-                            <SfButton CssClass="e-link" Content="@diagnosisGroup.Name" OnClick="(() => FilterIcdListByGroup(diagnosisGroup.Id))"></SfButton>
+                           @*  <div class="d-flex justify-content-between align-items-center"> *@
+                                <!-- Tanı Grubu Adı -->
+                                @* <SfButton CssClass="e-link" Content="@diagnosisGroup.Name" OnClick="(() => FilterIcdListByGroup(diagnosisGroup.Id))"></SfButton> *@
+
+                                <!-- Butonlar Grubu -->
+                                @* <div class="btn-group"> *@
+                                    <!-- Düzenleme Butonu -->
+                                   @*  <button class="btn btn-link p-0 me-1" title="Düzenle" @onclick="(() => OpenEditModal(diagnosisGroup))">
+                                        <i class="fas fa-edit"></i>
+                                    </button> *@
+
+                                    <!-- Silme Butonu -->
+                                  @*   <button class="btn btn-link text-danger p-0" title="Sil" @onclick="(() => OpenDeleteModal(diagnosisGroup.Id))">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div> *@
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <!-- Tanı Grubu Adı ve Kodu -->
+                                <SfButton CssClass="e-link" Content="@($"{diagnosisGroup.Name} ({diagnosisGroup.Code})")" OnClick="(() => FilterIcdListByGroup(diagnosisGroup.Id))"></SfButton>
+
+                                <!-- Butonlar Grubu -->
+                                <div class="btn-group">
+                                    <!-- Düzenleme Butonu -->
+                                    <button class="btn btn-link p-0 me-1" title="Düzenle" @onclick="(() => OpenEditModal(diagnosisGroup))">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+
+                                    <!-- Silme Butonu -->
+                                    <button class="btn btn-link text-danger p-0" title="Sil" @onclick="(() => OpenDeleteModal(diagnosisGroup.Id))">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
                         }
                     </Template>
                 </GridColumn>
@@ -25,16 +72,198 @@
         </SfGrid>
     </div>
 
-
     <!-- Sağ Taraf (Diagnosis - ICD List) -->
-    <div class="col-10">
+    <div class="col-9">
+        <!-- Ekleme Butonu -->
+        <div class="mb-2">
+            <SfButton CssClass="e-primary" Content="Tanı Ekle" OnClick="OpenAddDiagnosisModal"></SfButton>
+        </div>
         <SfGrid DataSource="@IcdList" AllowPaging="true" AllowSorting="true" RowHeight="35" Height="300px">
             <GridColumns>
+                <!-- Kod Kolonu -->
                 <GridColumn HeaderText="Kod" Field="Diagnosis.Code" Width="20%" TextAlign="TextAlign.Center"></GridColumn>
-                <GridColumn HeaderText="Tanı Adı" Field="Diagnosis.Name" Width="80%" TextAlign="TextAlign.Left"></GridColumn>
+
+                <!-- Tanı Adı Kolonu -->
+                <GridColumn HeaderText="Tanı Adı" Field="Diagnosis.Name" Width="60%" TextAlign="TextAlign.Left"></GridColumn>
+
+                
+                <!-- İşlemler Kolonu -->
+                <GridColumn HeaderText="İşlemler" Width="20%">
+                    <Template Context="gridDiagnosis">
+                        @if (gridDiagnosis is DiagnosisWithNavigationPropertiesDto item)
+                        {
+                            <div class="d-flex justify-content-start">
+                                <!-- Düzenleme  -->
+                                <button class="btn btn-link p-0 me-2" title="Düzenle" @onclick="(() => OpenEditDiagnosisModal(item.Diagnosis))">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+
+                                <!-- Silme  -->
+                                <button class="btn btn-link text-danger p-0" title="Sil" @onclick="(() => OpenDeleteDiagnosisModal(item.Diagnosis.Id))">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
             </GridColumns>
         </SfGrid>
     </div>
 </div>
 
+@*<----- DIAGNOSIS GROUP EDIT MODAL-------> *@
+<SfDialog Height="350px" Width="400px" Target="#target" ShowCloseIcon="true" @bind-Visible="IsEditModalVisible" Header="Tanı Grubu Düzenle">
+    <div>
 
+        <div>
+            <label for="groupCode" class="form-label">Grup Kodu</label>
+            <SfTextBox ID="groupCode" Placeholder="Grup Kodu Girin" @bind-Value="EditDto.Code" />
+        </div>
+
+        <div class="mb-3">
+            <label for="groupName" class="form-label">Grup İsmi</label>
+            <SfTextBox ID="groupName" Placeholder="Grup İsmi Girin" @bind-Value="EditDto.Name" />
+        </div>
+       
+    </div>
+    <div class="e-footer-content">
+        <!-- Kaydet ve Kapat Butonları -->
+        <SfButton CssClass="e-primary" Content="Kaydet" OnClick="SubmitEdit"></SfButton>
+        <SfButton CssClass="e-danger" Content="Kapat" OnClick="CloseEditModal"></SfButton>
+    </div>
+</SfDialog>
+
+@* <-------DIAGNOSIS GROUP CREATE MODAL-------> *@
+<SfDialog Height="400px" Width="500px" ShowCloseIcon="true" @bind-Visible="IsAddDiagnosisGroupModalVisible" Header="Tanı Grubu Ekle">
+    <SfDataForm ID="DiagnosisForm"
+                Model="@DiagnosisGroupCreateDto"
+                ButtonsAlignment="FormButtonsAlignment.Right"
+                OnValidSubmit="SubmitAddDiagnosisGroup">
+                
+        <FormValidator>
+            <DataAnnotationsValidator />
+        </FormValidator>
+
+        <FormItems>
+            <!-- Tanı Grubu Adı -->
+            <FormItem Field="@nameof(DiagnosisGroupCreateDto.Name)" LabelText="Tanı Grubu Adı">
+                <Template>
+                    <SfTextBox Placeholder="Tanı Grubu Adı Girin" @bind-Value="DiagnosisGroupCreateDto.Name" />
+                </Template>
+            </FormItem>
+
+            <!-- Tanı Grubu Kodu -->
+            <FormItem Field="@nameof(DiagnosisGroupCreateDto.Code)" LabelText="Tanı Grubu Kodu">
+                <Template>
+                    <SfTextBox Placeholder="Tanı Grubu Kodu Girin" @bind-Value="DiagnosisGroupCreateDto.Code" />
+                </Template>
+            </FormItem>
+        </FormItems>
+
+      @*   <FormButtons>
+            <SfButton CssClass="e-primary" Type="Submit" OnClick="SubmitAddDiagnosisGroup">Ekle</SfButton> 
+             <SfButton CssClass="e-danger" OnClick="CloseAddDiagnosisGroupModal">Kapat</SfButton> 
+         </FormButtons> *@
+    </SfDataForm>
+</SfDialog>
+
+@* <------DIAGNOSIS GROUP DELETE MODAL--------> *@
+<SfDialog Height="200px" Width="300px" Target="#target" ShowCloseIcon="true" @bind-Visible="IsDeleteModalVisible" Header="Silme Onayı">
+    <div>
+        <p>Bu tanı grubunu silmek istediğinizden emin misiniz?</p>
+    </div>
+    <div class="e-footer-content">
+        <!-- Evet ve Hayır Butonları -->
+        <SfButton CssClass="e-danger" Content="Evet" OnClick="ConfirmDelete"></SfButton>
+        <SfButton CssClass="e-primary" Content="Hayır" OnClick="CloseDeleteModal"></SfButton>
+    </div>
+</SfDialog>
+
+@* <------DIAGNOSIS CREATE MODAL--------> *@
+
+<SfDialog Height="400px" Width="500px" ShowCloseIcon="true" @bind-Visible="IsAddDiagnosisModalVisible" Header="Tanı Ekle">
+    <SfDataForm ID="DiagnosisForm"
+                Model="@DiagnosisCreateDto"
+                ButtonsAlignment="FormButtonsAlignment.Right"
+                OnValidSubmit="SubmitAddDiagnosis">
+        <FormValidator>
+            <DataAnnotationsValidator />
+        </FormValidator>
+
+        <FormItems>
+            <!-- Tanı Grubu -->
+            <FormItem Field="@nameof(DiagnosisCreateDto.GroupId)" LabelText="Tanı Grubu">
+                <Template>
+                    <SfDropDownList TValue="Guid" TItem="DiagnosisGroupDto" DataSource="@DiagnosisGroupsList"
+                                    Placeholder="Tanı Grubu Seçin"
+                                    @bind-Value="DiagnosisCreateDto.GroupId"
+                                    PopupHeight="200px">
+                        <DropDownListFieldSettings Text="Name" Value="Id" />
+                    </SfDropDownList>
+                </Template>
+            </FormItem>
+
+            <!-- Tanı Adı -->
+            <FormItem Field="@nameof(DiagnosisCreateDto.Name)" LabelText="Tanı Adı">
+                <Template>
+                    <SfTextBox Placeholder="Tanı Adı Girin" @bind-Value="DiagnosisCreateDto.Name" />
+                </Template>
+            </FormItem>
+
+            <!-- Tanı Kodu -->
+            <FormItem Field="@nameof(DiagnosisCreateDto.Code)" LabelText="Tanı Kodu">
+                <Template>
+                    <SfTextBox Placeholder="Tanı Kodu Girin" @bind-Value="DiagnosisCreateDto.Code" />
+                </Template>
+            </FormItem>
+        </FormItems>
+
+        <FormButtons>
+            <SfButton CssClass="e-primary" Type="Submit">Ekle</SfButton>
+        </FormButtons>
+    </SfDataForm>
+</SfDialog>
+
+
+<!-- Diagnosis Silme Modalı -->
+<SfDialog Height="200px" Width="400px" ShowCloseIcon="true" @bind-Visible="IsDeleteDiagnosisModalVisible" Header="Tanı Silme Onayı">
+    <div>
+        <p>Bu tanıyı silmek istediğinizden emin misiniz?</p>
+    </div>
+    <div class="e-footer-content d-flex justify-content-end">
+        <SfButton CssClass="e-danger me-2" Content="Evet" OnClick="ConfirmDeleteDiagnosisAsync" />
+        <SfButton CssClass="e-primary" Content="Hayır" OnClick="CloseDeleteDiagnosisModal" />
+    </div>
+</SfDialog>
+
+<!-- Diagnosis Düzenleme Modalı -->
+<SfDialog Height="400px" Width="500px" ShowCloseIcon="true" @bind-Visible="IsEditDiagnosisModalVisible" Header="Tanı Düzenle">
+    <SfDataForm ID="EditDiagnosisForm"
+                Model="@EditDiagnosisDto"
+                ButtonsAlignment="FormButtonsAlignment.Right"
+                OnValidSubmit="SubmitEditDiagnosis">
+        <FormValidator>
+            <DataAnnotationsValidator />
+        </FormValidator>
+
+        <FormItems>
+            <!-- Tanı Adı -->
+            <FormItem Field="@nameof(EditDiagnosisDto.Name)" LabelText="Tanı Adı">
+                <Template>
+                    <SfTextBox Placeholder="Tanı Adı Girin" @bind-Value="EditDiagnosisDto.Name" />
+                </Template>
+            </FormItem>
+
+            <!-- Tanı Kodu -->
+            <FormItem Field="@nameof(EditDiagnosisDto.Code)" LabelText="Tanı Kodu">
+                <Template>
+                    <SfTextBox Placeholder="Tanı Kodu Girin" @bind-Value="EditDiagnosisDto.Code" />
+                </Template>
+            </FormItem>
+        </FormItems>
+
+        <FormButtons>
+            <SfButton CssClass="e-primary" Type="Submit">Kaydet</SfButton>
+        </FormButtons>
+    </SfDataForm>
+</SfDialog>

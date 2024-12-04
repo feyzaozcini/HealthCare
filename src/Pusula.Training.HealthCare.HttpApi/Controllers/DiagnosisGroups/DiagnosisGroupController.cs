@@ -36,7 +36,7 @@ namespace Pusula.Training.HealthCare.Controllers.DiagnosisGroups
 
         [HttpDelete]
         [Route("{id}")]
-        public void DeleteAsync(Guid id) => diagnosisGroupsAppService.DeleteAsync(id);
+        public Task DeleteAsync(Guid id) => diagnosisGroupsAppService.DeleteAsync(id);
 
         [HttpDelete]
         [Route("all")]

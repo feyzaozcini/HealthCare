@@ -1,11 +1,4 @@
-﻿using Pusula.Training.HealthCare.LabRequests;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pusula.Training.HealthCare.DiagnosisGroups
+﻿namespace Pusula.Training.HealthCare.DiagnosisGroups
 {
     public class DiagnosisGroupConsts
     {
@@ -19,8 +12,14 @@ namespace Pusula.Training.HealthCare.DiagnosisGroups
         public const int NameMinLength = 2;
         public const int CodeMaxLength = 5;
         public const int CodeMinLength = 2;
-       
 
-        
+        public const string CodeRequired = "Tanı grubu kodu doldurulması zorunludur";
+        public const string CodeLength = "Tanı grubu kodu en az 2 en fazla 5 karakter icermelidir";
+
+        public const string NameRequired = "Tanı grubu adı doldurulması zorunludur";
+        public const string NameLength = "Tanı grubu adı en az 2 en fazla 100 karakter icermelidir";
+
+
+
     }
 }

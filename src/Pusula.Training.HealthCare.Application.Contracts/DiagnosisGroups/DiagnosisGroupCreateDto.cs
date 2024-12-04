@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Pusula.Training.HealthCare.DiagnosisGroups
 {
     public class DiagnosisGroupCreateDto
     {
-        [Required]
-        [StringLength(DiagnosisGroupConsts.NameMaxLength)]
+        [Required(ErrorMessage = DiagnosisGroupConsts.NameRequired)]
+        [StringLength(DiagnosisGroupConsts.NameMaxLength, ErrorMessage = DiagnosisGroupConsts.NameLength, MinimumLength = DiagnosisGroupConsts.NameMinLength)]
         public string Name { get; set; } = null!;
 
         [Required]
-        //[StringLength(DiagnosisGroupConsts.CodeMaxLength)] ADIM1
+        [StringLength(DiagnosisGroupConsts.CodeMaxLength)]
         public string Code { get; set; } = null!;
     }
 }

@@ -10,7 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using OpenIddict.Validation.AspNetCore;
 using Pusula.Training.HealthCare.Blazor.Components;
+using Pusula.Training.HealthCare.Blazor.Containers;
 using Pusula.Training.HealthCare.Blazor.Menus;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
 using Pusula.Training.HealthCare.Localization;
@@ -47,6 +49,7 @@ using Volo.Abp.VirtualFileSystem;
 using Syncfusion.Blazor;
 using Pusula.Training.HealthCare.Blazor.Containers;
 using Microsoft.Extensions.Logging;
+
 
 namespace Pusula.Training.HealthCare.Blazor;
 
@@ -121,7 +124,9 @@ public class HealthCareBlazorModule : AbpModule
         context.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF1cX2hIfExwWmFZfVpgdl9GZFZTRGYuP1ZhSXxXd0RhUH9ccHBXRmdVUUA=");
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzYwMzY4MkAzMjM3MmUzMDJlMzBLMnpuQTNJVzBHKzFNZTJLcEsySE1FZzFaMGRKUlJKQzVNTHJxYklzc1NFPQ==");
+
+        //Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NDaF1cX2hIfExwWmFZfVpgdl9GZFZTRGYuP1ZhSXxXd0RhUH9ccHBXRmdVUUA=");
         //context.Services.AddSyncfusionBlazor();
         context.Services.AddSyncfusionBlazor();
 
@@ -148,7 +153,7 @@ public class HealthCareBlazorModule : AbpModule
         {
             options.IsDynamicClaimsEnabled = true;
         });
-        
+
     }
 
     private void ConfigureUrls(IConfiguration configuration)

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 
@@ -11,7 +7,7 @@ namespace Pusula.Training.HealthCare.PshychologicalStates
     public class PshychologicalState : Entity<Guid>, ISoftDelete
     {
         public string Description { get; set; }
-        public State State { get; set; }
+        public MentalState MentalState { get; set; }
 
         public Guid ProtocolId { get; set; }
         public bool IsDeleted { get; set; }
@@ -21,10 +17,10 @@ namespace Pusula.Training.HealthCare.PshychologicalStates
             Description = string.Empty;
         }
 
-        public PshychologicalState(Guid id,State state,Guid protocolId,string description)
+        public PshychologicalState(Guid id, MentalState mentalState, Guid protocolId, string description)
         {
             Id = id;
-            State = state;
+            MentalState = mentalState;
             ProtocolId = protocolId;
             Description = description;
         }

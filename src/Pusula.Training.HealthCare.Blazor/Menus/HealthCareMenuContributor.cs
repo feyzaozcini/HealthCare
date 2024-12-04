@@ -2,6 +2,7 @@
 using Pusula.Training.HealthCare.Localization;
 using Pusula.Training.HealthCare.MultiTenancy;
 using Pusula.Training.HealthCare.Permissions;
+using System.Threading.Tasks;
 using Volo.Abp.Identity.Blazor;
 using Volo.Abp.SettingManagement.Blazor.Menus;
 using Volo.Abp.TenantManagement.Blazor.Navigation;
@@ -128,7 +129,7 @@ public class HealthCareMenuContributor : IMenuContributor
 
         #endregion
 
-
+        #region Examination Tabs
         // Tedavi başlığı ve alt menüleri
         var treatmentMenu = new ApplicationMenuItem(
             HealthCareMenus.Treatment,
@@ -154,7 +155,7 @@ public class HealthCareMenuContributor : IMenuContributor
         ).AddItem(new ApplicationMenuItem(
             HealthCareMenus.DoctorTaskList,
             l["Menu:DoctorTaskList"],
-            "/doctor-task-list",
+            "/doctors",//"/doctor-task-list"
             icon: "fa fa-user-md"
         )));
 
@@ -168,7 +169,7 @@ public class HealthCareMenuContributor : IMenuContributor
             "/diagnosis-report",
             icon: "fa fa-file"
         )));
-
+        #endregion
         context.Menu.AddItem(treatmentMenu);
         context.Menu.AddItem(labMenu);
 

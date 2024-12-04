@@ -1,15 +1,12 @@
-﻿using Pusula.Training.HealthCare.Titles;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories;
 
 namespace Pusula.Training.HealthCare.DiagnosisGroups
 {
-    public interface IDiagnosisGroupRepository : IRepository<DiagnosisGroup,Guid>
+    public interface IDiagnosisGroupRepository : IRepository<DiagnosisGroup, Guid>
     {
         Task DeleteAllAsync(
            string? filterText = null,

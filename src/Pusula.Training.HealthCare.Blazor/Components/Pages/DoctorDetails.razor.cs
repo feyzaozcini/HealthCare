@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Pusula.Training.HealthCare.Protocols;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System;
-using Volo.Abp.Application.Dtos;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Volo.Abp.Application.Dtos;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -15,6 +15,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private DateTime selectedDate = DateTime.Now;
         private List<ProtocolDto> ProtocolsList { get; set; } = new();
+
 
 
         private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
@@ -48,6 +49,11 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             var result = await ProtocolsAppService.GetListAsync(input);
             ProtocolsList = result.Items.ToList();
             TotalCount = result.TotalCount;
+        }
+
+        private void NavigateToExamination(Guid protocolId, Guid patientId)
+        {
+            NavigationManager.NavigateTo($"/examination/{protocolId}/{patientId}");
         }
     }
 }

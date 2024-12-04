@@ -1,13 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Pusula.Training.HealthCare.Anamneses;
 using Pusula.Training.HealthCare.Permissions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
-using Volo.Abp.ObjectMapping;
 
 namespace Pusula.Training.HealthCare.PshychologicalStates
 {
@@ -20,7 +15,7 @@ namespace Pusula.Training.HealthCare.PshychologicalStates
         [Authorize(HealthCarePermissions.Examinations.Create)]
         public async Task<PshychologicalStateDto> CreateAsync(PshychologicalStateCreateDto input)
         {
-            var pshychologicalState = await pshychologicalStateManager.CreateAsync(input.State,input.ProtocolId,input.Description);
+            var pshychologicalState = await pshychologicalStateManager.CreateAsync(input.MentalState, input.ProtocolId, input.Description);
 
             return ObjectMapper.Map<PshychologicalState, PshychologicalStateDto>(pshychologicalState);
         }
@@ -43,7 +38,7 @@ namespace Pusula.Training.HealthCare.PshychologicalStates
         {
             var pshychologicalState = await pshychologicalStateRepository.GetAsync(a => a.ProtocolId == protocolId);
 
-            
+
             var pshychologicalStateDto = ObjectMapper.Map<PshychologicalState, PshychologicalStateDto>(pshychologicalState);
 
             return pshychologicalStateDto;
@@ -51,6 +46,6 @@ namespace Pusula.Training.HealthCare.PshychologicalStates
 
         [Authorize(HealthCarePermissions.Examinations.Edit)]
         public async Task<PshychologicalStateDto> UpdateAsync(PshychologicalStateUpdateDto input) => ObjectMapper.Map<PshychologicalState, PshychologicalStateDto>(
-                await pshychologicalStateManager.UpdateAsync(input.Id,input.State,input.ProtocolId,input.Description));
+                await pshychologicalStateManager.UpdateAsync(input.Id, input.MentalState, input.ProtocolId, input.Description));
     }
 }

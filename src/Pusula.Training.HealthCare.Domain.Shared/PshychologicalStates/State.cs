@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Pusula.Training.HealthCare.PshychologicalStates
 {
-    public enum State
+    public enum MentalState
     {
-        Angry = 1,
+        Calm = 1,
         Sad = 2,
-        Depressed = 3,
+        Agitated = 3,//AJITE: Rahatsiz, huzursuz, taskinlik yapan.
+        Anxious = 4,
+        Aggresive = 5,
     }
 }

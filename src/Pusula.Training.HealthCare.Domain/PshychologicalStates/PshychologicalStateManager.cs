@@ -1,29 +1,24 @@
-﻿using Pusula.Training.HealthCare.Anamneses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
-using Volo.Abp;
 using Volo.Abp.Domain.Services;
 
 namespace Pusula.Training.HealthCare.PshychologicalStates
 {
     public class PshychologicalStateManager(IPshychologicalStateRepository pshychologicalStateRepository) : DomainService
     {
-        public virtual async Task<PshychologicalState> CreateAsync(State state, Guid protocolId, string description)
+        public virtual async Task<PshychologicalState> CreateAsync(MentalState mentalState, Guid protocolId, string description)
         {
 
-            var pshychologicalState = new PshychologicalState(Guid.NewGuid(),state,protocolId,description);
+            var pshychologicalState = new PshychologicalState(Guid.NewGuid(), mentalState, protocolId, description);
             return await pshychologicalStateRepository.InsertAsync(pshychologicalState);
         }
 
-        public virtual async Task<PshychologicalState> UpdateAsync(Guid id, State state, Guid protocolId, string description)
+        public virtual async Task<PshychologicalState> UpdateAsync(Guid id, MentalState mentalState, Guid protocolId, string description)
         {
 
             var pshychologicalState = await pshychologicalStateRepository.GetAsync(id);
 
-            pshychologicalState.State = state;
+            pshychologicalState.MentalState = mentalState;
             pshychologicalState.ProtocolId = protocolId;
             pshychologicalState.Description = description;
 

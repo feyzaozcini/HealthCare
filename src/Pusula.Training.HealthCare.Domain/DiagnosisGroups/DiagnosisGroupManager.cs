@@ -1,15 +1,11 @@
-﻿using Pusula.Training.HealthCare.Titles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Services;
 
 namespace Pusula.Training.HealthCare.DiagnosisGroups
 {
-    public class DiagnosisGroupManager(IDiagnosisGroupRepository diagnosisGroupRepository):DomainService
+    public class DiagnosisGroupManager(IDiagnosisGroupRepository diagnosisGroupRepository) : DomainService
     {
         public virtual async Task<DiagnosisGroup> CreateAsync(string name, string code)
         {
@@ -24,7 +20,7 @@ namespace Pusula.Training.HealthCare.DiagnosisGroups
 
         }
 
-        public virtual async Task<DiagnosisGroup> UpdateAsync(Guid id, string name,string code)
+        public virtual async Task<DiagnosisGroup> UpdateAsync(Guid id, string name, string code)
         {
             Check.NotNullOrWhiteSpace(code, nameof(code));
             Check.Length(code, nameof(code), DiagnosisGroupConsts.CodeMaxLength, DiagnosisGroupConsts.CodeMinLength);
@@ -39,7 +35,7 @@ namespace Pusula.Training.HealthCare.DiagnosisGroups
 
             return await diagnosisGroupRepository.UpdateAsync(diagnosisGroup);
 
-         
+
 
         }
     }
