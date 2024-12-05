@@ -102,6 +102,13 @@ public class HealthCareMenuContributor : IMenuContributor
                     url: "/lab-request",
                     icon: "fa fa-receipt"
                 )
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.LaboratoryOperationsLaborerBacklogs,
+                    l["Menu:LaborerBacklogs"],
+                    url: "/laborer-backlog",
+                    icon: "fa fa-vials"
+                )
             ));
 
         labMenu.AddItem(

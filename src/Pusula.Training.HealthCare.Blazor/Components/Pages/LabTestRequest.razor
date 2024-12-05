@@ -28,8 +28,9 @@ else
             <ToolbarItem Align="ItemAlign.Center">
                 <Template>
                     <div class="d-flex align-items-center">
-                        <span class="fw-bold fs-5">Kaan YOLCU</span>
-                        <span class="ms-2 fs-6">| 28 Yıl, Mapfre Sigorta A.Ş. (Tss-Gosb)</span>
+                            <span class="fw-bold fs-5">
+                                @($"{LabRequestService.SelectedLabRequest!.PatientName ?? "Ad"} {LabRequestService.SelectedLabRequest!.PatientSurname ?? "Soyad"}, {LabRequestService.SelectedLabRequest!.PatientBirthDate:dd.MM.yyyy}, {LabRequestService.SelectedLabRequest!.InsuranceName}")
+                            </span>
                     </div>
                 </Template>
             </ToolbarItem>
@@ -161,10 +162,14 @@ else
 @*Requests List*@
 <SfGrid @ref="TestProcessesGrid" DataSource="@TestProcessesList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="300px" PrintMode="PrintMode.AllPages">
     <GridColumns>
-        <GridColumn Field="@nameof(TestProcessDto.DoctorName)"
-                    HeaderText="İsteyen Doktor Adı"
-                    Width="15">
-        </GridColumn>
+            <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
+                <Template Context="context">
+                    @if (context is TestProcessDto testProcess)
+                    {
+                        <span>@testProcess.DoctorName @testProcess.DoctorSurname</span>
+                    }
+                </Template>
+            </GridColumn>
         <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)"
                     HeaderText="İstenen Test"
                     Width="25">

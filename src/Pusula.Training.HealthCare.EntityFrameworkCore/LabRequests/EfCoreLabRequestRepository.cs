@@ -22,6 +22,10 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
         Guid? protocolId = null,
         Guid? doctorId = null,
         string? doctorName = null,
+        string? doctorSurname = null,
+        string? patientName = null,
+        string? patientSurname = null,
+        int? protocolNo = null,
         DateTime? date = null,
         RequestStatusEnum? status = null,
         string? description = null,
@@ -30,7 +34,7 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
     {
         var query = await GetQueryableAsync();
 
-        query = ApplyFilter(query, filterText, protocolId, doctorId, doctorName, date, status, description);
+        query = ApplyFilter(query, filterText, protocolId, doctorId, doctorName, doctorSurname, patientName, patientSurname, protocolNo, date, status, description);
 
         var ids = query.Select(x => x.Id);
         await DeleteManyAsync(ids, cancellationToken: GetCancellationToken(cancellationToken));
@@ -41,13 +45,17 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
         Guid? protocolId = null,
         Guid? doctorId = null,
         string? doctorName = null,
+        string? doctorSurname = null,
+        string? patientName = null,
+        string? patientSurname = null,
+        int? protocolNo = null,
         DateTime? date = null,
         RequestStatusEnum? status = null,
         string? description = null,
         CancellationToken cancellationToken = default
         )
     {
-        var query = ApplyFilter((await GetDbSetAsync()), filterText, protocolId, doctorId, doctorName, date, status, description);
+        var query = ApplyFilter((await GetDbSetAsync()), filterText, protocolId, doctorId, doctorName, doctorSurname, patientName, patientSurname, protocolNo, date, status, description);
         return await query.LongCountAsync(GetCancellationToken(cancellationToken));
     }
 
@@ -55,7 +63,11 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
         string? filterText = null,
         Guid? protocolId = null,
         Guid? doctorId = null,
-                string? doctorName = null,
+        string? doctorName = null,
+        string? doctorSurname = null,
+        string? patientName = null,
+        string? patientSurname = null,
+        int? protocolNo = null,
         DateTime? date = null,
         RequestStatusEnum? status = null,
         string? description = null,
@@ -65,7 +77,7 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
         CancellationToken cancellationToken = default
         )
     {
-        var query = ApplyFilter((await GetQueryableAsync()), filterText, protocolId, doctorId, doctorName, date, status, description);
+        var query = ApplyFilter((await GetQueryableAsync()), filterText, protocolId, doctorId, doctorName, doctorSurname, patientName, patientSurname, protocolNo, date, status, description);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? LabRequestConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
@@ -75,6 +87,10 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
         Guid? protocolId = null,
         Guid? doctorId = null,
         string? doctorName = null,
+        string? doctorSurname = null,
+        string? patientName = null,
+        string? patientSurname = null,
+        int? protocolNo = null,
         DateTime? date = null,
         RequestStatusEnum? status = null,
         string? description = null,
@@ -84,7 +100,7 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
         CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
-        query = ApplyFilter(query, filterText, protocolId, doctorId, doctorName, date, status, description);
+        query = ApplyFilter(query, filterText, protocolId, doctorId, doctorName, doctorSurname, patientName, patientSurname, protocolNo, date, status, description);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? LabRequestConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
@@ -102,6 +118,8 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
         var dbSet = await GetDbSetAsync();
         return dbSet
             .Include(lr => lr.Protocol)
+                .ThenInclude(lr => lr.Patient)
+                .Include(lr => lr.Protocol.Insurance)
             .Include(lr => lr.Doctor)
                 .ThenInclude(lr => lr.User);
     }
@@ -112,6 +130,10 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
         Guid? protocolId = null,
         Guid? doctorId = null,
         string? doctorName = null,
+        string? doctorSurname = null,
+        string? patientName = null,
+        string? patientSurname = null,
+        int? protocolNo = null,
         DateTime? date = null,
         RequestStatusEnum? status = null,
         string? description = null)
@@ -121,7 +143,11 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
                 (e.ProtocolId != Guid.Empty && e.ProtocolId.ToString().Contains(filterText!)) ||
                 (e.DoctorId != Guid.Empty && e.DoctorId.ToString().Contains(filterText!)) ||
                 (e.Description!.Contains(filterText!)) ||
-                (e.Doctor.User.Name!.Contains(filterText!))
+                (e.Doctor.User.Name!.Contains(filterText!)) ||
+                (e.Doctor.User.Surname!.Contains(filterText!)) ||
+                (e.Protocol.Patient.FirstName!.Contains(filterText!)) ||
+                (e.Protocol.Patient.LastName!.Contains(filterText!)) ||
+                (e.Protocol.No!.ToString().Contains(filterText!))
             )
             .WhereIf(protocolId.HasValue && protocolId != Guid.Empty, e => e.ProtocolId == protocolId!.Value)
             .WhereIf(doctorId.HasValue && doctorId != Guid.Empty, e => e.DoctorId == doctorId!.Value)

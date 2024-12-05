@@ -16,6 +16,7 @@ public class HealthCareMenus
     public const string LaboratoryOperations = Laboratory + ".Operations";
     public const string LaboratoryOperationsProtocolList = LaboratoryOperations + ".ProtocolList";
     public const string LaboratoryOperationsTestRequests = LaboratoryOperations + ".TestRequests";
+    public const string LaboratoryOperationsLaborerBacklogs = LaboratoryOperations + ".LaborerBacklogs";
     public const string LaboratoryReports = Laboratory + ".Reports";
     public const string LaboratoryReportsTestStatistics = LaboratoryReports + ".TestStatistics";
     public const string LaboratoryReportsTestResults = LaboratoryReports + ".TestResults";

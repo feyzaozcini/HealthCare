@@ -87,11 +87,14 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<LabRequest, LabRequestDto>()
             .ForMember(dest => dest.ProtocolStartDate, opt=> opt.MapFrom(x => x.Protocol.StartTime))
             .ForMember(dest => dest.ProtocolEndDate, opt=> opt.MapFrom(x => x.Protocol.EndTime))
+            .ForMember(dest => dest.ProtocolNo, opt=> opt.MapFrom(x => x.Protocol.No))
             .ForMember(dest => dest.DoctorName, opt=> opt.MapFrom(x => x.Doctor.User.Name))
             .ForMember(dest => dest.DoctorSurname, opt=> opt.MapFrom(x => x.Doctor.User.Surname))
-            //.ForMember(dest => dest.PatientName, opt=> opt.MapFrom(x => x.Protocol.Patient.FirstName))
-            //.ForMember(dest => dest.PatientSurname, opt=> opt.MapFrom(x => x.Protocol.Patient.LastName))
-            //.ForMember(dest => dest.PatientNo, opt=> opt.MapFrom(x => x.Protocol.Patient.No))
+            .ForMember(dest => dest.PatientName, opt => opt.MapFrom(x => x.Protocol.Patient.FirstName))
+            .ForMember(dest => dest.PatientSurname, opt => opt.MapFrom(x => x.Protocol.Patient.LastName))
+            .ForMember(dest => dest.PatientNo, opt => opt.MapFrom(x => x.Protocol.Patient.No))
+            .ForMember(dest => dest.PatientBirthDate, opt => opt.MapFrom(x => x.Protocol.Patient.BirthDate))
+            .ForMember(dest => dest.InsuranceName, opt => opt.MapFrom(x => x.Protocol.Insurance.Name))
             .ReverseMap();
 
         CreateMap<TestGroup, GetTestGroupsInput>().ReverseMap();
@@ -281,22 +284,16 @@ public class HealthCareApplicationAutoMapperProfile : Profile
             .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(x => x.LabRequest.Doctor.User.Name))
             .ForMember(dest => dest.DoctorSurname, opt => opt.MapFrom(x => x.LabRequest.Doctor.User.Surname))
             .ForMember(dest => dest.TestGroupItemName, opt => opt.MapFrom(x => x.TestGroupItem.Name))
+            .ForMember(dest => dest.TestGroupName, opt => opt.MapFrom(x => x.TestGroupItem.TestGroup.Name))
+            .ForMember(dest => dest.PatientName, opt => opt.MapFrom(x => x.LabRequest.Protocol.Patient.FirstName))
+            .ForMember(dest => dest.PatientSurname, opt => opt.MapFrom(x => x.LabRequest.Protocol.Patient.LastName))
             .ReverseMap();
         CreateMap<TestProcess, TestProcessesCreateDto>().ReverseMap();
         CreateMap<TestProcessDto, TestProcessesCreateDto>().ReverseMap();
         CreateMap<TestProcess, TestProcessesUpdateDto>().ReverseMap();
         CreateMap<TestProcess, TestProcessesDeletedDto>().ReverseMap();
         CreateMap<TestProcess, GetTestProcessesInput>().ReverseMap();
-        CreateMap<TestProcess, GetTestProcessWithNavigationPropertiesDto>()
-            .ForMember(dest => dest.LabRequestCreatedDate, opt=> opt.MapFrom(x=> x.LabRequest.CreationTime))
-            .ForMember(dest => dest.LabRequestStatus, opt=> opt.MapFrom(x=> x.LabRequest.Status))
-            .ForMember(dest => dest.LabRequestDescription, opt=> opt.MapFrom(x=> x.LabRequest.Description))
-            .ForMember(dest => dest.TestGroupItemName, opt=> opt.MapFrom(x=> x.TestGroupItem.Name))
-            .ForMember(dest => dest.TestGroupItemCode, opt=> opt.MapFrom(x=> x.TestGroupItem.Code))
-            .ForMember(dest => dest.TestGroupItemType, opt=> opt.MapFrom(x=> x.TestGroupItem.TestType))
-            .ForMember(dest => dest.TestGroupItemDescription, opt=> opt.MapFrom(x=> x.TestGroupItem.Description))
-            .ForMember(dest => dest.TestGroupItemTurnaroundTime, opt=> opt.MapFrom(x=> x.TestGroupItem.TurnaroundTime))
-            .ReverseMap();
+        CreateMap<TestProcess, GetTestProcessWithNavigationPropertiesDto>().ReverseMap();
 
         CreateMap<ProtocolType, ProtocolTypeDto>();
         CreateMap<ProtocolTypeDto, ProtocolTypeUpdateDto>();

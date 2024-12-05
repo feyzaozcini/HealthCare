@@ -18,6 +18,7 @@ public class TestProcessDto : FullAuditedEntityDto<Guid>
     [Required]
     public Guid TestGroupItemId { get; set; }
     public string TestGroupItemName { get; set; } = null!;
+    public string TestGroupName { get; set; } = null!;
     [Required]
     public TestProcessStates Status { get; set; }
     public decimal? Result { get; set; }
