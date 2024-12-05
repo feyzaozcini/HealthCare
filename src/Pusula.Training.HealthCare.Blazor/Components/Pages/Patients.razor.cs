@@ -4,21 +4,33 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
+using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Districts;
+using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Handlers;
+using Pusula.Training.HealthCare.Insurances;
+using Pusula.Training.HealthCare.Notes;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
+using Pusula.Training.HealthCare.Protocols;
+using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Shared;
+using Pusula.Training.HealthCare.TestGroupItems;
 using Pusula.Training.HealthCare.Villages;
+using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.Notifications;
+using Syncfusion.Blazor.Popups;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.AspNetCore.Components.Web.Theming.PageToolbars;
 using Volo.Abp.BlazoriseUI.Components;
+using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
 using Type = Pusula.Training.HealthCare.Patients.Type;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages;
@@ -34,7 +46,24 @@ public partial class Patients
     private string CurrentSorting { get; set; } = string.Empty;
     private int TotalCount { get; set; }
     private long TotalCountLong { get; set; }
+    private ProtocolDto ProtocolModel = new ProtocolDto();
+    private List<LookupDto<Guid>> InsuranceList { get; set; } = new();
+    private List<LookupDto<Guid>> ProtocolTypeList { get; set; } = new();
+    private List<LookupDto<Guid>> ProtocolNoteList { get; set; } = new();
 
+    //private List<LookupDto<Guid>> DepartmentList { get; set; } = new();
+    //private List<LookupDto<Guid>> DoctorList { get; set; } = new();
+
+    //private Guid? SelectedDepartmentId { get; set; }
+
+    private DepartmentDto SelectedDepartment;
+
+    private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
+    private bool IsModalVisible { get; set; }
+
+    private List<DepartmentDto> FilteredDepartments = new();
+
+    private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
     private bool CanCreatePatient { get; set; }
     private bool CanEditPatient { get; set; }
     private bool CanDeletePatient { get; set; }
@@ -54,6 +83,7 @@ public partial class Patients
     protected string SelectedCreateTab = "Patient-create-tab";
     protected string SelectedEditTab = "Patient-edit-tab";
     private IReadOnlyList<LookupDto<Guid>> CompaniesCollection { get; set; } = [];
+    private IReadOnlyList<LookupDto<ProtocolStatus>> ProtocolStatusCollection { get; set; } = new List<LookupDto<ProtocolStatus>>();
     private IReadOnlyList<LookupDto<Gender>> GendersCollection { get; set; } = new List<LookupDto<Gender>>();
     private IReadOnlyList<LookupDto<Type>> TypesCollection { get; set; } = new List<LookupDto<Type>>();
     private IReadOnlyList<LookupDto<BloodType>> BloodTypesCollection { get; set; } = new List<LookupDto<BloodType>>();
@@ -74,7 +104,18 @@ public partial class Patients
 
     private string SelectedCountryCode;
 
-    
+    private SfDialog? CreateProtocolsDialog;
+    //private SfDialog? CreateProtocolDialog;
+
+    private SfToast? ToastObj;
+
+    private ProtocolCreateDto ProtocolCreateDto = new();
+    private List<ProtocolDto> ProtocolList { get; set; } = new List<ProtocolDto>();
+    private GetProtocolsInput? ProtocolsFilter { get; set; }
+    private Guid? SelectedPatientId { get; set; } = null;
+
+    private DoctorWithNavigationPropertiesDto SelectedDoctor;
+
 
     public Patients()
     {
@@ -89,6 +130,106 @@ public partial class Patients
         PatientList = [];
     }
 
+    #region General Staff
+    protected override async Task OnInitializedAsync()
+    {
+
+        CountriesFilter = new GetCountriesInput();
+
+        var insurances = await InsurancesAppService.GetListAsync(new GetInsurancesInput
+        {
+            FilterText = "",
+            Name = null,
+            Sorting = "Name asc",
+            MaxResultCount = 100,
+            SkipCount = 0
+        });
+
+        InsuranceList = insurances.Items.Select(x => new LookupDto<Guid>
+        {
+            Id = x.Id,
+            DisplayName = x.Name // Kullanýcýya görünecek sigorta adý
+        }).ToList();
+
+
+        var protocolTypes = await ProtocolTypesAppService.GetListAsync(new GetProtocolTypesInput
+        {
+            FilterText = "",
+            Name = null,
+            Sorting = "Name asc",
+            MaxResultCount = 100,
+            SkipCount = 0
+        });
+
+        ProtocolTypeList = protocolTypes.Items.Select(x => new LookupDto<Guid>
+        {
+            Id = x.Id,
+            DisplayName = x.Name // Kullanýcýya görünecek sigorta adý
+        }).ToList();
+
+        var protocolNotes = await NotesAppService.GetListAsync(new GetNotesInput
+        {
+            FilterText = "",
+            Text = null,
+            Sorting = "Text asc",
+            MaxResultCount = 100,
+            SkipCount = 0
+        });
+
+        ProtocolNoteList = protocolNotes.Items.Select(x => new LookupDto<Guid>
+        {
+            Id = x.Id,
+            DisplayName = x.Text // Kullanýcýya görünecek sigorta adý
+        }).ToList();
+
+        await LoadInitialDataAsync();
+        
+        await GetSecondaryCountriesAsync();
+        await GetPrimaryCountriesAsync();
+        await SetPermissionsAsync();
+        await GetCountryCodeCollectionLookupAsync();
+        await GetCompanyCollectionLookupAsync();
+        ToastObj ??= new SfToast();
+
+
+        ProtocolStatusCollection = Enum.GetValues(typeof(ProtocolStatus))
+        .Cast<ProtocolStatus>()
+        .Select(status => new LookupDto<ProtocolStatus>
+        {
+            Id = status,
+            DisplayName = status.ToString()
+        })
+        .ToList();
+
+
+        GendersCollection = Enum.GetValues(typeof(Gender))
+       .Cast<Gender>()
+       .Select(g => new LookupDto<Gender>
+       {
+           Id = g,
+           DisplayName = g.ToString()
+       })
+       .ToList();
+
+        TypesCollection = Enum.GetValues(typeof(Type))
+       .Cast<Type>()
+       .Select(t => new LookupDto<Type>
+       {
+           Id = t,
+           DisplayName = t.ToString()
+       })
+       .ToList();
+
+        BloodTypesCollection = Enum.GetValues(typeof(BloodType))
+       .Cast<BloodType>()
+       .Select(b => new LookupDto<BloodType>
+       {
+           Id = b,
+           DisplayName = b.ToString().Replace('_', ' ')
+       })
+       .ToList();
+    }
+
     private void NavigateToAppointments()
     {
         if (SelectedPatients.Count == 1)
@@ -97,7 +238,118 @@ public partial class Patients
             //NavigationManager.NavigateTo();
         }
     }
+    #endregion
 
+    #region Protocol
+    private async Task LoadInitialDataAsync()
+    {
+
+        var departmentResult = await DepartmentsAppService.GetListAsync(new GetDepartmentsInput());
+        if (departmentResult?.Items != null)
+        {
+            FilteredDepartments = departmentResult.Items.ToList();
+        }
+
+        var doctorResult = await DoctorsAppService.GetListAsync(new GetDoctorsInput());
+        if (doctorResult?.Items != null)
+        {
+            AllDoctors = doctorResult.Items.ToList();
+            FilteredDoctors = AllDoctors
+            .Select(d => new DoctorWithNavigationPropertiesDto
+            {
+                Doctor = d.Doctor,
+                Title = d.Title,
+                User = d.User,
+                FullName = $"{d.Title?.Name} {d.User?.Name} {d.User?.Surname}" // FullName oluþturuldu
+            })
+            .ToList();
+        }
+        StateHasChanged();
+
+    }
+
+    private async Task SelectDoctorAsync()
+    {
+        var departmentId = ProtocolCreateDto.DepartmentId;
+
+        if (departmentId != null)
+        {
+            // Seçilen departmana ait doktorlarý listelemek için
+            var departmentWithDoctors = await DepartmentsAppService.GetDoctorsByDepartmentIdAsync(departmentId);
+            if (departmentWithDoctors != null)
+            {
+                FilteredDoctors = departmentWithDoctors
+                    .Select(dd => new DoctorWithNavigationPropertiesDto
+                    {
+                        Doctor = dd.Doctor,
+                        Title = dd.Title,
+                        User = dd.User,
+                        FullName = $"{dd.Title.Name} {dd.User.Name} {dd.User.Surname}"
+                    })
+                    .ToList();
+                
+            }
+            StateHasChanged();
+        }
+        else
+        {
+            FilteredDoctors.Clear();
+        }
+        await Task.CompletedTask;
+    }
+
+    private async Task AddNewProtocol()
+    {
+
+        await ProtocolsAppService.CreateAsync(ProtocolCreateDto);
+        await CloseProtocolCreateModal();
+
+    }
+ 
+    private async Task OpenProtocolCreateModal(PatientWithNavigationPropertiesDto input)
+    {
+        if (input == null) return;
+
+        ProtocolCreateDto = new ProtocolCreateDto
+        {
+            PatientId = input.Patient.Id, // Hasta ID'sini buraya baðladýk
+
+        };
+        await CreateProtocolsDialog!.ShowAsync();
+    }
+
+    private async Task CloseProtocolCreateModal()
+    {
+        await CreateProtocolsDialog!.HideAsync();
+    }
+
+    //private async Task GetProtocolsAsync()
+    //{
+    //    var input = new GetProtocolsInput
+    //    {
+    //        FilterText = ProtocolsFilter?.FilterText,
+    //        StartTime = ProtocolsFilter?.StartTime,
+    //        EndTime = ProtocolsFilter?.EndTime,
+    //        ProtocolStatus = ProtocolsFilter?.ProtocolStatus,
+    //        ProtocolTypeId = ProtocolsFilter?.ProtocolTypeId,
+    //        ProtocolNoteId = ProtocolsFilter?.ProtocolNoteId,
+    //        NoteText = ProtocolsFilter?.NoteText,
+    //        ProtocolInsuranceId = ProtocolsFilter?.ProtocolInsuranceId,
+    //        DepartmentId = ProtocolsFilter?.DepartmentId,
+    //        DoctorId = ProtocolsFilter?.DoctorId,
+    //        MaxResultCount = ProtocolsFilter!.MaxResultCount,
+    //        SkipCount = (CurrentPage - 1) * PageSize,
+    //        PatientId = SelectedPatientId ?? Guid.Empty
+    //    };
+
+    //    var result = await ProtocolsAppService.GetListAsync(input);
+    //    ProtocolList = result.Items.ToList();
+    //    TotalCount = (int)result.TotalCount;
+    //}
+
+    #endregion
+
+    #region Address
     private async Task GetPrimaryCountriesAsync()
     {
 
@@ -294,47 +546,11 @@ public partial class Patients
             }
         }
     }
+    #endregion
 
-    protected override async Task OnInitializedAsync()
-    {
+    #region Patient
 
-        CountriesFilter = new GetCountriesInput();
-
-        await GetSecondaryCountriesAsync();
-        await GetPrimaryCountriesAsync();
-        await SetPermissionsAsync();
-        await GetCountryCodeCollectionLookupAsync();
-        await GetCompanyCollectionLookupAsync();
-   
-
-        GendersCollection = Enum.GetValues(typeof(Gender))
-       .Cast<Gender>()
-       .Select(g => new LookupDto<Gender>
-       {
-           Id = g,
-           DisplayName = g.ToString()
-       })
-       .ToList();
-
-        TypesCollection = Enum.GetValues(typeof(Type))
-       .Cast<Type>()
-       .Select(t => new LookupDto<Type>
-       {
-           Id = t,
-           DisplayName = t.ToString()
-       })
-       .ToList();
-
-        BloodTypesCollection = Enum.GetValues(typeof(BloodType))
-       .Cast<BloodType>()
-       .Select(b => new LookupDto<BloodType>
-       {
-           Id = b,
-           DisplayName = b.ToString().Replace('_', ' ')
-       })
-       .ToList();
-    }
-
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -365,6 +581,8 @@ public partial class Patients
         CanDeletePatient = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.Patients.Delete);
     }
 
+
+    
     private async Task GetPatientsAsync()
     {
         if (Filter == null || (string.IsNullOrEmpty(Filter.FilterText) &&
@@ -689,4 +907,8 @@ public partial class Patients
             currentStep--; // Bir önceki adýma dön
         }
     }
+
+
+    #endregion
+
 }

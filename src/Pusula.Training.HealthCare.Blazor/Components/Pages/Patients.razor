@@ -3,9 +3,15 @@
 @attribute [Authorize(HealthCarePermissions.Patients.Default)]
 @using Pusula.Training.HealthCare.Cities
 @using Pusula.Training.HealthCare.Countries
+@using Pusula.Training.HealthCare.Departments
 @using Pusula.Training.HealthCare.Districts
+@using Pusula.Training.HealthCare.Doctors
+@using Pusula.Training.HealthCare.Insurances
+@using Pusula.Training.HealthCare.Notes
 @using Pusula.Training.HealthCare.Patients
 @using Pusula.Training.HealthCare.Localization
+@using Pusula.Training.HealthCare.ProtocolTypes
+@using Pusula.Training.HealthCare.Protocols
 @using Pusula.Training.HealthCare.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
@@ -24,8 +30,25 @@
 @using Volo.Abp.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components
 @using Volo.Abp.Http.Client
+@using System.ComponentModel;
+@using System.ComponentModel.DataAnnotations
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Navigations
+
 @inherits HealthCareComponentBase
 @inject IPatientsAppService PatientsAppService
+@inject IProtocolsAppService ProtocolsAppService
+@inject IInsurancesAppService InsurancesAppService
+@inject IProtocolTypesAppService ProtocolTypesAppService
+@inject IDepartmentsAppService DepartmentsAppService
+@inject IDoctorsAppService DoctorsAppService
+@inject INotesAppService NotesAppService
+
+
 @inject ICountriesAppService countriesAppService
 @inject ICountryRepository countryRepository
 @inject ICityRepository cityRepository
@@ -45,6 +68,7 @@
 
 </PageHeader>
 @* @* ************************* SEARCH ************************* *@
+
 <Card>
     <CardBody>
         @*//<suite-custom-code-block-1>*@
@@ -252,6 +276,11 @@
                                           Clicked="() => DeletePatientAsync(context)"
                                           ConfirmationMessage="@(()=> L["DeleteConfirmationMessage"])"
                                           Text="@L["Delete"]"></EntityAction>
+                            <EntityAction TItem="PatientWithNavigationPropertiesDto"
+                                          Visible="true"
+                                          Clicked="@(() => OpenProtocolCreateModal(context))"
+                                          Text="@L["NewProtocol"]">
+                            </EntityAction>
                             @*//<suite-custom-code-block-4>*@
                             @*//</suite-custom-code-block-4>*@
                         </EntityActions>
@@ -316,7 +345,8 @@
     </CardBody>
 </Card>
 
-@* ************************* CREATE MODAL ************************* *@
+
+@* ************************* PATIENT CREATE MODAL ************************* *@
 <Modal @ref="CreatePatientModal" Closing="@CreatePatientModal.CancelClosingModalWhenFocusLost">
     <ModalContent Centered="true" Size="ModalSize.ExtraLarge">
         @*//<suite-custom-code-block-5>*@
@@ -810,11 +840,9 @@
     </ModalContent>
 </Modal>
 
-@* ************************* EDIT MODAL ************************* *@
+@* ************************* PATIENT EDIT MODAL ************************* *@
 <Modal @ref="EditPatientModal" Closing="@EditPatientModal.CancelClosingModalWhenFocusLost">
     <ModalContent Centered="true" Size="ModalSize.ExtraLarge">
-        @*//<suite-custom-code-block-8>*@
-        @*//</suite-custom-code-block-8>*@
         <Form id="EditPatientForm">
             <ModalHeader>
                 <ModalTitle>@L["Update"]</ModalTitle>
@@ -978,3 +1006,112 @@
         @*//</suite-custom-code-block-10>*@
     </ModalContent>
 </Modal>
+
+
+@* ************************* PROTOCOL CREATE MODAL ************************* *@
+<SfDialog @ref="CreateProtocolsDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="New Protocol" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <EditForm Model="@ProtocolCreateDto" OnValidSubmit="AddNewProtocol" class="needs-validation" novalidate>
+                <DataAnnotationsValidator />
+
+                <div class="row">
+
+                    <div class="col-6">
+                        <label for="departmentId">Department</label>
+                        <select id="departmentId" class="form-select" @bind="ProtocolCreateDto.DepartmentId">
+                            @foreach (var department in FilteredDepartments)
+                            {
+                                <option value="@department.Id">@department.Name</option>
+                            }
+                        </select>
+                        <ValidationMessage For="@(() => ProtocolCreateDto.DepartmentId)" />
+                    </div>
+
+                    <div class="col-6">
+                        <label for="doctorId">Doctor</label>
+                        <select id="doctorId" class="form-select" @bind="ProtocolCreateDto.DoctorId" @onclick="SelectDoctorAsync">
+                            @foreach (var doctor in FilteredDoctors)
+                            {
+                                <option value="@doctor.Doctor.Id">@doctor.FullName</option>
+                            }
+                        </select>
+                        <ValidationMessage For="@(() => ProtocolCreateDto.DoctorId)" />
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-6">
+                        <label for="protokolType">Type</label>
+                        <select id="protokolId" class="form-select" @bind="ProtocolCreateDto.ProtocolTypeId">
+                            @foreach (var type in ProtocolTypeList)
+                            {
+                                <option value="@type.Id">@type.DisplayName</option>
+                            }
+                        </select>
+                        <ValidationMessage For="@(() => ProtocolCreateDto.ProtocolTypeId)" />
+                    </div>
+
+                    <div class="col-6">
+                        <label for="insurance">Insurance</label>
+                        <select id="insuranceId" class="form-select" @bind="ProtocolCreateDto.ProtocolInsuranceId">
+                            @foreach (var insurance in InsuranceList)
+                            {
+                                <option value="@insurance.Id">@insurance.DisplayName</option>
+                            }
+                        </select>
+                        <ValidationMessage For="@(() => ProtocolCreateDto.ProtocolInsuranceId)" />
+                    </div>
+
+                </div>
+               
+            <div class="row">
+
+                <div class="col-6">
+                    <label for="status">Status</label>
+                    <select id="protocolStatus" class="form-select" @bind="ProtocolCreateDto.ProtocolStatus">
+                        @foreach (var status in ProtocolStatusCollection)
+                        {
+                            <option value="@status.Id">@status.DisplayName</option>
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => ProtocolCreateDto.ProtocolStatus)" />
+                </div>
+
+                <div class="col-6">
+                    <label for="protocolNote">Note</label>
+                    <textarea id="note" class="form-control" rows="4" @bind="ProtocolCreateDto.NoteText"
+                              placeholder="Note"></textarea>
+                        <ValidationMessage For="@(() => ProtocolCreateDto.NoteText)" />
+                </div>
+
+            </div>
+
+                <div class="row">
+
+                    <div class="col-6">
+                        <label for="startTime">Start Time</label>
+                        <SfDateTimePicker TValue="DateTime" @bind-Value="ProtocolCreateDto.StartTime"></SfDateTimePicker>
+                        <ValidationMessage For="@(() => ProtocolCreateDto.StartTime)" />
+                    </div>
+
+                    <div class="col-6">
+                        <label for="endTime">End Time</label>
+                        <SfDateTimePicker TValue="DateTime" @bind-Value="ProtocolCreateDto.EndTime"></SfDateTimePicker>
+                        <ValidationMessage For="@(() => ProtocolCreateDto.EndTime)" />
+                    </div>
+
+                </div>
+
+                <div class="row mt-2 mb-2">
+                    <div class="col-12 text-end">
+                        <SfButton CssClass="e-success e-medium m-1" Content="Kaydet" ></SfButton>
+                        <SfButton CssClass="e-secondary e-medium m-1" Content="Ýptal" OnClick="CloseProtocolCreateModal" Type="Button"></SfButton>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
