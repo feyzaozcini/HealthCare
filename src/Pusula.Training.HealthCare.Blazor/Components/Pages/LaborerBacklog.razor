@@ -1,9 +1,12 @@
 ﻿@page "/laborer-backlog"
+@using Microsoft.Extensions.Localization
+@using Pusula.Training.HealthCare.Extensions
 @using Pusula.Training.HealthCare.LabRequests
 @using Pusula.Training.HealthCare.TestProcesses
 
 @inject ITestProcessesAppService TestProcessesAppService
 @inject ILabRequestsAppService LabRequestsAppService
+@inject IStringLocalizer<LaborerBacklog> Localizer
 
 <div class="flex-grow-1 d-flex justify-content-center mb-2">
     <SfTextBox Placeholder="Protokol Ara"
@@ -14,38 +17,89 @@
     </SfTextBox>
 </div>
 
-<div class="d-flex flex-row">
-    <SfGrid DataSource="@LabRequestsList" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="750px" AllowResizing="false" GridLines="@GridLine.Both">
-        <GridColumns>
-            <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
-                <Template Context="context">
-                    @if (context is LabRequestDto labrequest)
-                    {
-                        <span>@labrequest.PatientName @labrequest.PatientSurname</span>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
-                <Template Context="context">
-                    @if (context is LabRequestDto labrequest)
-                    {
-                        <span>@labrequest.DoctorName @labrequest.DoctorSurname</span>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn Field=@nameof(LabRequestDto.Status) HeaderText="Protokol Durumu" Width="25" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn HeaderText="Sonuç Gir" Width="25" TextAlign="TextAlign.Center">
-                <Template Context="context">
-                    @if (context is LabRequestDto labRequest)
-                    {
-                        <SfButton CssClass="e-small e-primary" OnClick="(() => OpenResultUpdateModal(labRequest))">Sonuç Gir</SfButton>
-                    }
-                </Template>
-            </GridColumn>
-        </GridColumns>
-    </SfGrid>
+ <div class="d-flex flex-row">
+<SfTab>
+    <TabItems>
+        <!-- InProgress Tab -->
+        <TabItem>
+                <HeaderTemplate>İş Listesi</HeaderTemplate>
+
+                <ContentTemplate>
+                <SfGrid DataSource="@InProgressLabRequests" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="750px" AllowResizing="false" GridLines="@GridLine.Both">
+                    <GridColumns>
+                        <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
+                            <Template Context="context">
+                                @if (context is LabRequestDto labrequest)
+                                {
+                                    <span>@labrequest.PatientName @labrequest.PatientSurname</span>
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
+                            <Template Context="context">
+                                @if (context is LabRequestDto labrequest)
+                                {
+                                    <span>@labrequest.DoctorName @labrequest.DoctorSurname</span>
+                                }
+                            </Template>
+                        </GridColumn>
+                            <GridColumn Field=@nameof(LabRequestDto.Status) HeaderText="Protokol Durumu" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+
+                        <GridColumn Width="25" TextAlign="TextAlign.Center">
+                            <Template Context="context">
+                                @if (context is LabRequestDto labRequest)
+                                {
+                                    <SfButton CssClass="e-small e-primary" OnClick="(() => OpenResultUpdateModal(labRequest))">Sonuç Gir</SfButton>
+                                }
+                            </Template>
+                        </GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </ContentTemplate>
+        </TabItem>
+
+<!-- Completed Tab -->
+        <TabItem>
+                <HeaderTemplate>Biten İşler</HeaderTemplate>
+
+                <ContentTemplate>
+                <SfGrid DataSource="@CompletedLabRequests" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="750px" AllowResizing="false" GridLines="@GridLine.Both">
+                    <GridColumns>
+                        <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
+                            <Template Context="context">
+                                @if (context is LabRequestDto labrequest)
+                                {
+                                    <span>@labrequest.PatientName @labrequest.PatientSurname</span>
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
+                            <Template Context="context">
+                                @if (context is LabRequestDto labrequest)
+                                {
+                                    <span>@labrequest.DoctorName @labrequest.DoctorSurname</span>
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field=@nameof(LabRequestDto.Status) HeaderText="Protokol Durumu" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+                        <GridColumn Width="25" TextAlign="TextAlign.Center">
+                            <Template Context="context">
+                                @if (context is LabRequestDto labRequest)
+                                {
+                                    <SfButton CssClass="e-small e-primary" OnClick="(() => OpenResultUpdateModal(labRequest))">Sonuç Değiştir</SfButton>
+                                }
+                            </Template>
+                        </GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </ContentTemplate>
+        </TabItem>
+    </TabItems>
+</SfTab>
 </div>
 
 @*Sonuç Gir Dialog*@
@@ -77,6 +131,4 @@
 @* YAPILACAKLAR
    - Business rules eklenecek.
    - Toast ile handle error ve işlem durumları gösterilecek.
-   - Sonuç durumu, eğer protokole ait tüm test sonuçları girildiyse tamamlandı olarak işaretlenecek.
-   - Tüm süreçleri tamamlanan testler, iş listesinden silinecek. Ayrı bir tab'da "Tamamlanan İşler" olarak görüntülenecek.
 *@

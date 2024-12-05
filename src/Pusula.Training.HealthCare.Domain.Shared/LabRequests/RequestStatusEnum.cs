@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Pusula.Training.HealthCare.LabRequests;
 
 public enum RequestStatusEnum
 {
-    InProgress = 1,  // İşlemde
-    Completed = 2,   // Tamamlandı
-    Cancelled = 3    // İptal Edildi
+    [Display(Name = "İşleme Alındı")]
+    InProgress = 1,  
+    [Display(Name = "Tamamlandı")]
+    Completed = 2,   
+    //Cancelled = 3    // İptal Edildi
 }

@@ -16,6 +16,18 @@ public class GetTestProcessesInput : PagedAndSortedResultRequestDto
     public decimal? Result { get; set; }
     public DateTime? ResultDate { get; set; }
 
+    //Doktor
+    public string? DoctorName { get; set; }
+    public string? DoctorSurname { get; set; }
+
+    //Test
+    public string? TestGroupItemName { get; set; }
+
+    //LabRequest
+    public DateTime? LabRequestCreatedTime { get; set; }
+
+
+
     public GetTestProcessesInput()
     {
     }

@@ -21,6 +21,10 @@
     "Menu:ProtocolList": "Protokol Listesi",
     "Menu:TestStatistics": "Tetkik İstatistik Raporu",
     "Menu:TestResults": "Tetkik Sonuç Raporu",
-    "Menu:LaborerBacklogs": "Laborant İş Listesi"
+    "Menu:LaborerBacklogs": "Laborant İş Listesi",
+    "RequestStatusEnum:InProgress": "İşleme Alındı",
+    "RequestStatusEnum:Completed": "Tamamlandı",
+    "TestProcessStates:Requested": "Talep Edildi",
+    "TestProcessStates:Approved": "Tamamlandı"
   }
 }
