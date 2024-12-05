@@ -28,10 +28,9 @@
 <SfGrid DataSource="@LabRequestsList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
     <GridEvents TValue="LabRequestDto" RowSelected="RowSelectHandler"></GridEvents>
     <GridColumns>
-        <GridColumn Field=@nameof(LabRequestDto.ProtocolType) HeaderText="Protokol Tipi" Width="25"></GridColumn>
-        <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç T." Width="25" TextAlign="TextAlign.Left"></GridColumn>
-        <GridColumn Field=@nameof(LabRequestDto.ProtocolEndDate) HeaderText="Protokol Bitiş T." Width="25" TextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25">
+        <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10"></GridColumn>
+        <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç T." Width="25" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
             <Template Context="context">
                 @if (context is LabRequestDto labrequest)
                 {
@@ -48,9 +47,31 @@
             </Template>
         </GridColumn>
         <GridColumn Field=@nameof(LabRequestDto.Status) HeaderText="Protokol Durumu" Width="25" TextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn Field=@nameof(LabRequestDto.Description) HeaderText="Açıklama" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(LabRequestDto.Description) HeaderText="Açıklama" Width="25" TextAlign="TextAlign.Center">
+            <Template>
+                @if (context is LabRequestDto labRequest)
+                {
+                    <SfButton CssClass="e-small e-link"
+                              OnClick="(() => OpenDescriptionModal(labRequest.Description))"
+                              Style="@(string.IsNullOrEmpty(labRequest.Description) ? "display:none;" : "")">
+                        <i class="fa-regular fa-file"></i>
+                    </SfButton>
+                }
+            </Template>
+        </GridColumn>
     </GridColumns>
 </SfGrid>
+
+<SfDialog @ref="DescriptionDialog" IsModal="true" ShowCloseIcon="true" Width="400px" Header="Açıklama" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <p>@SelectedDescription</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="e-small e-secondary" Content="Kapat" OnClick="CloseDescriptionModal"></SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
 
 
 @* YAPILACAKLAR

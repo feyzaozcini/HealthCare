@@ -21,16 +21,19 @@ public partial class LabTestRequest
 {
     private List<TestGroupItemDto> TestGroupItemsList { get; set; } = new List<TestGroupItemDto>();
     private GetTestGroupItemsInput? TestGroupItemsFilter { get; set; }
+    private List<TestProcessDto> ApprovedTestProcesses { get; set; } = new();
 
     private IReadOnlyList<LookupDto<Guid>> TestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
     private GetTestGroupsInput? TestGroupsFilter { get; set; }
+    private GetTestProcessesInput? TestProcessesFilter { get; set; }
+
     private List<TestGroupDto> TestGroupsList { get; set; } = new List<TestGroupDto>();
     private List<TestProcessesCreateDto> CreatedTestProcesses { get; set; } = new();
     private List<TestProcessDto> TestProcessesList = new();
     private LabRequestDto? LabRequest { get; set; }
     private string SelectedDescription = string.Empty;
     private SfGrid<TestProcessDto>? TestProcessesGrid;
-
+    private List<TestProcessDto> CompletedTestProcesses { get; set; } = new();
     private Guid? SelectedTestGroupId { get; set; } = null;
     private Guid? SelectedTestProcessId { get; set; } = null;
 
@@ -39,10 +42,11 @@ public partial class LabTestRequest
     private long TotalCount;
 
     private SfDialog? DeleteTestProcessDialog;
+    private SfDialog? HistoryDialog;
+    private SfDialog? DescriptionDialog;
     private bool _isInitialized = false;
 
 
-    private SfDialog? DescriptionDialog;
     private DateTime[] FilterByDateRange = { DateTime.Today, DateTime.Today.AddDays(30) };
 
     protected override async Task OnInitializedAsync()
@@ -56,10 +60,14 @@ public partial class LabTestRequest
         // LabRequest mevcutsa gerekli iþlemleri yap
         TestGroupsFilter = new GetTestGroupsInput();
         TestGroupItemsFilter = new GetTestGroupItemsInput();
+        TestProcessesFilter = new GetTestProcessesInput();
         await LoadTestProcessesAsync();
         await GetTestGroupItemsAsync();
         await GetTestGroupsAsync();
         await LoadLookupsAsync();
+        await LoadApprovedTestProcessesAsync();
+        StateHasChanged(); 
+
 
         _isInitialized = true; 
     }
@@ -102,9 +110,20 @@ public partial class LabTestRequest
     #endregion
 
     #region Get Actions
+
+    private async Task LoadApprovedTestProcessesAsync()
+    {
+        var allTestProcesses = await TestProcessesAppService.GetByLabRequestIdAsync(LabRequestService.SelectedLabRequest!.Id);
+
+        ApprovedTestProcesses = allTestProcesses.Where(tp => tp.Status == TestProcessStates.Approved).ToList();
+    }
+
+
+
     private async Task LoadTestProcessesAsync()
     {
-        TestProcessesList = await TestProcessesAppService.GetByLabRequestIdAsync(LabRequestService.SelectedLabRequest!.Id);
+        var allTestProcesses = await TestProcessesAppService.GetByLabRequestIdAsync(LabRequestService.SelectedLabRequest!.Id);
+        TestProcessesList = allTestProcesses.Where(tp => tp.Status == TestProcessStates.Requested).ToList();
     }
 
     private async Task LoadLookupsAsync()
@@ -163,6 +182,13 @@ public partial class LabTestRequest
     #endregion
 
     #region Modals
+
+    private async Task OpenHistoryModal()
+    {
+        await LoadApprovedTestProcessesAsync(); 
+        await HistoryDialog!.ShowAsync();      
+    }
+
     private async Task OpenDescriptionModal(string? description)
     {
         SelectedDescription = description ?? "Açýklama mevcut deðil.";
@@ -216,6 +242,13 @@ public partial class LabTestRequest
 
         TestGroupItemsList = result.Items.ToList();
     }
+
+    private async Task SearchTestProcesses(InputEventArgs args)
+    {
+        TestProcessesFilter!.FilterText = args.Value;
+        await LoadTestProcessesAsync();
+    }
+
     private void DecreaseMonth()
     {
         FilterByDateRange[0] = FilterByDateRange[0].AddMonths(-1);

@@ -3,6 +3,7 @@ using Pusula.Training.HealthCare.Blazor.Containers;
 using Pusula.Training.HealthCare.LabRequests;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
+using Syncfusion.Blazor.Popups;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,8 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
     {
         private List<LabRequestDto> LabRequestsList { get; set; } = new List<LabRequestDto>();
         private GetLabRequestsInput? LabRequestsFilter { get; set; }
+        private SfDialog? DescriptionDialog;
+        private string SelectedDescription = string.Empty;
 
         private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
         private int CurrentPage { get; set; } = 1;
@@ -60,6 +63,17 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             {
                 NavigationManager.NavigateTo("/lab-request");
             }
+        }
+
+        private async Task OpenDescriptionModal(string? description)
+        {
+            SelectedDescription = description ?? "Açýklama mevcut deðil.";
+            await DescriptionDialog!.ShowAsync();
+        }
+        private async Task CloseDescriptionModal()
+        {
+            SelectedDescription = string.Empty;
+            await DescriptionDialog!.HideAsync();
         }
     }
 }

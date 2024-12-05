@@ -1,11 +1,11 @@
 ﻿@page "/lab-request"
 
+@using Microsoft.Extensions.Localization
 @using Pusula.Training.HealthCare.Blazor.Containers
 @using Pusula.Training.HealthCare.LabRequests
 @using Pusula.Training.HealthCare.TestGroupItems
 @using Pusula.Training.HealthCare.TestGroups
 @using Pusula.Training.HealthCare.TestProcesses
-@using Syncfusion.Blazor.Calendars
 
 @inject NavigationManager NavigationManager
 @inject LabRequestStateContainer LabRequestService
@@ -13,6 +13,8 @@
 @inject ITestGroupsAppService TestGroupsAppService
 @inject ILabRequestsAppService LabRequestsAppService
 @inject ITestProcessesAppService TestProcessesAppService
+@inject IStringLocalizer<LabTestRequest> Localizer
+
 
 @if (!_isInitialized)
 {
@@ -20,148 +22,151 @@
 }
 else
 {
-@*Patient Details Bar*@
-<div class="w-100 mb-1 border-bottom shadow">
-    <SfToolbar CssClass="e-fill e-flat">
-        <ToolbarItems>
-            <!-- Ortadaki Metin -->
-            <ToolbarItem Align="ItemAlign.Center">
-                <Template>
-                    <div class="d-flex align-items-center">
+    @*Patient Details Bar*@
+    <div class="w-100 mb-1 border-bottom shadow">
+        <SfToolbar CssClass="e-fill e-flat">
+            <ToolbarItems>
+                <!-- Ortadaki Metin -->
+                <ToolbarItem Align="ItemAlign.Center">
+                    <Template>
+                        <div class="d-flex align-items-center">
                             <span class="fw-bold fs-5">
                                 @($"{LabRequestService.SelectedLabRequest!.PatientName ?? "Ad"} {LabRequestService.SelectedLabRequest!.PatientSurname ?? "Soyad"}, {LabRequestService.SelectedLabRequest!.PatientBirthDate:dd.MM.yyyy}, {LabRequestService.SelectedLabRequest!.InsuranceName}")
                             </span>
-                    </div>
-                </Template>
-            </ToolbarItem>
-            <!-- Sağa Yaslanan Buton -->
-            <ToolbarItem Align="ItemAlign.Right">
-                <Template>
-                    <SfButton CssClass="e-flat e-small e-icon-left" IconCss="e-icons e-clock" Content="İstem Tarihçesi"></SfButton>
-                </Template>
-            </ToolbarItem>
-        </ToolbarItems>
-    </SfToolbar>
-</div>
-
-@*TestList Bar*@
-
-
-@*Test Groups & Items Data Grid*@
-<div class="d-flex flex-row">
-    <div class="col-2">
-        <SfTextBox Placeholder="Test Ara"
-                   FloatLabelType="FloatLabelType.Never"
-                   @bind-Value="TestGroupItemsFilter!.FilterText"
-                   Width="100%"
-                   Input="@(async (args) => await SearchAsync(args))">
-        </SfTextBox>
-
-    </div>
-    <div class="col-10">
-        <SfToolbar>
-            <ToolbarItems>
-
+                        </div>
+                    </Template>
+                </ToolbarItem>
+                <!-- Sağa Yaslanan Buton -->
+                <ToolbarItem Align="ItemAlign.Right">
+                    <Template>
+                        <SfButton CssClass="e-flat e-small e-icon-left" IconCss="e-icons e-clock" Content="İstem Tarihçesi" OnClick="OpenHistoryModal"></SfButton>
+                    </Template>
+                </ToolbarItem>
             </ToolbarItems>
         </SfToolbar>
     </div>
-</div>
 
-@*Test Groups & Items Data Grid*@
-<div class="d-flex flex-row">
-    @*Sol*@
-    <div class="col-2">
-        <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
-            <GridColumns>
-                <GridColumn Field="@nameof(TestGroup.Name)" HeaderText="Laboratuvar" Width="70" HeaderTextAlign="TextAlign.Left">
-                    <Template Context="group">
-                        @if (group is TestGroupDto testGroup)
-                        {
-                            <SfButton CssClass="e-link" Content="@testGroup.Name" OnClick="(() => FilterTestGroupItems(testGroup.Id))"></SfButton>
-                        }
-                    </Template>
-                </GridColumn>
-            </GridColumns>
-        </SfGrid>
-    </div>
+    @*TestList Bar*@
 
-    <!-- Sağ: Tabs -->
-    <div class="col-10">
-        <SfGrid DataSource="@TestGroupItemsList" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
-            <GridColumns>
-                <GridColumn Width="3%">
-                    <Template>
-                        @if (context is TestGroupItemDto testGroupItem)
-                        {
-                            <SfButton CssClass="e-icon-left e-flat e-small"
-                                      IconCss="e-icons e-plus"
-                                      OnClick="(() => OnAddClick(testGroupItem))">
-                            </SfButton>
-                        }
-                    </Template>
-                </GridColumn>
-                <GridColumn HeaderText="Test Adı - Kodu" Width="40%" TextAlign="TextAlign.Left">
-                    <Template>
-                        @if (context is TestGroupItemDto testGroupItem)
-                        {
-                            <span>@testGroupItem.Name - @testGroupItem.Code</span>
-                        }
-                    </Template>
-                </GridColumn>
-                <GridColumn Field="@nameof(TestGroupItem.TestType)" HeaderText="Test Tipi" Width="30%" TextAlign="TextAlign.Center"></GridColumn>
-                <GridColumn HeaderText="Açıklama" Width="20%" TextAlign="TextAlign.Center">
-                    <Template>
-                        @if (context is TestGroupItemDto testGroupItem)
-                        {
-                            <SfButton CssClass="e-small e-link"
-                                      OnClick="(() => OpenDescriptionModal(testGroupItem.Description))">
-                                <i class="fa-regular fa-file"></i>
-                            </SfButton>
-                        }
-                    </Template>
-                </GridColumn>
-            </GridColumns>
-        </SfGrid>
-    </div>
-</div>
-@*Data Grid Bottom Bar*@
-<div class="mt-0 border-bottom pb-2">
-    <SfToolbar>
 
-    </SfToolbar>
-</div>
-
-@*Patient Test Requests*@
-<div class="container-fluid py-2">
-    <div class="d-flex justify-content-end">
-    </div>
-    <div class="d-flex justify-content-between">
-        <div class="d-flex justify-content-start gap-3">
-            <SfTextBox Placeholder="Ara"
+    @*Test Groups & Items Data Grid*@
+    <div class="d-flex flex-row">
+        <div class="col-2">
+            <SfTextBox Placeholder="Test Ara"
                        FloatLabelType="FloatLabelType.Never"
-                       Width="50%">
+                       @bind-Value="TestGroupItemsFilter!.FilterText"
+                       Width="100%"
+                       Input="@(async (args) => await SearchAsync(args))">
             </SfTextBox>
-            <SfDateRangePicker TValue="DateTime?"
-                               AllowEdit="false"
-                               Width="50%"
-                               StartDate="@DateTime.Today"
-                               EndDate="@DateTime.Today.AddDays(1)">
-            </SfDateRangePicker>
-        </div>
 
-        <div class="col-md-3 text-end">
-            <SfButton CssClass="e-warning e-icon-left e-medium"
-                      Content="İstem Yazdır"
-                      IconCss="e-icons e-print"
-                      OnClick="OnPrintClick">
-            </SfButton>
+        </div>
+        <div class="col-10">
+            <SfToolbar>
+                <ToolbarItems>
+
+                </ToolbarItems>
+            </SfToolbar>
         </div>
     </div>
-</div>
 
-@*Requests List*@
-<SfGrid @ref="TestProcessesGrid" DataSource="@TestProcessesList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="300px" PrintMode="PrintMode.AllPages">
-    <GridColumns>
+    @*Test Groups & Items Data Grid*@
+    <div class="d-flex flex-row">
+        @*Sol*@
+        <div class="col-2">
+            <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
+                <GridColumns>
+                    <GridColumn Field="@nameof(TestGroup.Name)" HeaderText="Laboratuvar" Width="70" HeaderTextAlign="TextAlign.Left">
+                        <Template Context="group">
+                            @if (group is TestGroupDto testGroup)
+                            {
+                                <SfButton CssClass="e-link" Content="@testGroup.Name" OnClick="(() => FilterTestGroupItems(testGroup.Id))"></SfButton>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </div>
+
+        <!-- Sağ: Tabs -->
+        <div class="col-10">
+            <SfGrid DataSource="@TestGroupItemsList" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
+                <GridColumns>
+                    <GridColumn Width="3%">
+                        <Template>
+                            @if (context is TestGroupItemDto testGroupItem)
+                            {
+                                <SfButton CssClass="e-icon-left e-flat e-small"
+                                          IconCss="e-icons e-plus"
+                                          OnClick="(() => OnAddClick(testGroupItem))">
+                                </SfButton>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Test Adı - Kodu" Width="40%" TextAlign="TextAlign.Left">
+                        <Template>
+                            @if (context is TestGroupItemDto testGroupItem)
+                            {
+                                <span>@testGroupItem.Name - @testGroupItem.Code</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(TestGroupItem.TestType)" HeaderText="Test Tipi" Width="30%" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn HeaderText="Açıklama" Width="20%" TextAlign="TextAlign.Center">
+                        <Template>
+                            @if (context is TestGroupItemDto testGroupItem)
+                            {
+                                <SfButton CssClass="e-small e-link"
+                                          OnClick="(() => OpenDescriptionModal(testGroupItem.Description))">
+                                    <i class="fa-regular fa-file"></i>
+                                </SfButton>
+                            }
+                        </Template>
+                    </GridColumn>
+                </GridColumns>
+            </SfGrid>
+        </div>
+    </div>
+    @*Data Grid Bottom Bar*@
+    <div class="mt-0 border-bottom pb-2">
+        <SfToolbar>
+
+        </SfToolbar>
+    </div>
+
+    @*Patient Test Requests*@
+    <div class="container-fluid py-2">
+        <div class="d-flex justify-content-end">
+        </div>
+        <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-start gap-3">
+                <SfTextBox Placeholder="Ara"
+                           FloatLabelType="FloatLabelType.Never"
+                           @bind-Value="TestProcessesFilter!.FilterText"
+                           Width="50%"
+                           Input="SearchTestProcesses">
+                    >
+                </SfTextBox>
+                <SfDateRangePicker TValue="DateTime?"
+                                   AllowEdit="false"
+                                   Width="50%"
+                                   StartDate="@DateTime.Today"
+                                   EndDate="@DateTime.Today.AddDays(1)">
+                </SfDateRangePicker>
+            </div>
+
+            <div class="col-md-3 text-end">
+                <SfButton CssClass="e-warning e-icon-left e-medium"
+                          Content="İstem Yazdır"
+                          IconCss="e-icons e-print"
+                          OnClick="OnPrintClick">
+                </SfButton>
+            </div>
+        </div>
+    </div>
+
+    @*Requests List*@
+    <SfGrid @ref="TestProcessesGrid" DataSource="@TestProcessesList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="300px" PrintMode="PrintMode.AllPages">
+        <GridColumns>
             <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
                 <Template Context="context">
                     @if (context is TestProcessDto testProcess)
@@ -170,50 +175,68 @@ else
                     }
                 </Template>
             </GridColumn>
-        <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)"
-                    HeaderText="İstenen Test"
-                    Width="25">
-        </GridColumn>
-        <GridColumn Field="@nameof(TestProcessDto.Status)"
-                    HeaderText="İşlem Durumu"
-                    Width="15">
-        </GridColumn>
-        <GridColumn HeaderText="Actions" Width="5" TextAlign="TextAlign.Center">
-            <Template>
-                @if (context is TestProcessDto testProcess)
-                {
-                    <div class="d-flex justify-content-center">
-                        <SfButton CssClass="e-small e-danger" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(testProcess.Id))"></SfButton>
-                    </div>
-                }
-            </Template>
-        </GridColumn>
-    </GridColumns>
-</SfGrid>
+            <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)"
+                        HeaderText="İstenen Test"
+                        Width="25"
+                        TextAlign="TextAlign.Center">
+            </GridColumn>
+            <GridColumn Field="@nameof(TestProcessDto.Status)"
+                        HeaderText="İşlem Durumu"
+                        Width="15"
+                        TextAlign="TextAlign.Center">
+            </GridColumn>
+            <GridColumn HeaderText="Actions" Width="5" TextAlign="TextAlign.Center">
+                <Template>
+                    @if (context is TestProcessDto testProcess)
+                    {
+                        <div class="d-flex justify-content-center">
+                            <SfButton CssClass="e-small e-danger" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(testProcess.Id))"></SfButton>
+                        </div>
+                    }
+                </Template>
+            </GridColumn>
+        </GridColumns>
+    </SfGrid>
 
-@*Description Detail Modal*@
-<SfDialog @ref="DescriptionDialog" IsModal="true" ShowCloseIcon="true" Width="400px" Header="Açıklama" Visible="false">
-    <DialogTemplates>
-        <Content>
-            <p>@SelectedDescription</p>
-        </Content>
-        <FooterTemplate>
-            <SfButton CssClass="e-small e-secondary" Content="Kapat" OnClick="CloseDescriptionModal"></SfButton>
-        </FooterTemplate>
-    </DialogTemplates>
-</SfDialog>
+    @*Description Detail Modal*@
+    <SfDialog @ref="DescriptionDialog" IsModal="true" ShowCloseIcon="true" Width="400px" Header="Açıklama" Visible="false">
+        <DialogTemplates>
+            <Content>
+                <p>@SelectedDescription</p>
+            </Content>
+            <FooterTemplate>
+                <SfButton CssClass="e-small e-secondary" Content="Kapat" OnClick="CloseDescriptionModal"></SfButton>
+            </FooterTemplate>
+        </DialogTemplates>
+    </SfDialog>
 
-@*Delete Modal*@
-<SfDialog @ref="DeleteTestProcessDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Visible="false">
-    <DialogTemplates>
-        <Content>
-            <p>Silmek istediğinize emin misiniz?</p>
-        </Content>
-        <FooterTemplate>
-            <SfButton CssClass="e-small e-danger" OnClick="ConfirmTestProcessDelete">Evet</SfButton>
-            <SfButton CssClass="e-small e-primary" OnClick="CloseTestProcessDeleteModal">Hayır</SfButton>
-        </FooterTemplate>
-    </DialogTemplates>
-</SfDialog>
+    @*Delete Modal*@
+    <SfDialog @ref="DeleteTestProcessDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Visible="false">
+        <DialogTemplates>
+            <Content>
+                <p>Silmek istediğinize emin misiniz?</p>
+            </Content>
+            <FooterTemplate>
+                <SfButton CssClass="e-small e-danger" OnClick="ConfirmTestProcessDelete">Evet</SfButton>
+                <SfButton CssClass="e-small e-primary" OnClick="CloseTestProcessDeleteModal">Hayır</SfButton>
+            </FooterTemplate>
+        </DialogTemplates>
+    </SfDialog>
+
+    @*Test Process History Modal*@
+    <SfDialog @ref="HistoryDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="İstem Tarihçesi" Visible="false">
+        <DialogTemplates>
+            <Content>
+                <SfGrid DataSource="@ApprovedTestProcesses" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="400px" AllowResizing="false" GridLines="GridLine.Both">
+                    <GridColumns>
+                        <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)" HeaderText="Test Adı" Width="50%"></GridColumn>
+                        <GridColumn Field="@nameof(TestProcessDto.ResultDate)" HeaderText="Tamamlanma T." Width="50%"></GridColumn>
+                        <GridColumn Field="@nameof(TestProcessDto.Status)" HeaderText="Durum" Width="25%"></GridColumn>
+                        <GridColumn Field="@nameof(TestProcessDto.Result)" HeaderText="Sonuç" Width="25%"></GridColumn>
+                    </GridColumns>
+                </SfGrid>
+            </Content>
+        </DialogTemplates>
+    </SfDialog>
 
 }

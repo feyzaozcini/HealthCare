@@ -121,6 +121,10 @@
     "Permission:Insurances": "Insurances",
     "Insurances": "Insurances",
     "Insurance": "Insurance",
-    "Menu:LaborerBacklogs":  "Laborer Backlogs"
+    "Menu:LaborerBacklogs": "Laborer Backlogs",
+    "RequestStatusEnum:InProgress": "In Progress",
+    "RequestStatusEnum:Completed": "Completed",
+    "TestProcessStates:Requested": "Requested",
+    "TestProcessStates:Approved": "Approved"
   }
 }
