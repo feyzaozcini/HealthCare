@@ -14,6 +14,8 @@ namespace Pusula.Training.HealthCare.Protocols
         public ProtocolStatus ProtocolStatus { get; set; }
         [Required]
         public virtual Guid ProtocolTypeId { get; set; }
+        public string NoteText { get; set; }
+
         public virtual Guid ProtocolNoteId { get; set; }
         [Required]
         public virtual Guid ProtocolInsuranceId { get; set; }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
 using Pusula.Training.HealthCare.LabRequests;
+using Pusula.Training.HealthCare.Notes;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -23,6 +24,7 @@ namespace Pusula.Training.HealthCare.Protocols
     [Authorize(HealthCarePermissions.Protocols.Default)]
     public class ProtocolsAppService(
         IProtocolRepository protocolRepository, 
+        INoteRepository noteRepository,
         ProtocolManager protocolManager, 
         IDistributedCache<ProtocolDownloadTokenCacheItem, string> downloadTokenCache, 
         IRepository<Patients.Patient, Guid> patientRepository, 
@@ -41,6 +43,13 @@ namespace Pusula.Training.HealthCare.Protocols
             {
                 throw new UserFriendlyException(L["The {0} field is required.", L["Department"]]);
             }
+
+            // Yeni bir Note oluþtur ve kaydet
+            var note = new Note(Guid.NewGuid(), input.NoteText ?? string.Empty);
+            await noteRepository.InsertAsync(note);
+
+            // Yeni Note'un ID'sini ProtocolNoteId olarak ata
+            input.ProtocolNoteId = note.Id;
 
             var protocol = await protocolManager.CreateAsync(
             input.StartTime, input.EndTime, input.ProtocolStatus, input.ProtocolTypeId, input.ProtocolNoteId,

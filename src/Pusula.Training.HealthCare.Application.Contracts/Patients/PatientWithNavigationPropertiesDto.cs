@@ -2,6 +2,7 @@
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.PatientCompanies;
+using Pusula.Training.HealthCare.Protocols;
 using Pusula.Training.HealthCare.Villages;
 using System;
 using System.Collections.Generic;
@@ -23,5 +24,6 @@ namespace Pusula.Training.HealthCare.Patients
         public DistrictDto? SecondaryDistrict { get; set; } 
         public VillageDto? SecondaryVillage { get; set; }
         public PatientCompanyDto? PatientCompany { get; set; } 
+        //public ProtocolDto? Protocol { get; set; }
     }
 }

@@ -42,6 +42,7 @@ public class Protocol : FullAuditedAggregateRoot<Guid>
     protected Protocol()
     {
         StartTime = DateTime.Now;
+        EndTime = DateTime.Now.AddDays(1);
     }
 
     public Protocol(Guid id, DateTime startTime, DateTime endTime, ProtocolStatus protocolStatus, Guid protocolTypeId, Guid protocolNoteId, Guid protocolInsuranceId,

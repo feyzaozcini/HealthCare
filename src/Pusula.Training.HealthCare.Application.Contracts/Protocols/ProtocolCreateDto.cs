@@ -12,6 +12,8 @@ public class ProtocolCreateDto
     [Required]
     public virtual Guid ProtocolTypeId { get; set; }
     public virtual Guid ProtocolNoteId { get; set; }
+    public string NoteText { get; set; }
+
     [Required]
     public virtual Guid ProtocolInsuranceId { get; set; }
     [Required]
@@ -22,5 +24,7 @@ public class ProtocolCreateDto
     public virtual Guid DoctorId { get; set; }
     public ProtocolCreateDto()
     {
+        StartTime = DateTime.Now;
+        EndTime = DateTime.Now.AddDays(1);
     }
 }

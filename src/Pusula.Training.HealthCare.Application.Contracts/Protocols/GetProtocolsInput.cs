@@ -12,6 +12,8 @@ public class GetProtocolsInput : PagedAndSortedResultRequestDto
     public ProtocolStatus? ProtocolStatus { get; set; }
     public virtual Guid? ProtocolTypeId { get; set; }
     public virtual Guid? ProtocolNoteId { get; set; }
+    public string NoteText { get; set; }
+
     public virtual Guid? ProtocolInsuranceId { get; set; }
     public virtual Guid? PatientId { get; set; }
     public virtual Guid? DepartmentId { get; set; }

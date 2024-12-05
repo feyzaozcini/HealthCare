@@ -16,6 +16,8 @@ namespace Pusula.Training.HealthCare.Protocols
         [Required]
         public virtual Guid ProtocolTypeId { get; set; }
         public virtual Guid ProtocolNoteId { get; set; }
+        public string NoteText { get; set; }
+
         [Required]
         public virtual Guid ProtocolInsuranceId { get; set; }
         [Required]
@@ -27,6 +29,8 @@ namespace Pusula.Training.HealthCare.Protocols
         public string ConcurrencyStamp { get; set; } = null!;
         public ProtocolDto()
         {
+           
+
         }
     }
 }
