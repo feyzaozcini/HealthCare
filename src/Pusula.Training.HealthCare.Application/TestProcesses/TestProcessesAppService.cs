@@ -145,8 +145,8 @@ public class TestProcessesAppService(
     {
         var testProcess = await testProcessManager.UpdateAsync(
             input.Id,
-            input.TestGroupItemId,
             input.LabRequestId,
+            input.TestGroupItemId,
             input.Status,
             input.Result,
             input.ResultDate

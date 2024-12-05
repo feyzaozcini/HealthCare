@@ -7,19 +7,23 @@ namespace Pusula.Training.HealthCare.LabRequests;
 
 public class LabRequestDto : FullAuditedEntity<Guid>
 {
-    public Guid Id { get; set; }
     //Protocol
     [Required]
     public Guid ProtocolId { get; set; }
     public string ProtocolType { get; set; }
     public DateTime? ProtocolStartDate { get; set; }
     public string? ProtocolEndDate { get; set; }
+    public int ProtocolNo { get; set; }
+
+    //Insurance
+    public string InsuranceName { get; set; }
 
     //Patient
 
-    //public string PatientName { get; set; }
-    //public string PatientSurname { get; set; }
-    //public int PatientNo { get; set; }
+    public string PatientName { get; set; }
+    public string PatientSurname { get; set; }
+    public int PatientNo { get; set; }
+    public DateTime PatientBirthDate { get; set; }
 
     //Doctor
     [Required]

@@ -63,7 +63,7 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
     public async Task<List<TestProcess>> GetListWithNavigationPropertiesAsync(string? filterText = null, Guid? labRequestId = null, Guid? testGroupItemId = null, TestProcessStates? status = null, decimal? result = null, DateTime? resultDate = null, string? sorting = null, int maxResultCount = int.MaxValue, int skipCount = 0, CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
-        query = ApplyFilter((await GetQueryableAsync()), filterText, labRequestId, testGroupItemId, status, result, resultDate);
+        query = ApplyFilter(query, filterText, labRequestId, testGroupItemId, status, result, resultDate);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? TestProcessConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
@@ -72,22 +72,24 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
     public virtual async Task<List<TestProcess>> GetByLabRequestIdAsync(Guid labRequestId)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
+        query = ApplyFilter(query, labRequestId: labRequestId);
 
-        return await query
-            .Where(tp => tp.LabRequestId == labRequestId)
-            .ToListAsync();
+        return await query.ToListAsync();
     }
+
 
     protected virtual async Task<IQueryable<TestProcess>> GetQueryForNavigationPropertiesAsync()
     {
         var dbSet = await GetDbSetAsync();
         return dbSet
-            .Include(tp => tp.LabRequest) 
-                .ThenInclude(lr => lr.Protocol) 
+            .Include(tp => tp.LabRequest)
+                .ThenInclude(lr => lr.Protocol)
+                    .ThenInclude(p => p.Patient) 
             .Include(tp => tp.LabRequest.Doctor)
-            .ThenInclude(tp=> tp.User)
-            .Include(tp => tp.TestGroupItem.TestGroup); 
+                .ThenInclude(d => d.User)
+            .Include(tp => tp.TestGroupItem.TestGroup);
     }
+
 
 
     protected virtual IQueryable<TestProcess> ApplyFilter(
@@ -106,8 +108,8 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
                 (e.Result.HasValue && e.Result.ToString()!.Contains(filterText!)) ||
                 (e.ResultDate.HasValue && e.ResultDate.ToString()!.Contains(filterText!))
             )
-            .WhereIf(labRequestId.HasValue && labRequestId != Guid.Empty, e => e.LabRequestId == labRequestId.Value)
-            .WhereIf(testGroupItemId.HasValue && testGroupItemId != Guid.Empty, e => e.TestGroupItemId == testGroupItemId.Value)
+            .WhereIf(labRequestId.HasValue && labRequestId != Guid.Empty, e => e.LabRequestId == labRequestId!.Value)
+            .WhereIf(testGroupItemId.HasValue && testGroupItemId != Guid.Empty, e => e.TestGroupItemId == testGroupItemId!.Value)
             .WhereIf(status.HasValue, e => e.Status == status!.Value)
             .WhereIf(result.HasValue, e => e.Result == result!.Value)
             .WhereIf(resultDate.HasValue, e => e.ResultDate == resultDate!.Value);

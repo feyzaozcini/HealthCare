@@ -21,6 +21,7 @@ public partial class LabTestRequest
 {
     private List<TestGroupItemDto> TestGroupItemsList { get; set; } = new List<TestGroupItemDto>();
     private GetTestGroupItemsInput? TestGroupItemsFilter { get; set; }
+
     private IReadOnlyList<LookupDto<Guid>> TestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
     private GetTestGroupsInput? TestGroupsFilter { get; set; }
     private List<TestGroupDto> TestGroupsList { get; set; } = new List<TestGroupDto>();

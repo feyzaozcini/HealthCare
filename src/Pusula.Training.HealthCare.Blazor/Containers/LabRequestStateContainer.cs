@@ -4,7 +4,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace Pusula.Training.HealthCare.Blazor.Containers;
 
-public class LabRequestStateContainer : ISingletonDependency
+public class LabRequestStateContainer : IScopedDependency
 {
     public LabRequestDto? SelectedLabRequest { get; set; }
 

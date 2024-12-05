@@ -31,8 +31,22 @@
         <GridColumn Field=@nameof(LabRequestDto.ProtocolType) HeaderText="Protokol Tipi" Width="25"></GridColumn>
         <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç T." Width="25" TextAlign="TextAlign.Left"></GridColumn>
         <GridColumn Field=@nameof(LabRequestDto.ProtocolEndDate) HeaderText="Protokol Bitiş T." Width="25" TextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn Field=@nameof(LabRequestDto.DoctorName) HeaderText="Doktor Adı" Width="25" TextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn Field=@nameof(LabRequestDto.DoctorSurname) HeaderText="Doktor Soyadı" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25">
+            <Template Context="context">
+                @if (context is LabRequestDto labrequest)
+                {
+                    <span>@labrequest.PatientName @labrequest.PatientSurname</span>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is LabRequestDto labrequest)
+                {
+                    <span>@labrequest.DoctorName @labrequest.DoctorSurname</span>
+                }
+            </Template>
+        </GridColumn>
         <GridColumn Field=@nameof(LabRequestDto.Status) HeaderText="Protokol Durumu" Width="25" TextAlign="TextAlign.Center"></GridColumn>
         <GridColumn Field=@nameof(LabRequestDto.Description) HeaderText="Açıklama" Width="25" TextAlign="TextAlign.Center"></GridColumn>
     </GridColumns>

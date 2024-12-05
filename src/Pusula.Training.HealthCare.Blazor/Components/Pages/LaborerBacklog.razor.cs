@@ -1,3 +1,5 @@
+using Pusula.Training.HealthCare.LabRequests;
+using Pusula.Training.HealthCare.TestProcesses;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
 using Syncfusion.Blazor.Popups;
@@ -5,28 +7,75 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Volo.Abp.Application.Dtos;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
     public partial class LaborerBacklog
     {
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        private List<TestProcessDto> TestProcessesList { get; set; } = new();
+        private List<LabRequestDto> LabRequestsList { get; set; } = new();
+        private LabRequestDto? SelectedLabRequest;
 
-        private List<object> GridData = new List<object>
-    {
-        new { PatientName = "Mehmet KAYA", Info = "Glucose Test", DoctorName = "Ahmet YILMAZ", Date = DateTime.Now, Status = "Tamamlandi", Result = 95.4m },
-new { PatientName = "Selim CAN", Info = "Cholesterol Test", DoctorName = "Huseyin AKSU", Date = DateTime.Now, Status = "Hazirlaniyor", Result = 203.1m },
-new { PatientName = "Fatma YILMAZ", Info = "Vitamin D Test", DoctorName = "Zehra ERDEM", Date = DateTime.Now, Status = "Tamamlandi", Result = 34.2m },
-new { PatientName = "Hasan CELIK", Info = "Hemoglobin A1C Test", DoctorName = "Kemal ASLAN", Date = DateTime.Now, Status = "Bekleniyor", Result = 6.8m },
-new { PatientName = "Aylin DURMAZ", Info = "Thyroid Panel Test", DoctorName = "Leyla CIFT", Date = DateTime.Now, Status = "Tamamlandi", Result = 1.7m },
-new { PatientName = "Umut SEN", Info = "Iron Level Test", DoctorName = "Omer YAVUZ", Date = DateTime.Now, Status = "Hazirlaniyor", Result = 110.3m },
-new { PatientName = "Cem TUNC", Info = "Liver Function Test", DoctorName = "Duygu YAZAR", Date = DateTime.Now, Status = "Bekleniyor", Result = 32.9m },
-new { PatientName = "Ece OZDEMIR", Info = "Kidney Function Test", DoctorName = "Murat DEMIR", Date = DateTime.Now, Status = "Tamamlandi", Result = 78.6m },
-new { PatientName = "Eren ALTIN", Info = "Electrolyte Panel Test", DoctorName = "Caner BULUT", Date = DateTime.Now, Status = "Hazirlaniyor", Result = 142.5m },
-new { PatientName = "Sevgi ILHAN", Info = "Blood Count Test", DoctorName = "Elif AKIN", Date = DateTime.Now, Status = "Tamamlandi", Result = 13.8m }
+        private TestProcessesUpdateDto UpdateTestProcessDto = new ();
+        private GetTestProcessesInput? TestProcessesFilter { get; set; }
+        private GetLabRequestsInput? LabRequestsFilter { get; set; }
+        private SfDialog? ResultDialog;
+        private Guid? SelectedTestProcessId;
 
-    };
+        protected override async Task OnInitializedAsync()
+        {
+            TestProcessesFilter = new GetTestProcessesInput();
+            LabRequestsFilter = new GetLabRequestsInput();
+            await GetLabRequestsAsync();
+        }
 
+        private async Task GetLabRequestsAsync()
+        {
+            var result = await LabRequestsAppService.GetListWithNavigationPropertiesAsync(LabRequestsFilter!);
+            LabRequestsList = result.Items.ToList();
+        }
+        private async Task GetTestProcessesAsync()
+        {
+            TestProcessesList = await TestProcessesAppService.GetByLabRequestIdAsync(SelectedLabRequest!.Id);
+        }
+        private async Task SaveResult()
+        {
+            foreach (var testProcess in TestProcessesList)
+            {
+                await TestProcessesAppService.UpdateAsync(new TestProcessesUpdateDto
+                {
+                    Id = testProcess.Id,
+                    LabRequestId = testProcess.LabRequestId,
+                    TestGroupItemId = testProcess.TestGroupItemId,
+                    Status = testProcess.Status,
+                    Result = testProcess.Result,
+                    ResultDate = DateTime.Now
+                });
+            }
+
+            await GetLabRequestsAsync(); 
+            await CloseResultDialog(); 
+        }
+
+        private async Task OpenResultUpdateModal(LabRequestDto labRequest)
+        {
+            SelectedLabRequest = labRequest;
+            await GetTestProcessesAsync();
+            await ResultDialog!.ShowAsync();
+        }
+
+        private async Task CloseResultDialog()
+        {
+            TestProcessesList = new();
+            SelectedLabRequest = null;
+            await ResultDialog!.HideAsync();
+        }
+
+        private async Task OnInputChange(InputEventArgs args)
+        {
+            LabRequestsFilter!.FilterText = args.Value;
+            await GetLabRequestsAsync();
+        }
     }
 }

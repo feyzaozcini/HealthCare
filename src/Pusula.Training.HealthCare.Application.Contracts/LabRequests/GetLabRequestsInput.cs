@@ -13,6 +13,10 @@ public class GetLabRequestsInput : PagedAndSortedResultRequestDto
     public Guid? ProtocolId { get; set; }
     public Guid? DoctorId { get; set; }
     public string? DoctorName { get; set; }
+    public string? DoctorSurname { get; set; }
+    public string? PatientName { get; set; }
+    public string? PatientSurname { get; set; }
+    public int? ProtocolNo { get; set; }
     public DateTime? Date { get; set; }
     public RequestStatusEnum? Status { get; set; }
     public string? Description { get; set; }

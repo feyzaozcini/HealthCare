@@ -1,8 +1,15 @@
-﻿namespace Pusula.Training.HealthCare.TestProcesses;
+﻿using System.ComponentModel;
+
+namespace Pusula.Training.HealthCare.TestProcesses;
 
 public enum TestProcessStates
 {
+    [Description("Talep Edildi")]
     Requested = 1,           // Test talebi oluşturuldu
-    Completed = 2,           // Test tamamlandı
-    Cancelled = 3,           // Test iptal edildi
+
+    [Description("Tamamlandı")]
+    Approved = 2,           // Test tamamlandı
+
+    [Description("İptal Edildi")]
+    Completed = 3,           // Test iptal edildi
 }

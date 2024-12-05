@@ -20,6 +20,7 @@
     "Menu:Tests": "Tetkikler",
     "Menu:ProtocolList": "Protokol Listesi",
     "Menu:TestStatistics": "Tetkik İstatistik Raporu",
-    "Menu:TestResults": "Tetkik Sonuç Raporu"
+    "Menu:TestResults": "Tetkik Sonuç Raporu",
+    "Menu:LaborerBacklogs": "Laborant İş Listesi"
   }
 }
