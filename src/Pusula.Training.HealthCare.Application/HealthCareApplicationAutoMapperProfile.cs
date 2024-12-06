@@ -45,7 +45,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         /* You can configure your AutoMapper mapping configuration here.
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
-        
+
         CreateMap<Patient, PatientDto>();
         CreateMap<Patient, PatientExcelDto>();
         CreateMap<PatientDto, PatientUpdateDto>();
@@ -85,11 +85,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<LabRequest, LabRequestUpdateDto>().ReverseMap();
         CreateMap<LabRequest, LabRequestDeletedDto>().ReverseMap();
         CreateMap<LabRequest, LabRequestDto>()
-            .ForMember(dest => dest.ProtocolStartDate, opt=> opt.MapFrom(x => x.Protocol.StartTime))
-            .ForMember(dest => dest.ProtocolEndDate, opt=> opt.MapFrom(x => x.Protocol.EndTime))
-            .ForMember(dest => dest.ProtocolNo, opt=> opt.MapFrom(x => x.Protocol.No))
-            .ForMember(dest => dest.DoctorName, opt=> opt.MapFrom(x => x.Doctor.User.Name))
-            .ForMember(dest => dest.DoctorSurname, opt=> opt.MapFrom(x => x.Doctor.User.Surname))
+            .ForMember(dest => dest.ProtocolStartDate, opt => opt.MapFrom(x => x.Protocol.StartTime))
+            .ForMember(dest => dest.ProtocolEndDate, opt => opt.MapFrom(x => x.Protocol.EndTime))
+            .ForMember(dest => dest.ProtocolNo, opt => opt.MapFrom(x => x.Protocol.No))
+            .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(x => x.Doctor.User.Name))
+            .ForMember(dest => dest.DoctorSurname, opt => opt.MapFrom(x => x.Doctor.User.Surname))
             .ForMember(dest => dest.PatientName, opt => opt.MapFrom(x => x.Protocol.Patient.FirstName))
             .ForMember(dest => dest.PatientSurname, opt => opt.MapFrom(x => x.Protocol.Patient.LastName))
             .ForMember(dest => dest.PatientNo, opt => opt.MapFrom(x => x.Protocol.Patient.No))
@@ -113,13 +113,12 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<TestGroupItem, TestGroupItemDto>()
             .ForMember(dest => dest.TestGroupName, opt => opt.MapFrom(x => x.TestGroup.Name))
             .ReverseMap();
-        CreateMap<TestGroupItemWithNavigationProperties, TestGroupItemWithNavigationPropertiesDto>();
 
         CreateMap<DepartmentService, DepartmentServiceDto>();
         CreateMap<DepartmentService, DepartmentServiceExcelDto>();
         CreateMap<DepartmentServiceDto, DepartmentServiceUpdateDto>();
         CreateMap<DepartmentService, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
-        
+
         CreateMap<Country, CountryDto>();
         CreateMap<Country, CountryCreateDto>();
         CreateMap<Country, CountryDeletedDto>();
@@ -142,7 +141,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<City, CityExcelDto>();
         CreateMap<City, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
 
-        
+
         CreateMap<IdentityUser, DoctorDto>()
          .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
          .ForMember(dest => dest.Id, opt => opt.Ignore());
@@ -158,11 +157,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         .ForMember(dest => dest.TitleId, opt => opt.MapFrom(src => src.Doctor.TitleId))
         .ForMember(dest => dest.DoctorDepartments, opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()));
         CreateMap<Doctor, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.UserId.ToString()));
-    //    CreateMap<Doctor, DoctorDto>()
-    //.ForMember(dest => dest.DoctorDepartments,
-    //           opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()));
+        //    CreateMap<Doctor, DoctorDto>()
+        //.ForMember(dest => dest.DoctorDepartments,
+        //           opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()));
         CreateMap<DepartmentWithDoctorsDto, DoctorWithNavigationPropertiesDto>();
-        CreateMap<DoctorWithNavigationPropertiesDto,DepartmentWithDoctorsDto>();
+        CreateMap<DoctorWithNavigationPropertiesDto, DepartmentWithDoctorsDto>();
         CreateMap<DoctorWithNavigationProperties, DoctorWithNavigationPropertiesDto>();
 
         CreateMap<Doctor, DoctorDto>()
@@ -177,7 +176,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
                opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()))
             .ForMember(dest => dest.TitleName, opt => opt.MapFrom(src => src.Title.Name));
 
-       
+
         CreateMap<DoctorCreateDto, Doctor>();
         CreateMap<DoctorWithNavigationProperties, DoctorWithNavigationPropertiesDto>()
    .ForMember(dest => dest.Doctor, opt => opt.MapFrom(src => src.Doctor))
@@ -225,7 +224,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Village, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
         CreateMap<IdentityUser, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
 
-        CreateMap<Appointment,AppointmentDto>();
+        CreateMap<Appointment, AppointmentDto>();
         CreateMap<Appointment, AppointmentWithNavigationPropertiesDto>();
         CreateMap<AppointmentWithNavigationProperties, AppointmentWithNavigationPropertiesDto>();
         CreateMap<AppointmentDto, AppointmentWithNavigationPropertiesDto>();
@@ -270,11 +269,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<PshychologicalStateWithNavigationDto, PshychologicalStateWithNavigationProperties>().ReverseMap();
 
         CreateMap<TestValueRange, TestValueRangeDto>()
-            .ForMember(dest => dest.TestGroupItemName, opt => opt.MapFrom(x=> x.TestGroupItem.Name))
-            .ForMember(dest => dest.TestGroupItemCode, opt => opt.MapFrom(x=> x.TestGroupItem.Code))
-            .ForMember(dest => dest.TestGroupItemTurnaroundTime, opt => opt.MapFrom(x=> x.TestGroupItem.TurnaroundTime))
-            .ForMember(dest => dest.TestGroupItemDescription, opt => opt.MapFrom(x=> x.TestGroupItem.Description))
-            .ForMember(dest => dest.TestGroupName, opt => opt.MapFrom(x=> x.TestGroupItem.TestGroup.Name))
+            .ForMember(dest => dest.TestGroupItemName, opt => opt.MapFrom(x => x.TestGroupItem.Name))
+            .ForMember(dest => dest.TestGroupItemCode, opt => opt.MapFrom(x => x.TestGroupItem.Code))
+            .ForMember(dest => dest.TestGroupItemTurnaroundTime, opt => opt.MapFrom(x => x.TestGroupItem.TurnaroundTime))
+            .ForMember(dest => dest.TestGroupItemDescription, opt => opt.MapFrom(x => x.TestGroupItem.Description))
+            .ForMember(dest => dest.TestGroupName, opt => opt.MapFrom(x => x.TestGroupItem.TestGroup.Name))
             .ReverseMap();
 
         CreateMap<TestValueRange, TestValueRangesCreateDto>().ReverseMap();
@@ -290,7 +289,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
             .ForMember(dest => dest.TestGroupName, opt => opt.MapFrom(x => x.TestGroupItem.TestGroup.Name))
             .ForMember(dest => dest.PatientName, opt => opt.MapFrom(x => x.LabRequest.Protocol.Patient.FirstName))
             .ForMember(dest => dest.PatientSurname, opt => opt.MapFrom(x => x.LabRequest.Protocol.Patient.LastName))
+            .ForMember(dest => dest.TestMinValue, opt => opt.MapFrom(x => x.TestGroupItem.TestValueRange!.MinValue))
+            .ForMember(dest => dest.TestMaxValue, opt => opt.MapFrom(x => x.TestGroupItem.TestValueRange!.MaxValue))
+            .ForMember(dest => dest.TestUnit, opt => opt.MapFrom(x => x.TestGroupItem.TestValueRange!.Unit))
             .ReverseMap();
+
         CreateMap<TestProcess, TestProcessesCreateDto>().ReverseMap();
         CreateMap<TestProcessDto, TestProcessesCreateDto>().ReverseMap();
         CreateMap<TestProcess, TestProcessesUpdateDto>().ReverseMap();

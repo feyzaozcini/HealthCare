@@ -83,7 +83,8 @@ public class EfCoreTestGroupItemRepository(IDbContextProvider<HealthCareDbContex
     {
         var dbSet = await GetDbSetAsync();
         return dbSet
-            .Include(tp => tp.TestGroup);
+            .Include(tp => tp.TestGroup)
+            .Include(tp => tp.TestValueRange);
     }
 
     public async Task<List<TestGroupItem>> GetListWithNavigationPropertiesAsync(
@@ -129,32 +130,4 @@ public class EfCoreTestGroupItemRepository(IDbContextProvider<HealthCareDbContex
             .WhereIf(turnaroundTime.HasValue, e => e.TurnaroundTime == turnaroundTime!.Value)
             .WhereIf(testGroupId.HasValue && testGroupId != Guid.Empty, e => e.TestGroupId == testGroupId!.Value);
     }
-
-    private IQueryable<TestGroupItemWithNavigationProperties> ApplyFilter(
-    IQueryable<TestGroupItemWithNavigationProperties> query,
-    string? filterText,
-    string? name,
-    Guid? testGroupId,
-    string? code,
-    string? testType,
-    string? description,
-    int? turnaroundTime)
-    {
-        return query
-            .WhereIf(!string.IsNullOrWhiteSpace(filterText),
-                x => x.TestGroup.Name.Contains(filterText!) ||
-                     x.TestGroupItem.Name.Contains(filterText!) ||
-                     x.TestGroupItem.Code.Contains(filterText!) ||
-                     x.TestGroupItem.Description!.Contains(filterText!) ||
-                     x.TestGroupItem.TestType.Contains(filterText!))
-            .WhereIf(testGroupId.HasValue, x => x.TestGroup.Id == testGroupId)
-            .WhereIf(!string.IsNullOrWhiteSpace(name), x => x.TestGroupItem.Name.Contains(name!))
-            .WhereIf(!string.IsNullOrWhiteSpace(code), x => x.TestGroupItem.Code.Contains(code!))
-            .WhereIf(!string.IsNullOrWhiteSpace(testType), x => x.TestGroupItem.TestType.Contains(testType!))
-            .WhereIf(!string.IsNullOrWhiteSpace(description), x => x.TestGroupItem.Description!.Contains(description!))
-            .WhereIf(turnaroundTime.HasValue, x => x.TestGroupItem.TurnaroundTime == turnaroundTime);
-    }
-
-
-
 }

@@ -1,7 +1,67 @@
 ﻿@page "/test-results-report"
+@using Pusula.Training.HealthCare.TestProcesses
+@using Syncfusion.Licensing
 
-<h3>Test Results</h3>
+@inject ITestProcessesAppService TestProcessesAppService
 
-@code {
+<div class="d-flex align-items-center justify-content-between mb-2">
+    <div class="d-flex justify-content-center flex-grow-1">
+        @* <SfTextBox Placeholder="Protokol Ara"
+                   FloatLabelType="FloatLabelType.Never"
+                   @bind-Value="TestProcessesFilter!.FilterText"
+                   Width="50%"
+                   Input="OnInputChange">
+        </SfTextBox> *@
+    </div>
 
-}
+    <SfButton CssClass="e-warning e-icon-left e-medium ml-auto"
+              Content="Sonuç Yazdır"
+              IconCss="e-icons e-print"
+              OnClick="OnPrintClick">
+    </SfButton>
+</div>
+
+<SfGrid @ref="TestProcessesGrid" DataSource="@TestResultsList" AllowPaging="false" AllowSorting="true" Height="700px">
+    <GridEvents TValue="TestProcessDto" RowDataBound="RowBound"></GridEvents>
+    <GridColumns>
+        <GridColumn HeaderText="Doktor Ad-Soyad" Width="200" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is TestProcessDto testProcess)
+                {
+                    @($"{testProcess.DoctorName} {testProcess.DoctorSurname}")
+                }
+            </Template>
+        </GridColumn>    
+        <GridColumn HeaderText="Hasta Ad-Soyad" Width="200" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is TestProcessDto testProcess)
+                {
+                    @($"{testProcess.PatientName} {testProcess.PatientSurname}")
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn HeaderText="Test Adı" Width="200" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is TestProcessDto testProcess)
+                {
+                    @($"{testProcess.TestGroupName} - {testProcess.TestGroupItemName}")
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn HeaderText="Min-Max Değer" Width="200" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is TestProcessDto testProcess)
+                {
+                    @($"{testProcess.TestMinValue} - {testProcess.TestMaxValue}")
+                }
+            </Template>
+        </GridColumn>      
+        <GridColumn Field=@nameof(TestProcessDto.Result) Width="100" HeaderText="Değer" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(TestProcessDto.TestUnit) Width="100" HeaderText="Değer" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(TestProcessDto.ResultDate) HeaderText="Result Date" Width="200" TextAlign="TextAlign.Center"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@* YAPILACAKLAR
+    -Vakit olursa testprocess searchbox yapılandırılacak.
+*@

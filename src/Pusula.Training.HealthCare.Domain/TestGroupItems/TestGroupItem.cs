@@ -1,6 +1,8 @@
 ﻿using JetBrains.Annotations;
 using Pusula.Training.HealthCare.TestGroups;
+using Pusula.Training.HealthCare.TestValueRanges;
 using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -23,6 +25,9 @@ public class TestGroupItem : AuditedEntity<Guid>
     public string? Description { get; private set; }
     [NotNull]
     public int TurnaroundTime { get; set; } // Tetkikin tahmini tamamlanma süresi. Saat cinsinden tanımlanacak. Arayüzde gün ve saat dönüşümü yapılacak.
+
+    public TestValueRange? TestValueRange { get; set; } 
+
 
     protected TestGroupItem()
     {

@@ -217,7 +217,7 @@ public class HealthCareDbContext :
                 b.HasMany(x => x.Doctors).WithOne().HasForeignKey(x => x.DepartmentId).IsRequired();
             });
 
-           
+
 
             builder.Entity<ProtocolType>(b =>
             {
@@ -277,7 +277,7 @@ public class HealthCareDbContext :
                 b.HasOne(x => x.User) // Navigasyon özelliği bağlanıyor
         .WithOne()
         .HasForeignKey<Doctor>(x => x.UserId)
-        .IsRequired()  
+        .IsRequired()
         .OnDelete(DeleteBehavior.Cascade);
 
                 b.HasOne(d => d.Title)
@@ -328,11 +328,6 @@ public class HealthCareDbContext :
                     .HasColumnName(nameof(TestGroupItem.TurnaroundTime))
                     .IsRequired();
 
-                b.HasOne(x=> x.TestGroup)
-                    .WithMany()
-                    .HasForeignKey(x => x.TestGroupId)
-                    .IsRequired()
-                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<LabRequest>(b =>
@@ -359,17 +354,17 @@ public class HealthCareDbContext :
                     .HasColumnName(nameof(LabRequest.Description))
                     .IsRequired(false);
 
-                b.HasOne(x => x.Doctor) 
-                    .WithMany()       
+                b.HasOne(x => x.Doctor)
+                    .WithMany()
                     .HasForeignKey(x => x.DoctorId)
                     .IsRequired()
-                    .OnDelete(DeleteBehavior.Restrict); 
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 b.HasOne(x => x.Protocol)
-                    .WithMany()         
+                    .WithMany()
                     .HasForeignKey(x => x.ProtocolId)
                     .IsRequired()
-                    .OnDelete(DeleteBehavior.Restrict); 
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<TestProcess>(b =>
@@ -432,10 +427,9 @@ public class HealthCareDbContext :
                     .HasColumnName(nameof(TestValueRange.Unit))
                     .IsRequired();
 
-                b.HasOne(x => x.TestGroupItem)
-                    .WithMany()
-                    .HasForeignKey(x => x.TestGroupItemId)
-                    .IsRequired()
+                b.HasOne(tvr => tvr.TestGroupItem)
+                    .WithOne(tgi => tgi.TestValueRange)
+                    .HasForeignKey<TestValueRange>(tvr => tvr.TestGroupItemId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
 

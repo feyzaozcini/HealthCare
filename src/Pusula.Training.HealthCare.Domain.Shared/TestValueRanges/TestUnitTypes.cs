@@ -1,90 +1,90 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Pusula.Training.HealthCare.TestValueRanges;
 
 public enum TestUnitTypes
 {
-    [Description("mg/dL")]  // Miligram/desilitre
+    [Display(Name = "mg/dL")]  // Miligram/desilitre
     MgPerDl = 1,
 
-    [Description("g/dL")]   // Gram/desilitre
+    [Display(Name = "g/dL")]   // Gram/desilitre
     GPerDl = 2,
 
-    [Description("mmol/L")] // Milimol/litre
+    [Display(Name = "mmol/L")] // Milimol/litre
     MmolPerL = 3,
 
-    [Description("μmol/L")] // Mikromol/litre
+    [Display(Name = "μmol/L")] // Mikromol/litre
     UmolPerL = 4,
 
-    [Description("mcg/dL")] // Mikrogram/desilitre
+    [Display(Name = "mcg/dL")] // Mikrogram/desilitre
     McgPerDl = 5,
 
-    [Description("ng/mL")]  // Nanogram/mililitre
+    [Display(Name = "ng/mL")]  // Nanogram/mililitre
     NgPerMl = 6,
 
-    [Description("pg/mL")]  // Pikogram/mililitre
+    [Display(Name = "pg/mL")]  // Pikogram/mililitre
     PgPerMl = 7,
 
-    [Description("IU/L")]   // Uluslararası birim/litre
+    [Display(Name = "IU/L")]   // Uluslararası birim/litre
     IUPerL = 8,
 
-    [Description("U/L")]    // Birim/litre
+    [Display(Name = "U/L")]    // Birim/litre
     UPerL = 9,
 
-    [Description("mmHg")]   // Milimetre cıva
+    [Display(Name = "mmHg")]   // Milimetre cıva
     MmHg = 10,
 
-    [Description("kPa")]    // Kilopascal
+    [Display(Name = "kPa")]    // Kilopascal
     KPa = 11,
 
-    [Description("fL")]     // Femtolitre
+    [Display(Name = "fL")]     // Femtolitre
     Fl = 12,
 
-    [Description("mL")]     // Mililitre
+    [Display(Name = "mL")]     // Mililitre
     Ml = 13,
 
-    [Description("L")]      // Litre
+    [Display(Name = "L")]      // Litre
     L = 14,
 
-    [Description("mg")]     // Miligram
+    [Display(Name = "mg")]     // Miligram
     Mg = 15,
 
-    [Description("g")]      // Gram
+    [Display(Name = "g")]      // Gram
     G = 16,
 
-    [Description("mcg")]    // Mikrogram
+    [Display(Name = "mcg")]    // Mikrogram
     Mcg = 17,
 
-    [Description("ng")]     // Nanogram
+    [Display(Name = "ng")]     // Nanogram
     Ng = 18,
 
-    [Description("pg")]     // Pikogram
+    [Display(Name = "pg")]     // Pikogram
     Pg = 19,
 
-    [Description("%")]      // Yüzde
+    [Display(Name = "%")]      // Yüzde
     Percent = 20,
 
-    [Description("/mL")]    // Mililitre başına
+    [Display(Name = "/mL")]    // Mililitre başına
     PerMl = 21,
 
-    [Description("/mm³")]   // Milimetreküp başına
+    [Display(Name = "/mm³")]   // Milimetreküp başına
     PerMm3 = 22,
 
-    [Description("/μL")]    // Mikrolitre başına
+    [Display(Name = "/μL")]    // Mikrolitre başına
     PerMicroliter = 23,
 
-    [Description("sec")]    // Saniye
+    [Display(Name = "sec")]    // Saniye
     Sec = 24,
 
-    [Description("min")]    // Dakika
+    [Display(Name = "min")]    // Dakika
     Min = 25,
 
-    [Description("hr")]     // Saat
+    [Display(Name = "hr")]     // Saat
     Hr = 26,
 
-    [Description("Ratio")]  // Oran
+    [Display(Name = "Ratio")]  // Oran
     Ratio = 27,
 
-    [Description("AU")]     // Rastgele birim (Arbitrary Unit)
+    [Display(Name = "AU")]     // Rastgele birim (Arbitrary Unit)
     ArbitraryUnit = 28
 }
