@@ -25,6 +25,8 @@ public static class HealthCareDomainErrorCodes
     public const string TestCannotBeDeletedDueToRequests = "Bu teste ait talepler bulunduğundan silinemez.";
     public const string TestGroupCannotBeChangedDueToActiveRequests = "Bu teste ait aktif talepler bulunduğu için grubu değiştirilemez.";
     public const string TurnaroundTimeCannotBeNegative = "Sonuçlanma süresi sıfırdan küçük olamaz.";
+    public const string CannotAddTheSameTestOnTheSameDay = "24 saat içinde aynı test isteminde bulunamazsınız.";
+
 
     public const string DiagnosisGroupAlreadyExist = "Böyle bir tanı grubu zaten mevcut";
     public const string DiagnosisAlreadyExist = "Böyle bir tanı zaten mevcut";

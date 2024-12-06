@@ -10,6 +10,7 @@ using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.TestGroupItems;
 using Pusula.Training.HealthCare.TestGroups;
+using Pusula.Training.HealthCare.TestValueRanges;
 using Pusula.Training.HealthCare.Titles;
 using Pusula.Training.HealthCare.Villages;
 using System;
@@ -34,6 +35,7 @@ namespace Pusula.Training.HealthCare
         IVillageRepository villageRepository,
         ITestGroupRepository testGroupRepository,
         ITestGroupItemRepository testGroupItemRepository,
+        ITestValueRangeRepository testValueRangeRepository,
         IDepartmentRepository departmentRepository,
         ITitleRepository titleRepository,
         IAppointmentTypeRepository appointmentTypeRepository,
@@ -55,6 +57,8 @@ namespace Pusula.Training.HealthCare
 
             var testGroups = await SeedTestGroupsAsync();
             var testGroupItems = await SeedTestGroupItemsAsync(testGroups);
+            await SeedTestValueRangesAsync(testGroupItems);
+
 
             var departments = await SeedDepartmentsAsync();
             var titles = await SeedTitlesAsync();
@@ -1517,6 +1521,419 @@ namespace Pusula.Training.HealthCare
 
         #endregion
 
+        #region TestValueRanges
+
+        private async Task<List<Guid>> SeedTestValueRangesAsync(List<Guid> testGroupItemKeys)
+        {
+            if (await testValueRangeRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+
+            var testValueRanges = new List<TestValueRange>
+    {
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(0),
+            minValue: 1.0m,
+            maxValue: 6.0m,
+            unit: TestUnitTypes.Percent
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(1),
+            minValue: 5.2m,
+            maxValue: 8.0m,
+            unit: TestUnitTypes.Percent
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(2),
+            minValue: 4.1m,
+            maxValue: 9.0m,
+            unit: TestUnitTypes.Percent
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(3),
+            minValue: 8.3m,
+            maxValue: 9.0m,
+            unit: TestUnitTypes.Percent
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(4),
+            minValue: 11.5m,
+            maxValue: 15.5m,
+            unit: TestUnitTypes.GPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(5),
+            minValue: 6.5m,
+            maxValue: 45.0m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(6),
+            minValue: 9.3m,
+            maxValue: 22.0m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(7),
+            minValue: 2.6m,
+            maxValue: 3.0m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(8),
+            minValue: 4.0m,
+            maxValue: 10.0m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(9),
+            minValue: 12.0m,
+            maxValue: 16.0m,
+            unit: TestUnitTypes.GPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(10),
+            minValue: 4.0m,
+            maxValue: 5.5m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(11),
+            minValue: 3.5m,
+            maxValue: 5.0m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(12),
+            minValue: 70.0m,
+            maxValue: 110.0m,
+            unit: TestUnitTypes.MgPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(13),
+            minValue: 3.6m,
+            maxValue: 5.0m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(14),
+            minValue: 5.3m,
+            maxValue: 12.0m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(15),
+            minValue: 11.5m,
+            maxValue: 15.5m,
+            unit: TestUnitTypes.GPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(16),
+            minValue: 120.0m,
+            maxValue: 140.0m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(17),
+            minValue: 1.2m,
+            maxValue: 3.0m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(18),
+            minValue: 7.0m,
+            maxValue: 10.0m,
+            unit: TestUnitTypes.MgPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(19),
+            minValue: 8.0m,
+            maxValue: 12.0m,
+            unit: TestUnitTypes.Percent
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(20),
+            minValue: 3.6m,
+            maxValue: 5.5m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(21),
+            minValue: 35.0m,
+            maxValue: 45.0m,
+            unit: TestUnitTypes.Percent
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(22),
+            minValue: 6.2m,
+            maxValue: 10.0m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(23),
+            minValue: 11.0m,
+            maxValue: 14.0m,
+            unit: TestUnitTypes.GPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(24),
+            minValue: 4.5m,
+            maxValue: 5.0m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(25),
+            minValue: 10.0m,
+            maxValue: 50.0m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(26),
+            minValue: 12.0m,
+            maxValue: 16.0m,
+            unit: TestUnitTypes.GPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(27),
+            minValue: 4.5m,
+            maxValue: 5.5m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(28),
+            minValue: 70.0m,
+            maxValue: 110.0m,
+            unit: TestUnitTypes.MgPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(29),
+            minValue: 1.0m,
+            maxValue: 4.2m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(30),
+            minValue: 120.0m,
+            maxValue: 140.0m,
+            unit: TestUnitTypes.ArbitraryUnit
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(31),
+            minValue: 10.0m,
+            maxValue: 25.0m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(32),
+            minValue: 2.0m,
+            maxValue: 8.0m,
+            unit: TestUnitTypes.UPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(33),
+            minValue: 1.5m,
+            maxValue: 3.5m,
+            unit: TestUnitTypes.MgPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(34),
+            minValue: 3.5m,
+            maxValue: 5.5m,
+            unit: TestUnitTypes.McgPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(35),
+            minValue: 50.0m,
+            maxValue: 100.0m,
+            unit: TestUnitTypes.Fl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(36),
+            minValue: 2.1m,
+            maxValue: 5.4m,
+            unit: TestUnitTypes.IUPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(37),
+            minValue: 15.0m,
+            maxValue: 30.0m,
+            unit: TestUnitTypes.Percent
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(38),
+            minValue: 1.0m,
+            maxValue: 2.2m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(39),
+            minValue: 70.0m,
+            maxValue: 110.0m,
+            unit: TestUnitTypes.MgPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(40),
+            minValue: 1.0m,
+            maxValue: 3.0m,
+            unit: TestUnitTypes.Mcg
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(41),
+            minValue: 1.1m,
+            maxValue: 2.5m,
+            unit: TestUnitTypes.Mg
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(42),
+            minValue: 120.0m,
+            maxValue: 140.0m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(43),
+            minValue: 1.8m,
+            maxValue: 2.5m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(44),
+            minValue: 10.0m,
+            maxValue: 20.0m,
+            unit: TestUnitTypes.Mcg
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(45),
+            minValue: 4.0m,
+            maxValue: 6.0m,
+            unit: TestUnitTypes.MgPerDl
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(46),
+            minValue: 0.6m,
+            maxValue: 1.2m,
+            unit: TestUnitTypes.MmolPerL
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(47),
+            minValue: 12.0m,
+            maxValue: 24.0m,
+            unit: TestUnitTypes.MmHg
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(48),
+            minValue: 4.0m,
+            maxValue: 5.0m,
+            unit: TestUnitTypes.MmHg
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(49),
+            minValue: 200.0m,
+            maxValue: 500.0m,
+            unit: TestUnitTypes.MmHg
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(50),
+            minValue: 9.0m,
+            maxValue: 15.0m,
+            unit: TestUnitTypes.MmHg
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(51),
+            minValue: 2.2m,
+            maxValue: 4.3m,
+            unit: TestUnitTypes.MmHg
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(52),
+            minValue: 6.3m,
+            maxValue: 9.4m,
+            unit: TestUnitTypes.MmHg
+        )
+
+        ,new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(53),
+            minValue: 2.0m,
+            maxValue: 8.9m,
+            unit: TestUnitTypes.MmHg
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(54),
+            minValue: 150.0m,
+            maxValue: 300.0m,
+            unit: TestUnitTypes.MmHg
+            
+        ),
+        new TestValueRange(
+            guidGenerator.Create(),
+            testGroupItemKeys.ElementAt(55),
+            minValue: 5.0m,
+            maxValue: 10.0m,
+            unit: TestUnitTypes.MmHg
+        )
+    };
+
+            await testValueRangeRepository.InsertManyAsync(testValueRanges, true);
+
+            return testValueRanges.Select(c => c.Id).ToList();
+        }
+
+
+        #endregion
+
         #region Departments
         private async Task<List<Guid>> SeedDepartmentsAsync()
         {
@@ -1556,7 +1973,7 @@ namespace Pusula.Training.HealthCare
         #endregion
 
         #region AppointmentTypes
-        
+
         #endregion
 
         #region Companies

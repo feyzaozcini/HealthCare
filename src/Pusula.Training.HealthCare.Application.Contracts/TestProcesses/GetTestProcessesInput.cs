@@ -19,6 +19,8 @@ public class GetTestProcessesInput : PagedAndSortedResultRequestDto
     //Doktor
     public string? DoctorName { get; set; }
     public string? DoctorSurname { get; set; }
+    public string PatientName { get; set; } = null!;
+    public string PatientSurname { get; set; } = null!;
 
     //Test
     public string? TestGroupItemName { get; set; }
@@ -30,7 +32,10 @@ public class GetTestProcessesInput : PagedAndSortedResultRequestDto
 
     public GetTestProcessesInput()
     {
+        MaxResultCount = PagedAndSortedResultRequestDto.MaxMaxResultCount;
+        SkipCount = 0;
     }
+
 
     public GetTestProcessesInput(string? filterText, Guid? labRequestId, Guid? testGroupItemId, TestProcessStates? status, decimal? result, DateTime? resultDate)
     {

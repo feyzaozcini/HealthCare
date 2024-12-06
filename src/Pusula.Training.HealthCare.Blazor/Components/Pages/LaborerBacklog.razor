@@ -1,12 +1,10 @@
 ﻿@page "/laborer-backlog"
 @using Microsoft.Extensions.Localization
-@using Pusula.Training.HealthCare.Extensions
 @using Pusula.Training.HealthCare.LabRequests
 @using Pusula.Training.HealthCare.TestProcesses
 
 @inject ITestProcessesAppService TestProcessesAppService
 @inject ILabRequestsAppService LabRequestsAppService
-@inject IStringLocalizer<LaborerBacklog> Localizer
 
 <div class="flex-grow-1 d-flex justify-content-center mb-2">
     <SfTextBox Placeholder="Protokol Ara"
@@ -127,8 +125,3 @@
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
-
-@* YAPILACAKLAR
-   - Business rules eklenecek.
-   - Toast ile handle error ve işlem durumları gösterilecek.
-*@

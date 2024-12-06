@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Pusula.Training.HealthCare.TestValueRanges;
 using System;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Application.Dtos;
@@ -19,6 +20,10 @@ public class TestProcessDto : FullAuditedEntityDto<Guid>
     public Guid TestGroupItemId { get; set; }
     public string TestGroupItemName { get; set; } = null!;
     public string TestGroupName { get; set; } = null!;
+
+    public decimal TestMinValue { get; set; }
+    public decimal TestMaxValue { get; set; }
+    public TestUnitTypes TestUnit { get; set; }
     [Required]
     public TestProcessStates Status { get; set; }
     public decimal? Result { get; set; }

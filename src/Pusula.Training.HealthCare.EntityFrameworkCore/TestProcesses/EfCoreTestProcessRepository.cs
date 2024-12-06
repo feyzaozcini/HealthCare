@@ -60,7 +60,17 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
     }
 
     //Bağlı olduğu entity'ler ile beraber tüm verileri getirir.
-    public async Task<List<TestProcess>> GetListWithNavigationPropertiesAsync(string? filterText = null, Guid? labRequestId = null, Guid? testGroupItemId = null, TestProcessStates? status = null, decimal? result = null, DateTime? resultDate = null, string? sorting = null, int maxResultCount = int.MaxValue, int skipCount = 0, CancellationToken cancellationToken = default)
+    public async Task<List<TestProcess>> GetListWithNavigationPropertiesAsync(
+        string? filterText = null, 
+        Guid? labRequestId = null, 
+        Guid? testGroupItemId = null, 
+        TestProcessStates? status = null, 
+        decimal? result = null, 
+        DateTime? resultDate = null,
+        string? sorting = null, 
+        int maxResultCount = int.MaxValue, 
+        int skipCount = 0, 
+        CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
         query = ApplyFilter(query, filterText, labRequestId, testGroupItemId, status, result, resultDate);
@@ -84,10 +94,12 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
         return dbSet
             .Include(tp => tp.LabRequest)
                 .ThenInclude(lr => lr.Protocol)
-                    .ThenInclude(p => p.Patient) 
+                    .ThenInclude(p => p.Patient)
             .Include(tp => tp.LabRequest.Doctor)
                 .ThenInclude(d => d.User)
-            .Include(tp => tp.TestGroupItem.TestGroup);
+              .Include(tp => tp.TestGroupItem.TestGroup)
+               .Include(tp => tp.TestGroupItem)
+            .ThenInclude(tgi => tgi.TestValueRange);
     }
 
 

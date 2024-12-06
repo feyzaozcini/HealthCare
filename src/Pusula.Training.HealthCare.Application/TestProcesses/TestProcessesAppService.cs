@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Core;
+using Pusula.Training.HealthCare.Core.Rules.TestProcesses;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.TestValueRanges;
@@ -21,6 +22,7 @@ namespace Pusula.Training.HealthCare.TestProcesses;
 public class TestProcessesAppService(
     ITestProcessRepository testProcessRepository,
     TestProcessManager testProcessManager,
+    ITestProcessBusinessRules testProcessBusinessRules,
     IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache
     ) : HealthCareAppService, ITestProcessesAppService
 {
@@ -28,6 +30,8 @@ public class TestProcessesAppService(
     [Authorize(HealthCarePermissions.TestProcesses.Create)]
     public virtual async Task<TestProcessDto> CreateAsync(TestProcessesCreateDto input)
     {
+        await testProcessBusinessRules.ValidateRecentTestsAsync(input.LabRequestId, input.TestGroupItemId);
+
         var testProcess = await testProcessManager.CreateAsync(
             input.LabRequestId,
             input.TestGroupItemId,

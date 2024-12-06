@@ -29,7 +29,7 @@ else
                 <!-- Ortadaki Metin -->
                 <ToolbarItem Align="ItemAlign.Center">
                     <Template>
-                        <div class="d-flex align-items-center">
+                        <div class="d-flex align-items-center" >
                             <span class="fw-bold fs-5">
                                 @($"{LabRequestService.SelectedLabRequest!.PatientName ?? "Ad"} {LabRequestService.SelectedLabRequest!.PatientSurname ?? "Soyad"}, {LabRequestService.SelectedLabRequest!.PatientBirthDate:dd.MM.yyyy}, {LabRequestService.SelectedLabRequest!.InsuranceName}")
                             </span>
@@ -45,9 +45,6 @@ else
             </ToolbarItems>
         </SfToolbar>
     </div>
-
-    @*TestList Bar*@
-
 
     @*Test Groups & Items Data Grid*@
     <div class="d-flex flex-row">
@@ -240,3 +237,13 @@ else
     </SfDialog>
 
 }
+
+@*Toast*@
+<SfToast @ref="ToastObj" Width="300px">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
+
+@* YAPILACAKLAR
+    -Vakit olursa testprocess searchbox yapılandırılacak.
+    -Tarihe göre filtreleme yapılacak.
+*@

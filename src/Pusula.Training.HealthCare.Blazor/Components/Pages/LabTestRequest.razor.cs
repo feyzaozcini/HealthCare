@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Components;
 using Pusula.Training.HealthCare.LabRequests;
 using Pusula.Training.HealthCare.TestProcesses;
 using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
+using Volo.Abp;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages;
 
@@ -36,16 +37,19 @@ public partial class LabTestRequest
     private List<TestProcessDto> CompletedTestProcesses { get; set; } = new();
     private Guid? SelectedTestGroupId { get; set; } = null;
     private Guid? SelectedTestProcessId { get; set; } = null;
+    private SfToast? ToastObj;
+    private string ErrorMessage = string.Empty;
 
     private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
     private int CurrentPage { get; set; } = 1;
     private long TotalCount;
 
+
+    private SfDialog? PatientDetailsModal;
     private SfDialog? DeleteTestProcessDialog;
     private SfDialog? HistoryDialog;
     private SfDialog? DescriptionDialog;
     private bool _isInitialized = false;
-
 
     private DateTime[] FilterByDateRange = { DateTime.Today, DateTime.Today.AddDays(30) };
 
@@ -66,12 +70,10 @@ public partial class LabTestRequest
         await GetTestGroupsAsync();
         await LoadLookupsAsync();
         await LoadApprovedTestProcessesAsync();
-        StateHasChanged(); 
+        StateHasChanged();
 
-
-        _isInitialized = true; 
+        _isInitialized = true;
     }
-
 
     #region Click Events
     private async Task OnPrintClick()
@@ -83,30 +85,59 @@ public partial class LabTestRequest
     }
     private async Task OnAddClick(TestGroupItemDto testGroupItem)
     {
-        var newTestProcess = new TestProcessesCreateDto
+        await HandleError(async () =>
         {
-            LabRequestId = LabRequestService.SelectedLabRequest!.Id,
-            TestGroupItemId = testGroupItem.Id,
-            Status = TestProcessStates.Requested,
-            Result = null,
-            ResultDate = null
-        };
+            var newTestProcess = new TestProcessesCreateDto
+            {
+                LabRequestId = LabRequestService.SelectedLabRequest!.Id,
+                TestGroupItemId = testGroupItem.Id,
+                Status = TestProcessStates.Requested,
+                Result = null,
+                ResultDate = null
+            };
 
-        await TestProcessesAppService.CreateAsync(newTestProcess);
+            await TestProcessesAppService.CreateAsync(newTestProcess);
+            var labRequest = await LabRequestsAppService.GetAsync(LabRequestService.SelectedLabRequest.Id);
+            if (labRequest.Status == RequestStatusEnum.Completed)
+            {
+                labRequest.Status = RequestStatusEnum.InProgress;
 
-        await LoadTestProcessesAsync();
+                await LabRequestsAppService.UpdateAsync(new LabRequestUpdateDto
+                {
+                    Id = labRequest.Id,
+                    ProtocolId = labRequest.ProtocolId,
+                    DoctorId = labRequest.DoctorId,
+                    Date = labRequest.Date,
+                    Description = labRequest.Description,
+                    Status = labRequest.Status
+                });
+            }
 
-        if (TestProcessesGrid != null)
-        {
-            await TestProcessesGrid.Refresh();
-        }
+            await LoadTestProcessesAsync();
+
+            if (TestProcessesGrid != null)
+            {
+                await TestProcessesGrid.Refresh();
+            }
+
+            await ShowToast("Test baþarýyla eklendi.", true);
+        });
     }
 
-    private void OnPlanningClick()
+    private async Task ConfirmTestProcessDelete()
     {
-        Console.WriteLine("Planlamaya týklandý!");
+        await HandleError(async () =>
+        {
+            if (SelectedTestProcessId.HasValue)
+            {
+                await TestProcessesAppService.DeleteAsync(SelectedTestProcessId.Value);
+                await LoadTestProcessesAsync();
+                StateHasChanged();
+            }
+            await CloseTestProcessDeleteModal();
+            await ShowToast("Test baþarýyla silindi.", true);
+        });
     }
-
     #endregion
 
     #region Get Actions
@@ -182,11 +213,18 @@ public partial class LabTestRequest
     #endregion
 
     #region Modals
-
+    private async Task OpenPatientDetailsModal()
+    {
+        await PatientDetailsModal!.ShowAsync();
+    }
+    private async Task ClosePatientDetailsModal()
+    {
+        await PatientDetailsModal!.HideAsync();
+    }
     private async Task OpenHistoryModal()
     {
-        await LoadApprovedTestProcessesAsync(); 
-        await HistoryDialog!.ShowAsync();      
+        await LoadApprovedTestProcessesAsync();
+        await HistoryDialog!.ShowAsync();
     }
 
     private async Task OpenDescriptionModal(string? description)
@@ -200,17 +238,6 @@ public partial class LabTestRequest
         await DescriptionDialog!.HideAsync();
     }
 
-    private async Task ConfirmTestProcessDelete()
-    {
-
-        if (SelectedTestProcessId.HasValue)
-        {
-            await TestProcessesAppService.DeleteAsync(SelectedTestProcessId.Value);
-            await LoadTestProcessesAsync();
-            StateHasChanged();
-        }
-        await CloseTestProcessDeleteModal();
-    }
     private async Task OpenTestProcessDeleteModal(Guid id)
     {
         SelectedTestProcessId = id;
@@ -262,4 +289,34 @@ public partial class LabTestRequest
 
     #endregion
 
+    #region Toast & Exception Controls
+
+    public async Task HandleError(Func<Task> action)
+    {
+        try
+        {
+            await action();
+        }
+        catch (UserFriendlyException ex)
+        {
+            await ShowToast(ex.Message, false);
+        }
+        catch (Exception)
+        {
+            await ShowToast("Bir hata oluþtu. Lütfen tekrar deneyin.", false);
+        }
+    }
+
+    private async Task ShowToast(string message, bool isSuccess = true)
+    {
+        await ToastObj!.ShowAsync(new ToastModel
+        {
+            Content = message,
+            CssClass = isSuccess ? "e-toast-success" : "e-toast-danger",
+            Timeout = 3000,
+            ShowCloseButton = true
+        });
+    }
+
+    #endregion
 }

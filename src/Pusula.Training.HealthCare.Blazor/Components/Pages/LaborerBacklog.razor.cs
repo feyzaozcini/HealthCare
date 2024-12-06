@@ -43,35 +43,41 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         #endregion
 
-        #region Save
+        #region Save Methods
         private async Task SaveResult()
         {
-            //Eðer TestProcess'in deðeri güncellendiyse veya eklendiyse her durumda Status'ü 'Approved', ResultDate'ini DateTime.Now olarak güncelle.
-            var updateTasks = TestProcessesList
-            .Select(async testProcess =>
+            await UpdateTestProcessesAsync();
+            await UpdateLabRequestStatusAsync();
+            await LoadLabRequestsAsync();
+            await CloseResultDialog();
+        }
+
+        private async Task UpdateTestProcessesAsync()
+        {
+            var updateTasks = TestProcessesList.Select(async testProcess =>
             {
-                var existingTestProcess = await TestProcessesAppService.GetAsync(testProcess.Id);
-                if (testProcess.Result.HasValue &&
-                    (!existingTestProcess.Result.HasValue || existingTestProcess.Result != testProcess.Result))
-                {
-                    await TestProcessesAppService.UpdateAsync(new TestProcessesUpdateDto
+                    var existingTestProcess = await TestProcessesAppService.GetAsync(testProcess.Id);
+                    if (testProcess.Result.HasValue &&
+                        (!existingTestProcess.Result.HasValue || existingTestProcess.Result != testProcess.Result))
                     {
-                        Id = testProcess.Id,
-                        LabRequestId = testProcess.LabRequestId,
-                        TestGroupItemId = testProcess.TestGroupItemId,
-                        Status = TestProcessStates.Approved,
-                        Result = testProcess.Result,
-                        ResultDate = DateTime.Now
-                    });
-                }
+                        await TestProcessesAppService.UpdateAsync(new TestProcessesUpdateDto
+                        {
+                            Id = testProcess.Id,
+                            LabRequestId = testProcess.LabRequestId,
+                            TestGroupItemId = testProcess.TestGroupItemId,
+                            Status = TestProcessStates.Approved,
+                            Result = testProcess.Result,
+                            ResultDate = DateTime.Now
+                        });
+                    }
             });
-
             await Task.WhenAll(updateTasks);
+        }
 
-            //Eðer lab request'e ait tüm testlerin sonucu girildiyse, lab request'i completed olarak iþaretle.
+        private async Task UpdateLabRequestStatusAsync()
+        {
             bool allResultsEntered = TestProcessesList.All(tp => tp.Result.HasValue);
-
-            if (allResultsEntered && SelectedLabRequest != null)
+            if (allResultsEntered && SelectedLabRequest != null && SelectedLabRequest.Status != RequestStatusEnum.Completed)
             {
                 SelectedLabRequest.Status = RequestStatusEnum.Completed;
 
@@ -85,10 +91,8 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                     Status = SelectedLabRequest.Status
                 });
             }
-
-            await LoadLabRequestsAsync();
-            await CloseResultDialog();
         }
+
 
         #endregion
 
