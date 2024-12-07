@@ -7,7 +7,9 @@ using Pusula.Training.HealthCare.Diagnoses;
 using Pusula.Training.HealthCare.DiagnosisGroups;
 using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.Insurances;
 using Pusula.Training.HealthCare.PatientCompanies;
+using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.TestGroupItems;
 using Pusula.Training.HealthCare.TestGroups;
 using Pusula.Training.HealthCare.TestValueRanges;
@@ -40,6 +42,8 @@ namespace Pusula.Training.HealthCare
         ITitleRepository titleRepository,
         IAppointmentTypeRepository appointmentTypeRepository,
         IPatientCompanyRepository patientCompanyRepository,
+        IInsuranceRepository insuranceRepository,
+        IProtocolTypeRepository protocolTypeRepository,
         IGuidGenerator guidGenerator,
         DiagnosisGroupDataSeeder diagnosisGroupDataSeeder,
         DiagnosisDataSeeder diagnosisDataSeeder) : IDataSeedContributor, ITransientDependency
@@ -67,6 +71,10 @@ namespace Pusula.Training.HealthCare
 
             var diagnosisGroupKeys = await diagnosisGroupDataSeeder.SeedDiagnosisGroupsAsync();
             await diagnosisDataSeeder.SeedDiagnosesAsync(diagnosisGroupKeys);
+
+            var insurances = await SeedInsurancesAsync();
+
+            var protocolTypes = await SeedProtocolTypesAsync();
         }
 
         #region Countries
@@ -1993,5 +2001,59 @@ namespace Pusula.Training.HealthCare
 
         #endregion
 
+        #region Insurances
+        private async Task<List<Guid>> SeedInsurancesAsync()
+        {
+            if (await insuranceRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+            var insurances = new List<Insurance>
+            {
+                new Insurance(guidGenerator.Create(), "SGK (Sosyal Güvenlik Kurumu)"),
+                new Insurance(guidGenerator.Create(), "Eski SSK"),
+                new Insurance(guidGenerator.Create(), "Bağ-Kur"),
+                new Insurance(guidGenerator.Create(), "Yeşil Kart"),
+                new Insurance(guidGenerator.Create(), "Genel Sağlık Sigortası"),
+                new Insurance(guidGenerator.Create(), "Emekli Sandığı"),
+                new Insurance(guidGenerator.Create(), "Tamamlayıcı Sağlık Sigortası"),
+                new Insurance(guidGenerator.Create(), "Özel Sağlık Sigortası"),
+                new Insurance(guidGenerator.Create(), "Yabancı Uyruklular Sağlık Sigortası"),
+                new Insurance(guidGenerator.Create(), "Tarsim Sağlık Sigortası")
+            };
+            await insuranceRepository.InsertManyAsync(insurances, true);
+            return insurances.Select(i => i.Id).ToList();
+        }
+        #endregion
+
+        #region ProtocolTypes
+        private async Task<List<Guid>> SeedProtocolTypesAsync()
+        {
+            if (await protocolTypeRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+            var protocolTypes = new List<ProtocolType>
+            {
+                new ProtocolType(guidGenerator.Create(), "Acil Servis"),
+                new ProtocolType(guidGenerator.Create(), "Yoğun Bakım"),
+                new ProtocolType(guidGenerator.Create(), "Muayene"),
+                new ProtocolType(guidGenerator.Create(), "Kontrol"),
+                new ProtocolType(guidGenerator.Create(), "Tahlil/Tetkik"),
+                new ProtocolType(guidGenerator.Create(), "Ameliyat"),
+                new ProtocolType(guidGenerator.Create(), "Ameliyat Öncesi Hazırlık"),
+                new ProtocolType(guidGenerator.Create(), "Ameliyat Sonrası Bakım"),
+                new ProtocolType(guidGenerator.Create(), "Planlı Yatış"),
+                new ProtocolType(guidGenerator.Create(), "Acil Yatış"),
+                new ProtocolType(guidGenerator.Create(), "Doğum Yatışı"),
+                new ProtocolType(guidGenerator.Create(), "Fizik Tedavi"),
+                new ProtocolType(guidGenerator.Create(), "Psikiyatri"),
+                new ProtocolType(guidGenerator.Create(), "Diş Tedavisi"),
+                new ProtocolType(guidGenerator.Create(), "Rutin Check-up"),
+                new ProtocolType(guidGenerator.Create(), "Aşı Uygulaması"),
+                new ProtocolType(guidGenerator.Create(), "Gözlem"),
+                new ProtocolType(guidGenerator.Create(), "Hafif Yaralanma Tedavisi"),
+                new ProtocolType(guidGenerator.Create(), "Evde Bakım")
+            };
+            await protocolTypeRepository.InsertManyAsync(protocolTypes, true);
+            return protocolTypes.Select(pt => pt.Id).ToList();
+        }
+        #endregion
     }
 }
