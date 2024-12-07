@@ -9,19 +9,19 @@ namespace Pusula.Training.HealthCare.LabRequests;
 public interface ILabRequestRepository : IRepository<LabRequest, Guid>
 {
     Task DeleteAllAsync(
-        string? filterText = null,
-        Guid? protocolId = null,
-        Guid? doctorId = null,
-        string? doctorName = null,
-        string? doctorSurname = null,
-        string? patientName = null,
-        string? patientSurname = null,
-        int? protocolNo = null,
-        DateTime? date = null,
-        RequestStatusEnum? status = null,
-        string? description = null,
-        CancellationToken cancellationToken = default
-        );
+                string? filterText = null,
+                Guid? protocolId = null,
+                Guid? doctorId = null,
+                string? doctorName = null,
+                string? doctorSurname = null,
+                string? patientName = null,
+                string? patientSurname = null,
+                int? protocolNo = null,
+                DateTime? date = null,
+                RequestStatusEnum? status = null,
+                string? description = null,
+                CancellationToken cancellationToken = default
+                );
 
     Task<List<LabRequest>> GetListAsync(
                 string? filterText = null,
@@ -29,9 +29,9 @@ public interface ILabRequestRepository : IRepository<LabRequest, Guid>
                 Guid? doctorId = null,
                 string? doctorName = null,
                 string? doctorSurname = null,
-        string? patientName = null,
-        string? patientSurname = null,
-        int? protocolNo = null,
+                string? patientName = null,
+                string? patientSurname = null,
+                int? protocolNo = null,
                 DateTime? date = null,
                 RequestStatusEnum? status = null,
                 string? description = null,
@@ -39,7 +39,7 @@ public interface ILabRequestRepository : IRepository<LabRequest, Guid>
                 int maxResultCount = int.MaxValue,
                 int skipCount = 0,
                 CancellationToken cancellationToken = default
-        );
+                );
 
     Task<long> GetCountAsync(
                 string? filterText = null,
@@ -47,9 +47,9 @@ public interface ILabRequestRepository : IRepository<LabRequest, Guid>
                 Guid? doctorId = null,
                 string? doctorName = null,
                 string? doctorSurname = null,
-        string? patientName = null,
-        string? patientSurname = null,
-        int? protocolNo = null,
+                string? patientName = null,
+                string? patientSurname = null,
+                int? protocolNo = null,
                 DateTime? date = null,
                 RequestStatusEnum? status = null,
                 string? description = null,
@@ -58,7 +58,8 @@ public interface ILabRequestRepository : IRepository<LabRequest, Guid>
 
     Task<LabRequest> GetWithNavigationPropertiesAsync(
                 Guid id,
-                CancellationToken cancellationToken = default);
+                CancellationToken cancellationToken = default
+                );
 
     Task<List<LabRequest>> GetListWithNavigationPropertiesAsync(
                 string? filterText = null,
@@ -75,5 +76,6 @@ public interface ILabRequestRepository : IRepository<LabRequest, Guid>
                 string? sorting = null,
                 int maxResultCount = int.MaxValue,
                 int skipCount = 0,
-                CancellationToken cancellationToken = default);
+                CancellationToken cancellationToken = default
+                );
 }

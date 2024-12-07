@@ -31,13 +31,12 @@
 
 @*Lab Groups List*@
 <div class="container-fluid d-flex flex-row">
-
     @*Sol Panel*@
     <div class="col-2">
         <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
             <GridColumns>
                 <!-- Grup Adı Sütunu -->
-                <GridColumn Field="@nameof(TestGroup.Name)" HeaderText="Test Grupları" Width="70">
+                <GridColumn Field="@nameof(TestGroupDto.Name)" HeaderText="Test Grupları" Width="70">
                     <Template Context="group">
                         @if (group is TestGroupDto testGroup)
                         {
@@ -65,7 +64,7 @@
         @*Data Grid*@
         <SfGrid DataSource="@TestGroupItemsList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
             <GridColumns>
-                <GridColumn Field=@nameof(TestGroupItem.Code) HeaderText="Test Kodu" Width="25"></GridColumn>
+                <GridColumn Field=@nameof(TestGroupItemDto.Code) HeaderText="Test Kodu" Width="25"></GridColumn>
                 <GridColumn HeaderText="Test Grubu" Width="25">
                     <Template>
                         @if (context is TestGroupItemDto testGroupItem)
@@ -75,8 +74,8 @@
                         }
                     </Template>
                 </GridColumn>
-                <GridColumn Field=@nameof(TestGroupItem.Name) HeaderText="Test Adı" Width="100" TextAlign="TextAlign.Left"></GridColumn>
-                <GridColumn Field=@nameof(TestGroupItem.TestType) HeaderText="Test Tipi" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field=@nameof(TestGroupItemDto.Name) HeaderText="Test Adı" Width="100" TextAlign="TextAlign.Left"></GridColumn>
+                <GridColumn Field=@nameof(TestGroupItemDto.TestType) HeaderText="Test Tipi" Width="25" TextAlign="TextAlign.Center"></GridColumn>
                 <GridColumn HeaderText="Tahmini Süre" Width="25" TextAlign="TextAlign.Center">
                     <Template>
                         @if (context is TestGroupItemDto testGroupItem)

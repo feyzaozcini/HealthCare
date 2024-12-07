@@ -86,7 +86,11 @@ public class TestProcessesAppService(
             input.LabRequestId,
             input.Status,
             input.Result,
-            input.ResultDate
+            input.ResultDate,
+            input.DoctorName,
+            input.DoctorSurname,
+            input.PatientName,
+            input.PatientSurname
             );
 
         var items = await testProcessRepository.GetListAsync(
@@ -96,6 +100,10 @@ public class TestProcessesAppService(
             input.Status,
             input.Result,
             input.ResultDate,
+            input.DoctorName,
+            input.DoctorSurname,
+            input.PatientName,
+            input.PatientSurname,
             input.Sorting,
             input.MaxResultCount,
             input.SkipCount
@@ -116,7 +124,11 @@ public class TestProcessesAppService(
             input.LabRequestId,
             input.Status,
             input.Result,
-            input.ResultDate
+            input.ResultDate,
+            input.DoctorName,
+            input.DoctorSurname,
+            input.PatientName,
+            input.PatientSurname
             );
 
         var items = await testProcessRepository.GetListWithNavigationPropertiesAsync(
@@ -126,6 +138,10 @@ public class TestProcessesAppService(
             input.Status,
             input.Result,
             input.ResultDate,
+            input.DoctorName,
+            input.DoctorSurname,
+            input.PatientName,
+            input.PatientSurname,
             input.Sorting,
             input.MaxResultCount,
             input.SkipCount
