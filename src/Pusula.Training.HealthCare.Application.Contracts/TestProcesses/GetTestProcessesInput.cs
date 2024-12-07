@@ -19,8 +19,8 @@ public class GetTestProcessesInput : PagedAndSortedResultRequestDto
     //Doktor
     public string? DoctorName { get; set; }
     public string? DoctorSurname { get; set; }
-    public string PatientName { get; set; } = null!;
-    public string PatientSurname { get; set; } = null!;
+    public string? PatientName { get; set; } = null!;
+    public string? PatientSurname { get; set; } = null!;
 
     //Test
     public string? TestGroupItemName { get; set; }
@@ -36,8 +36,7 @@ public class GetTestProcessesInput : PagedAndSortedResultRequestDto
         SkipCount = 0;
     }
 
-
-    public GetTestProcessesInput(string? filterText, Guid? labRequestId, Guid? testGroupItemId, TestProcessStates? status, decimal? result, DateTime? resultDate)
+    public GetTestProcessesInput(string? filterText, Guid? labRequestId, Guid? testGroupItemId, TestProcessStates? status, decimal? result, DateTime? resultDate, string? doctorName, string? doctorSurname, string patientName, string patientSurname, string? testGroupItemName, DateTime? labRequestCreatedTime)
     {
         FilterText = filterText;
         LabRequestId = labRequestId;
@@ -45,5 +44,11 @@ public class GetTestProcessesInput : PagedAndSortedResultRequestDto
         Status = status;
         Result = result;
         ResultDate = resultDate;
+        DoctorName = doctorName;
+        DoctorSurname = doctorSurname;
+        PatientName = patientName;
+        PatientSurname = patientSurname;
+        TestGroupItemName = testGroupItemName;
+        LabRequestCreatedTime = labRequestCreatedTime;
     }
 }

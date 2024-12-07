@@ -6,12 +6,12 @@
 
 <div class="d-flex align-items-center justify-content-between mb-2">
     <div class="d-flex justify-content-center flex-grow-1">
-        @* <SfTextBox Placeholder="Protokol Ara"
+        <SfTextBox Placeholder="Ara"
                    FloatLabelType="FloatLabelType.Never"
                    @bind-Value="TestProcessesFilter!.FilterText"
                    Width="50%"
                    Input="OnInputChange">
-        </SfTextBox> *@
+        </SfTextBox>
     </div>
 
     <SfButton CssClass="e-warning e-icon-left e-medium ml-auto"
@@ -61,7 +61,3 @@
         <GridColumn Field=@nameof(TestProcessDto.ResultDate) HeaderText="Result Date" Width="200" TextAlign="TextAlign.Center"></GridColumn>
     </GridColumns>
 </SfGrid>
-
-@* YAPILACAKLAR
-    -Vakit olursa testprocess searchbox yapılandırılacak.
-*@

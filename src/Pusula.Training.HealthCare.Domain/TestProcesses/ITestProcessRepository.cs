@@ -15,6 +15,10 @@ public interface ITestProcessRepository : IRepository<TestProcess, Guid>
                TestProcessStates? status = null,
                decimal? result = null,
                DateTime? resultDate = null,
+               string? doctorName = null,
+               string? doctorSurname = null,
+               string? patientName = null,
+               string? patientSurname = null,
                string? sorting = null,
                int maxResultCount = int.MaxValue,
                int skipCount = 0,
@@ -28,6 +32,10 @@ public interface ITestProcessRepository : IRepository<TestProcess, Guid>
         TestProcessStates? status = null,
         decimal? result = null,
         DateTime? resultDate = null,
+        string? doctorName = null,
+        string? doctorSurname = null,
+        string? patientName = null,
+        string? patientSurname = null,
         CancellationToken cancellationToken = default);
 
     Task<TestProcess> GetWithNavigationPropertiesAsync(
@@ -41,6 +49,10 @@ public interface ITestProcessRepository : IRepository<TestProcess, Guid>
        TestProcessStates? status = null,
        decimal? result = null,
        DateTime? resultDate = null,
+       string? doctorName = null,
+       string? doctorSurname = null,
+       string? patientName = null,
+       string? patientSurname = null,
        string? sorting = null,
        int maxResultCount = int.MaxValue,
        int skipCount = 0,

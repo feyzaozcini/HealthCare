@@ -54,11 +54,11 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             }
         }
         #region Filter
-        //private async Task OnInputChange(InputEventArgs args)
-        //{
-        //    TestProcessesFilter!.FilterText = args.Value;
-        //    await GetTestResultsAsync();
-        //}
+        private async Task OnInputChange(InputEventArgs args)
+        {
+            TestProcessesFilter!.FilterText = args.Value;
+            await GetTestResultsAsync();
+        }
 
         #endregion
     }

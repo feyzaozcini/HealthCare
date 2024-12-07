@@ -29,7 +29,7 @@ else
                 <!-- Ortadaki Metin -->
                 <ToolbarItem Align="ItemAlign.Center">
                     <Template>
-                        <div class="d-flex align-items-center" >
+                        <div class="d-flex align-items-center">
                             <span class="fw-bold fs-5">
                                 @($"{LabRequestService.SelectedLabRequest!.PatientName ?? "Ad"} {LabRequestService.SelectedLabRequest!.PatientSurname ?? "Soyad"}, {LabRequestService.SelectedLabRequest!.PatientBirthDate:dd.MM.yyyy}, {LabRequestService.SelectedLabRequest!.InsuranceName}")
                             </span>
@@ -133,31 +133,11 @@ else
     @*Patient Test Requests*@
     <div class="container-fluid py-2">
         <div class="d-flex justify-content-end">
-        </div>
-        <div class="d-flex justify-content-between">
-            <div class="d-flex justify-content-start gap-3">
-                <SfTextBox Placeholder="Ara"
-                           FloatLabelType="FloatLabelType.Never"
-                           @bind-Value="TestProcessesFilter!.FilterText"
-                           Width="50%"
-                           Input="SearchTestProcesses">
-                    >
-                </SfTextBox>
-                <SfDateRangePicker TValue="DateTime?"
-                                   AllowEdit="false"
-                                   Width="50%"
-                                   StartDate="@DateTime.Today"
-                                   EndDate="@DateTime.Today.AddDays(1)">
-                </SfDateRangePicker>
-            </div>
-
-            <div class="col-md-3 text-end">
-                <SfButton CssClass="e-warning e-icon-left e-medium"
-                          Content="İstem Yazdır"
-                          IconCss="e-icons e-print"
-                          OnClick="OnPrintClick">
-                </SfButton>
-            </div>
+            <SfButton CssClass="e-warning e-icon-left e-medium"
+                      Content="İstem Yazdır"
+                      IconCss="e-icons e-print"
+                      OnClick="OnTestProcessesPrintClick">
+            </SfButton>
         </div>
     </div>
 
@@ -221,29 +201,41 @@ else
     </SfDialog>
 
     @*Test Process History Modal*@
-    <SfDialog @ref="HistoryDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="İstem Tarihçesi" Visible="false">
+    <SfDialog @ref="HistoryDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Visible="false">
         <DialogTemplates>
             <Content>
-                <SfGrid DataSource="@ApprovedTestProcesses" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="400px" AllowResizing="false" GridLines="GridLine.Both">
-                    <GridColumns>
-                        <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)" HeaderText="Test Adı" Width="50%"></GridColumn>
-                        <GridColumn Field="@nameof(TestProcessDto.ResultDate)" HeaderText="Tamamlanma T." Width="50%"></GridColumn>
-                        <GridColumn Field="@nameof(TestProcessDto.Status)" HeaderText="Durum" Width="25%"></GridColumn>
-                        <GridColumn Field="@nameof(TestProcessDto.Result)" HeaderText="Sonuç" Width="25%"></GridColumn>
-                    </GridColumns>
-                </SfGrid>
+                <div class="d-flex justify-content-end align-items-center w-100 mb-1">
+                    <SfButton CssClass="e-warning e-icon-left e-medium"
+                              Content="Yazdır"
+                              IconCss="e-icons e-print"
+                              OnClick="OnTestResultsPrintClick">
+                    </SfButton>
+                </div>
+
+                <div class="mb-2">
+                    <SfGrid @ref="TestResultsGrid" DataSource="@ApprovedTestProcesses" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="400px" AllowResizing="false" GridLines="GridLine.Both">
+                        <GridEvents TValue="TestProcessDto" RowDataBound="RowBound"></GridEvents>
+                        <GridColumns>
+                            <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)" HeaderText="Test Adı" Width="50%"></GridColumn>
+                            <GridColumn Field="@nameof(TestProcessDto.ResultDate)" HeaderText="Tamamlanma T." Width="50%"></GridColumn>
+                            <GridColumn HeaderText="Min-Max Değer" Width="200" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is TestProcessDto testProcess)
+                                    {
+                                        @($"{testProcess.TestMinValue} - {testProcess.TestMaxValue}")
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field="@nameof(TestProcessDto.Result)" HeaderText="Sonuç" Width="25%"></GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+                </div>
             </Content>
         </DialogTemplates>
     </SfDialog>
-
 }
 
 @*Toast*@
 <SfToast @ref="ToastObj" Width="300px">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
-
-@* YAPILACAKLAR
-    -Vakit olursa testprocess searchbox yapılandırılacak.
-    -Tarihe göre filtreleme yapılacak.
-*@

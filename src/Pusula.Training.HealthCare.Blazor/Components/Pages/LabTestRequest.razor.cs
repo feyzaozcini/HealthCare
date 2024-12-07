@@ -34,6 +34,7 @@ public partial class LabTestRequest
     private LabRequestDto? LabRequest { get; set; }
     private string SelectedDescription = string.Empty;
     private SfGrid<TestProcessDto>? TestProcessesGrid;
+    private SfGrid<TestProcessDto>? TestResultsGrid;
     private List<TestProcessDto> CompletedTestProcesses { get; set; } = new();
     private Guid? SelectedTestGroupId { get; set; } = null;
     private Guid? SelectedTestProcessId { get; set; } = null;
@@ -76,11 +77,24 @@ public partial class LabTestRequest
     }
 
     #region Click Events
-    private async Task OnPrintClick()
+    private async Task OnTestProcessesPrintClick()
     {
         if (TestProcessesGrid != null)
         {
             await TestProcessesGrid.PrintAsync();
+        }
+    }
+    private SfDialog? PatientDetailsDialog;
+
+    private void OpenPatientDetailsDialog()
+    {
+        PatientDetailsDialog?.ShowAsync();
+    }
+    private async Task OnTestResultsPrintClick()
+    {
+        if (TestResultsGrid != null)
+        {
+            await TestResultsGrid.PrintAsync();
         }
     }
     private async Task OnAddClick(TestGroupItemDto testGroupItem)
@@ -176,32 +190,13 @@ public partial class LabTestRequest
 
     private async Task GetTestGroupItemsAsync()
     {
-        var input = new GetTestGroupItemsInput
-        {
-            FilterText = TestGroupItemsFilter?.FilterText,
-            Name = TestGroupItemsFilter?.Name,
-            Code = TestGroupItemsFilter?.Code,
-            TestType = TestGroupItemsFilter?.TestType,
-            Description = TestGroupItemsFilter?.Description,
-            MaxResultCount = TestGroupItemsFilter!.MaxResultCount,
-            SkipCount = (CurrentPage - 1) * PageSize,
-            TestGroupId = SelectedTestGroupId ?? Guid.Empty
-        };
-
-        var result = await TestGroupItemsAppService.GetListAsync(input);
+        var result = await TestGroupItemsAppService.GetListAsync(TestGroupItemsFilter!);
         TestGroupItemsList = result.Items.ToList();
         TotalCount = result.TotalCount;
     }
     private async Task GetTestGroupsAsync()
     {
-        var input = new GetTestGroupsInput
-        {
-            FilterText = TestGroupsFilter?.FilterText,
-            Name = TestGroupsFilter?.Name,
-            MaxResultCount = PageSize,
-            SkipCount = (CurrentPage - 1) * PageSize
-        };
-        var result = await TestGroupsAppService.GetListAsync(input);
+        var result = await TestGroupsAppService.GetListAsync(TestGroupsFilter!);
         TestGroupsList = result.Items.ToList();
         TotalCount = result.TotalCount;
     }
@@ -319,4 +314,23 @@ public partial class LabTestRequest
     }
 
     #endregion
+
+    public void RowBound(RowDataBoundEventArgs<TestProcessDto> args)
+    {
+        if (args.Data.Result.HasValue)
+        {
+            var result = args.Data.Result.Value;
+            var minValue = args.Data.TestMinValue;
+            var maxValue = args.Data.TestMaxValue;
+
+            if (result < minValue || result > maxValue)
+            {
+                args.Row.AddClass(new string[] { "bg-danger" });
+            }
+            else
+            {
+                args.Row.AddClass(new string[] { "bg-success" });
+            }
+        }
+    }
 }
