@@ -40,6 +40,8 @@
 @using Syncfusion.Blazor.Navigations
 
 @inherits HealthCareComponentBase
+@inject PatientStateContainer PatientStateService
+
 @inject IPatientsAppService PatientsAppService
 @inject IProtocolsAppService ProtocolsAppService
 @inject IInsurancesAppService InsurancesAppService
@@ -291,6 +293,7 @@
                                 Field="Patient.No"
                                 Caption="@L["PatientNo"]">
                 </DataGridColumn>
+
                 <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
                                 Field="Patient.FirstName"
                                 Caption="@L["FirstName"]">
@@ -301,18 +304,11 @@
                                 Caption="@L["LastName"]">
                 </DataGridColumn>
 
-                @*  <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
-                Field="BirthDate"
-                Caption="@L["BirthDate"]">
-                <DisplayTemplate>
-                @context.BirthDate.ToShortDateString()
-                </DisplayTemplate>
-                </DataGridColumn> *@
-
                 <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
                                 Field="Patient.PassportNumber"
                                 Caption="@L["PassportNumber"]">
                 </DataGridColumn>
+
                 <DataGridColumn TItem="PatientWithNavigationPropertiesDto"
                                 Field="Patient.IdentityNumber"
                                 Caption="@L["IdentityNumber"]">
@@ -328,15 +324,17 @@
                                 Caption="@L["MobilePhoneNumber"]">
                 </DataGridColumn>
 
-                @* <DataGridColumn TItem="PatientDto"
-                Field="HomePhoneNumber"
-                Caption="@L["HomePhoneNumber"]">
-                </DataGridColumn> *@
+                
+                <DataGridColumn TItem="PatientWithNavigationPropertiesDto">
+                    <DisplayTemplate Context="context">
+                        <Button Color="Color.Primary" Class="mx-1" Size="Size.Medium"
+                                Clicked="() => NavigateToPatientDetails(context)">
+                            <Icon Name="@Blazorise.IconName.InfoCircle" /> @L["Detay"]
+                        </Button>
+                    </DisplayTemplate>
+                </DataGridColumn>
 
-                @* <DataGridColumn TItem="PatientDto"
-                Field="Gender"
-                Caption="@L["Gender"]">
-                </DataGridColumn> *@
+
 
             </DataGridColumns>
 

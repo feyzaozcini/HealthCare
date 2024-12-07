@@ -2,6 +2,7 @@ using Blazorise;
 using Blazorise.DataGrid;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Pusula.Training.HealthCare.Blazor.Containers;
 using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Departments;
@@ -50,12 +51,7 @@ public partial class Patients
     private List<LookupDto<Guid>> InsuranceList { get; set; } = new();
     private List<LookupDto<Guid>> ProtocolTypeList { get; set; } = new();
     private List<LookupDto<Guid>> ProtocolNoteList { get; set; } = new();
-
-    //private List<LookupDto<Guid>> DepartmentList { get; set; } = new();
-    //private List<LookupDto<Guid>> DoctorList { get; set; } = new();
-
-    //private Guid? SelectedDepartmentId { get; set; }
-
+   
     private DepartmentDto SelectedDepartment;
 
     private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
@@ -105,9 +101,6 @@ public partial class Patients
     private string SelectedCountryCode;
 
     private SfDialog? CreateProtocolsDialog;
-    //private SfDialog? CreateProtocolDialog;
-
-    private SfToast? ToastObj;
 
     private ProtocolCreateDto ProtocolCreateDto = new();
     private List<ProtocolDto> ProtocolList { get; set; } = new List<ProtocolDto>();
@@ -129,6 +122,7 @@ public partial class Patients
         };
         PatientList = [];
     }
+
 
     #region General Staff
     protected override async Task OnInitializedAsync()
@@ -189,7 +183,7 @@ public partial class Patients
         await SetPermissionsAsync();
         await GetCountryCodeCollectionLookupAsync();
         await GetCompanyCollectionLookupAsync();
-        ToastObj ??= new SfToast();
+        
 
 
         ProtocolStatusCollection = Enum.GetValues(typeof(ProtocolStatus))
@@ -234,10 +228,23 @@ public partial class Patients
     {
         if (SelectedPatients.Count == 1)
         {
-            StateService.SelectedPatient = SelectedPatients.First().Patient;
+            //StateService.SelectedPatient = SelectedPatients.First().Patient;
             //NavigationManager.NavigateTo();
         }
     }
+
+    private void NavigateToPatientDetails(PatientWithNavigationPropertiesDto selectedPatient)
+    {
+        // Seçilen hastayý StateService'e kaydet
+        StateService.PreviousPageUrl = NavigationManager.Uri;
+
+        StateService.SelectedPatientNavigation = selectedPatient;
+
+        // Detay sayfasýna yönlendir
+        NavigationManager.NavigateTo("/patient-details");
+    }
+
+
     #endregion
 
     #region Protocol
