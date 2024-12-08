@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.AppointmentRules;
 using Pusula.Training.HealthCare.AppointmentTypes;
+using Pusula.Training.HealthCare.Core.Rules.Appointments;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Patients;
@@ -8,15 +10,13 @@ using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
-using Volo.Abp.EventBus.Distributed;
-using Volo.Abp.ObjectMapping;
 
 namespace Pusula.Training.HealthCare.Appointments
 {
@@ -29,7 +29,9 @@ namespace Pusula.Training.HealthCare.Appointments
         IPatientRepository patientRepository,
         IDoctorRepository doctorRepository,
         IDepartmentRepository departmentRepository,
-        IAppointmentTypeRepository appointmentTypeRepository
+        IAppointmentTypeRepository appointmentTypeRepository,
+        IAppointmentBusinessRules appointmentBusinessRules,
+        IAppointmentRuleRepository appointmentRuleRepository
         ) : HealthCareAppService, IAppointmentsAppService
     {
 
@@ -117,8 +119,13 @@ namespace Pusula.Training.HealthCare.Appointments
 
 
         [Authorize(HealthCarePermissions.Appointments.Create)]
-        public virtual async Task<AppointmentDto> CreateAsync(AppointmentCreateDto input) => ObjectMapper.Map<Appointment, AppointmentDto>(
-            await appointmentManager.CreateAsync(
+        public virtual async Task<AppointmentDto> CreateAsync(AppointmentCreateDto input)
+        {
+            await CheckRulesAsync(input);
+
+            await appointmentBusinessRules.AppointmentDatesCannotOverlapForDoctor(input.DoctorId,input.StartDate, input.EndDate);
+
+            var appointment= await appointmentManager.CreateAsync(
                 input.PatientId,
                 input.DoctorId,
                 input.DepartmentId,
@@ -128,29 +135,37 @@ namespace Pusula.Training.HealthCare.Appointments
                 input.Note,
                 input.AppointmentStatus,
                 input.IsBlock
-            ));
+            );
 
-
-
-
+            return ObjectMapper.Map<Appointment, AppointmentDto>(appointment);
+            
+        }
+       
         [Authorize(HealthCarePermissions.Appointments.Delete)]
         public virtual async Task DeleteAsync(Guid id) => await appointmentRepository.DeleteAsync(id);
 
 
         [Authorize(HealthCarePermissions.Appointments.Edit)]
-        public virtual async Task<AppointmentDto> UpdateAsync(AppointmentUpdateDto input) => ObjectMapper.Map<Appointment,AppointmentDto>(
-            await appointmentManager.UpdateAsync(
-                input.Id,
-                input.PatientId,
-                input.DoctorId,
-                input.DepartmentId,
-                input.AppointmentTypeId,
-                input.StartDate,
-                input.EndDate,
-                input.Note,
-                input.AppointmentStatus,
-                input.IsBlock
-            ));
+        public virtual async Task<AppointmentDto> UpdateAsync(AppointmentUpdateDto input)
+        {
+            if(input.AppointmentStatus == AppointmentStatus.Cancelled)
+            {
+                await appointmentRepository.DeleteAsync(input.Id);
+            }
+            return ObjectMapper.Map<Appointment, AppointmentDto>(
+                await appointmentManager.UpdateAsync(
+                    input.Id,
+                    input.PatientId,
+                    input.DoctorId,
+                    input.DepartmentId,
+                    input.AppointmentTypeId,
+                    input.StartDate,
+                    input.EndDate,
+                    input.Note,
+                    input.AppointmentStatus,
+                    input.IsBlock
+                ));
+        }
 
         public virtual async Task<DownloadTokenResultDto> GetDownloadTokenAsync()
         {
@@ -170,5 +185,26 @@ namespace Pusula.Training.HealthCare.Appointments
             };
         }
 
+        public virtual async Task CheckRulesAsync(AppointmentCreateDto input)
+        {
+            var patient = await patientRepository.GetAsync(input.PatientId);
+            var patientAge = DateTime.Now.Year - patient.BirthDate.Year;
+            var patientGender=patient.Gender.ToString();
+
+            
+            var departmentRules = await appointmentRuleRepository.GetRulesForDepartmentAsync(input.DepartmentId);
+            var doctorRules = await appointmentRuleRepository.GetRulesForDoctorAsync(input.DoctorId);
+            var allRules = departmentRules.Concat(doctorRules).ToList();
+
+            //Çocuk departmanına tanımlanmış 18 yaşından büyüklerin girememesi
+            foreach (var rule in allRules)
+            {
+                
+                if  (rule.Age.Equals(null) && patientAge != null && patientAge > rule.Age)  
+                {
+                    await appointmentBusinessRules.AppointmentCannotCreate();
+                }
+            }
+        }
     }
 }

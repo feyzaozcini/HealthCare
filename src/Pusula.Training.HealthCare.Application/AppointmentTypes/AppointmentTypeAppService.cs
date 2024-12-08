@@ -46,7 +46,7 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
             await appointmentTypeRepository.DeleteAsync(id);
 
             AppointmentTypeDeleteDto response = ObjectMapper.Map<AppointmentType, AppointmentTypeDeleteDto>(appointmentType);
-            response.Message = "Başarıyla silindi";
+            response.Message = HealthCareDomainErrorCodes.DeleteMessage;
 
             return response;
         }

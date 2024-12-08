@@ -49,6 +49,7 @@ using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
 using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Notes;
 using Pusula.Training.HealthCare.Insurances;
+using Pusula.Training.HealthCare.AppointmentRules;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -91,7 +92,7 @@ public class HealthCareDbContext :
     public DbSet<FallRisk> FallRisks { get; set; } = null!;
     public DbSet<Note> Notes { get; set; } = null!;
     public DbSet<Insurance> Insurances { get; set; } = null!;
-
+    public DbSet<AppointmentRule> AppointmentRules { get; set; }
 
 
     #region Entities from the modules
@@ -622,8 +623,16 @@ public class HealthCareDbContext :
                 b.HasOne<Protocol>().WithOne().HasForeignKey<FallRisk>(x => x.ProtocolId).OnDelete(DeleteBehavior.NoAction);
             });
 
-
-
+            builder.Entity<AppointmentRule>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "AppointmentRules", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Gender).HasColumnName(nameof(AppointmentRule.Gender));
+                b.Property(x => x.Age).HasColumnName(nameof(AppointmentRule.Age));
+                b.Property(x => x.Description).HasColumnName(nameof(AppointmentRule.Description));
+                b.HasOne<Doctor>().WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Department>().WithMany().IsRequired(false).HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
+            });
         }
 
         //builder.Entity<YourEntity>(b =>
