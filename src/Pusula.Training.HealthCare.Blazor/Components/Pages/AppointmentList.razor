@@ -75,6 +75,7 @@
     <div class="row">
         <div class="col-lg-12">
             <SfGrid DataSource="@Appointments" AllowPaging="true" AllowSorting="true" Height="600">
+                <GridPageSettings PageSize="12"></GridPageSettings>
                 <GridColumns>
                     <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
                     <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="200"></GridColumn>
@@ -153,6 +154,10 @@
     private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
     private DoctorWithNavigationPropertiesDto SelectedDoctor;
     private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
+
+    private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
+    private int CurrentPage { get; set; } = 1;
+    private string CurrentSorting { get; set; } = string.Empty;
     // Uyarı için değişken
     private bool IsWarningDialogOpen { get; set; } = false;
 
@@ -168,8 +173,14 @@
     }
     private async Task LoadInitialDataAsync()
     {
+        var input = new GetAppointmentsInput
+            {
+                MaxResultCount = 100,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
 
-        var result = await AppointmentAppService.GetListAsync(new GetAppointmentsInput());
+        var result = await AppointmentAppService.GetListAsync(input);
         Appointments = result.Items.Select(a => new AppointmentListItem
             {
                 DepartmentName = a.Department.Name,
@@ -204,14 +215,10 @@
     {
         var input = new GetAppointmentsInput
             {
-                StartDate = null,
-                EndDate = null,
-                Note = null,
-                AppointmentStatus = null,
-                PatientId = null,
-                AppointmentTypeId = null,
                 DoctorId = SelectedDoctor?.Doctor?.Id, //Doctorun randevularını getirme filtresi
-                DepartmentId = null //Departmanın randevularını getirme filtresi
+                MaxResultCount = PageSize,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
             };
 
         var result = await AppointmentAppService.GetListAsync(input);

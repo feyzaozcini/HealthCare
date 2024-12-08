@@ -30,6 +30,7 @@
 		<PackageReference Include="Syncfusion.Blazor.Layouts" Version="27.2.3" />
 		<PackageReference Include="Syncfusion.Blazor.Lists" Version="27.2.3" />
 		<PackageReference Include="Syncfusion.Blazor.Notifications" Version="27.2.3" />
+		<PackageReference Include="Syncfusion.Blazor.PivotTable" Version="27.2.3" />
 		<PackageReference Include="Syncfusion.Blazor.Popups" Version="27.2.3" />
 		<PackageReference Include="Syncfusion.Blazor.Schedule" Version="27.2.3" />
 		<PackageReference Include="Syncfusion.Blazor.Themes" Version="27.2.3" />

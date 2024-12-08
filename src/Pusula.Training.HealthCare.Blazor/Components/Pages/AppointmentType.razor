@@ -202,30 +202,17 @@
         IsEditModalOpen = visible;
     }
 
+    //Handle Error Düzelt
     private async Task DeleteAppointmentType(Guid id)
     {
-        
-    
-    await HandleError(async () =>
-            {
-                try 
-                {
-                    await AppointmentTypeAppService.DeleteAsync(id);
-                    var result = await AppointmentTypeAppService.GetListAsync(new GetAppointmentTypesInput());
-                    AppointmentTypeList = result.Items.ToList();
+        await HandleError(async () =>
+    {
+        await AppointmentTypeAppService.DeleteAsync(id);
+        var result = await AppointmentTypeAppService.GetListAsync(new GetAppointmentTypesInput());
+        AppointmentTypeList = result.Items.ToList();
 
-                        await ShowToast("Appoinment Type başarıyla silindi.", true);
-                }
-                catch (UserFriendlyException ex)
-                {
-                    await ShowToast(ex.Message, false);
-                }
-                catch (Exception)
-                {
-                    await ShowToast("Appoinment Type Silinemez.", false);
-                }
-            });
-    
+        await ShowToast("Appoinment Type başarıyla silindi.", true);
+    });
 }
 
     public class DoctorListItems

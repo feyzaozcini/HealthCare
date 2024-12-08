@@ -34,6 +34,8 @@ using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
 using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Notes;
 using Pusula.Training.HealthCare.Insurances;
+using Pusula.Training.HealthCare.AppointmentRules;
+using System.Collections.Generic;
 
 
 namespace Pusula.Training.HealthCare;
@@ -49,7 +51,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Patient, PatientDto>();
         CreateMap<Patient, PatientExcelDto>();
         CreateMap<PatientDto, PatientUpdateDto>();
-        CreateMap<Patient, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.FirstName));
+        CreateMap<Patient, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"));
         CreateMap<PatientWithNavigationProperties, PatientWithNavigationPropertiesDto>();
         CreateMap<Patient, PatientWithNavigationPropertiesDto>();
         CreateMap<Patient, PatientDeletedDto>();
@@ -312,5 +314,10 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Insurance, InsuranceDto>();
         CreateMap<InsuranceDto, InsuranceUpdateDto>();
         CreateMap<Insurance, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+
+        CreateMap<AppointmentRule, AppointmentRuleDto>();
+        CreateMap<AppointmentRule, AppointmentRuleWithNavigationPropertiesDto>();
+        CreateMap<AppointmentRuleWithNavigationProperties, AppointmentRuleWithNavigationPropertiesDto>();
+        CreateMap<AppointmentRuleDto, AppointmentRuleWithNavigationPropertiesDto>();
     }
 }

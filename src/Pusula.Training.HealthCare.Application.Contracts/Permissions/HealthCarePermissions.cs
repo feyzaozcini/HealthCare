@@ -200,4 +200,12 @@ public static class HealthCarePermissions
         public const string Delete = Default + ".Delete";
     }
 
+    public static class AppointmentRules
+    {
+        public const string Default = GroupName + ".AppointmentRules";
+        public const string Edit = Default + ".Edit";
+        public const string Create = Default + ".Create";
+        public const string Delete = Default + ".Delete";
+    }
+
 }
