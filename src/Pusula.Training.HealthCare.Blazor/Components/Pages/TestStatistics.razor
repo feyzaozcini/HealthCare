@@ -1,7 +1,49 @@
 ﻿@page "/test-statistics-report"
 
-<h3>Test Statistics</h3>
+@using Pusula.Training.HealthCare.TestProcesses
 
-@code {
+@inject ITestProcessesAppService TestProcessesAppService
 
-}
+<SfChart Title="Toplam İstenen Test Sayısı" Width="100%" Height="100%">
+    <ChartZoomSettings EnableScrollbar="true" EnableSelectionZooming="true" />
+    <ChartTitleStyle Size="20px" Color="red" FontFamily="Segoe UI" FontWeight="bold" />
+
+    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"
+                       LabelIntersectAction="LabelIntersectAction.Rotate45"
+                       EnableTrim="true"
+                       IsIndexed="true">
+        <ChartAxisMajorGridLines Width="2" DashArray="10" />
+    </ChartPrimaryXAxis>
+
+    <ChartPrimaryYAxis Interval="1">
+    </ChartPrimaryYAxis>
+    <ChartSeriesCollection>
+        <ChartSeries DataSource="TestCounts"
+                     XName="TestName"
+                     YName="Count"
+                     Type="ChartSeriesType.Column">
+        </ChartSeries>
+    </ChartSeriesCollection>
+</SfChart>
+
+<SfChart Title="Test Grubuna Göre Toplam İstenen Test Sayısı" Width="50%" Height="400px">
+    <ChartTitleStyle Size="20px" Color="red" FontFamily="Segoe UI" FontWeight="bold" />
+
+    <ChartPrimaryXAxis ValueType="Syncfusion.Blazor.Charts.ValueType.Category"
+                       EdgeLabelPlacement="EdgeLabelPlacement.Shift">
+    </ChartPrimaryXAxis>
+
+    <ChartPrimaryYAxis Interval="5">
+    </ChartPrimaryYAxis>
+
+    <ChartSeriesCollection>
+        <ChartSeries DataSource="TestGroupCounts"
+                     XName="TestName"
+                     YName="Count"
+                     Type="ChartSeriesType.Column"
+                     ColumnWidth="0.8">
+        </ChartSeries>
+    </ChartSeriesCollection>
+</SfChart>
+
+

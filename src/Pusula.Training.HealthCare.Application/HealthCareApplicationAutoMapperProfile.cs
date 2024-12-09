@@ -294,6 +294,8 @@ public class HealthCareApplicationAutoMapperProfile : Profile
             .ForMember(dest => dest.TestMinValue, opt => opt.MapFrom(x => x.TestGroupItem.TestValueRange!.MinValue))
             .ForMember(dest => dest.TestMaxValue, opt => opt.MapFrom(x => x.TestGroupItem.TestValueRange!.MaxValue))
             .ForMember(dest => dest.TestUnit, opt => opt.MapFrom(x => x.TestGroupItem.TestValueRange!.Unit))
+            .ForMember(dest => dest.ProtocolNo, opt => opt.MapFrom(x => x.LabRequest.Protocol.No))
+            .ForMember(dest => dest.ProtocolCreatedDate, opt => opt.MapFrom(x => x.LabRequest.Protocol.StartTime))
             .ReverseMap();
 
         CreateMap<TestProcess, TestProcessesCreateDto>().ReverseMap();

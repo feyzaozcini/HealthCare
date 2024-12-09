@@ -18,5 +18,7 @@ public class TestGroupConsts
     public const int NameMaxLength = 50;
     public const int NameMinLength = 2;
 
-    public const string TestGroupDeletedMessage = "Test grubu silindi.";
+    public const string TestGroupDeletedMessage = "Test grubu başarıyla silindi.";
+    public const string TestGroupSuccessfullyUpdated = "Test grubu başarıyla güncellendi.";
+    public const string TestGroupSuccessfullyCreated = "Test grubu başarıyla oluşturuldu.";
 }

@@ -19,6 +19,7 @@ public interface ITestProcessRepository : IRepository<TestProcess, Guid>
                string? doctorSurname = null,
                string? patientName = null,
                string? patientSurname = null,
+               int? protocolNo = null,
                string? sorting = null,
                int maxResultCount = int.MaxValue,
                int skipCount = 0,
@@ -36,6 +37,7 @@ public interface ITestProcessRepository : IRepository<TestProcess, Guid>
         string? doctorSurname = null,
         string? patientName = null,
         string? patientSurname = null,
+        int? protocolNo = null,
         CancellationToken cancellationToken = default);
 
     Task<TestProcess> GetWithNavigationPropertiesAsync(
@@ -53,6 +55,7 @@ public interface ITestProcessRepository : IRepository<TestProcess, Guid>
        string? doctorSurname = null,
        string? patientName = null,
        string? patientSurname = null,
+       int? protocolNo = null,
        string? sorting = null,
        int maxResultCount = int.MaxValue,
        int skipCount = 0,
@@ -60,5 +63,4 @@ public interface ITestProcessRepository : IRepository<TestProcess, Guid>
    );
 
     Task<List<TestProcess>> GetByLabRequestIdAsync(Guid labRequestId);
-
 }
