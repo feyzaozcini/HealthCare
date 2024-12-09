@@ -53,12 +53,12 @@ namespace Pusula.Training.HealthCare
         AppointmentTypeManager appointmentTypeManager,
         IPatientCompanyRepository patientCompanyRepository,
         IPatientRepository patientRepository,
-        //IProtocolRepository protocolRepository,
+        IProtocolRepository protocolRepository,
         IDoctorRepository doctorRepository,
         DoctorManager doctorManager,
         UserProfileManager userProfileManager,
         UserManager<IdentityUser> userManager,
-    INoteRepository noteRepository,
+        INoteRepository noteRepository,
         IInsuranceRepository insuranceRepository,
         IProtocolTypeRepository protocolTypeRepository,
         IGuidGenerator guidGenerator,
@@ -68,8 +68,9 @@ namespace Pusula.Training.HealthCare
     {
         public async Task SeedAsync(DataSeedContext context)
         {
-            // Eğer veritabanında Country verisi varsa, işlemi sonlandırıyoruz.
             //if (await countryRepository.GetCountAsync() > 0) return;
+
+            // Eğer veritabanında Country verisi varsa, işlemi sonlandırıyoruz. Bu mantıkta tüm seed datalar yapılandırılabilir.
 
             // Seed işlemleri
             var countries = await SeedCountriesAsync();
@@ -80,7 +81,6 @@ namespace Pusula.Training.HealthCare
             var testGroups = await SeedTestGroupsAsync();
             var testGroupItems = await SeedTestGroupItemsAsync(testGroups);
             await SeedTestValueRangesAsync(testGroupItems);
-
 
             var departments = await SeedDepartmentsAsync();
             var titles = await SeedTitlesAsync();
@@ -98,15 +98,16 @@ namespace Pusula.Training.HealthCare
 
             var notes = await SeedNotesAsync();
 
-            //var protocol = await SeedProtocolsAsync(protocolTypes, notes, insurances, patients, departments);
-
             var users = await SeedUsersAsync();
 
-            var doctors = await SeedDoctorsAsync( titles, departments,users);
+            var doctors = await SeedDoctorsAsync(titles, departments, users);
 
             var appointmentTypes = await SeedAppointmentTypesAsync(doctors);
 
             await SeedPainTypesAsync();
+
+            var protocol = await SeedProtocolsAsync(protocolTypes, notes, insurances, patients, departments, doctors);
+
         }
 
         #region Countries
@@ -2033,10 +2034,10 @@ namespace Pusula.Training.HealthCare
             await appointmentTypeRepository.InsertManyAsync(appointmentTypes, true);
             return appointmentTypes.Select(p => p.Id).ToList();
         }
-            #endregion
+        #endregion
 
-            #region Companies
-            private async Task<List<Guid>> SeedPatientCompaniesAsync()
+        #region Companies
+        private async Task<List<Guid>> SeedPatientCompaniesAsync()
         {
             if (await patientCompanyRepository.GetCountAsync() > 0)
                 return new List<Guid>();
@@ -2310,37 +2311,154 @@ namespace Pusula.Training.HealthCare
         #endregion
 
         #region Protocols
-        //private async Task<List<Guid>> SeedProtocolsAsync(
-        //    List<Guid> protocolTypeKeys,
-        //    List<Guid> protocolNoteKeys,
-        //    List<Guid> protocolInsuranceKeys,
-        //    List<Guid> patientKeys,
-        //    List<Guid> departmentKeys,
-        //    List<Guid> doctorKeys)
-        //{
-        //    // Eğer Protocol tablosunda veri varsa işlem yapma
-        //    if (await protocolRepository.GetCountAsync() > 0)
-        //        return new List<Guid>();
+        private async Task<List<Guid>> SeedProtocolsAsync(
+            List<Guid> protocolTypeKeys,
+            List<Guid> protocolNoteKeys,
+            List<Guid> protocolInsuranceKeys,
+            List<Guid> patientKeys,
+            List<Guid> departmentKeys,
+            List<Guid> doctorKeys)
+        {
+            // Eğer Protocol tablosunda veri varsa işlem yapma
+            if (await protocolRepository.GetCountAsync() > 0)
+                return new List<Guid>();
 
-        //    var protocols = new List<Protocol>
-        //    {
-        //        new Protocol(
-        //            guidGenerator.Create(),
-        //            DateTime.UtcNow, // StartTime
-        //            DateTime.UtcNow.AddDays(1),  
-        //            ProtocolStatus.Postponed,       
-        //            protocolTypeKeys.ElementAt(0), 
-        //            protocolNoteKeys.ElementAt(0), 
-        //            protocolInsuranceKeys.ElementAt(0), 
-        //            patientKeys.ElementAt(0),    
-        //            departmentKeys.ElementAt(0), 
-        //            doctorKeys.ElementAt(0)      
-        //        ),
-        //    };
-        //            await protocolRepository.InsertManyAsync(protocols, true);
-        //            // Eklenen Protocol kayıtlarının ID'lerini döndür
-        //            return protocols.Select(p => p.Id).ToList();
-        //        }
+            var protocols = new List<Protocol>
+            {
+                new Protocol(
+                guidGenerator.Create(),
+                DateTime.UtcNow, 
+                DateTime.UtcNow.AddDays(1),
+                ProtocolStatus.Cancelled,
+                protocolTypeKeys.ElementAt(0),
+                protocolNoteKeys.ElementAt(0),
+                protocolInsuranceKeys.ElementAt(0),
+                patientKeys.ElementAt(0),
+                departmentKeys.ElementAt(0),
+                doctorKeys.ElementAt(0)
+            ),
+
+            new Protocol(
+                guidGenerator.Create(),
+                DateTime.UtcNow, 
+                DateTime.UtcNow.AddDays(1),
+                ProtocolStatus.Postponed,
+                protocolTypeKeys.ElementAt(1),
+                protocolNoteKeys.ElementAt(1),
+                protocolInsuranceKeys.ElementAt(1),
+                patientKeys.ElementAt(1),
+                departmentKeys.ElementAt(1),
+                doctorKeys.ElementAt(1)
+            ),
+
+            new Protocol(
+                guidGenerator.Create(),
+                DateTime.UtcNow, 
+                DateTime.UtcNow.AddDays(1),
+                ProtocolStatus.Confirmed,
+                protocolTypeKeys.ElementAt(2),
+                protocolNoteKeys.ElementAt(2),
+                protocolInsuranceKeys.ElementAt(2),
+                patientKeys.ElementAt(2),
+                departmentKeys.ElementAt(2),
+                doctorKeys.ElementAt(2)
+            ),
+
+            new Protocol(
+                guidGenerator.Create(),
+                DateTime.UtcNow,
+                DateTime.UtcNow.AddDays(1),
+                ProtocolStatus.Pending,
+                protocolTypeKeys.ElementAt(3),
+                protocolNoteKeys.ElementAt(3),
+                protocolInsuranceKeys.ElementAt(3),
+                patientKeys.ElementAt(3),
+                departmentKeys.ElementAt(3),
+                doctorKeys.ElementAt(3)
+            ),
+
+            new Protocol(
+                guidGenerator.Create(),
+                DateTime.UtcNow, 
+                DateTime.UtcNow.AddDays(1),
+                ProtocolStatus.Rescheduled,
+                protocolTypeKeys.ElementAt(4),
+                protocolNoteKeys.ElementAt(4),
+                protocolInsuranceKeys.ElementAt(4),
+                patientKeys.ElementAt(4),
+                departmentKeys.ElementAt(4),
+                doctorKeys.ElementAt(0)
+            ),
+
+            new Protocol(
+                guidGenerator.Create(),
+                DateTime.UtcNow,
+                DateTime.UtcNow.AddDays(1),
+                ProtocolStatus.Failed,
+                protocolTypeKeys.ElementAt(5),
+                protocolNoteKeys.ElementAt(0),
+                protocolInsuranceKeys.ElementAt(5),
+                patientKeys.ElementAt(0),
+                departmentKeys.ElementAt(1),
+                doctorKeys.ElementAt(1)
+            ),
+
+            new Protocol(
+                guidGenerator.Create(),
+                DateTime.UtcNow, 
+                DateTime.UtcNow.AddDays(1),
+                ProtocolStatus.InProgress,
+                protocolTypeKeys.ElementAt(6),
+                protocolNoteKeys.ElementAt(1),
+                protocolInsuranceKeys.ElementAt(6),
+                patientKeys.ElementAt(1),
+                departmentKeys.ElementAt(2),
+                doctorKeys.ElementAt(2)
+            ),
+
+            new Protocol(
+                guidGenerator.Create(),
+                DateTime.UtcNow, 
+                DateTime.UtcNow.AddDays(1),
+                ProtocolStatus.NoShow,
+                protocolTypeKeys.ElementAt(7),
+                protocolNoteKeys.ElementAt(2),
+                protocolInsuranceKeys.ElementAt(7),
+                patientKeys.ElementAt(2),
+                departmentKeys.ElementAt(3),
+                doctorKeys.ElementAt(3)
+            ),
+
+            new Protocol(
+                guidGenerator.Create(),
+                DateTime.UtcNow, 
+                DateTime.UtcNow.AddDays(1),
+                ProtocolStatus.Pending,
+                protocolTypeKeys.ElementAt(8),
+                protocolNoteKeys.ElementAt(3),
+                protocolInsuranceKeys.ElementAt(8),
+                patientKeys.ElementAt(3),
+                departmentKeys.ElementAt(4),
+                doctorKeys.ElementAt(0)
+            ),
+
+            new Protocol(
+                guidGenerator.Create(),
+                DateTime.UtcNow,
+                DateTime.UtcNow.AddDays(1),
+                ProtocolStatus.Postponed,
+                protocolTypeKeys.ElementAt(9),
+                protocolNoteKeys.ElementAt(4),
+                protocolInsuranceKeys.ElementAt(0),
+                patientKeys.ElementAt(4),
+                departmentKeys.ElementAt(0),
+                doctorKeys.ElementAt(1)
+            ),
+            };
+            await protocolRepository.InsertManyAsync(protocols, true);
+
+            return protocols.Select(p => p.Id).ToList();
+        }
         #endregion
 
         #region Notes
@@ -2450,5 +2568,5 @@ namespace Pusula.Training.HealthCare
         }
 
     }
-        #endregion
+    #endregion
 }
