@@ -154,5 +154,7 @@
     "Hr": "hr",
     "Ratio": "Ratio",
     "ArbitraryUnit": "AU"
+    "Insurance": "Insurance",
+    "Permission:PainTypes": "Pain Types"
   }
 }

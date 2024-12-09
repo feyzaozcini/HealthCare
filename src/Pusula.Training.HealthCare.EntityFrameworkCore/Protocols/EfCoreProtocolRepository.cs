@@ -87,7 +87,8 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
        int skipCount = 0,
        CancellationToken cancellationToken = default)
     {
-        var query = ApplyFilter(await GetQueryableAsync(), filterText, startTime, endTime, protocolStatus, protocolTypeId, protocolNoteId, protocolInsuranceId, patientId, departmentId, doctorId, no);
+        
+        var query = ApplyFilter(await GetQueryForNavigationPropertiesAsync(),filterText, startTime, endTime, protocolStatus, protocolTypeId, protocolNoteId, protocolInsuranceId, patientId, departmentId, doctorId, no);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? ProtocolConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }

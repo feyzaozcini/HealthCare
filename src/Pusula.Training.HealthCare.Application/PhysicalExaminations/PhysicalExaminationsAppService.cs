@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Pusula.Training.HealthCare.Anamneses;
+using Pusula.Training.HealthCare.FallRisks;
 using Pusula.Training.HealthCare.Permissions;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Domain.Repositories;
 using Volo.Abp.ObjectMapping;
 
 namespace Pusula.Training.HealthCare.PhysicalExaminations
@@ -43,10 +45,17 @@ namespace Pusula.Training.HealthCare.PhysicalExaminations
 
         public async Task<PhysicalExaminationDto> GetWithProtocolIdAsync(Guid protocolId)
         {
-            var physicalExamiantion = await physicalExaminationRepository.GetAsync(a => a.ProtocolId == protocolId);
+            //var physicalExamination = await physicalExaminationRepository.GetAsync(a => a.ProtocolId == protocolId);
+
+            var physicalExamination = await physicalExaminationRepository.FirstOrDefaultAsync(a => a.ProtocolId == protocolId);
+            // Eğer fallRisk null ise null döner
+            if (physicalExamination == null)
+            {
+                return new PhysicalExaminationDto();
+            }
 
             // Anamnesis'i DTO'ya mapliyoruz
-            var physicalExaminationDto = ObjectMapper.Map<PhysicalExamination, PhysicalExaminationDto>(physicalExamiantion);
+            var physicalExaminationDto = ObjectMapper.Map<PhysicalExamination, PhysicalExaminationDto>(physicalExamination);
 
             return physicalExaminationDto;
         }

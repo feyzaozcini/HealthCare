@@ -46,5 +46,6 @@ namespace Pusula.Training.HealthCare.PhysicalExaminations
             int maxResultCount = int.MaxValue,
             int skipCount = 0,
             CancellationToken cancellationToken = default);
+
     }
 }
