@@ -9,7 +9,7 @@ namespace Pusula.Training.HealthCare.AppointmentRules
 {
     public class AppointmentRuleCreateDto
     {
-        public Guid? DoctorId { get; set; } 
+        public Guid? DoctorId { get; set; } = Guid.Empty;
 
         public Guid? DepartmentId { get; set; }
 

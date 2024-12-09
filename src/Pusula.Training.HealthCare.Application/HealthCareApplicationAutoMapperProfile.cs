@@ -186,11 +186,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
             .ForMember(dest => dest.SurName, opt => opt.MapFrom(src => src.User.Surname))
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
+            .ForMember(dest => dest.TitleName, opt => opt.MapFrom(src => src.Title.Name))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
             .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
             .ForMember(dest => dest.DoctorDepartments,
-               opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()))
-            .ForMember(dest => dest.TitleName, opt => opt.MapFrom(src => src.Title.Name));
+               opt => opt.MapFrom(src => src.DoctorDepartments.Select(dd => dd.DepartmentId).ToList()));
 
 
         CreateMap<DoctorCreateDto, Doctor>();

@@ -154,6 +154,13 @@
     "Hr": "hr",
     "Ratio": "Ratio",
     "ArbitraryUnit": "AU",
+    "Menu:Appointment": "Appointment",
+    "Menu:AppointmentList": "Appointment List",
+    "Menu:AppointmentType": "Appointment Types",
+    "Menu:AppointmentSchedule": "Appointment Schedule",
+    "Menu:AppointmentReport": "Appointment Report",
+    "Menu:AppointmentRule": "Appointment Rules"
+    "ArbitraryUnit": "AU",
     "Permission:PainTypes": "Pain Types",
     "ArbitraryUnit": "AU",
     "Menu:Patient": "Patient",
