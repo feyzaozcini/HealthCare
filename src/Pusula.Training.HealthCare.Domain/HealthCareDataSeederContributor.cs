@@ -30,6 +30,11 @@ using Volo.Abp.Domain.Entities.Auditing;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Guids;
 using Volo.Abp.Identity;
+using Microsoft.AspNetCore.Identity;
+using Volo.Abp.Users;
+using static Volo.Abp.Identity.Settings.IdentitySettingNames;
+using Volo.Abp.MultiTenancy;
+using Pusula.Training.HealthCare.UserProfiles;
 
 
 namespace Pusula.Training.HealthCare
@@ -45,10 +50,15 @@ namespace Pusula.Training.HealthCare
         IDepartmentRepository departmentRepository,
         ITitleRepository titleRepository,
         IAppointmentTypeRepository appointmentTypeRepository,
+        AppointmentTypeManager appointmentTypeManager,
         IPatientCompanyRepository patientCompanyRepository,
         IPatientRepository patientRepository,
         //IProtocolRepository protocolRepository,
-        INoteRepository noteRepository,
+        IDoctorRepository doctorRepository,
+        DoctorManager doctorManager,
+        UserProfileManager userProfileManager,
+        UserManager<IdentityUser> userManager,
+    INoteRepository noteRepository,
         IInsuranceRepository insuranceRepository,
         IProtocolTypeRepository protocolTypeRepository,
         IGuidGenerator guidGenerator,
@@ -74,7 +84,7 @@ namespace Pusula.Training.HealthCare
 
             var departments = await SeedDepartmentsAsync();
             var titles = await SeedTitlesAsync();
-            //var appointmentTypes = await SeedAppointmentTypesAsync();
+
             var patientCompanies = await SeedPatientCompaniesAsync();
 
             var diagnosisGroupKeys = await diagnosisGroupDataSeeder.SeedDiagnosisGroupsAsync();
@@ -89,6 +99,12 @@ namespace Pusula.Training.HealthCare
             var notes = await SeedNotesAsync();
 
             //var protocol = await SeedProtocolsAsync(protocolTypes, notes, insurances, patients, departments);
+
+            var users = await SeedUsersAsync();
+
+            var doctors = await SeedDoctorsAsync( titles, departments,users);
+
+            var appointmentTypes = await SeedAppointmentTypesAsync(doctors);
 
             await SeedPainTypesAsync();
         }
@@ -1970,8 +1986,8 @@ namespace Pusula.Training.HealthCare
                 new Department(guidGenerator.Create(), "Neurology"),
                 new Department(guidGenerator.Create(), "General Surgery"),
                 new Department(guidGenerator.Create(), "Dermatology"),
-                new Department(guidGenerator.Create(), "Psychiatry"),
-                new Department(guidGenerator.Create(), "Pediatrics")
+                new Department(guidGenerator.Create(), "Children's Diseases And Health"),
+                new Department(guidGenerator.Create(), "Gynecology And Obstetrics")
             };
             await departmentRepository.InsertManyAsync(departments, true);
             return departments.Select(d => d.Id).ToList();
@@ -1998,11 +2014,29 @@ namespace Pusula.Training.HealthCare
         #endregion
 
         #region AppointmentTypes
+        private async Task<List<Guid>> SeedAppointmentTypesAsync(
+            List<Guid> doctorKeys)
+        {
+            if (await appointmentTypeRepository.GetCountAsync() > 0)
+                return new List<Guid>();
 
-        #endregion
+            var appointmentTypes = new List<AppointmentType>
+            {
+                new AppointmentType(
+                    guidGenerator.Create(),
+                    "Muayene",
+                    30
+                ),
+            };
+            var doctorIds = new List<Guid> { doctorKeys.ElementAt(0), doctorKeys.ElementAt(1), doctorKeys.ElementAt(2),doctorKeys.ElementAt(3),doctorKeys.ElementAt(4) };
+            await appointmentTypeManager.SetDoctors(appointmentTypes.ElementAt(0), doctorIds);
+            await appointmentTypeRepository.InsertManyAsync(appointmentTypes, true);
+            return appointmentTypes.Select(p => p.Id).ToList();
+        }
+            #endregion
 
-        #region Companies
-        private async Task<List<Guid>> SeedPatientCompaniesAsync()
+            #region Companies
+            private async Task<List<Guid>> SeedPatientCompaniesAsync()
         {
             if (await patientCompanyRepository.GetCountAsync() > 0)
                 return new List<Guid>();
@@ -2329,5 +2363,92 @@ namespace Pusula.Training.HealthCare
             return notes.Select(n => n.Id).ToList();
         }
         #endregion
+
+        #region Users
+        private async Task<List<Guid>> SeedUsersAsync( )
+        {
+            //if(await userRepository.GetCountAsync() > 1)
+            //    return new List<Guid>();
+            if (await doctorRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+
+            var user1=await userProfileManager.CreateUserWithPropertiesAsync("ahmetkaya", "Ahmet", "Kaya", "ahmet@gmail.com", "Test.1*", "admin", "5352108596");
+            var user2 = await userProfileManager.CreateUserWithPropertiesAsync("zeyneozturk", "Zeynep", "Öztürk", "zeynepozturk@gmail.com", "Test.1*", "admin", "5352108595");
+            var user3 = await userProfileManager.CreateUserWithPropertiesAsync("omercelik", "Ömer", "Çelik", "omercelik@gmail.com", "Test.1*", "admin", "5352108592");
+            var user4 = await userProfileManager.CreateUserWithPropertiesAsync("ilknuraydin", "İlknur", "Aydın", "ilknur@gmail.com", "Test.1*", "admin", "5352108593");
+            var user5 = await userProfileManager.CreateUserWithPropertiesAsync("mehmetkaraca", "Mehmet", "Karaca", "mehmet@gmail.com", "Test.1*", "admin", "5352108591");
+            var users = new List<Guid> { user1.Id,user2.Id,user3.Id,user4.Id,user5.Id };
+            return users;
+
+        }
+        #endregion
+
+        #region Doctors
+        private async Task<List<Guid>> SeedDoctorsAsync(
+            List<Guid> titleKeys,
+            List<Guid> departmentKeys,
+            List<Guid> userKeys)
+        {
+            if (await doctorRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+
+            var doctors = new List<Doctor>
+            {
+                new Doctor(
+                    guidGenerator.Create(),
+                    userKeys.ElementAt(0),
+                    DateTime.UtcNow,
+                    Gender.Male,
+                    titleKeys.ElementAt(0),
+                    "12345678922"
+                ),
+                new Doctor(
+                    guidGenerator.Create(),
+                    userKeys.ElementAt(1),
+                    DateTime.UtcNow,
+                    Gender.Female,
+                    titleKeys.ElementAt(0),
+                    "12345678926"
+                ),
+                new Doctor(
+                    guidGenerator.Create(),
+                    userKeys.ElementAt(2),
+                    DateTime.UtcNow,
+                    Gender.Male,
+                    titleKeys.ElementAt(2),
+                    "12345678928"
+                ),
+                new Doctor(
+                    guidGenerator.Create(),
+                    userKeys.ElementAt(3),
+                    DateTime.UtcNow,
+                    Gender.Female,
+                    titleKeys.ElementAt(3),
+                    "12345678924"
+                ),
+                new Doctor(
+                    guidGenerator.Create(),
+                    userKeys.ElementAt(4),
+                    DateTime.UtcNow,
+                    Gender.Male,
+                    titleKeys.ElementAt(2),
+                    "12345678920"
+                ),
+            };
+            var departmentIds1 = new List<Guid> { departmentKeys.ElementAt(0), departmentKeys.ElementAt(1), departmentKeys.ElementAt(2) };
+            var departmentIds2 = new List<Guid> { departmentKeys.ElementAt(0), departmentKeys.ElementAt(3) };
+            var departmentIds3 = new List<Guid> { departmentKeys.ElementAt(2), departmentKeys.ElementAt(4) };
+            var departmentIds4 = new List<Guid> { departmentKeys.ElementAt(5), departmentKeys.ElementAt(2) };
+            var departmentIds5 = new List<Guid> { departmentKeys.ElementAt(4), departmentKeys.ElementAt(2) };
+            await doctorManager.SetDepartments(doctors[0], departmentIds1);
+            await doctorManager.SetDepartments(doctors[1], departmentIds2);
+            await doctorManager.SetDepartments(doctors[2], departmentIds3);
+            await doctorManager.SetDepartments(doctors[3], departmentIds4);
+            await doctorManager.SetDepartments(doctors[4], departmentIds5);
+            await doctorRepository.InsertManyAsync(doctors, true);
+            return doctors.Select(p => p.Id).ToList();
+        }
+
     }
+        #endregion
 }
