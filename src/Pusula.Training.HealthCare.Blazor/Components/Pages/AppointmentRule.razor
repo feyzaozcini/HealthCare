@@ -1,0 +1,259 @@
+﻿@page "/appointmentRule"
+
+@using Pusula.Training.HealthCare.Shared
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Buttons
+@using Pusula.Training.HealthCare.Departments
+@using Pusula.Training.HealthCare.Doctors
+@using Pusula.Training.HealthCare.AppointmentRules
+
+@inject IDepartmentsAppService DepartmentsAppService
+@inject IDoctorsAppService DoctorsAppService
+@inject IAppointmentRulesAppService AppointmentRulesAppService
+
+<div class="row">
+    <div class="col-md-12">
+        <SfButton CssClass="e-primary e-small" IconCss="e-icons e-add" Content="Add New" OnClick="OpenAddNewDialog"></SfButton>
+        <SfGrid DataSource="@AppointmentRules" AllowPaging="true" AllowSorting="true" Toolbar="@(new List<string>() { "Search" })">
+            <GridColumns>
+                <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="150"></GridColumn>
+                <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
+                <GridColumn Field="PatientGender" HeaderText="Gender" Width="100"></GridColumn>
+                <GridColumn Field="Age" HeaderText="Age" Width="100"></GridColumn>
+                <GridColumn Field="Description" HeaderText="Description" Width="200"></GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+</div>
+
+<SfDialog IsModal="true" Width="400px" Header="Add New Appointment Rule" Visible="@IsAddNewDialogOpen" ShowCloseIcon="true">
+    <div class="dialog-content">
+        <!-- Departman Seçimi -->
+        <div class="form-group">
+            <SfDropDownList TValue="Guid"
+                            TItem="DepartmentDto"
+                            Placeholder="Departman seçiniz..."
+                            DataSource="@FilteredDepartments">
+                <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                <DropDownListEvents TValue="Guid" TItem="DepartmentDto" ValueChange="OnDepartmentValueChange"></DropDownListEvents>
+            </SfDropDownList>
+        </div>
+        <!-- Doktor Seçimi -->
+        <div class="form-group">
+            <SfDropDownList DataSource="@FilteredDoctors"
+                            Placeholder="Doktor seçiniz..."
+                            TItem="DoctorWithNavigationPropertiesDto"
+                            TValue="Guid">
+                <DropDownListFieldSettings Value="Doctor.Id" Text="FullName"></DropDownListFieldSettings>
+                <DropDownListEvents TValue="Guid" TItem="DoctorWithNavigationPropertiesDto" ValueChange="OnDoctorValueChange"></DropDownListEvents>
+            </SfDropDownList>
+        </div>
+        <div class="form-group">
+            <SfNumericTextBox TValue="int"
+                              Placeholder="Age"
+                              @bind-Value="@NewAppointmentRule.Age">
+            </SfNumericTextBox>
+        </div>
+        <div class="form-group">
+            <SfDropDownList DataSource="@GendersCollection"
+                            Placeholder="Gender"
+                            @bind-Value="@NewAppointmentRule.Gender">
+                <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
+            </SfDropDownList>
+        </div>
+        <div class="form-group">
+            <SfTextArea Placeholder="Description"
+                        @bind-Value="@NewAppointmentRule.Description">
+            </SfTextArea>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end">
+        <SfButton CssClass="e-primary e-small" Content="Create" OnClick="CreateAppointmentRule"></SfButton>
+    </div>
+</SfDialog>
+
+@code{
+
+    private IReadOnlyList<LookupDto<Gender>> GendersCollection { get; set; } = new List<LookupDto<Gender>>();
+    private IReadOnlyList<LookupDto<Guid>> DepartmentsCollection { get; set; } = new List<LookupDto<Guid>>();
+    private IReadOnlyList<LookupDto<Guid>> DoctorsCollection { get; set; } = new List<LookupDto<Guid>>();
+    private AppointmentRuleCreateDto NewAppointmentRule = new AppointmentRuleCreateDto();
+
+    private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
+    private List<DepartmentDto> AllDepartments = new();
+
+    private DoctorWithNavigationPropertiesDto SelectedDoctor;
+    private DepartmentDto SelectedDepartment;
+
+    private List<DepartmentDto> FilteredDepartments = new();
+    private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
+
+    public List<AppointmentListItem> AppointmentRules { get; set; } = new();
+
+
+    private bool IsAddNewDialogOpen = false;
+    protected override async Task OnInitializedAsync()
+    {
+        await GetDoctorCollectionLookupAsync();
+        await GetDepartmentCollectionLookupAsync();
+        await LoadInitialDataAsync();
+        await LoadAppointmentRulesAsync();
+        GendersCollection = Enum.GetValues(typeof(Gender))
+            .Cast<Gender>()
+            .Select(b => new LookupDto<Gender> { Id = b, DisplayName = b.ToString() })
+            .ToList();
+
+    }
+    private async Task LoadInitialDataAsync()
+    {
+        var departmentResult = await DepartmentsAppService.GetListAsync(new GetDepartmentsInput());
+        if (departmentResult?.Items != null)
+        {
+            FilteredDepartments = departmentResult.Items.ToList();
+        }
+
+        var doctorResult = await DoctorsAppService.GetListAsync(new GetDoctorsInput());
+        if (doctorResult?.Items != null)
+        {
+            AllDoctors = doctorResult.Items.ToList();
+            FilteredDoctors = AllDoctors
+            .Select(d => new DoctorWithNavigationPropertiesDto
+                {
+                    Doctor = d.Doctor,
+                    Title = d.Title,
+                    User = d.User,
+                    FullName = $"{d.Title?.Name} {d.User?.Name} {d.User?.Surname}" // FullName oluşturuldu
+                })
+            .ToList();
+        }
+    }
+    private async Task OnDepartmentValueChange(ChangeEventArgs<Guid, DepartmentDto> args)
+    {
+        // Seçilen departmanın Id'si
+        Guid selectedDepartmentId = args.Value;
+
+        // Seçilen departman objesi
+        DepartmentDto selectedDepartment = FilteredDepartments.FirstOrDefault(d => d.Id == selectedDepartmentId);
+
+        if (selectedDepartment != null)
+        {
+            await SelectDepartmentAsync(selectedDepartment);
+        }
+    }
+
+    private async Task OnDoctorValueChange(ChangeEventArgs<Guid, DoctorWithNavigationPropertiesDto> args)
+    {
+        // Seçilen departmanın Id'si
+        Guid selectedDoctorId = args.Value;
+
+        // Seçilen departman objesi
+        DoctorWithNavigationPropertiesDto selectedDoctor = FilteredDoctors.FirstOrDefault(d => d.Doctor.Id == selectedDoctorId);
+
+        if (selectedDoctor != null)
+        {
+            await SelectDoctorAsync(selectedDoctor);
+        }
+    }
+    private async Task SelectDoctorAsync(DoctorWithNavigationPropertiesDto doctor)
+    {
+        SelectedDoctor = doctor;
+        await Task.CompletedTask;
+    }
+    private async Task SelectDepartmentAsync(DepartmentDto department)
+    {
+        SelectedDepartment = department;
+
+        if (department != null)
+        {
+            // Seçilen departmana ait doktorları listelemek için
+            var departmentWithDoctors = await DepartmentsAppService.GetDoctorsByDepartmentIdAsync(department.Id);
+            if (departmentWithDoctors != null)
+            {
+                FilteredDoctors = departmentWithDoctors
+                    .Select(dd => new DoctorWithNavigationPropertiesDto
+                        {
+                            Doctor = dd.Doctor,
+                            Title = dd.Title,
+                            User = dd.User,
+                            FullName = $"{dd.Title.Name} {dd.User.Name} {dd.User.Surname}"
+                        })
+                    .ToList();
+
+            }
+        }
+        else
+        {
+            FilteredDoctors.Clear();
+        }
+        await Task.CompletedTask;
+    }
+    private async Task LoadAppointmentRulesAsync()
+    {
+        var result = await AppointmentRulesAppService.GetListAsync(new GetAppointmentRulesInput());
+        AppointmentRules = result.Items.Select(a => new AppointmentListItem
+            {
+                DepartmentName = a.Department.Name,
+                DoctorFullName = $"{a.Doctor.TitleName} {a.Doctor.Name} {a.Doctor.SurName}",
+                Age= a.AppointmentRule.Age,
+                PatientGender = ToDisplayString(a.AppointmentRule.Gender),
+                Description=a.AppointmentRule.Description
+            }).ToList();
+    }
+    private async Task GetDoctorCollectionLookupAsync(string? newValue = null)
+    {
+        DoctorsCollection = (await AppointmentRulesAppService.GetDoctorLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
+    }
+
+    private async Task GetDepartmentCollectionLookupAsync(string? newValue = null)
+    {
+        DepartmentsCollection = (await AppointmentRulesAppService.GetDepartmentLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
+    }
+    private void OpenAddNewDialog()
+    {
+        IsAddNewDialogOpen = true;
+    }
+    private string ToDisplayString(Gender gender)
+    {
+        return gender switch
+        {
+            Gender.Male => "Erkek",
+            Gender.Female => "Kadın",
+            Gender.Unspecified => "Belirtilmemiş",
+            Gender.Other => "Diğer",
+            _ => "Belirtilmemiş"
+        };
+    }
+    private async Task CreateAppointmentRule()
+    {
+        try
+        {
+            NewAppointmentRule.DepartmentId = SelectedDepartment.Id;
+            NewAppointmentRule.DoctorId = SelectedDoctor.Doctor.Id;
+            await AppointmentRulesAppService.CreateAsync(NewAppointmentRule);
+
+            IsAddNewDialogOpen = false; // Dialog kapat
+            await LoadAppointmentRulesAsync(); // Listeyi güncelle
+        }
+        catch (Exception ex)
+        {
+
+        }
+    }
+    public class AppointmentListItem
+    {
+        public Guid Id { get; set; }
+        public Guid DepartmentId { get; set; }
+        public Guid DoctorId { get; set; }
+        public string DepartmentName { get; set; }
+        public string DoctorFullName { get; set; }
+        public int Age { get; set; }
+        public string PatientGender { get; set; }
+        public string Description { get; set; }
+    }
+
+}
+
+
+

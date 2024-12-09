@@ -31,6 +31,19 @@ public class HealthCareMenus
     public const string DoctorTaskList = Operations + ".DoctorTaskList";
     public const string DiagnosisReport = Reports + ".DiagnosisReport";
 
+
+    //Appoinment
+    public const string Appointment = Prefix + ".Appointment";
+    public const string AppointmentDefinitions = Appointment + ".Definitions";
+    public const string AppointmentOperations = Appointment + ".Operations";
+    public const string AppointmentReports = Appointment + ".Reports";
+
+    public const string AppointmentType = AppointmentDefinitions + ".AppointmentType";
+    public const string AppointmentRule = AppointmentDefinitions + ".AppointmentRule";
+    public const string AppoinmentSchedule = AppointmentOperations + ".AppointmentSchedule";
+    public const string Appointments = AppointmentReports + ".AppointmentLists";
+    public const string AppointmentReport = AppointmentReports + ".AppointmentReports";
+
     public const string Patient = Prefix + ".Patient";
     public const string PatientOperations = Patient + ".Operations";
     public const string PatientOperationsPrm = PatientOperations + ".PRM";
