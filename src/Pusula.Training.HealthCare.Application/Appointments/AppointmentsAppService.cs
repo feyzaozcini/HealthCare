@@ -199,8 +199,15 @@ namespace Pusula.Training.HealthCare.Appointments
             //Çocuk departmanına tanımlanmış 18 yaşından büyüklerin girememesi
             foreach (var rule in allRules)
             {
-                
-                if  (rule.Age.Equals(null) && patientAge != null && patientAge > rule.Age)  
+                //Şimdili çocuk departmanı için yazıldı eğer hasta 18 yaşından büyükse randevu alamaz
+                // Eğer yaş kısıtlaması varsa ve 0'dan büyükse kontrol et
+                if (rule.Age > 0 && patientAge > rule.Age)
+                {
+                    await appointmentBusinessRules.AppointmentCannotCreate();
+                }
+
+                // Eğer cinsiyet kısıtlaması varsa ve "Belirtilmemiş" değilse kontrol et
+                if (rule.Gender != Pusula.Training.HealthCare.AppointmentRules.Gender.Unspecified && patientGender != rule.Gender.ToString())
                 {
                     await appointmentBusinessRules.AppointmentCannotCreate();
                 }

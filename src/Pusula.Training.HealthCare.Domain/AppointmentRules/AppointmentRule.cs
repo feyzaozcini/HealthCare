@@ -25,7 +25,7 @@ namespace Pusula.Training.HealthCare.AppointmentRules
 
         protected AppointmentRule()
         {
-            
+            Gender = Gender.Unspecified;
         }
 
         public AppointmentRule(Guid id, Guid? doctorId, Guid? departmentId,Gender gender,int age, string description)
@@ -33,7 +33,7 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Id = id;
             DepartmentId = departmentId;
             DoctorId = doctorId;
-            SetGender(Gender);
+            SetGender(gender);
             SetAge(age);
             SetDescription(description);
         }
@@ -44,7 +44,7 @@ namespace Pusula.Training.HealthCare.AppointmentRules
         }
         public void SetGender(Gender gender)
         {
-            Gender = gender;
+            Gender = Enum.IsDefined(typeof(Gender), gender) ? gender : Gender.Unspecified;
         }
         public void SetAge(int age)
         {
