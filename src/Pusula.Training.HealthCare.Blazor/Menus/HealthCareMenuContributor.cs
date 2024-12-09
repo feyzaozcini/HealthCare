@@ -62,6 +62,46 @@ public class HealthCareMenuContributor : IMenuContributor
         //        requiredPermissionName: HealthCarePermissions.Departments.Default)
         //);
 
+        #region Patient Tabs
+
+        var patientMenu = new ApplicationMenuItem(
+            HealthCareMenus.Patient,
+            l["Menu:Patient"],
+            icon: "fa fa-vials"
+        );
+
+        patientMenu.AddItem(
+        new ApplicationMenuItem(
+            HealthCareMenus.PatientOperations,
+            l["Menu:Operations"],
+            icon: "fa fa-tools"
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.PatientOperationsPrm,
+                    l["Menu:PRM"],
+                    url: "/patients",
+                    icon: "fa fa-list"
+                )
+            
+            ));
+
+        patientMenu.AddItem(
+        new ApplicationMenuItem(
+                HealthCareMenus.PatientReports,
+                l["Menu:Reports"],
+                icon: "fa fa-chart-bar"
+        ).AddItem(
+            new ApplicationMenuItem(
+                HealthCareMenus.PatientReportsProtocolList,
+                l["Menu:ProtocolLists"],
+                url: "/protocol-list",
+                icon: "fa fa-chart-pie"
+                )
+        )
+    );
+
+        #endregion
+
         #region Lab Tabs
 
         var labMenu = new ApplicationMenuItem(
@@ -177,6 +217,8 @@ public class HealthCareMenuContributor : IMenuContributor
             icon: "fa fa-file"
         )));
         #endregion
+
+        context.Menu.AddItem(patientMenu);
         context.Menu.AddItem(treatmentMenu);
         context.Menu.AddItem(labMenu);
 

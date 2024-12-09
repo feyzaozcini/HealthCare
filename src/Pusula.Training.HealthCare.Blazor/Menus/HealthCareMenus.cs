@@ -30,4 +30,10 @@ public class HealthCareMenus
     public const string IcdList = Definitions + ".IcdList";
     public const string DoctorTaskList = Operations + ".DoctorTaskList";
     public const string DiagnosisReport = Reports + ".DiagnosisReport";
+
+    public const string Patient = Prefix + ".Patient";
+    public const string PatientOperations = Patient + ".Operations";
+    public const string PatientOperationsPrm = PatientOperations + ".PRM";
+    public const string PatientReports = Patient + ".Reports";
+    public const string PatientReportsProtocolList = PatientReports + ".ProtocolLists";
 }

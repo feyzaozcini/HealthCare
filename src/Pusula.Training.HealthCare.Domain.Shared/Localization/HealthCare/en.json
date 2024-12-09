@@ -153,6 +153,10 @@
     "Min": "min",
     "Hr": "hr",
     "Ratio": "Ratio",
-    "ArbitraryUnit": "AU"
+    "ArbitraryUnit": "AU",
+    "Menu:Patient": "Patient",
+    "Menu:PRM": "PRM",
+    "Menu:ProtocolLists": "Protocol List"
+
   }
 }
