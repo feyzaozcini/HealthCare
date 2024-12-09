@@ -7,12 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Domain.Repositories;
 
 namespace Pusula.Training.HealthCare.FallRisks
 {
     [RemoteService(IsEnabled = false)]
     [Authorize(HealthCarePermissions.Examinations.Default)]
-    public class FallRiskAppService(IFallRiskRepository fallRiskRepository,
+    public class FallRisksAppService(IFallRiskRepository fallRiskRepository,
         FallRiskManager fallRiskManager) : HealthCareAppService, IFallRisksAppService
     {
 
@@ -40,9 +41,14 @@ namespace Pusula.Training.HealthCare.FallRisks
 
         public async Task<FallRiskDto> GetWithProtocolIdAsync(Guid protocolId)
         {
-            var fallRisk = await fallRiskRepository.GetAsync(a => a.ProtocolId == protocolId);
+            //var fallRisk = await fallRiskRepository.GetAsync(a => a.ProtocolId == protocolId);
 
-          
+            var fallRisk = await fallRiskRepository.FirstOrDefaultAsync(a => a.ProtocolId == protocolId);
+            // Eğer fallRisk null ise null döner
+            if (fallRisk == null)
+            {
+                return null;
+            }
             var fallRiskDto = ObjectMapper.Map<FallRisk, FallRiskDto>(fallRisk);
 
             return fallRiskDto;

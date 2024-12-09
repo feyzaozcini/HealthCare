@@ -143,6 +143,11 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         appintmentRulePermission.AddChild(HealthCarePermissions.AppointmentRules.Edit, L("Permission:Edit"));
         appintmentRulePermission.AddChild(HealthCarePermissions.AppointmentRules.Delete, L("Permission:Delete"));
 
+        var painTypePermission = myGroup.AddPermission(HealthCarePermissions.PainTypes.Default, L("Permission:PainTypes"));
+        painTypePermission.AddChild(HealthCarePermissions.PainTypes.Create, L("Permission:Create"));
+        painTypePermission.AddChild(HealthCarePermissions.PainTypes.Edit, L("Permission:Edit"));
+        painTypePermission.AddChild(HealthCarePermissions.PainTypes.Delete, L("Permission:Delete"));
+
     }
 
     private static LocalizableString L(string name)

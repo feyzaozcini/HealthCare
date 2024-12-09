@@ -36,6 +36,8 @@ using Pusula.Training.HealthCare.Notes;
 using Pusula.Training.HealthCare.Insurances;
 using Pusula.Training.HealthCare.AppointmentRules;
 using System.Collections.Generic;
+using Pusula.Training.HealthCare.PainTypes;
+using Pusula.Training.HealthCare.PainDetails;
 
 
 namespace Pusula.Training.HealthCare;
@@ -56,7 +58,19 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Patient, PatientWithNavigationPropertiesDto>();
         CreateMap<Patient, PatientDeletedDto>();
 
-        CreateMap<Protocol, ProtocolDto>();
+
+        CreateMap<Protocol, ProtocolDto>()
+        .ForMember(dest => dest.PatientFirstName, opt => opt.MapFrom(x => x.Patient.FirstName))
+        .ForMember(dest => dest.PatientLastName, opt => opt.MapFrom(x => x.Patient.LastName))
+        .ForMember(dest => dest.PatientNo, opt => opt.MapFrom(x => x.Patient.No))
+        .ForMember(dest => dest.PatientBirthDate, opt => opt.MapFrom(x => x.Patient.BirthDate))
+        .ForMember(dest => dest.PatientGender, opt => opt.MapFrom(x => x.Patient.Gender));
+
+
+
+
+
+
         CreateMap<ProtocolDto, ProtocolUpdateDto>();
         CreateMap<ProtocolWithNavigationProperties, ProtocolWithNavigationPropertiesDto>();
 
@@ -243,6 +257,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<DiagnosisUpdateDto, Diagnosis>().ReverseMap();
         CreateMap<DiagnosisDto, DiagnosisUpdateDto>().ReverseMap();
         CreateMap<DiagnosisWithNavigationProperties, DiagnosisWithNavigationPropertiesDto>().ReverseMap();
+        CreateMap<Diagnosis, LookupDto<Guid>>().ForMember(dest => dest.DisplayName,opt => opt.MapFrom(src => $"{src.Code} - {src.Name}"));
 
 
         CreateMap<Anamnesis, AnamnesisDto>().ReverseMap();
@@ -254,6 +269,8 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<ExaminationDiagnosisCreateDto, ExaminationDiagnosis>().ReverseMap();
         CreateMap<ExaminationDiagnosisUpdateDto, ExaminationDiagnosis>().ReverseMap();
         CreateMap<ExaminationDiagnosisWithNavigationProperties, ExaminationDiagnosisWithNavigationPropertiesDto>().ReverseMap();
+
+       
 
         CreateMap<FallRisk, FallRiskDto>().ReverseMap();
         CreateMap<FallRiskCreateDto, FallRisk>().ReverseMap();
@@ -321,5 +338,13 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<AppointmentRule, AppointmentRuleWithNavigationPropertiesDto>();
         CreateMap<AppointmentRuleWithNavigationProperties, AppointmentRuleWithNavigationPropertiesDto>();
         CreateMap<AppointmentRuleDto, AppointmentRuleWithNavigationPropertiesDto>();
+
+        CreateMap<PainType, PainTypeDto>();
+        CreateMap<PainTypeDto, PainTypeUpdateDto>();
+        CreateMap<PainType, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
+
+        CreateMap<PainDetail, PainDetailDto>()
+           .ForMember(dest => dest.PainTypeName, opt => opt.MapFrom(x => x.PainType.Name))
+           .ReverseMap();
     }
 }

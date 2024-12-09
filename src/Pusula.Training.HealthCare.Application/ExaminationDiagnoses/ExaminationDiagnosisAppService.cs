@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Pusula.Training.HealthCare.Anamneses;
 using Pusula.Training.HealthCare.Diagnoses;
+using Pusula.Training.HealthCare.PainTypes;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Protocols;
+using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -19,6 +22,7 @@ namespace Pusula.Training.HealthCare.ExaminationDiagnoses
     [RemoteService(IsEnabled = false)]
     [Authorize(HealthCarePermissions.Examinations.Default)]
     public class ExaminationDiagnosisAppService(IExaminationDiagnosisRepository examinationDiagnosisRepository,
+        IDiagnosisRepository diagnosisRepository,
         ExaminationDiagnosisManager examinationDiagnosisManager) : HealthCareAppService, IExaminationDiagnosisAppService
     {
         [Authorize(HealthCarePermissions.Examinations.Create)]
@@ -43,6 +47,21 @@ namespace Pusula.Training.HealthCare.ExaminationDiagnoses
 
         public async Task<ExaminationDiagnosisDto> GetAsync(Guid id)=> ObjectMapper.Map<ExaminationDiagnosis, ExaminationDiagnosisDto>(
                 await examinationDiagnosisRepository.GetAsync(id));
+
+        public async Task<PagedResultDto<LookupDto<Guid>>> GetDiagnosisLookupAsync(LookupRequestDto input)
+        {
+            var query = (await diagnosisRepository.GetQueryableAsync())
+                .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
+                    x => x.Name != null && x.Name.Contains(input.Filter!));
+
+            var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Diagnosis>();
+            var totalCount = query.Count();
+            return new PagedResultDto<LookupDto<Guid>>
+            {
+                TotalCount = totalCount,
+                Items = ObjectMapper.Map<List<Diagnosis>, List<LookupDto<Guid>>>(lookupData)
+            };
+        }
 
         public async Task<PagedResultDto<ExaminationDiagnosisWithNavigationPropertiesDto>> GetListAsync(GetExaminationDiagnosisInput input)
         {

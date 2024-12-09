@@ -9,6 +9,7 @@ using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Notes;
 using Pusula.Training.HealthCare.Insurances;
+using Pusula.Training.HealthCare.PainTypes;
 using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Protocols;
@@ -52,7 +53,8 @@ namespace Pusula.Training.HealthCare
         IProtocolTypeRepository protocolTypeRepository,
         IGuidGenerator guidGenerator,
         DiagnosisGroupDataSeeder diagnosisGroupDataSeeder,
-        DiagnosisDataSeeder diagnosisDataSeeder) : IDataSeedContributor, ITransientDependency
+        DiagnosisDataSeeder diagnosisDataSeeder,
+        IPainTypeRepository painTypeRepository) : IDataSeedContributor, ITransientDependency
     {
         public async Task SeedAsync(DataSeedContext context)
         {
@@ -87,6 +89,8 @@ namespace Pusula.Training.HealthCare
             var notes = await SeedNotesAsync();
 
             //var protocol = await SeedProtocolsAsync(protocolTypes, notes, insurances, patients, departments);
+
+            await SeedPainTypesAsync();
         }
 
         #region Countries
@@ -2012,6 +2016,26 @@ namespace Pusula.Training.HealthCare
             return companies.Select(c => c.Id).ToList();
         }
 
+        #endregion
+
+        #region Pain Types
+        private async Task<List<Guid>> SeedPainTypesAsync()
+        {
+            if (await painTypeRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+            var painTypes = new List<PainType>
+            {
+                new PainType(guidGenerator.Create(), "Ezici"),
+                new PainType(guidGenerator.Create(), "Küt"),
+                new PainType(guidGenerator.Create(), "Saplanıcı"),
+                new PainType(guidGenerator.Create(), "Stabilize"),
+                new PainType(guidGenerator.Create(), "Yangın"),
+
+
+            };
+            await painTypeRepository.InsertManyAsync(painTypes, true);
+            return painTypes.Select(c => c.Id).ToList();
+        }
         #endregion
 
         #region Patients

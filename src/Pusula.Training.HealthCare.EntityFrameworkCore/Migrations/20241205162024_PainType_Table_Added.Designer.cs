@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Pusula.Training.HealthCare.Migrations
 {
     [DbContext(typeof(HealthCareDbContext))]
-    partial class HealthCareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241205162024_PainType_Table_Added")]
+    partial class PainType_Table_Added
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,39 +83,6 @@ namespace Pusula.Training.HealthCare.Migrations
                         .IsUnique();
 
                     b.ToTable("AppAnamneses", (string)null);
-                });
-
-            modelBuilder.Entity("Pusula.Training.HealthCare.AppointmentRules.AppointmentRule", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Age")
-                        .HasColumnType("integer")
-                        .HasColumnName("Age");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("Description");
-
-                    b.Property<Guid>("DoctorId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Gender")
-                        .HasColumnType("integer")
-                        .HasColumnName("Gender");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("DoctorId");
-
-                    b.ToTable("AppAppointmentRules", (string)null);
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.AppointmentTypes.AppointmentType", b =>
@@ -878,73 +848,6 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.ToTable("AppNotes", (string)null);
                 });
 
-            modelBuilder.Entity("Pusula.Training.HealthCare.PainDetails.PainDetail", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Area")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("character varying(25)")
-                        .HasColumnName("Area");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("Description");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<string>("OtherPain")
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("OtherPain");
-
-                    b.Property<int>("PainRhythm")
-                        .HasColumnType("integer")
-                        .HasColumnName("PainRhythm");
-
-                    b.Property<Guid>("PainTypeId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("PainTypeId");
-
-                    b.Property<Guid>("ProtocolId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("ProtocolId");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("integer")
-                        .HasColumnName("Score");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("StartDate");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PainTypeId");
-
-                    b.HasIndex("ProtocolId")
-                        .IsUnique();
-
-                    b.ToTable("AppPainDetails", (string)null);
-                });
-
             modelBuilder.Entity("Pusula.Training.HealthCare.PainTypes.PainType", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1664,8 +1567,7 @@ namespace Pusula.Training.HealthCare.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TestGroupItemId")
-                        .IsUnique();
+                    b.HasIndex("TestGroupItemId");
 
                     b.ToTable("AppTestValueRanges", (string)null);
                 });
@@ -3552,19 +3454,6 @@ namespace Pusula.Training.HealthCare.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Pusula.Training.HealthCare.AppointmentRules.AppointmentRule", b =>
-                {
-                    b.HasOne("Pusula.Training.HealthCare.Departments.Department", null)
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Pusula.Training.HealthCare.Doctors.Doctor", null)
-                        .WithMany()
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.NoAction);
-                });
-
             modelBuilder.Entity("Pusula.Training.HealthCare.Appointments.Appointment", b =>
                 {
                     b.HasOne("Pusula.Training.HealthCare.AppointmentTypes.AppointmentType", null)
@@ -3719,25 +3608,6 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.Navigation("Protocol");
                 });
 
-            modelBuilder.Entity("Pusula.Training.HealthCare.PainDetails.PainDetail", b =>
-                {
-                    b.HasOne("Pusula.Training.HealthCare.PainTypes.PainType", "PainType")
-                        .WithMany()
-                        .HasForeignKey("PainTypeId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Pusula.Training.HealthCare.Protocols.Protocol", "Protocol")
-                        .WithOne()
-                        .HasForeignKey("Pusula.Training.HealthCare.PainDetails.PainDetail", "ProtocolId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("PainType");
-
-                    b.Navigation("Protocol");
-                });
-
             modelBuilder.Entity("Pusula.Training.HealthCare.Patients.Patient", b =>
                 {
                     b.HasOne("Pusula.Training.HealthCare.PatientCompanies.PatientCompany", null)
@@ -3887,8 +3757,8 @@ namespace Pusula.Training.HealthCare.Migrations
             modelBuilder.Entity("Pusula.Training.HealthCare.TestValueRanges.TestValueRange", b =>
                 {
                     b.HasOne("Pusula.Training.HealthCare.TestGroupItems.TestGroupItem", "TestGroupItem")
-                        .WithOne("TestValueRange")
-                        .HasForeignKey("Pusula.Training.HealthCare.TestValueRanges.TestValueRange", "TestGroupItemId")
+                        .WithMany()
+                        .HasForeignKey("TestGroupItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -4059,11 +3929,6 @@ namespace Pusula.Training.HealthCare.Migrations
             modelBuilder.Entity("Pusula.Training.HealthCare.Doctors.Doctor", b =>
                 {
                     b.Navigation("DoctorDepartments");
-                });
-
-            modelBuilder.Entity("Pusula.Training.HealthCare.TestGroupItems.TestGroupItem", b =>
-                {
-                    b.Navigation("TestValueRange");
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.Titles.Title", b =>

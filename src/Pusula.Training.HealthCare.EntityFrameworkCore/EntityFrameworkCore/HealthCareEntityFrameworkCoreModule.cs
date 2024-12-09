@@ -36,6 +36,8 @@ using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Notes;
 using Pusula.Training.HealthCare.Insurances;
 using Pusula.Training.HealthCare.AppointmentRules;
+using Pusula.Training.HealthCare.PainTypes;
+using Pusula.Training.HealthCare.PainDetails;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -94,6 +96,11 @@ public class HealthCareEntityFrameworkCoreModule : AbpModule
             options.AddRepository<PshychologicalState, EfCorePshychologicalStateRepository>();
             options.AddRepository<Insurance, EfCoreInsuranceRepository>();
             options.AddRepository<AppointmentRule, EfCoreAppointmentRuleRepository>();
+            options.AddRepository<PainType, EfCorePainTypeRepository>();
+            options.AddRepository<PainDetail, EfCorePainDetailRepository>();
+
+
+
 
         });
 
