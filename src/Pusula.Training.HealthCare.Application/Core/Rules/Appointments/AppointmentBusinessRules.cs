@@ -17,9 +17,10 @@ namespace Pusula.Training.HealthCare.Core.Rules.Appointments
                HealthCareDomainErrorCodes.DoctorRules);
         }
 
-        public async Task AppointmentDatesCannotOverlapForDoctor(Guid doctorId, DateTime startDate, DateTime endDate)
+        public async Task AppointmentDatesCannotOverlapForDoctor(Guid departmentId,Guid doctorId, DateTime startDate, DateTime endDate)
         {
             var overlappingAppointment = await appointmentRepository.FirstOrDefaultAsync(a =>
+                a.DepartmentId == departmentId &&
                 a.DoctorId == doctorId &&
                 a.StartDate < endDate && // EndDate'den önce başlayan randevular
                 a.EndDate > startDate);  // StartDate'den sonra biten randevular

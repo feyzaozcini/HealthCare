@@ -8,7 +8,7 @@ namespace Pusula.Training.HealthCare.Core.Rules.Appointments
 {
     public interface IAppointmentBusinessRules : IBusinessRules
     {
-        Task AppointmentDatesCannotOverlapForDoctor(Guid doktorId,DateTime startDate, DateTime endDate);
+        Task AppointmentDatesCannotOverlapForDoctor(Guid departmentId,Guid doktorId,DateTime startDate, DateTime endDate);
         Task AppointmentCannotCreate();
     }
 }

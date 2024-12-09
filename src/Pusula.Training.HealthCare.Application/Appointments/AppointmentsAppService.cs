@@ -123,7 +123,7 @@ namespace Pusula.Training.HealthCare.Appointments
         {
             await CheckRulesAsync(input);
 
-            await appointmentBusinessRules.AppointmentDatesCannotOverlapForDoctor(input.DoctorId,input.StartDate, input.EndDate);
+            await appointmentBusinessRules.AppointmentDatesCannotOverlapForDoctor(input.DepartmentId,input.DoctorId,input.StartDate, input.EndDate);
 
             var appointment= await appointmentManager.CreateAsync(
                 input.PatientId,
