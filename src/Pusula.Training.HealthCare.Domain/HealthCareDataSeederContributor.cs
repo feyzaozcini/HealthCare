@@ -7,8 +7,11 @@ using Pusula.Training.HealthCare.Diagnoses;
 using Pusula.Training.HealthCare.DiagnosisGroups;
 using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.Notes;
 using Pusula.Training.HealthCare.Insurances;
 using Pusula.Training.HealthCare.PatientCompanies;
+using Pusula.Training.HealthCare.Patients;
+using Pusula.Training.HealthCare.Protocols;
 using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.TestGroupItems;
 using Pusula.Training.HealthCare.TestGroups;
@@ -42,6 +45,9 @@ namespace Pusula.Training.HealthCare
         ITitleRepository titleRepository,
         IAppointmentTypeRepository appointmentTypeRepository,
         IPatientCompanyRepository patientCompanyRepository,
+        IPatientRepository patientRepository,
+        //IProtocolRepository protocolRepository,
+        INoteRepository noteRepository,
         IInsuranceRepository insuranceRepository,
         IProtocolTypeRepository protocolTypeRepository,
         IGuidGenerator guidGenerator,
@@ -57,7 +63,7 @@ namespace Pusula.Training.HealthCare
             var countries = await SeedCountriesAsync();
             var cities = await SeedCitiesAsync(countries);
             var districts = await SeedDistrictsAsync(cities);
-            await SeedVillagesAsync(districts);
+            var villages = await SeedVillagesAsync(districts);
 
             var testGroups = await SeedTestGroupsAsync();
             var testGroupItems = await SeedTestGroupItemsAsync(testGroups);
@@ -75,6 +81,12 @@ namespace Pusula.Training.HealthCare
             var insurances = await SeedInsurancesAsync();
 
             var protocolTypes = await SeedProtocolTypesAsync();
+
+            var patients = await SeedPatientsAsync(countries, cities, districts, villages, patientCompanies);
+
+            var notes = await SeedNotesAsync();
+
+            //var protocol = await SeedProtocolsAsync(protocolTypes, notes, insurances, patients, departments);
         }
 
         #region Countries
@@ -448,10 +460,10 @@ namespace Pusula.Training.HealthCare
         #endregion
 
         #region Villages
-        private async Task SeedVillagesAsync(List<Guid> districtKeys)
+        private async Task<List<Guid>> SeedVillagesAsync(List<Guid> districtKeys)
         {
             if (await villageRepository.GetCountAsync() > 0)
-                return;
+                return new List<Guid>();
 
             var villages = new List<Village>
     {
@@ -982,6 +994,7 @@ namespace Pusula.Training.HealthCare
 
             await villageRepository.InsertManyAsync(villages, true);
 
+            return villages.Select(v => v.Id).ToList();
         }
         #endregion
 
@@ -1923,7 +1936,7 @@ namespace Pusula.Training.HealthCare
             minValue: 150.0m,
             maxValue: 300.0m,
             unit: TestUnitTypes.MmHg
-            
+
         ),
         new TestValueRange(
             guidGenerator.Create(),
@@ -2001,6 +2014,188 @@ namespace Pusula.Training.HealthCare
 
         #endregion
 
+        #region Patients
+        private async Task<List<Guid>> SeedPatientsAsync(
+            List<Guid> countryKeys,
+            List<Guid> cityKeys,
+            List<Guid> districtKeys,
+            List<Guid> villageKeys,
+            List<Guid> companyKeys)
+        {
+            if (await patientRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+
+            var patients = new List<Patient>
+        {
+            new Patient(
+                guidGenerator.Create(),
+                companyKeys.ElementAt(0),
+                "Ali",
+                "Öztürk",
+                new DateTime(2000, 3, 15),
+                "45931152168",
+                "11124315258",
+                "aliozturkinfo@gmail.com",
+                "05551234567",
+                "05551234568",
+                Gender.Male,
+                "Sevinç",
+                "Mehmet",
+                BloodType.O_Positive,
+                Patients.Type.VIP,
+                countryKeys.ElementAt(178),
+                cityKeys.ElementAt(33),
+                districtKeys.ElementAt(0),
+                villageKeys.ElementAt(0),
+                "Hatay, Altınözü Mahallesi, No:33",
+                countryKeys.ElementAt(178),
+                cityKeys.ElementAt(33),
+                districtKeys.ElementAt(1),
+                villageKeys.ElementAt(1),
+                "Düzce, Konuralp Mahallesi, No:35"
+            ),
+            new Patient(
+            guidGenerator.Create(),
+            companyKeys.ElementAt(1),
+            "Baran",
+            "Efe",
+            new DateTime(1995, 8, 24),
+            "12345678902",
+            "98765432102",
+            "baran.efe@example.com",
+            "05551112233",
+            "05551112234",
+            Gender.Male,
+            "Zehra",
+            "Kemal",
+            BloodType.A_Positive,
+            Patients.Type.Normal,
+            countryKeys.ElementAt(178),
+            cityKeys.ElementAt(33),
+            districtKeys.ElementAt(2),
+            villageKeys.ElementAt(2),
+            "Ankara, Merkez Mahallesi, No:12",
+            countryKeys.ElementAt(178),
+            cityKeys.ElementAt(33),
+            districtKeys.ElementAt(3),
+            villageKeys.ElementAt(3),
+            "İstanbul, Üsküdar, No:34"
+        ),
+            new Patient(
+                guidGenerator.Create(),
+                companyKeys.ElementAt(2),
+                "Nil",
+                "Birlik",
+                new DateTime(1988, 4, 10),
+                "65432198762",
+                "98712345678",
+                "nil.birlik@example.com",
+                "05342223344",
+                "05342223345",
+                Gender.Female,
+                "Ayla",
+                "Erol",
+                BloodType.B_Negative,
+                Patients.Type.VIP,
+                countryKeys.ElementAt(178),
+                cityKeys.ElementAt(33),
+                districtKeys.ElementAt(4),
+                villageKeys.ElementAt(3),
+                "Bursa, Osmangazi, No:45",
+                countryKeys.ElementAt(178),
+                cityKeys.ElementAt(33),
+                districtKeys.ElementAt(5),
+                villageKeys.ElementAt(3),
+                "Bursa, Nilüfer, No:67"
+            ),
+            new Patient(
+                guidGenerator.Create(),
+                companyKeys.ElementAt(0),
+                "Feyza",
+                "Özçini",
+                new DateTime(1999, 7, 19),
+                "78945612306",
+                "12312312394",
+                "feyza.ozcini@hotmail.com",
+                "05441113344",
+                "05441113345",
+                Gender.Female,
+                "Hatice",
+                "Yılmaz",
+                BloodType.AB_Positive,
+                Patients.Type.Unknown,
+                countryKeys.ElementAt(178),
+                cityKeys.ElementAt(33),
+                districtKeys.ElementAt(6),
+                villageKeys.ElementAt(3),
+                "İzmir, Bornova, No:123",
+                countryKeys.ElementAt(178),
+                cityKeys.ElementAt(33),
+                districtKeys.ElementAt(7),
+                villageKeys.ElementAt(3),
+                "İzmir, Karşıyaka, No:89"
+            ),
+            new Patient(
+                guidGenerator.Create(),
+                companyKeys.ElementAt(2),
+                "Mehmet",
+                "Desteci",
+                new DateTime(1990, 1, 12),
+                "85296374108",
+                "75395145632",
+                "mehmet.desteci@gmail.com",
+                "05335557788",
+                "05335557789",
+                Gender.Male,
+                "Fatma",
+                "Ali",
+                BloodType.O_Negative,
+                Patients.Type.VIP,
+                countryKeys.ElementAt(178),
+                cityKeys.ElementAt(33),
+                districtKeys.ElementAt(8),
+                villageKeys.ElementAt(3),
+                "Adana, Seyhan, No:11",
+                countryKeys.ElementAt(178),
+                cityKeys.ElementAt(33),
+                districtKeys.ElementAt(9),
+                villageKeys.ElementAt(3),
+                "Adana, Yüreğir, No:15"
+            ),
+            new Patient(
+                guidGenerator.Create(),
+                companyKeys.ElementAt(1),
+                "Atakan",
+                "Aymankuy",
+                new DateTime(1992, 12, 5),
+                "96325874100",
+                "12365478912",
+                "atakan.aymankuy@hotmail.com",
+                "05312225566",
+                "05312225567",
+                Gender.Male,
+                "Emine",
+                "Ahmet",
+                BloodType.B_Positive,
+                Patients.Type.VIP,
+                countryKeys.ElementAt(178),
+                cityKeys.ElementAt(33),
+                districtKeys.ElementAt(10),
+                villageKeys.ElementAt(3),
+                "Gaziantep, Şahinbey, No:21",
+                countryKeys.ElementAt(178),
+                cityKeys.ElementAt(33),
+                districtKeys.ElementAt(10),
+                villageKeys.ElementAt(3),
+                "Gaziantep, Nizip, No:14"
+            ),
+
+        };
+            await patientRepository.InsertManyAsync(patients, true);
+            return patients.Select(p => p.Id).ToList();
+        }
+        #endregion
+
         #region Insurances
         private async Task<List<Guid>> SeedInsurancesAsync()
         {
@@ -2053,6 +2248,61 @@ namespace Pusula.Training.HealthCare
             };
             await protocolTypeRepository.InsertManyAsync(protocolTypes, true);
             return protocolTypes.Select(pt => pt.Id).ToList();
+        }
+        #endregion
+
+        #region Protocols
+        //private async Task<List<Guid>> SeedProtocolsAsync(
+        //    List<Guid> protocolTypeKeys,
+        //    List<Guid> protocolNoteKeys,
+        //    List<Guid> protocolInsuranceKeys,
+        //    List<Guid> patientKeys,
+        //    List<Guid> departmentKeys,
+        //    List<Guid> doctorKeys)
+        //{
+        //    // Eğer Protocol tablosunda veri varsa işlem yapma
+        //    if (await protocolRepository.GetCountAsync() > 0)
+        //        return new List<Guid>();
+
+        //    var protocols = new List<Protocol>
+        //    {
+        //        new Protocol(
+        //            guidGenerator.Create(),
+        //            DateTime.UtcNow, // StartTime
+        //            DateTime.UtcNow.AddDays(1),  
+        //            ProtocolStatus.Postponed,       
+        //            protocolTypeKeys.ElementAt(0), 
+        //            protocolNoteKeys.ElementAt(0), 
+        //            protocolInsuranceKeys.ElementAt(0), 
+        //            patientKeys.ElementAt(0),    
+        //            departmentKeys.ElementAt(0), 
+        //            doctorKeys.ElementAt(0)      
+        //        ),
+        //    };
+        //            await protocolRepository.InsertManyAsync(protocols, true);
+        //            // Eklenen Protocol kayıtlarının ID'lerini döndür
+        //            return protocols.Select(p => p.Id).ToList();
+        //        }
+        #endregion
+
+        #region Notes
+        private async Task<List<Guid>> SeedNotesAsync()
+        {
+            if (await noteRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+
+            var notes = new List<Note>
+            {
+                new Note(guidGenerator.Create(), "Hasta baş ağrısı ve halsizlik şikayetiyle geldi."),
+                new Note(guidGenerator.Create(), "Kan tahlili sonuçları bekleniyor."),
+                new Note(guidGenerator.Create(), "Doktor muayenesi tamamlandı, tedavi planı oluşturuldu."),
+                new Note(guidGenerator.Create(), "Hasta MR çekimi için yönlendirildi."),
+                new Note(guidGenerator.Create(), "Tedavi süreci tamamlandı ve hasta taburcu edildi."),
+                new Note(guidGenerator.Create(), "Hasta şeker ölçüm cihazı eğitimi aldı."),
+                new Note(guidGenerator.Create(), "Hastanın tansiyon değerleri kontrol edildi."),
+            };
+            await noteRepository.InsertManyAsync(notes, true);
+            return notes.Select(n => n.Id).ToList();
         }
         #endregion
     }
