@@ -54,30 +54,32 @@
         <!-- Cinsiyet -->
         <GridColumn HeaderText="Cinsiyet" Width="100">
             <Template>
-                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                @if (context is ProtocolDto protocol)
                 {
-                    var genderText = protocol.Patient.Gender == 0 ? "Kadın" : "Erkek";
-                    @genderText
+                    @protocol.PatientGender
+                  
+                }
+            </Template>
+        </GridColumn>
+   
+        <!-- Hasta No -->
+        <GridColumn HeaderText="Hasta No" Width="100">
+            <Template>
+                @if (context is ProtocolDto protocol)
+                {
+                    @protocol.PatientNo
                 }
             </Template>
         </GridColumn>
 
-        <!-- Hasta No -->
-        <GridColumn HeaderText="Hasta No" Width="100">
-            <Template>
-                @if (context is ProtocolWithNavigationPropertiesDto protocol)
-                {
-                    @protocol.Patient.No
-                }
-            </Template>
-        </GridColumn>
+      
 
         <!-- Hasta Adı ve Soyadı -->
         <GridColumn HeaderText="Hasta Adı ve Soyadı" Width="200">
             <Template>
-                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                @if (context is ProtocolDto protocol)
                 {
-                    @($"{protocol.Patient.FirstName} {protocol.Patient.LastName}")
+                    @($"{protocol.PatientFirstName} {protocol.PatientLastName}")
                 }
             </Template>
         </GridColumn>
@@ -85,9 +87,9 @@
         <!-- Hasta Doğum Tarihi ve Yaşı -->
         <GridColumn HeaderText="Doğum Tarihi (Yaş)" Width="150">
             <Template>
-                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                @if (context is ProtocolDto protocol)
                 {
-                    var birthDate = protocol.Patient.BirthDate;
+                    var birthDate = protocol.PatientBirthDate;
                     var age = DateTime.Now.Year - birthDate.Year;
                     if (DateTime.Now < birthDate.AddYears(age)) age--;
                     @($"{birthDate:dd.MM.yyyy} ({age} yaşında)")
@@ -95,12 +97,12 @@
             </Template>
         </GridColumn>
 
-        <!-- Protokol No -->
-        <GridColumn HeaderText="Protokol No" Width="150">
+        <!-- Protokol  No -->
+        <GridColumn HeaderText="Protokol No" Width="100">
             <Template>
-                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                @if (context is ProtocolDto protocol)
                 {
-                    @protocol.Protocol.Id
+                    @protocol.No
                 }
             </Template>
         </GridColumn>
@@ -108,10 +110,10 @@
         <!-- Göreve Git Butonu -->
         <GridColumn HeaderText="Göreve Git" Width="120">
             <Template>
-                @if (context is ProtocolWithNavigationPropertiesDto protocol)
+                @if (context is ProtocolDto protocol)
                 {
                     <SfButton CssClass="e-primary" Content="Göreve Git"
-                              @onclick="(() => NavigateToExamination(protocol.Protocol.Id, protocol.Patient.Id))">
+                              @onclick="(() => NavigateToExamination(protocol.Id, protocol.PatientId))">
                     </SfButton>
                 }
             </Template>

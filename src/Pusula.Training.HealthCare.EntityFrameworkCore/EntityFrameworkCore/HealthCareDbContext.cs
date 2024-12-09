@@ -50,6 +50,8 @@ using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Notes;
 using Pusula.Training.HealthCare.Insurances;
 using Pusula.Training.HealthCare.AppointmentRules;
+using Pusula.Training.HealthCare.PainTypes;
+using Pusula.Training.HealthCare.PainDetails;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -93,6 +95,8 @@ public class HealthCareDbContext :
     public DbSet<Note> Notes { get; set; } = null!;
     public DbSet<Insurance> Insurances { get; set; } = null!;
     public DbSet<AppointmentRule> AppointmentRules { get; set; }
+    public DbSet<PainType> PainTypes { get; set; } = null!;
+    public DbSet<PainDetail> PainDetails { get; set; } = null!;
 
 
     #region Entities from the modules
@@ -633,6 +637,31 @@ public class HealthCareDbContext :
                 b.HasOne<Doctor>().WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne<Department>().WithMany().IsRequired(false).HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
             });
+            builder.Entity<PainType>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "PainTypes", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Name).HasColumnName(nameof(PainType.Name)).IsRequired().HasMaxLength(PainTypeConsts.NameMaxLength);
+            });
+
+            builder.Entity<PainDetail>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "PainDetails", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.Area).HasColumnName(nameof(PainDetail.Area)).IsRequired().HasMaxLength(PainDetailConsts.AreaMaxLength);
+                b.Property(x => x.ProtocolId).HasColumnName(nameof(PainDetail.ProtocolId)) .IsRequired();
+                b.Property(x => x.Score).HasColumnName(nameof(PainDetail.Score)).IsRequired();
+                b.Property(x => x.PainTypeId).HasColumnName(nameof(PainDetail.PainTypeId)).IsRequired();
+                b.Property(x => x.Description) .HasColumnName(nameof(PainDetail.Description)).HasMaxLength(PainDetailConsts.DescriptionMaxLength).IsRequired(false);
+                b.Property(x => x.PainRhythm).HasColumnName(nameof(PainDetail.PainRhythm)).IsRequired();
+                b.Property(x => x.OtherPain).HasColumnName(nameof(PainDetail.OtherPain)).HasMaxLength(PainDetailConsts.OtherPainMaxLength).IsRequired(false);
+                b.Property(x => x.StartDate).HasColumnName(nameof(PainDetail.StartDate)).IsRequired();
+                b.HasOne(x => x.Protocol).WithOne().HasForeignKey<PainDetail>(x => x.ProtocolId).IsRequired().OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x => x.PainType).WithMany().HasForeignKey(x => x.PainTypeId).IsRequired().OnDelete(DeleteBehavior.NoAction);
+
+
+            });
+
         }
 
         //builder.Entity<YourEntity>(b =>

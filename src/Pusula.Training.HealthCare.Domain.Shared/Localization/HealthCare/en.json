@@ -154,6 +154,8 @@
     "Hr": "hr",
     "Ratio": "Ratio",
     "ArbitraryUnit": "AU",
+    "Permission:PainTypes": "Pain Types",
+    "ArbitraryUnit": "AU",
     "Menu:Patient": "Patient",
     "Menu:PRM": "PRM",
     "Menu:ProtocolLists": "Protocol List"

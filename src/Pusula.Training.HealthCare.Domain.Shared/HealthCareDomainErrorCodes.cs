@@ -30,6 +30,8 @@ public static class HealthCareDomainErrorCodes
 
     public const string DiagnosisGroupAlreadyExist = "Böyle bir tanı grubu zaten mevcut";
     public const string DiagnosisAlreadyExist = "Böyle bir tanı zaten mevcut";
+    public const string PainTypeAlreadyExist = "Böyle bir Ağrı tipi zaten mevcut";
+
 
     public const string DoctorScheduleConflict = "Bu tarih aralığı başka bir randevu ile çakışmaktadır.";
     public const string DoctorRules = "Doktor için Yaş ve Cinsiyet Kısıtlmasına Uyulmamaktadır.";

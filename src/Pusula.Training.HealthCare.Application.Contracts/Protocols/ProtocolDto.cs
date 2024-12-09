@@ -1,3 +1,4 @@
+using Pusula.Training.HealthCare.Patients;
 using System;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Application.Dtos;
@@ -22,6 +23,18 @@ namespace Pusula.Training.HealthCare.Protocols
         public virtual Guid ProtocolInsuranceId { get; set; }
         [Required]
         public virtual Guid PatientId { get; set; }
+
+        public  string PatientFirstName { get; set; }
+        public string PatientLastName { get; set; }
+
+        public string PatientNo { get; set; }
+
+        public Gender PatientGender { get; set; }
+
+        public DateTime PatientBirthDate { get; set; }
+
+
+
         [Required]
         public virtual Guid DepartmentId { get; set; }
         [Required]
