@@ -1,0 +1,108 @@
+﻿@page "/appointmentReport"
+@using Syncfusion.Blazor.PivotView
+@using Pusula.Training.HealthCare.Appointments
+@using Pusula.Training.HealthCare.Patients
+@using Pusula.Training.HealthCare.Departments
+@using Pusula.Training.HealthCare.Doctors
+
+@inject IAppointmentsAppService AppointmentsAppService
+@inject IDepartmentsAppService DepartmentsAppService
+@inject IDoctorsAppService DoctorsAppService
+@inject IPatientsAppService PatientsAppService
+<div class="control-section">
+    <div class="date-filters" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+        <SfDatePicker TValue="DateTime?" Placeholder="Başlangıç Tarihi" @bind-Value="StartDate"></SfDatePicker>
+        <SfDatePicker TValue="DateTime?" Placeholder="Bitiş Tarihi" @bind-Value="EndDate"></SfDatePicker>
+        <SfButton CssClass="e-primary" OnClick="LoadFilteredData">Filtrele</SfButton>
+    </div>
+    <div class="content-wrapper">
+        <div style="text-align: right; margin-bottom: 10px;">
+            <SfButton CssClass="e-primary" IsPrimary="true" OnClick="@ExportToExcel">Export to Excel</SfButton>
+        </div>
+        <SfPivotView TValue="AppointmentPivotData" @ref="Pivot" Height="400" Width="100%" AllowExcelExport="true" ShowFieldList="true" EnableValueSorting=true ExpandAll="false">
+            <PivotViewDataSourceSettings DataSource="@PivotData" EnableSorting="true">
+                <PivotViewColumns>
+                    <PivotViewColumn Name="AppointmentStatus" Caption="Randevu Durumu"></PivotViewColumn>
+                </PivotViewColumns>
+                <PivotViewRows>
+                    <PivotViewRow Name="DepartmentName" Caption="Departman"></PivotViewRow>
+                    <PivotViewRow Name="DoctorName" Caption="Doktor"></PivotViewRow>
+                </PivotViewRows>
+                <PivotViewValues>
+                    <PivotViewValue Name="AppointmentCount" Caption="Randevu Sayısı" ></PivotViewValue>
+                </PivotViewValues>
+            </PivotViewDataSourceSettings>
+            <PivotViewPageSettings ColumnPageSize="100" RowPageSize="100"></PivotViewPageSettings> <!-- Sayfa başına daha fazla veri -->
+            <PivotViewGridSettings ColumnWidth="120"></PivotViewGridSettings>
+        </SfPivotView>
+    </div>
+</div>
+<style>
+    .e-pivotview {
+        min-height: 200px;
+    }
+
+    html, body {
+        height: 100%;
+    }
+</style>
+@code {
+    SfPivotView<AppointmentPivotData> Pivot;
+    public List<AppointmentPivotData> PivotData { get; set; }
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+    private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
+    private int CurrentPage { get; set; } = 1;
+    private string CurrentSorting { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+    private async Task LoadDataAsync()
+    {
+        /*var input = new GetAppointmentsInput
+                {
+                StartDate = DateTime.Now.AddMonths(-1),
+                EndDate = DateTime.Now
+            };*/
+
+        var input = new GetAppointmentsInput
+            {
+                StartDate = StartDate,
+                EndDate = EndDate,
+                MaxResultCount = 100,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
+        var appointments = await AppointmentsAppService.GetListAsync(input);
+
+        // Randevu verilerini Pivot View için uygun formata dönüştür
+        PivotData = appointments.Items.Select(item => new AppointmentPivotData
+            {
+                DepartmentName = item.Department.Name,
+                DoctorName = $"{item.Doctor?.TitleName} {item.Doctor?.Name} {item.Doctor?.SurName}",
+                AppointmentStatus = item.Appointment.AppointmentStatus.ToString(),
+                AppointmentCount = 1 // Her kayıt bir randevu olarak sayılır
+            }).ToList();
+    }
+    public async Task LoadFilteredData()
+    {
+        await LoadDataAsync();
+    }
+    public async Task ExportToExcel(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
+    {
+        if (Pivot != null)
+        {
+            await Pivot.ExportToExcelAsync();
+        }
+    }
+    // Pivot View için veri modeli
+    public class AppointmentPivotData
+    {
+        public string DepartmentName { get; set; }
+        public string DoctorName { get; set; }
+        public string AppointmentStatus { get; set; }
+        public int AppointmentCount { get; set; }
+    }
+}

@@ -219,8 +219,66 @@ public class HealthCareMenuContributor : IMenuContributor
         #endregion
 
         context.Menu.AddItem(patientMenu);
+
+        #region Appointments Tabs
+        // Randevu başlığı ve alt menüleri
+        var appoinmentMenu = new ApplicationMenuItem(
+            HealthCareMenus.Appointment,
+            l["Menu:Appointment"],
+            icon: "fa fa-calendar-check"
+        );
+
+        appoinmentMenu.AddItem(new ApplicationMenuItem(
+            HealthCareMenus.AppointmentDefinitions,
+            l["Menu:Definitions"],
+            icon: "fa fa-sliders-h"
+        ).AddItem(new ApplicationMenuItem(
+            HealthCareMenus.AppointmentType,
+            l["Menu:AppointmentType"],
+            "/appointment-types",
+            icon: "fa fa-list-ul"
+        )).AddItem(new ApplicationMenuItem(
+            HealthCareMenus.AppointmentRule,
+            l["Menu:AppointmentRule"],
+            "/appointmentRule",
+            icon: "fa fa-list-ul"
+        )));
+
+        appoinmentMenu.AddItem(new ApplicationMenuItem(
+            HealthCareMenus.AppointmentOperations,
+            l["Menu:Operations"],
+            icon: "fa fa-clipboard-list"
+        ).AddItem(new ApplicationMenuItem(
+            HealthCareMenus.AppoinmentSchedule,
+            l["Menu:AppointmentSchedule"],
+            url:"/appointment",
+            icon: "fa fa-calendar-alt"
+        )));
+
+        appoinmentMenu.AddItem(
+        new ApplicationMenuItem(
+                HealthCareMenus.AppointmentReports,
+                l["Menu:Reports"],
+                icon: "fa fa-chart-line"
+        ).AddItem(
+            new ApplicationMenuItem(
+                HealthCareMenus.Appointments,
+                l["Menu:AppointmentList"],
+                url: "/appointmentslist",
+                icon: "fa fa-list-alt"
+                )
+        ).AddItem(
+            new ApplicationMenuItem(
+                HealthCareMenus.AppointmentReport,
+                l["Menu:AppointmentReport"],
+                url: "/appointmentReport",
+                icon: "fa fa-file-alt"
+               ) ));
+        
+        #endregion
         context.Menu.AddItem(treatmentMenu);
         context.Menu.AddItem(labMenu);
+        context.Menu.AddItem(appoinmentMenu);
 
         return Task.CompletedTask;
     }
