@@ -134,7 +134,9 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
             .Include(pr => pr.Patient)
             .Include(pr => pr.Department)
             .Include(pr => pr.Doctor)
-                .ThenInclude(pr => pr.User);
+                .ThenInclude(pr => pr.User)
+            .Include(pr => pr.Doctor)
+                .ThenInclude(pr => pr.Title);
     }
 
     protected virtual IQueryable<Protocol> ApplyFilter(
