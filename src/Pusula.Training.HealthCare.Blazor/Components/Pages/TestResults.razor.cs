@@ -46,6 +46,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 }
             }
         }
+
         private async Task OnPrintClick()
         {
             if (TestProcessesGrid != null)

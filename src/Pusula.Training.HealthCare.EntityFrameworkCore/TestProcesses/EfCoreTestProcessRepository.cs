@@ -28,9 +28,10 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
         string? doctorSurname = null,
         string? patientName = null,
         string? patientSurname = null,
+        int? protocolNo = null,
         CancellationToken cancellationToken = default)
     {
-        var query = ApplyFilter((await GetDbSetAsync()), filterText, labRequestId, testGroupItemId, status, result, resultDate, doctorName, doctorSurname, patientName, patientSurname);
+        var query = ApplyFilter((await GetDbSetAsync()), filterText, labRequestId, testGroupItemId, status, result, resultDate, doctorName, doctorSurname, patientName, patientSurname, protocolNo);
         return await query.LongCountAsync(GetCancellationToken(cancellationToken));
     }
 
@@ -45,12 +46,13 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
         string? doctorSurname = null,
         string? patientName = null,
         string? patientSurname = null,
+        int? protocolNo = null,
         string? sorting = null,
         int maxResultCount = int.MaxValue,
         int skipCount = 0,
         CancellationToken cancellationToken = default)
     {
-        var query = ApplyFilter((await GetQueryableAsync()), filterText, labRequestId, testGroupItemId, status, result, resultDate, doctorName, doctorSurname, patientName, patientSurname);
+        var query = ApplyFilter((await GetQueryableAsync()), filterText, labRequestId, testGroupItemId, status, result, resultDate, doctorName, doctorSurname, patientName, patientSurname, protocolNo);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? TestProcessConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
@@ -76,13 +78,14 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
         string? doctorSurname = null,
         string? patientName = null,
         string? patientSurname = null,
+        int? protocolNo = null,
         string? sorting = null,
         int maxResultCount = int.MaxValue,
         int skipCount = 0,
         CancellationToken cancellationToken = default)
     {
         var query = await GetQueryForNavigationPropertiesAsync();
-        query = ApplyFilter(query, filterText, labRequestId, testGroupItemId, status, result, resultDate, doctorName, doctorSurname, patientName, patientSurname);
+        query = ApplyFilter(query, filterText, labRequestId, testGroupItemId, status, result, resultDate, doctorName, doctorSurname, patientName, patientSurname, protocolNo);
         query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? TestProcessConsts.GetDefaultSorting(false) : sorting);
         return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
     }
@@ -124,7 +127,8 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
         string? doctorName = null,
         string? doctorSurname = null,
         string? patientName = null,
-        string? patientSurname = null
+        string? patientSurname = null,
+        int? protocolNo = null
     )
     {
         return query
@@ -132,7 +136,9 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
                (e.LabRequest.Doctor.User.Name!.Contains(filterText!)) ||
                (e.LabRequest.Doctor.User.Surname!.Contains(filterText!)) ||
                (e.LabRequest.Protocol.Patient.FirstName!.Contains(filterText!)) ||
-               (e.LabRequest.Protocol.Patient.LastName!.Contains(filterText!))
+               (e.LabRequest.Protocol.Patient.LastName!.Contains(filterText!)) ||
+               (e.LabRequest.Protocol.No!.ToString().Contains(filterText!))
+
            )
           .WhereIf(labRequestId.HasValue && labRequestId != Guid.Empty, e => e.LabRequestId == labRequestId!.Value)
             .WhereIf(testGroupItemId.HasValue && testGroupItemId != Guid.Empty, e => e.TestGroupItemId == testGroupItemId!.Value)
@@ -142,7 +148,8 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
             .WhereIf(!string.IsNullOrWhiteSpace(doctorName), e => e.LabRequest.Doctor != null && e.LabRequest.Doctor.User.Name != null && e.LabRequest.Doctor.User.Name.Contains(doctorName!))
             .WhereIf(!string.IsNullOrWhiteSpace(doctorSurname), e => e.LabRequest.Doctor != null && e.LabRequest.Doctor.User.Surname != null && e.LabRequest.Doctor.User.Surname.Contains(doctorSurname!))
             .WhereIf(!string.IsNullOrWhiteSpace(patientName), e => e.LabRequest.Protocol != null && e.LabRequest.Protocol.Patient != null && e.LabRequest.Protocol.Patient.FirstName != null && e.LabRequest.Protocol.Patient.FirstName.Contains(patientName!))
-            .WhereIf(!string.IsNullOrWhiteSpace(patientSurname), e => e.LabRequest.Protocol != null && e.LabRequest.Protocol.Patient != null && e.LabRequest.Protocol.Patient.LastName != null && e.LabRequest.Protocol.Patient.LastName.Contains(patientSurname!));
+            .WhereIf(!string.IsNullOrWhiteSpace(patientSurname), e => e.LabRequest.Protocol != null && e.LabRequest.Protocol.Patient != null && e.LabRequest.Protocol.Patient.LastName != null && e.LabRequest.Protocol.Patient.LastName.Contains(patientSurname!))
+            .WhereIf(protocolNo.HasValue, e => e.LabRequest.Protocol.No == protocolNo!.Value);
     }
 
 

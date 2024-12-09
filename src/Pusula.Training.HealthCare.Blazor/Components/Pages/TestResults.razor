@@ -24,15 +24,8 @@
 <SfGrid @ref="TestProcessesGrid" DataSource="@TestResultsList" AllowPaging="false" AllowSorting="true" Height="700px">
     <GridEvents TValue="TestProcessDto" RowDataBound="RowBound"></GridEvents>
     <GridColumns>
-        <GridColumn HeaderText="Doktor Ad-Soyad" Width="200" TextAlign="TextAlign.Center">
-            <Template Context="context">
-                @if (context is TestProcessDto testProcess)
-                {
-                    @($"{testProcess.DoctorName} {testProcess.DoctorSurname}")
-                }
-            </Template>
-        </GridColumn>    
-        <GridColumn HeaderText="Hasta Ad-Soyad" Width="200" TextAlign="TextAlign.Center">
+        <GridColumn Field=@nameof(TestProcessDto.ProtocolNo) Width="100%" HeaderText="Protokol No" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn HeaderText="Hasta Ad-Soyad" Width="100%" TextAlign="TextAlign.Center">
             <Template Context="context">
                 @if (context is TestProcessDto testProcess)
                 {
@@ -40,7 +33,15 @@
                 }
             </Template>
         </GridColumn>
-        <GridColumn HeaderText="Test Adı" Width="200" TextAlign="TextAlign.Center">
+        <GridColumn HeaderText="Doktor Ad-Soyad" Width="100%" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is TestProcessDto testProcess)
+                {
+                    @($"{testProcess.DoctorName} {testProcess.DoctorSurname}")
+                }
+            </Template>
+        </GridColumn>    
+        <GridColumn HeaderText="Test Adı" Width="100%" TextAlign="TextAlign.Center">
             <Template Context="context">
                 @if (context is TestProcessDto testProcess)
                 {
@@ -48,7 +49,7 @@
                 }
             </Template>
         </GridColumn>
-        <GridColumn HeaderText="Min-Max Değer" Width="200" TextAlign="TextAlign.Center">
+        <GridColumn HeaderText="Min-Max Değer" Width="100%" TextAlign="TextAlign.Center">
             <Template Context="context">
                 @if (context is TestProcessDto testProcess)
                 {
@@ -56,8 +57,18 @@
                 }
             </Template>
         </GridColumn>      
-        <GridColumn Field=@nameof(TestProcessDto.Result) Width="100" HeaderText="Değer" TextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn Field=@nameof(TestProcessDto.TestUnit) Width="100" HeaderText="Değer" TextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn Field=@nameof(TestProcessDto.ResultDate) HeaderText="Result Date" Width="200" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(TestProcessDto.Result) Width="100%" HeaderText="Değer" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(TestProcessDto.TestUnit) Width="100%" HeaderText="" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(TestProcessDto.ResultDate) HeaderText="Result Date" Width="100%" TextAlign="TextAlign.Center"></GridColumn>
     </GridColumns>
 </SfGrid>
+
+<style>
+    .bg-success {
+        background-color: #639833 !important;
+    }
+
+    .bg-danger {
+        background-color: #A33B3B !important;
+    }
+</style>

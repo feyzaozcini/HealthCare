@@ -90,7 +90,8 @@ public class TestProcessesAppService(
             input.DoctorName,
             input.DoctorSurname,
             input.PatientName,
-            input.PatientSurname
+            input.PatientSurname,
+            input.ProtocolNo
             );
 
         var items = await testProcessRepository.GetListAsync(
@@ -104,6 +105,7 @@ public class TestProcessesAppService(
             input.DoctorSurname,
             input.PatientName,
             input.PatientSurname,
+            input.ProtocolNo,
             input.Sorting,
             input.MaxResultCount,
             input.SkipCount
@@ -128,7 +130,8 @@ public class TestProcessesAppService(
             input.DoctorName,
             input.DoctorSurname,
             input.PatientName,
-            input.PatientSurname
+            input.PatientSurname,
+            input.ProtocolNo
             );
 
         var items = await testProcessRepository.GetListWithNavigationPropertiesAsync(
@@ -142,6 +145,7 @@ public class TestProcessesAppService(
             input.DoctorSurname,
             input.PatientName,
             input.PatientSurname,
+            input.ProtocolNo,
             input.Sorting,
             input.MaxResultCount,
             input.SkipCount
@@ -152,6 +156,44 @@ public class TestProcessesAppService(
             TotalCount = totalCount,
             Items = ObjectMapper.Map<List<TestProcess>, List<TestProcessDto>>(items)
         };
+    }
+
+    //Tetkik İstem Test Sayısı Raporlama
+    public async Task<List<TestCountDto>> GetTestCountsAsync()
+    {
+        var testProcesses = await testProcessRepository
+        .GetListWithNavigationPropertiesAsync();
+
+        var testCounts = testProcesses
+            .Where(tp => tp.TestGroupItem != null) 
+            .GroupBy(tp => tp.TestGroupItem.Name)
+            .Select(group => new TestCountDto
+            {
+                TestName = group.Key,
+                Count = group.Count()
+            })
+            .ToList();
+            
+        return testCounts;
+    }
+
+    //Tetkik İstem Test Grup Sayısı Raporlama
+    public async Task<List<TestGroupCountDto>> GetTestGroupCountsAsync()
+    {
+        var testProcesses = await testProcessRepository
+        .GetListWithNavigationPropertiesAsync();
+
+        var testCounts = testProcesses
+            .Where(tp => tp.TestGroupItem.TestGroup != null)
+            .GroupBy(tp => tp.TestGroupItem.TestGroup.Name)
+            .Select(group => new TestGroupCountDto
+            {
+                TestName = group.Key,
+                Count = group.Count()
+            })
+            .ToList();
+
+        return testCounts;
     }
 
     public async Task<TestProcessDto> GetWithNavigationPropertiesAsync(Guid id)

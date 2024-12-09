@@ -29,7 +29,9 @@ public static class TestGroupItemConsts
     public const int MinTurnaroundTime = 1; 
     public const int MaxTurnaroundTime = 365 * 24; // Maksimum 1 yıl (8760 saat)
 
-    public const string TestGroupItemDeletedMessage = "Test silindi.";
+    public const string TestGroupItemDeletedMessage = "Test başarıyla silindi.";
+    public const string TestSuccessfullyUpdated = "Test başarıyla güncellendi.";
+    public const string TestSuccessfullyCreated = "Test başarıyla oluşturuldu.";
 
 }
 

@@ -12,6 +12,8 @@ public interface ITestProcessesAppService : IApplicationService
     Task<PagedResultDto<TestProcessDto>> GetListAsync(GetTestProcessesInput input);
     Task<PagedResultDto<TestProcessDto>> GetListWithNavigationPropertiesAsync(GetTestProcessesInput input);
     Task<List<TestProcessDto>> GetByLabRequestIdAsync(Guid labRequestId);
+    Task<List<TestCountDto>> GetTestCountsAsync();
+    Task<List<TestGroupCountDto>> GetTestGroupCountsAsync();
     Task<TestProcessDto> GetWithNavigationPropertiesAsync(Guid id);
     Task<TestProcessDto> GetAsync(Guid id);
     Task<TestProcessesDeletedDto> DeleteAsync(Guid id);

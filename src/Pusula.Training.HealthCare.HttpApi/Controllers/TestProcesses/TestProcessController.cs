@@ -45,6 +45,14 @@ public class TestProcessController(ITestProcessesAppService testProcessesAppServ
     public Task<PagedResultDto<TestProcessDto>> GetListWithNavigationPropertiesAsync(GetTestProcessesInput input) => testProcessesAppService.GetListWithNavigationPropertiesAsync(input);
 
     [HttpGet]
+    [Route("get-test-count")]
+    public Task<List<TestCountDto>> GetTestCountsAsync() => testProcessesAppService.GetTestCountsAsync();
+
+    [HttpGet]
+    [Route("get-test-group-count")]
+    public Task<List<TestGroupCountDto>> GetTestGroupCountsAsync() => testProcessesAppService.GetTestGroupCountsAsync();
+
+    [HttpGet]
     [Route("get-with-navigation-properties")]
     public Task<TestProcessDto> GetWithNavigationPropertiesAsync(Guid id) => testProcessesAppService.GetWithNavigationPropertiesAsync(id);
 

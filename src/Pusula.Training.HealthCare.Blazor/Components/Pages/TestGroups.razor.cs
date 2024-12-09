@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Components.Forms;
 using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.TestGroupItems;
 using Pusula.Training.HealthCare.TestGroups;
-using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
 using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Popups;
@@ -226,7 +224,6 @@ public partial class TestGroups
     #endregion
 
     #region Save Changes
-    //Deðiþiklikleri Kaydetme
     private async Task UpdateTestGroupItem()
     {
         await HandleError(async () =>
@@ -234,7 +231,7 @@ public partial class TestGroups
             await TestGroupItemsAppService.UpdateAsync(UpdateTestGroupItemsDto);
             await CloseTestGroupItemUpdateModal();
             await GetTestGroupItemsAsync();
-            await ShowToast("Test baþarýyla güncellendi.", true);
+            await ShowToast(TestGroupItemConsts.TestSuccessfullyUpdated, true);
         });
     }
     private async Task UpdateTestGroup()
@@ -244,7 +241,7 @@ public partial class TestGroups
             await TestGroupsAppService.UpdateAsync(UpdateTestGroupsDto);
             await GetTestGroupsAsync();
             await CloseTestGroupUpdateModal();
-            await ShowToast("Test Grubu baþarýyla güncellendi.", true);
+            await ShowToast(TestGroupConsts.TestGroupSuccessfullyUpdated, true);
         });
     }
     private async Task AddTestGroupItem()
@@ -255,7 +252,7 @@ public partial class TestGroups
             await LoadTestGroupItemsAsync();
             await CloseTestGroupItemCreateModal();
             await GetTestGroupItemsAsync(); 
-            await ShowToast("Test baþarýyla eklendi.", true);
+            await ShowToast(TestGroupItemConsts.TestSuccessfullyCreated, true);
         });
     }
     private async Task AddTestGroup()
@@ -268,7 +265,7 @@ public partial class TestGroups
             StateHasChanged();
             await CloseTestGroupCreateModal();
             await GetTestGroupsAsync();
-            await ShowToast("Test Grubu baþarýyla eklendi.", true);
+            await ShowToast(TestGroupConsts.TestGroupSuccessfullyCreated, true);
         });
     }
     private async Task ConfirmTestGroupItemDelete()
@@ -281,7 +278,7 @@ public partial class TestGroups
                 await GetTestGroupItemsAsync();
             }
             await CloseTestGroupItemDeleteModal();
-            await ShowToast("Test baþarýyla silindi.", true);
+            await ShowToast(TestGroupItemConsts.TestGroupItemDeletedMessage, true);
         });
     }
     private async Task ConfirmTestGroupDelete()
@@ -297,14 +294,13 @@ public partial class TestGroups
                 StateHasChanged();
             }
             await CloseTestGroupDeleteModal();
-            await ShowToast("Test Grubu baþarýyla silindi.", true);
+            await ShowToast(TestGroupConsts.TestGroupDeletedMessage, true);
         });
     }
 
     #endregion
 
     #region Search
-    //Search
     private async Task SearchAsync(InputEventArgs args)
     {
         CurrentPage = 1;
@@ -326,7 +322,6 @@ public partial class TestGroups
     }
 
     #endregion
-
 
     #region Toast & Exception Controls
 

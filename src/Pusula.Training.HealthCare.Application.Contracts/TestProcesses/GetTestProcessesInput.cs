@@ -21,6 +21,7 @@ public class GetTestProcessesInput : PagedAndSortedResultRequestDto
     public string? DoctorSurname { get; set; }
     public string? PatientName { get; set; } = null!;
     public string? PatientSurname { get; set; } = null!;
+    public int? ProtocolNo { get; set; } = null!;
 
     //Test
     public string? TestGroupItemName { get; set; }

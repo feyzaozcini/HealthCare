@@ -21,25 +21,24 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages;
 public partial class LabTestRequest
 {
     private List<TestGroupItemDto> TestGroupItemsList { get; set; } = new List<TestGroupItemDto>();
-    private GetTestGroupItemsInput? TestGroupItemsFilter { get; set; }
+    private List<TestGroupDto> TestGroupsList { get; set; } = new List<TestGroupDto>();
+    private List<TestProcessDto> TestProcessesList = new();
     private List<TestProcessDto> ApprovedTestProcesses { get; set; } = new();
-
+    //private List<TestProcessesCreateDto> CreatedTestProcesses { get; set; } = new();
     private IReadOnlyList<LookupDto<Guid>> TestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
+    private GetTestGroupItemsInput? TestGroupItemsFilter { get; set; }
     private GetTestGroupsInput? TestGroupsFilter { get; set; }
     private GetTestProcessesInput? TestProcessesFilter { get; set; }
 
-    private List<TestGroupDto> TestGroupsList { get; set; } = new List<TestGroupDto>();
-    private List<TestProcessesCreateDto> CreatedTestProcesses { get; set; } = new();
-    private List<TestProcessDto> TestProcessesList = new();
-    private LabRequestDto? LabRequest { get; set; }
-    private string SelectedDescription = string.Empty;
+    //private LabRequestDto? LabRequest { get; set; }
     private SfGrid<TestProcessDto>? TestProcessesGrid;
     private SfGrid<TestProcessDto>? TestResultsGrid;
     private List<TestProcessDto> CompletedTestProcesses { get; set; } = new();
     private Guid? SelectedTestGroupId { get; set; } = null;
+    private string? SelectedDescription { get; set; } = string.Empty;
     private Guid? SelectedTestProcessId { get; set; } = null;
+
     private SfToast? ToastObj;
-    private string ErrorMessage = string.Empty;
 
     private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
     private int CurrentPage { get; set; } = 1;
@@ -52,7 +51,6 @@ public partial class LabTestRequest
     private SfDialog? DescriptionDialog;
     private bool _isInitialized = false;
 
-    private DateTime[] FilterByDateRange = { DateTime.Today, DateTime.Today.AddDays(30) };
 
     protected override async Task OnInitializedAsync()
     {
@@ -111,6 +109,7 @@ public partial class LabTestRequest
             };
 
             await TestProcessesAppService.CreateAsync(newTestProcess);
+ 
             var labRequest = await LabRequestsAppService.GetAsync(LabRequestService.SelectedLabRequest.Id);
             if (labRequest.Status == RequestStatusEnum.Completed)
             {
@@ -134,7 +133,7 @@ public partial class LabTestRequest
                 await TestProcessesGrid.Refresh();
             }
 
-            await ShowToast("Test baþarýyla eklendi.", true);
+            await ShowToast(TestGroupItemConsts.TestSuccessfullyCreated, true);
         });
     }
 
@@ -149,7 +148,7 @@ public partial class LabTestRequest
                 StateHasChanged();
             }
             await CloseTestProcessDeleteModal();
-            await ShowToast("Test baþarýyla silindi.", true);
+            await ShowToast(TestGroupItemConsts.TestGroupItemDeletedMessage, true);
         });
     }
     #endregion
@@ -162,8 +161,6 @@ public partial class LabTestRequest
 
         ApprovedTestProcesses = allTestProcesses.Where(tp => tp.Status == TestProcessStates.Approved).ToList();
     }
-
-
 
     private async Task LoadTestProcessesAsync()
     {
@@ -263,23 +260,6 @@ public partial class LabTestRequest
         });
 
         TestGroupItemsList = result.Items.ToList();
-    }
-
-    private async Task SearchTestProcesses(InputEventArgs args)
-    {
-        TestProcessesFilter!.FilterText = args.Value;
-        await LoadTestProcessesAsync();
-    }
-
-    private void DecreaseMonth()
-    {
-        FilterByDateRange[0] = FilterByDateRange[0].AddMonths(-1);
-        FilterByDateRange[1] = FilterByDateRange[1].AddMonths(-1);
-    }
-    private void IncreaseMonth()
-    {
-        FilterByDateRange[0] = FilterByDateRange[0].AddMonths(1);
-        FilterByDateRange[1] = FilterByDateRange[1].AddMonths(1);
     }
 
     #endregion

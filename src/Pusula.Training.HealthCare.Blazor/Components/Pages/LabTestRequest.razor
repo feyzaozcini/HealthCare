@@ -26,7 +26,6 @@ else
     <div class="w-100 mb-1 border-bottom shadow">
         <SfToolbar CssClass="e-fill e-flat">
             <ToolbarItems>
-                <!-- Ortadaki Metin -->
                 <ToolbarItem Align="ItemAlign.Center">
                     <Template>
                         <div class="d-flex align-items-center">
@@ -36,7 +35,6 @@ else
                         </div>
                     </Template>
                 </ToolbarItem>
-                <!-- Sağa Yaslanan Buton -->
                 <ToolbarItem Align="ItemAlign.Right">
                     <Template>
                         <SfButton CssClass="e-flat e-small e-icon-left" IconCss="e-icons e-clock" Content="İstem Tarihçesi" OnClick="OpenHistoryModal"></SfButton>
@@ -84,7 +82,7 @@ else
             </SfGrid>
         </div>
 
-        <!-- Sağ: Tabs -->
+        @*Sağ*@
         <div class="col-10">
             <SfGrid DataSource="@TestGroupItemsList" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
                 <GridColumns>
@@ -99,7 +97,7 @@ else
                             }
                         </Template>
                     </GridColumn>
-                    <GridColumn HeaderText="Test Adı - Kodu" Width="40%" TextAlign="TextAlign.Left">
+                    <GridColumn HeaderText="Test Adı - Kodu" TextAlign="TextAlign.Left">
                         <Template>
                             @if (context is TestGroupItemDto testGroupItem)
                             {
@@ -107,8 +105,8 @@ else
                             }
                         </Template>
                     </GridColumn>
-                    <GridColumn Field="@nameof(TestGroupItem.TestType)" HeaderText="Test Tipi" Width="30%" TextAlign="TextAlign.Center"></GridColumn>
-                    <GridColumn HeaderText="Açıklama" Width="20%" TextAlign="TextAlign.Center">
+                    <GridColumn Field="@nameof(TestGroupItem.TestType)" HeaderText="Test Tipi" TextAlign="TextAlign.Center"></GridColumn>
+                    <GridColumn HeaderText="Açıklama" TextAlign="TextAlign.Center">
                         <Template>
                             @if (context is TestGroupItemDto testGroupItem)
                             {
@@ -144,34 +142,33 @@ else
     @*Requests List*@
     <SfGrid @ref="TestProcessesGrid" DataSource="@TestProcessesList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="300px" PrintMode="PrintMode.AllPages">
         <GridColumns>
-            <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
-                <Template Context="context">
-                    @if (context is TestProcessDto testProcess)
-                    {
-                        <span>@testProcess.DoctorName @testProcess.DoctorSurname</span>
-                    }
-                </Template>
-            </GridColumn>
-            <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)"
-                        HeaderText="İstenen Test"
-                        Width="25"
-                        TextAlign="TextAlign.Center">
-            </GridColumn>
-            <GridColumn Field="@nameof(TestProcessDto.Status)"
-                        HeaderText="İşlem Durumu"
-                        Width="15"
-                        TextAlign="TextAlign.Center">
-            </GridColumn>
-            <GridColumn HeaderText="Actions" Width="5" TextAlign="TextAlign.Center">
-                <Template>
-                    @if (context is TestProcessDto testProcess)
-                    {
-                        <div class="d-flex justify-content-center">
-                            <SfButton CssClass="e-small e-danger" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(testProcess.Id))"></SfButton>
-                        </div>
-                    }
-                </Template>
-            </GridColumn>
+            <GridColumn Field="@nameof(TestProcessDto.CreationTime)" HeaderText="İstem Tarihi" TextAlign="TextAlign.Center"></GridColumn>
+            <GridColumn HeaderText="İsteyen Doktor" TextAlign="TextAlign.Center">
+                    <Template Context="context">
+                        @if (context is TestProcessDto testProcess)
+                        {
+                            <span>@testProcess.DoctorName @testProcess.DoctorSurname</span>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)"
+                            HeaderText="İstenen Test"
+                            TextAlign="TextAlign.Center">
+                </GridColumn>
+                <GridColumn Field="@nameof(TestProcessDto.Status)"
+                            HeaderText="İşlem Durumu"
+                            TextAlign="TextAlign.Center">
+                </GridColumn>
+                <GridColumn HeaderText="" TextAlign="TextAlign.Right">
+                    <Template>
+                        @if (context is TestProcessDto testProcess)
+                        {
+                            <div class="d-flex justify-content-center">
+                                <SfButton CssClass="e-small e-danger" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(testProcess.Id))"></SfButton>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
         </GridColumns>
     </SfGrid>
 
