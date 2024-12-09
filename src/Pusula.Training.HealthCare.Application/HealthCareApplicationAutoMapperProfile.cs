@@ -60,19 +60,22 @@ public class HealthCareApplicationAutoMapperProfile : Profile
 
 
         CreateMap<Protocol, ProtocolDto>()
+        .ForMember(dest => dest.ProtocolTypeName, opt => opt.MapFrom(x => x.ProtocolType.Name))
+        .ForMember(dest => dest.ProtocolInsuranceName, opt => opt.MapFrom(x => x.Insurance.Name))
+        .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(x => x.Department.Name))
+        .ForMember(dest => dest.No, opt => opt.MapFrom(x => x.No))
         .ForMember(dest => dest.PatientFirstName, opt => opt.MapFrom(x => x.Patient.FirstName))
         .ForMember(dest => dest.PatientLastName, opt => opt.MapFrom(x => x.Patient.LastName))
         .ForMember(dest => dest.PatientNo, opt => opt.MapFrom(x => x.Patient.No))
         .ForMember(dest => dest.PatientBirthDate, opt => opt.MapFrom(x => x.Patient.BirthDate))
-        .ForMember(dest => dest.PatientGender, opt => opt.MapFrom(x => x.Patient.Gender));
-
-
-
-
-
+        .ForMember(dest => dest.PatientGender, opt => opt.MapFrom(x => x.Patient.Gender))
+        .ForMember(dest => dest.DoctorTitleName, opt => opt.MapFrom(x => x.Doctor.Title.Name))
+        .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(x => x.Doctor.User.Name))
+        .ForMember(dest => dest.DoctorSurname, opt => opt.MapFrom(x => x.Doctor.User.Surname));
 
         CreateMap<ProtocolDto, ProtocolUpdateDto>();
         CreateMap<ProtocolWithNavigationProperties, ProtocolWithNavigationPropertiesDto>();
+
 
         CreateMap<Department, DepartmentDto>();
         CreateMap<Department, DepartmentExcelDto>();

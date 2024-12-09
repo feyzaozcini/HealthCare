@@ -1,0 +1,105 @@
+﻿@page "/patient-protocol-lists"
+@using Pusula.Training.HealthCare.Blazor.Containers
+@using Pusula.Training.HealthCare.Protocols
+
+@inject NavigationManager NavigationManager
+@inject PatientStateContainer StateService
+@inject IProtocolsAppService ProtocolAppService
+
+<div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+    <div class="flex-grow-1 d-flex justify-content-center">
+        <SfTextBox Placeholder="Protokol Ara"
+                   FloatLabelType="FloatLabelType.Never"
+                   @bind-Value="ProtocolsFilter!.FilterText"
+                   Width="50%"
+                   Input="OnInputChange">
+        </SfTextBox>
+    </div>
+</div>
+
+@* ************************* PROTOCOL LIST MODAL ************************* *@
+
+<SfGrid DataSource="@ProtocolsList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
+    <GridColumns>
+
+        <GridColumn Field=@nameof(ProtocolDto.PatientNo) HeaderText="Patient No" Width="7"></GridColumn>
+        <GridColumn Field=@nameof(ProtocolDto.No) HeaderText="Protocol No" Width="7"></GridColumn>
+
+        <GridColumn HeaderText="Patient" Width="10" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is ProtocolDto protocol)
+                {
+                    <span>@protocol.PatientFirstName @protocol.PatientLastName</span>
+                }
+            </Template>
+        </GridColumn>
+
+        <GridColumn HeaderText="Department" Width="8" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is ProtocolDto protocol)
+                {
+                    <span>@protocol.DepartmentName</span>
+                }
+            </Template>
+        </GridColumn>
+
+        <GridColumn HeaderText="Doctor" Width="12" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is ProtocolDto protocol)
+                {
+                    <span>@protocol.DoctorTitleName @protocol.DoctorName @protocol.DoctorSurname</span>
+                }
+            </Template>
+        </GridColumn>
+
+        <GridColumn HeaderText="Protocol Type" Width="12" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is ProtocolDto protocol)
+                {
+                    <span>@protocol.ProtocolTypeName</span>
+                }
+            </Template>
+        </GridColumn>
+
+        <GridColumn HeaderText="Insurance" Width="12" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is ProtocolDto protocol)
+                {
+                    <span>@protocol.ProtocolInsuranceName</span>
+                }
+            </Template>
+        </GridColumn>
+
+        <GridColumn Field=@nameof(ProtocolDto.ProtocolStatus) HeaderText="Status" Width="7" TextAlign="TextAlign.Center"></GridColumn>
+
+        <GridColumn HeaderText="Note" Width="5" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is ProtocolDto protocol)
+                {
+                    <SfButton CssClass="e-small e-link"
+                              OnClick="(() => OpenNoteModal(protocol.NoteText))"
+                              Style="@(string.IsNullOrEmpty(protocol.NoteText) ? "display:none;" : "")">
+                        <i class="fa-regular fa-file"></i>
+                    </SfButton>
+                }
+            </Template>
+        </GridColumn>
+
+        <GridColumn Field=@nameof(ProtocolDto.StartTime) HeaderText="Start Time" Width="10" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(ProtocolDto.EndTime) HeaderText="End Time" Width="10" TextAlign="TextAlign.Center"></GridColumn>
+        
+    </GridColumns>
+</SfGrid>
+
+@* ************************* NOTE LIST MODAL ************************* *@
+
+<SfDialog @ref="NoteDialog" IsModal="true" ShowCloseIcon="true" Width="400px" Header="Protocol Note" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <p>@SelectedNote</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="e-small e-secondary" Content="Close" OnClick="CloseNoteModal"></SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>

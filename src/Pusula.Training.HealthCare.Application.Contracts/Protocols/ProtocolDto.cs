@@ -16,11 +16,14 @@ namespace Pusula.Training.HealthCare.Protocols
         public ProtocolStatus ProtocolStatus { get; set; }
         [Required]
         public virtual Guid ProtocolTypeId { get; set; }
+        public string ProtocolTypeName { get; set; }
         public virtual Guid ProtocolNoteId { get; set; }
         public string NoteText { get; set; }
 
         [Required]
         public virtual Guid ProtocolInsuranceId { get; set; }
+        public string ProtocolInsuranceName { get; set; }
+
         [Required]
         public virtual Guid PatientId { get; set; }
 
@@ -32,13 +35,15 @@ namespace Pusula.Training.HealthCare.Protocols
         public Gender PatientGender { get; set; }
 
         public DateTime PatientBirthDate { get; set; }
-
-
-
         [Required]
         public virtual Guid DepartmentId { get; set; }
+        public string DepartmentName { get; set; }
+
         [Required]
         public virtual Guid DoctorId { get; set; }
+        public string DoctorTitleName { get; set; }
+        public string DoctorName { get; set; }
+        public string DoctorSurname { get; set; }
         public string ConcurrencyStamp { get; set; } = null!;
         public ProtocolDto()
         {

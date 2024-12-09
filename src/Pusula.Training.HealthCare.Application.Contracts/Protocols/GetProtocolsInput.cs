@@ -26,16 +26,16 @@ public class GetProtocolsInput : PagedAndSortedResultRequestDto
 
     public GetProtocolsInput(
         string? filterText,
-        DateTime startTime,
-        DateTime endTime,
-        int no,
-        ProtocolStatus protocolStatus,
-        Guid protocolTypeId,
-        Guid protocolNoteId,
-        Guid protocolInsuranceId,
-        Guid patientId,
-        Guid departmentId,
-        Guid doctorId,
+        DateTime? startTime,
+        DateTime? endTime,
+        int? no,
+        ProtocolStatus? protocolStatus,
+        Guid? protocolTypeId,
+        Guid? protocolNoteId,
+        Guid? protocolInsuranceId,
+        Guid? patientId,
+        Guid? departmentId,
+        Guid? doctorId,
         int currentPage,
         int pageSize)
     {

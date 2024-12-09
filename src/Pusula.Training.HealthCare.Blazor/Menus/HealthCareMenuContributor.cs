@@ -67,7 +67,7 @@ public class HealthCareMenuContributor : IMenuContributor
         var patientMenu = new ApplicationMenuItem(
             HealthCareMenus.Patient,
             l["Menu:Patient"],
-            icon: "fa fa-vials"
+            icon: "fa fa-user-injured"
         );
 
         patientMenu.AddItem(
@@ -80,7 +80,7 @@ public class HealthCareMenuContributor : IMenuContributor
                     HealthCareMenus.PatientOperationsPrm,
                     l["Menu:PRM"],
                     url: "/patients",
-                    icon: "fa fa-list"
+                    icon: "fa fa-users"
                 )
             
             ));
@@ -94,8 +94,8 @@ public class HealthCareMenuContributor : IMenuContributor
             new ApplicationMenuItem(
                 HealthCareMenus.PatientReportsProtocolList,
                 l["Menu:ProtocolLists"],
-                url: "/protocol-list",
-                icon: "fa fa-chart-pie"
+                url: "/patient-protocol-lists",
+                icon: "fa fa-file-alt"
                 )
         )
     );
