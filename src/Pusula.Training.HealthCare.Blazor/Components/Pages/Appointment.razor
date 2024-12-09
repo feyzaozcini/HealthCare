@@ -189,7 +189,7 @@
 @code {
 
     private SfSchedule<FlatAppointmentDto> SfScheduleInstance;
-    DateTime CurrentDate = new DateTime(2024, 12, 2);
+    DateTime CurrentDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
     View CurrentView = View.WorkWeek;
     Syncfusion.Blazor.Schedule.ValidationRules ValidationRules = new Syncfusion.Blazor.Schedule.ValidationRules { Required = true };
     private AppointmentUpdateDto EditAppointment { get; set; } = new AppointmentUpdateDto();
