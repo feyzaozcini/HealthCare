@@ -2377,18 +2377,7 @@ namespace Pusula.Training.HealthCare
                 doctorKeys.ElementAt(3)
             ),
 
-            new Protocol(
-                guidGenerator.Create(),
-                DateTime.UtcNow, 
-                DateTime.UtcNow.AddDays(1),
-                ProtocolStatus.Rescheduled,
-                protocolTypeKeys.ElementAt(4),
-                protocolNoteKeys.ElementAt(4),
-                protocolInsuranceKeys.ElementAt(4),
-                patientKeys.ElementAt(4),
-                departmentKeys.ElementAt(4),
-                doctorKeys.ElementAt(0)
-            ),
+            
 
             new Protocol(
                 guidGenerator.Create(),
@@ -2396,7 +2385,7 @@ namespace Pusula.Training.HealthCare
                 DateTime.UtcNow.AddDays(1),
                 ProtocolStatus.Failed,
                 protocolTypeKeys.ElementAt(5),
-                protocolNoteKeys.ElementAt(0),
+                protocolNoteKeys.ElementAt(4),
                 protocolInsuranceKeys.ElementAt(5),
                 patientKeys.ElementAt(0),
                 departmentKeys.ElementAt(1),
@@ -2409,7 +2398,7 @@ namespace Pusula.Training.HealthCare
                 DateTime.UtcNow.AddDays(1),
                 ProtocolStatus.InProgress,
                 protocolTypeKeys.ElementAt(6),
-                protocolNoteKeys.ElementAt(1),
+                protocolNoteKeys.ElementAt(5),
                 protocolInsuranceKeys.ElementAt(6),
                 patientKeys.ElementAt(1),
                 departmentKeys.ElementAt(2),
@@ -2422,37 +2411,11 @@ namespace Pusula.Training.HealthCare
                 DateTime.UtcNow.AddDays(1),
                 ProtocolStatus.NoShow,
                 protocolTypeKeys.ElementAt(7),
-                protocolNoteKeys.ElementAt(2),
+                protocolNoteKeys.ElementAt(6),
                 protocolInsuranceKeys.ElementAt(7),
                 patientKeys.ElementAt(2),
                 departmentKeys.ElementAt(3),
                 doctorKeys.ElementAt(3)
-            ),
-
-            new Protocol(
-                guidGenerator.Create(),
-                DateTime.UtcNow, 
-                DateTime.UtcNow.AddDays(1),
-                ProtocolStatus.Pending,
-                protocolTypeKeys.ElementAt(8),
-                protocolNoteKeys.ElementAt(3),
-                protocolInsuranceKeys.ElementAt(8),
-                patientKeys.ElementAt(3),
-                departmentKeys.ElementAt(4),
-                doctorKeys.ElementAt(0)
-            ),
-
-            new Protocol(
-                guidGenerator.Create(),
-                DateTime.UtcNow,
-                DateTime.UtcNow.AddDays(1),
-                ProtocolStatus.Postponed,
-                protocolTypeKeys.ElementAt(9),
-                protocolNoteKeys.ElementAt(4),
-                protocolInsuranceKeys.ElementAt(0),
-                patientKeys.ElementAt(4),
-                departmentKeys.ElementAt(0),
-                doctorKeys.ElementAt(1)
             ),
             };
             await protocolRepository.InsertManyAsync(protocols, true);
