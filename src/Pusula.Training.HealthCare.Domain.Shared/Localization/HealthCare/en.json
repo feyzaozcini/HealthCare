@@ -175,7 +175,10 @@
     "Enum:MentalState.Sad": "Sad",
     "Enum:MentalState.Agitated": "Agitated",
     "Enum:MentalState.Anxious": "Anxious",
-    "Enum:MentalState.Aggresive": "Aggresive"
-
+    "Enum:MentalState.Aggresive": "Aggresive",
+    "Menu:Treatment": "Treatment",
+    "Menu:IcdList": "Icd List",
+    "Menu:DoctorTaskList": "Doctor Task List",
+    "Menu:DiagnosisReport": "Diagnosis Report"
   }
 }

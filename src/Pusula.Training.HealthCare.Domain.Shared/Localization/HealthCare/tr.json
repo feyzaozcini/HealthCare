@@ -67,7 +67,8 @@
     "Enum:MentalState.Anxious": "Endişeli",
     "Enum:MentalState.Aggresive": "Agresif",
     "Enum:PainRhythm.Continually": "Surekli",
-    "Enum:PainRhythm.Intermittent": "Aralikli"
-
+    "Enum:PainRhythm.Intermittent": "Aralikli",
+    "Menu:Patient": "Hasta",
+    "Menu:PRM": "Vezne"
   }
 }
