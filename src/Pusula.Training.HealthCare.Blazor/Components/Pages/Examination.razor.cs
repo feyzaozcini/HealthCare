@@ -8,6 +8,7 @@ using Pusula.Training.HealthCare.FallRisks;
 using Pusula.Training.HealthCare.PainDetails;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.PhysicalExaminations;
+using Pusula.Training.HealthCare.Protocols;
 using Pusula.Training.HealthCare.PshychologicalStates;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -29,11 +30,10 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         [Parameter]
         public Guid PatientId { get; set; }
 
-
-
         private PatientDto Patient { get; set; } = new();
 
-      
+        private ProtocolDto protocolDto { get; set; } = new();
+
         protected override async Task OnInitializedAsync()
         {
             // Hasta bilgilerini çek
@@ -44,6 +44,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             await LoadPainDetailAsync();
             await LoadIcdListAsync();
             await LoadExaminationDiagnosesAsync();
+            await GetProtocolAsync();
+        }
+
+        private async Task GetProtocolAsync()
+        {
+           protocolDto = await ProtocolAppService.GetWithNavigationPropertiesAsync(ProtocolId);
+
         }
 
         private int CalculateAge(DateTime birthDate)

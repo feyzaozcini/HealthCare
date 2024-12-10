@@ -53,6 +53,21 @@
     "Min": "dakika",
     "Hr": "saat",
     "Ratio": "Oran",
-    "ArbitraryUnit": "AU"
+    "ArbitraryUnit": "AU",
+    "Gender:Unspecified": "Belirtilmemiş",
+    "Gender:Male": "Erkek",
+    "Gender:Female": "Kadın",
+    "Gender:Approved": "Diğer",
+    "DiagnosisType:Definitive": "Kesin tanı",
+    "DiagnosisType:Preliminary": "Ön tanı",
+    "DiagnosisType:Differential": "Ayırıcı tanı",
+    "Enum:MentalState.Calm": "Sakin",
+    "Enum:MentalState.Sad": "Üzgün",
+    "Enum:MentalState.Agitated": "Ajite",
+    "Enum:MentalState.Anxious": "Endişeli",
+    "Enum:MentalState.Aggresive": "Agresif",
+    "Enum:PainRhythm.Continually": "Surekli",
+    "Enum:PainRhythm.Intermittent": "Aralikli"
+
   }
 }

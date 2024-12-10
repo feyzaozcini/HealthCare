@@ -9,6 +9,7 @@
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Calendars
 @using Pusula.Training.HealthCare.Blazor.Containers
+@using Microsoft.Extensions.Localization
 @inject DoctorStateContainer DoctorStateService
 @inject IProtocolsAppService ProtocolsAppService
 @inject NavigationManager NavigationManager
@@ -39,11 +40,11 @@
             <SfDatePicker TValue="DateTime" Placeholder="Tarih Seçin" @bind-Value="selectedDate" CssClass="form-control" />
         </div>
 
-        <!-- Buttons -->
+       @*  <!-- Buttons -->
         <div class="col-md-5 text-end">
             <button class="btn btn-primary me-2">İş Listesi</button>
             <button class="btn btn-success">Randevular</button>
-        </div>
+        </div> *@
     </div>
 </div>
 
@@ -52,7 +53,7 @@
 <SfGrid DataSource="@ProtocolsList" AllowPaging="true">
     <GridColumns>
         <!-- Cinsiyet -->
-        <GridColumn HeaderText="Cinsiyet" Width="100">
+       @*  <GridColumn HeaderText="Cinsiyet" Width="100">
             <Template>
                 @if (context is ProtocolDto protocol)
                 {
@@ -60,7 +61,8 @@
                   
                 }
             </Template>
-        </GridColumn>
+        </GridColumn> *@
+        <GridColumn Field=@nameof(ProtocolDto.PatientGender) HeaderText="Cinsiyet" Width="100" ></GridColumn>
    
         <!-- Hasta No -->
         <GridColumn HeaderText="Hasta No" Width="100">

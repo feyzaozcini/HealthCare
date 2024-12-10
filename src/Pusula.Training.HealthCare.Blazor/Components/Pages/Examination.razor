@@ -7,8 +7,11 @@
 @using Pusula.Training.HealthCare.PainDetails
 @using Pusula.Training.HealthCare.Diagnoses
 @using Pusula.Training.HealthCare.ExaminationDiagnoses
+@using Pusula.Training.HealthCare.Protocols
 
 
+@using Volo.Abp.Localization
+@using Pusula.Training.HealthCare.Localization
 
 @using Syncfusion.Blazor.Cards
 @using Syncfusion.Blazor.DataForm
@@ -18,6 +21,8 @@
 @using Syncfusion.Blazor.Popups
 @using Syncfusion.Blazor.Notifications
 @using Syncfusion.Blazor.Grids
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<HealthCareResource> Localizer
 @inject IPatientsAppService PatientsAppService
 @inject IAnamnesisAppService AnamnesisAppService
 @inject IFallRisksAppService FallRiskAppService
@@ -25,12 +30,14 @@
 @inject IPainDetailsAppService PainDetailAppService
 @inject IDiagnosisAppService DiagnosisAppService
 @inject IExaminationDiagnosisAppService ExaminationDiagnosisAppService
+@inject IProtocolsAppService ProtocolAppService
+
 
 <p>Protocol ID: @ProtocolId Patient ID: @PatientId</p>
 
 #<!-- #region patient card -->
 <!-- Hasta Kartı -->
-<div class="patient-card-container">
+@* <div class="patient-card-container">
     <SfCard CssClass="e-card e-card-horizontal patient-card">
         <div class="e-card-header">
             <div class="e-card-header-image">
@@ -50,26 +57,36 @@
             <p><strong>Doktor:</strong> Uzm. Dr. Ahmet Hulusi Arslan</p>
         </div>
     </SfCard>
+</div> *@
+
+<div class="patient-card-container">
+    <SfCard CssClass="e-card e-card-horizontal patient-card">
+        <div class="e-card-header">
+            <div class="e-card-header-image">
+                <!-- Placeholder bir görsel -->
+                @* <img src="https://via.placeholder.com/50" alt="Patient" /> *@
+                @* <img src="/icons/6833591.png" alt="Patient Avatar" /> *@
+                <img src="/images/main/avatar.jpg" class="custom-avatar" alt="Patient Avatar" />
+            </div>
+            <div class="e-card-header-text">
+                <!-- Hasta Adı ve Soyadı -->
+                <h4>@($"{protocolDto.PatientFirstName} {protocolDto.PatientLastName}")</h4>
+                <!-- Hasta Yaşı ve Doğum Tarihi -->
+                <p>
+                    <strong>Yaş:</strong> @CalculateAge(protocolDto.PatientBirthDate) |
+                    <strong>Doğum Tarihi:</strong> @protocolDto.PatientBirthDate.ToString("dd.MM.yyyy")
+                </p>
+            </div>
+        </div>
+        <div class="e-card-content">
+            <!-- Hasta No ve Ülke Bilgisi -->
+            <p><strong>Hasta No:</strong> @protocolDto.PatientNo | <strong>Ülke:</strong> TR</p>
+            <!-- Bölüm ve Doktor Bilgisi -->
+            <p><strong>Bölüm:</strong>@protocolDto.DepartmentName</p>
+            <p><strong>Doktor:</strong>@($"{protocolDto.DoctorTitleName} {protocolDto.DoctorName} {protocolDto.DoctorSurname}")</p>
+        </div>
+    </SfCard>
 </div>
-@* <SfCard CssClass="e-card e-card-horizontal">
-    <div class="e-card-header">
-        <div class="e-card-header-image">
-            <img src="https://via.placeholder.com/50" alt="Patient" />
-        </div>
-        <div class="e-card-header-text">
-            <h4>@($"{Patient.FirstName} {Patient.LastName}")</h4>
-            <p>
-                <strong>Yaş:</strong> @CalculateAge(Patient.BirthDate) |
-                <strong>Doğum Tarihi:</strong> @Patient.BirthDate.ToString("dd.MM.yyyy")
-            </p>
-        </div>
-    </div>
-    <div class="e-card-content">
-        <p><strong>Hasta No:</strong> @Patient.No | <strong>Ülke:</strong> TR</p>
-        <p><strong>Bölüm:</strong> Genel Cerrahi</p>
-        <p><strong>Doktor:</strong> Uzm. Dr. Ahmet Hulusi Arslan</p>
-    </div>
-</SfCard> *@
 
 <!-- #endregion -->
 
@@ -133,9 +150,10 @@
                             <div class="btn-group me-3" role="group">
                                 @foreach (var state in Enum.GetValues(typeof(MentalState)))
                                 {
+                                    @* buradayim *@
                                     <SfButton CssClass="@GetButtonClass((MentalState)state)"
                                               @onclick="() => SetMentalState((MentalState)state)">
-                                        @state
+                                        @Localizer[$"Enum:MentalState.{state}"]
                                     </SfButton>
                                 }
                             </div>
@@ -235,7 +253,7 @@
                                     {
                                         <SfButton CssClass="@GetPainRhythmButtonClass((PainRhythm)rhythm)"
                                                   @onclick="() => SetPainRhythm((PainRhythm)rhythm)">
-                                            @rhythm
+                                            @Localizer[$"Enum:PainRhythm.{rhythm}"]
                                         </SfButton>
                                     }
                                 </div>
@@ -384,13 +402,31 @@
 
                             <!-- Butonlar -->
                             <div class="btn-group ms-3" role="group">
-                                @foreach (var type in Enum.GetValues(typeof(DiagnosisType)))
+                              @*   @foreach (var type in Enum.GetValues(typeof(DiagnosisType)))
                                 {
                                     <SfButton CssClass="@GetDiagnosisTypeButtonClass((DiagnosisType)type)"
                                               @onclick="() => SetDiagnosisType((DiagnosisType)type)">
                                         @type
                                     </SfButton>
-                                }
+                                } *@
+
+                                <div class="btn-group ms-3" role="group">
+                                    <SfButton CssClass="@GetDiagnosisTypeButtonClass(DiagnosisType.Definitive)"
+                                              @onclick="() => SetDiagnosisType(DiagnosisType.Definitive)">
+                                        @Localizer["DiagnosisType:Definitive"]
+                                    </SfButton>
+
+                                    <SfButton CssClass="@GetDiagnosisTypeButtonClass(DiagnosisType.Preliminary)"
+                                              @onclick="() => SetDiagnosisType(DiagnosisType.Preliminary)">
+                                        @Localizer["DiagnosisType:Preliminary"]
+                                    </SfButton>
+
+                                    <SfButton CssClass="@GetDiagnosisTypeButtonClass(DiagnosisType.Differential)"
+                                              @onclick="() => SetDiagnosisType(DiagnosisType.Differential)">
+                                        @Localizer["DiagnosisType:Differential"]
+                                    </SfButton>
+                                </div>
+
                             </div>
                         </div>
 
