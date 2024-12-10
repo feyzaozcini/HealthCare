@@ -193,11 +193,11 @@ namespace Pusula.Training.HealthCare.Appointments
 
             
             var departmentRules = await appointmentRuleRepository.GetRulesForDepartmentAsync(input.DepartmentId);
-            var doctorRules = await appointmentRuleRepository.GetRulesForDoctorAsync(input.DoctorId);
-            var allRules = departmentRules.Concat(doctorRules).ToList();
+            //var doctorRules = await appointmentRuleRepository.GetRulesForDoctorAsync(input.DoctorId);
+           // var allRules = departmentRules.Concat(doctorRules).ToList();
 
             //Çocuk departmanına tanımlanmış 18 yaşından büyüklerin girememesi
-            foreach (var rule in allRules)
+            foreach (var rule in departmentRules)
             {
                 //Şimdili çocuk departmanı için yazıldı eğer hasta 18 yaşından büyükse randevu alamaz
                 // Eğer yaş kısıtlaması varsa ve 0'dan büyükse kontrol et
