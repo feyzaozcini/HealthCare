@@ -19,7 +19,7 @@
         <div style="text-align: right; margin-bottom: 10px;">
             <SfButton CssClass="e-primary" IsPrimary="true" OnClick="@ExportToExcel">Export to Excel</SfButton>
         </div>
-        <SfPivotView TValue="AppointmentPivotData" @ref="Pivot" Height="400" Width="100%" AllowExcelExport="true" ShowFieldList="true" EnableValueSorting=true ExpandAll="false">
+        <SfPivotView TValue="AppointmentPivotData" @ref="Pivot" Height="800" Width="100%" AllowExcelExport="true" ShowFieldList="true" EnableValueSorting=true ExpandAll="false">
             <PivotViewDataSourceSettings DataSource="@PivotData" EnableSorting="true">
                 <PivotViewColumns>
                     <PivotViewColumn Name="AppointmentStatus" Caption="Randevu Durumu"></PivotViewColumn>
