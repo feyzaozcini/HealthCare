@@ -1018,6 +1018,7 @@
                     <div class="col-6">
                         <label for="departmentId">Department</label>
                         <select id="departmentId" class="form-select" @bind="ProtocolCreateDto.DepartmentId">
+                            <option value="">@L["Select"]</option>
                             @foreach (var department in FilteredDepartments)
                             {
                                 <option value="@department.Id">@department.Name</option>
@@ -1029,6 +1030,7 @@
                     <div class="col-6">
                         <label for="doctorId">Doctor</label>
                         <select id="doctorId" class="form-select" @bind="ProtocolCreateDto.DoctorId" @onclick="SelectDoctorAsync">
+                            <option value="">@L["Select"]</option>
                             @foreach (var doctor in FilteredDoctors)
                             {
                                 <option value="@doctor.Doctor.Id">@doctor.FullName</option>
@@ -1044,6 +1046,7 @@
                     <div class="col-6">
                         <label for="protokolType">Type</label>
                         <select id="protokolId" class="form-select" @bind="ProtocolCreateDto.ProtocolTypeId">
+                            <option value="">@L["Select"]</option>
                             @foreach (var type in ProtocolTypeList)
                             {
                                 <option value="@type.Id">@type.DisplayName</option>
@@ -1055,6 +1058,7 @@
                     <div class="col-6">
                         <label for="insurance">Insurance</label>
                         <select id="insuranceId" class="form-select" @bind="ProtocolCreateDto.ProtocolInsuranceId">
+                            <option value="">@L["Select"]</option>
                             @foreach (var insurance in InsuranceList)
                             {
                                 <option value="@insurance.Id">@insurance.DisplayName</option>
@@ -1070,6 +1074,7 @@
                 <div class="col-6">
                     <label for="status">Status</label>
                     <select id="protocolStatus" class="form-select" @bind="ProtocolCreateDto.ProtocolStatus">
+                            <option value="">@L["Select"]</option>
                         @foreach (var status in ProtocolStatusCollection)
                         {
                             <option value="@status.Id">@status.DisplayName</option>

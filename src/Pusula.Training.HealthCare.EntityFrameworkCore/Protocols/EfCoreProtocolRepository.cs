@@ -158,7 +158,14 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
                     e.No.ToString().StartsWith(filterText!) ||
                     e.Patient.FirstName!.StartsWith(filterText!) ||
                     e.Patient.LastName!.StartsWith(filterText!) ||
-                    e.Patient.No!.ToString().StartsWith(filterText!))
+                    e.Patient.No!.ToString().StartsWith(filterText!) ||
+                    e.ProtocolType.Name.StartsWith(filterText!) ||
+                    e.Note.Text.StartsWith(filterText!) ||
+                    e.Insurance.Name.StartsWith(filterText!) ||
+                    e.Department.Name.StartsWith(filterText!) ||
+                    e.Doctor.User.Name.StartsWith(filterText!) ||
+                    e.Doctor.User.Surname.StartsWith(filterText!) ||
+                    e.Doctor.Title.Name.StartsWith(filterText!))
 
                 .WhereIf(startTime.HasValue, e => e.StartTime >= startTime!.Value)
                 .WhereIf(endTime.HasValue, e => e.EndTime <= endTime!.Value)

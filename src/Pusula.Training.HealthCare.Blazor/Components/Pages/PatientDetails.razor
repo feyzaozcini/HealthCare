@@ -2,204 +2,279 @@
 
 @using Pusula.Training.HealthCare.Blazor.Containers
 @using Pusula.Training.HealthCare.Patients
+@using Pusula.Training.HealthCare.Protocols
 @using Syncfusion.Blazor.Cards
 @using Syncfusion.Blazor.Buttons
+
 @inject PatientStateContainer StateService
 @inject NavigationManager NavigationManager
 @inject PatientStateContainer PatientStateService
+@inject IProtocolsAppService ProtocolAppService
+
 
 <!-- Patient Details -->
-<div class="control-section card-control-section tile_layout">
-    <div class='row e-card-layout' style="margin: auto">
-        <div>
-            <h3 style="margin-bottom: 20px; margin-left: 0;">Patient Detail</h3>
-            <SfCard Class="patient-card">
-                <CardContent>
-                    <SfButton CssClass="e-button e-outline e-primary" @onclick="NavigateBack">Back</SfButton>
-                        <div class="text-center">
-                            <img src="/images/main/avatar.jpg" class="custom-avatar" alt="Patient Avatar" />
-                        </div>
-                </CardContent>
-
-                <CardContent>
-                @if (ShowTable)
-                {
-                    <!-- Personal Information -->
-                    <CardContent>
-                    <h4 class="fw-bold text-center mt-3">Personal</h4>
-                    <table style="line-height: 2.75em;">
-                        <tr>
-                            <td><b>Full Name:</b></td>
-                        <td>@PatientStateService.SelectedPatientNavigation.Patient?.FirstName @PatientStateService.SelectedPatientNavigation.Patient?.LastName</td>
-                        </tr>
-                        <tr>
-                            <td><b>Gender:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.Gender</td>
-                        </tr>
-                        <tr>
-                            <td><b>Birthdate:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.BirthDate.ToShortDateString()</td>
-                        </tr>
-                         <tr>
-                            <td><b>Identity Number:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.IdentityNumber</td>
-                        </tr>
-                        <tr>
-                            <td><b>Passport Number:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.PassportNumber</td>
-                        </tr>
-                    </table>
-                    </CardContent>
-
-                    <!-- Contact Information -->
-                    <CardContent>
-                    <h4 class="fw-bold text-center mt-3">Contact</h4>
-                    <table style="line-height: 2.75em;">
-                        <tr>
-                            <td><b>Mobile Phone:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.MobilePhoneNumber</td>
-                        </tr>
-                        <tr>
-                            <td><b>Emergency Phone:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.EmergencyPhoneNumber</td>
-                        </tr>
-                        <tr>
-                            <td><b>Email:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.Email</td>
-                        </tr>
-                        <tr>
-                            <td><b>Company:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.PatientCompany?.Name</td>
-                        </tr>
-                    </table>
-                    </CardContent>
-
-                    <!-- Additional Information -->
-                    <CardContent>
-                    <h4 class="fw-bold text-center mt-3">Additional</h4>
-                    <table style="line-height: 2.75em;">
-                        <tr>
-                            <td><b>Mother Name:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.MotherName</td>
-                        </tr>
-                        <tr>
-                            <td><b>Father Name:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.FatherName</td>
-                        </tr>
-                        <tr>
-                            <td><b>Blood Type:</b></td>
-                                    <td>@PatientStateService.SelectedPatientNavigation.Patient?.BloodType.ToString().Replace('_', ' ')</td>
-                        </tr>
-                        <tr>
-                            <td><b>Type:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.Type</td>
-                        </tr>
-                    </table>
-                    </CardContent>
-                }
-                else
-                {
-                
-                    <!-- Address Information -->
-                    <CardContent>
-                    <h4 class="fw-bold text-center mt-3">Address</h4>
-                    <h5 class="fw-bold text-center mt-3">Primary Address</h5>
-                    <table style="line-height: 2.75em;">
-                        <tr>
-                            <td><b>Country:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.PrimaryCountry?.Name</td>
-                        </tr>
-                        <tr>
-                            <td><b>City:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.PrimaryCity?.Name</td>
-                        </tr>
-                        <tr>
-                             <td><b>District:</b></td>
-                             <td>@PatientStateService.SelectedPatientNavigation.PrimaryDistrict?.Name</td>
-                        </tr>
-                        <tr>
-                             <td><b>Village:</b></td>
-                             <td>@PatientStateService.SelectedPatientNavigation.PrimaryVillage?.Name</td>
-                        </tr>
-                        <tr>
-                             <td><b>Address:</b></td>
-                             <td>@PatientStateService.SelectedPatientNavigation.Patient?.PrimaryAddressDescription</td>
-                        </tr>
-                    </table>
-
-                    <h5 class="fw-bold text-center mt-3">Secondary Address</h5>
-                    <table style="line-height: 2.75em;">
-                        <tr>
-                            <td><b>Country:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryCountry?.Name</td>
-                        </tr>
-                        <tr>
-                            <td><b>City:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryCity?.Name</td>
-                        </tr>
-                        <tr>
-                            <td><b>District:</b></td>
-                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryDistrict?.Name</td>
-                        </tr>
-                        <tr>
-                             <td><b>Village:</b></td>
-                             <td>@PatientStateService.SelectedPatientNavigation.SecondaryVillage?.Name</td>
-                        </tr>
-                        <tr>
-                             <td><b>Address:</b></td>
-                             <td>@PatientStateService.SelectedPatientNavigation.Patient?.SecondaryAddressDescription</td>
-                        </tr>
-                    </table>
-
-                    <div class="right-align">
-                    <SfButton CssClass="e-button e-btn e-outline e-primary" @onclick="@(()=> ShowTable = !ShowTable)">For Less Info</SfButton>
-                    </div>
-
-                    </CardContent>
-                   
-                }
-
-                </CardContent>
-
-                @if (ShowTable)
-                {
-                    <Syncfusion.Blazor.Cards.CardFooter>
-                        <CardFooterContent>
-                            <div class="right-align">
-                            <SfButton CssClass="e-btn e-outline e-primary" @onclick="@(()=> ShowTable = !ShowTable)">For More Info</SfButton>
+   <div class="row">
+    <!-- Sol Panel -->
+    <div class="col-md-3">
+        <div class="control-section card-control-section tile_layout">
+            <div class='row e-card-layout' style="margin: auto">
+                <div>
+                    <h3 style="margin-bottom: 20px; margin-left: 0; font-weight: bold;">Patient Detail</h3>
+                    <SfCard Class="patient-card">
+                        <CardContent>
+                            <SfButton CssClass="e-button e-outline e-primary" @onclick="NavigateBack">Back</SfButton>
+                            <div class="text-center">
+                                <img src="/images/main/avatar.jpg" class="custom-avatar" alt="Patient Avatar" />
                             </div>
-                        </CardFooterContent>
-                    </Syncfusion.Blazor.Cards.CardFooter>
-                }
-            </SfCard>
+                        </CardContent>
+
+                        <CardContent>
+                            @if (ShowTable)
+                            {
+                                <!-- Personal Information -->
+                                <CardContent>
+                                    <h4 class="fw-bold text-center mt-3">Personal</h4>
+                                    <table style="line-height: 2.75em;">
+                                        <tr>
+                                            <td><b>Full Name:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.FirstName @PatientStateService.SelectedPatientNavigation.Patient?.LastName</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Gender:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.Gender</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Birthdate:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.BirthDate.ToShortDateString()</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Identity Number:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.IdentityNumber</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Passport Number:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.PassportNumber</td>
+                                        </tr>
+                                    </table>
+                                </CardContent>
+
+                                <!-- Contact Information -->
+                                <CardContent>
+                                    <h4 class="fw-bold text-center mt-3">Contact</h4>
+                                    <table style="line-height: 2.75em;">
+                                        <tr>
+                                            <td><b>Mobile Phone:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.MobilePhoneNumber</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Emergency Phone:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.EmergencyPhoneNumber</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Email:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.Email</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Company:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.PatientCompany?.Name</td>
+                                        </tr>
+                                    </table>
+                                </CardContent>
+
+                                <!-- Additional Information -->
+                                <CardContent>
+                                    <h4 class="fw-bold text-center mt-3">Additional</h4>
+                                    <table style="line-height: 2.75em;">
+                                        <tr>
+                                            <td><b>Mother Name:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.MotherName</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Father Name:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.FatherName</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Blood Type:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.BloodType.ToString().Replace('_', ' ')</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Type:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.Type</td>
+                                        </tr>
+                                    </table>
+                                </CardContent>
+                            }
+                            else
+                            {
+
+                                <!-- Address Information -->
+                                <CardContent>
+                                    <h4 class="fw-bold text-center mt-3">Address</h4>
+                                    <h5 class="fw-bold text-center mt-3">Primary Address</h5>
+                                    <table style="line-height: 2.75em;">
+                                        <tr>
+                                            <td><b>Country:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.PrimaryCountry?.Name</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>City:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.PrimaryCity?.Name</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>District:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.PrimaryDistrict?.Name</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Village:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.PrimaryVillage?.Name</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Address:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.PrimaryAddressDescription</td>
+                                        </tr>
+                                    </table>
+
+                                    <h5 class="fw-bold text-center mt-3">Secondary Address</h5>
+                                    <table style="line-height: 2.75em;">
+                                        <tr>
+                                            <td><b>Country:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryCountry?.Name</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>City:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryCity?.Name</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>District:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryDistrict?.Name</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Village:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryVillage?.Name</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Address:</b></td>
+                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.SecondaryAddressDescription</td>
+                                        </tr>
+                                    </table>
+
+                                    <div class="right-align">
+                                        <SfButton CssClass="e-button e-btn e-outline e-primary" @onclick="@(()=> ShowTable = !ShowTable)">For Less Info</SfButton>
+                                    </div>
+
+                                </CardContent>
+
+                            }
+
+                        </CardContent>
+
+                        @if (ShowTable)
+                        {
+                            <Syncfusion.Blazor.Cards.CardFooter>
+                                <CardFooterContent>
+                                    <div class="right-align">
+                                        <SfButton CssClass="e-btn e-outline e-primary" @onclick="@(()=> ShowTable = !ShowTable)">For More Info</SfButton>
+                                    </div>
+                                </CardFooterContent>
+                            </Syncfusion.Blazor.Cards.CardFooter>
+                        }
+                    </SfCard>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* ************************* PROTOCOL LIST MODAL ************************* *@
+    <!-- Sağ Panel -->
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+            <div class="flex-grow-1 d-flex justify-content-center">
+                <SfTextBox Placeholder="Protokol Ara"
+                           FloatLabelType="FloatLabelType.Never"
+                           @bind-Value="ProtocolsFilter!.FilterText"
+                           Width="50%"
+                           Input="OnInputChange">
+                </SfTextBox>
+            </div>
+        </div>
+        <div class="sfgrid-container">
+            <SfGrid DataSource="@ProtocolsList" TValue="ProtocolDto" AllowPaging="true" AllowSorting="true" RowHeight="40" Height="700px">
+                <GridColumns>
+
+                    <!-- Protocol No -->
+                    <GridColumn Field=@nameof(ProtocolDto.No) HeaderText="Protocol No" Width="7" TextAlign="TextAlign.Center"></GridColumn>
+
+                    <!-- Patient No -->
+                    <GridColumn Field=@nameof(ProtocolDto.PatientNo) HeaderText="Patient No" Width="7" TextAlign="TextAlign.Center"></GridColumn>
+
+                    <!-- Full Name -->
+                    <GridColumn HeaderText="Full Name" Width="15" TextAlign="TextAlign.Center">
+                        <Template Context="item">
+                            @((item as ProtocolDto)?.PatientFirstName) @((item as ProtocolDto)?.PatientLastName)
+                        </Template>
+                    </GridColumn>
+
+                    <!-- Department -->
+                    <GridColumn Field=@nameof(ProtocolDto.DepartmentName) HeaderText="Department" Width="7" TextAlign="TextAlign.Center"></GridColumn>
+
+                    <!-- Doctor -->
+                    <GridColumn HeaderText="Doctor" Width="15" TextAlign="TextAlign.Center">
+                        <Template Context="item">
+                            @((item as ProtocolDto)?.DoctorTitleName) @((item as ProtocolDto)?.DoctorName) @((item as ProtocolDto)?.DoctorSurname)
+                        </Template>
+                    </GridColumn>
+
+                    <!-- Protocol Type -->
+                    <GridColumn Field=@nameof(ProtocolDto.ProtocolTypeName) HeaderText="Protocol Type" Width="7" TextAlign="TextAlign.Center"></GridColumn>
+
+                    <!-- Insurance -->
+                    <GridColumn Field=@nameof(ProtocolDto.ProtocolInsuranceName) HeaderText="Insurance" Width="7" TextAlign="TextAlign.Center"></GridColumn>
+
+                    <!-- Status -->
+                    <GridColumn Field=@nameof(ProtocolDto.ProtocolStatus) HeaderText="Status" Width="7" TextAlign="TextAlign.Center"></GridColumn>
+
+                    <!-- Note -->
+                    <GridColumn HeaderText="Note" Width="5" TextAlign="TextAlign.Center">
+                        <Template Context="item">
+                            @if (!string.IsNullOrEmpty((item as ProtocolDto)?.NoteText))
+                            {
+                                <SfButton CssClass="e-small e-link"
+                                          OnClick="(() => OpenNoteModal((item as ProtocolDto)?.NoteText))">
+                                    <i class="fa-regular fa-file"></i>
+                                </SfButton>
+                            }
+                        </Template>
+                    </GridColumn>
+
+                    <!-- Start Time -->
+                    <GridColumn Field=@nameof(ProtocolDto.StartTime) HeaderText="Start Time" Width="7" TextAlign="TextAlign.Center"></GridColumn>
+
+                    <!-- End Time -->
+                    <GridColumn Field=@nameof(ProtocolDto.EndTime) HeaderText="End Time" Width="7" TextAlign="TextAlign.Center"></GridColumn>
+
+                </GridColumns>
+            </SfGrid>
         </div>
     </div>
 </div>
 
-@code{
-    private bool ShowTable = true;
+@* ************************* NOTE LIST MODAL ************************* *@
 
-     private void NavigateBack()
-     {
-        if (!string.IsNullOrEmpty(StateService.PreviousPageUrl))
-        {
-            //Patient'ta filtrelense olsa bile url değişmediği için için otomatik olarak /patients sayfasına yönlendiriliyor zorunlu olarak 
-            //ama yapı değişirse ilerde ve url alanı filtrelemeye yapıldıgında o filtrelemeye göre değişirse mesela Ali Ozturk u filtrelersek /patients/Ali-Ozturk gibi
-            // PreviousPageUrl yapısı sayesinde filtrelenmiş önceki haline yönlendirilecektir. Kısacası İlerdeki yapıya uygun genişletilebilir bir kullanıldı.
-            NavigationManager.NavigateTo(StateService.PreviousPageUrl);
-        }
-        else
-        {
-            // Önceki URL yoksa varsayılan bir sayfaya yönlendir
-            NavigationManager.NavigateTo("/patients");
-        }
-     }
-}
+<SfDialog @ref="NoteDialog" IsModal="true" ShowCloseIcon="true" Width="400px" Header="Protocol Note" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <p>@SelectedNote</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="e-small e-secondary" Content="Close" OnClick="CloseNoteModal"></SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
 
 <style>
 
     .patient-card {
-        width: 25%;
+        width: 100%; /* Genişliği dinamik yap */
         margin-left: 0;
         margin-right: 0;
         padding: 20px;
@@ -218,19 +293,21 @@
 
     /* Sağ hizalama için özel CSS sınıfı */
     .right-align {
-    display: flex;
-    justify-content: flex-end; /* Sağ tarafa hizalar */
-    width: 100%; /* Genişliği kapsaması için */
+        display: flex;
+        justify-content: flex-end; /* Sağ tarafa hizalar */
+        width: 100%; /* Genişliği kapsaması için */
+    }
+
+    .sfgrid-container {
+        overflow-x: auto; /* Yatay kaydırmayı etkinleştir */
     }
 
 
     table td {
+        vertical-align: top;
+        width: auto;
+    }
 
-    vertical-align: top;
-    width:auto;
-        
-    }   
-        
 
     .e-card-button {
         border: none;
@@ -238,8 +315,8 @@
     }
 
     .e-card-button .e-icons {
-    font-size: 18px; /* Simgeyi büyütme */
-    margin-right: 5px; /* Simge ve metin arası boşluk */
+            font-size: 18px; /* Simgeyi büyütme */
+            margin-right: 5px; /* Simge ve metin arası boşluk */
     }
 
 
@@ -247,37 +324,48 @@
         height: 180px;
         width: 240px;
     }
+
     .card-text-value {
         text-align: left;
         font-weight: 500;
     }
+
     .tile_layout.card-control-section .row.filter .col-xs-6.col-sm-6.col-lg-6.col-md-6 {
-        display: inline-flex;
-        flex-direction: column;
+        display: flex;
+        flex-direction: row;
         width: 100%;
     }
+
     .tile_layout.card-control-section .col-xs-6.col-sm-6.col-lg-6.col-md-6 {
-        width: 100%;
+        width: 50%;
         padding: 10px;
+        box-sizing: border-box;
     }
+
     .card-control-section.tile_layout .e-card-layout {
-        margin-left: 0 ;
-        margin-right: 0  ;
-        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
+        display: inline-block;
+        vertical-align: top;
     }
+
     .e-card-header {
         padding-left: inherit !important;
     }
+
     .e-btn {
         margin-left: 10px;
     }
+
     .e-card .e-card-header .e-card-header-caption .e-card-header-title {
         font-weight: bold;
     }
+
     .e-collapse::before {
         content: "\e745";
-
     }
+
     .material .e-collapse::before,
     .material-dark .e-collapse::before,
     .fabric .e-collapse::before,
@@ -287,6 +375,7 @@
     .highcontrast .e-collapse::before {
         content: '\e7fc';
     }
+
     .fluent .e-collapse::before,
     .fluent-dark .e-collapse::before,
     .fluent2-dark .e-collapse::before,
@@ -299,6 +388,7 @@
     .bootstrap5-dark .e-collapse::before {
         content: "\e7e7";
     }
+
     .fluent .e-reveal-icon:before,
     .fluent-dark .e-reveal-icon:before,
     .fluent2-dark .e-reveal-icon:before,
@@ -307,11 +397,13 @@
     .tailwind-dark .e-reveal-icon:before,
     .bootstrap5 .e-reveal-icon:before,
     .bootstrap5-dark .e-reveal-icon:before {
-    	content: "\e71c";
+        content: "\e71c";
     }
+
     .material-dark .e-card .e-card-header {
         padding: 10px;
     }
+
     .tailwind-dark .tile_layout.card-control-section .e-card .e-card-content table td .e-card-actions .e-card-btn {
         background-color: unset;
         border: 1px solid #22d3ee;
