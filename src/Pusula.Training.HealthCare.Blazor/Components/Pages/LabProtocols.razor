@@ -29,7 +29,7 @@
     <GridEvents TValue="LabRequestDto" RowSelected="RowSelectHandler"></GridEvents>
     <GridColumns>
         <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10"></GridColumn>
-        <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç T." Width="25" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(LabRequestDto.CreationTime) HeaderText="Protokol Başlangıç T." Width="25" TextAlign="TextAlign.Center"></GridColumn>
         <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
             <Template Context="context">
                 @if (context is LabRequestDto labrequest)

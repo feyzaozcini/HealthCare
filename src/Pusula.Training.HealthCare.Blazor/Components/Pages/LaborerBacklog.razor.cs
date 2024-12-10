@@ -36,9 +36,18 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         #region GetActions
         private async Task LoadLabRequestsAsync()
         {
+            //Temize çekilecek. Sadece test süreci baþlamýþ protokolleri listeler.
             var allLabRequests = await LabRequestsAppService.GetListWithNavigationPropertiesAsync(LabRequestsFilter!);
-            InProgressLabRequests = allLabRequests.Items.Where(lr => lr.Status == RequestStatusEnum.InProgress).ToList();
-            CompletedLabRequests = allLabRequests.Items.Where(lr => lr.Status == RequestStatusEnum.Completed).ToList();
+            var testProcesses = await TestProcessesAppService.GetListAsync(TestProcessesFilter!);
+            var labRequestIdsWithTestProcesses = testProcesses.Items.Select(tp => tp.LabRequestId).Distinct().ToList();
+
+            InProgressLabRequests = allLabRequests.Items
+                .Where(lr => lr.Status == RequestStatusEnum.InProgress && labRequestIdsWithTestProcesses.Contains(lr.Id))
+                .ToList();
+
+            CompletedLabRequests = allLabRequests.Items
+                .Where(lr => lr.Status == RequestStatusEnum.Completed && labRequestIdsWithTestProcesses.Contains(lr.Id))
+                .ToList();
         }
 
         #endregion
