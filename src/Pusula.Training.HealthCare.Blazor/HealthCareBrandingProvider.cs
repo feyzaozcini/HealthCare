@@ -15,5 +15,7 @@ public class HealthCareBrandingProvider : DefaultBrandingProvider
         _localizer = localizer;
     }
 
-    public override string AppName => _localizer["AppName"];
+    public override string AppName => _localizer["halleDEViz"];
+    public override string LogoUrl => "/images/logo/leptonx/halledeviz_logo.png";
+
 }
