@@ -10,8 +10,8 @@ namespace Pusula.Training.HealthCare.Notes
 {
     public class NoteCreateDto
     {
-        [Required]
         [StringLength(NoteConsts.TextMaxLength)]
-        public string Text { get; set; } = null!;
+        public string? Text { get; set; }
     }
+
 }

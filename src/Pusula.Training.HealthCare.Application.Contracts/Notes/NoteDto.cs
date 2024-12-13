@@ -11,7 +11,7 @@ namespace Pusula.Training.HealthCare.Notes
     public class NoteDto : FullAuditedEntityDto<Guid>, IHasConcurrencyStamp
     {
         public Guid Id { get; set; }
-        public string Text { get; set; } = null!;
+        public string? Text { get; set; } 
         public string ConcurrencyStamp { get; set; } = null!;
     }
 }

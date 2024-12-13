@@ -40,11 +40,6 @@ using Pusula.Training.HealthCare.FallRisks;
 using System;
 using Pusula.Training.HealthCare.TestProcesses;
 using Pusula.Training.HealthCare.TestValueRanges;
-
-
-
-
-
 using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
 using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Notes;
@@ -198,7 +193,6 @@ public class HealthCareDbContext :
                 b.Property(x => x.StartTime).HasColumnName(nameof(Protocol.StartTime));
                 b.Property(x => x.EndTime).HasColumnName(nameof(Protocol.EndTime));
                 b.Property(x => x.ProtocolStatus).HasColumnName(nameof(Protocol.ProtocolStatus));
-                //b.Property(x => x.ProtocolStatus).HasColumnName(nameof(Protocol.ProtocolStatus)).HasConversion<string>();
                 b.Property(x => x.ProtocolTypeId).HasColumnName(nameof(Protocol.ProtocolType));
                 b.Property(x => x.ProtocolNoteId).HasColumnName(nameof(Protocol.Note));
                 b.Property(x => x.ProtocolInsuranceId).HasColumnName(nameof(Protocol.Insurance));
@@ -207,7 +201,7 @@ public class HealthCareDbContext :
                 b.Property(x => x.DoctorId).HasColumnName(nameof(Protocol.Doctor));
                 b.Property(x => x.No).HasColumnName(nameof(Protocol.No)).IsRequired().HasDefaultValueSql("nextval('\"ProtocolNoSequence\"')");
                 b.HasOne(x => x.ProtocolType).WithMany().IsRequired().HasForeignKey(x => x.ProtocolTypeId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne(x => x.Note).WithOne().HasForeignKey<Protocol>(x => x.ProtocolNoteId).IsRequired().OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x => x.Note).WithOne().HasForeignKey<Protocol>(x => x.ProtocolNoteId).IsRequired(false).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne(x => x.Insurance).WithMany().IsRequired().HasForeignKey(x => x.ProtocolInsuranceId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne(x => x.Patient).WithMany().IsRequired().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne(x => x.Department).WithMany().IsRequired().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
@@ -235,7 +229,7 @@ public class HealthCareDbContext :
             {
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Notes", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
-                b.Property(x => x.Text).HasColumnName(nameof(Note.Text)).IsRequired().HasMaxLength(NoteConsts.TextMaxLength);
+                b.Property(x => x.Text).HasColumnName(nameof(Note.Text)).IsRequired(false).HasMaxLength(NoteConsts.TextMaxLength);
             });
 
             builder.Entity<Insurance>(b =>

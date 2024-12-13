@@ -1102,7 +1102,7 @@
 
                     <div class="col-6">
                         <label for="endTime">End Time</label>
-                        <SfDateTimePicker TValue="DateTime" @bind-Value="ProtocolCreateDto.EndTime"></SfDateTimePicker>
+                        <SfDateTimePicker TValue="DateTime?" @bind-Value="ProtocolCreateDto.EndTime"></SfDateTimePicker>
                         <ValidationMessage For="@(() => ProtocolCreateDto.EndTime)" />
                     </div>
 

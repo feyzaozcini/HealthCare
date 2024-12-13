@@ -11,10 +11,10 @@ public class ProtocolManager(IProtocolRepository protocolRepository) : DomainSer
 {
     public virtual async Task<Protocol> CreateAsync(
     DateTime startTime,
-    DateTime endTime,
+    DateTime? endTime,
     ProtocolStatus protocolStatus,
     Guid protocolTypeId,
-    Guid protocolNoteId,
+    Guid? protocolNoteId,
     Guid protocolInsuranceId,
     Guid patientId,
     Guid departmentId,
@@ -40,10 +40,10 @@ public class ProtocolManager(IProtocolRepository protocolRepository) : DomainSer
     public virtual async Task<Protocol> UpdateAsync(
         Guid id,
         DateTime startTime,
-        DateTime endTime,
+        DateTime? endTime,
         ProtocolStatus protocolStatus,
         Guid protocolTypeId,
-        Guid protocolNoteId,
+        Guid? protocolNoteId,
         Guid protocolInsuranceId,
         Guid patientId,
         Guid departmentId,

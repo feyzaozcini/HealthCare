@@ -14,7 +14,7 @@ namespace Pusula.Training.HealthCare.Notes
     public class NoteManager(INoteRepository noteRepository) : DomainService
     {
         public virtual async Task<Note> CreateAsync(
-        string text)
+        string? text)
         {
 
             var note = new Note(
@@ -22,14 +22,12 @@ namespace Pusula.Training.HealthCare.Notes
              text
              );
 
-            note.SetText(text);
-
             return await noteRepository.InsertAsync(note);
         }
 
         public virtual async Task<Note> UpdateAsync(
             Guid id,
-            string text, [CanBeNull] string? concurrencyStamp = null
+            string? text, [CanBeNull] string? concurrencyStamp = null
         )
         {
 

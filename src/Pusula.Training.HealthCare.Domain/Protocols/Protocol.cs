@@ -17,15 +17,15 @@ public class Protocol : FullAuditedAggregateRoot<Guid>
 
     [NotNull]
     public virtual DateTime StartTime { get; private set; }
-    public virtual DateTime EndTime { get; private set; }
+    public virtual DateTime? EndTime { get; private set; }
     [NotNull]
     public virtual int No {  get; set; }
     public virtual ProtocolStatus ProtocolStatus { get; private set; }
     [NotNull]
     public virtual Guid ProtocolTypeId { get; private set; }
     public ProtocolType ProtocolType { get; private set; }
-    public virtual Guid ProtocolNoteId { get; private set; }
-    public Note Note { get; private set; }
+    public virtual Guid? ProtocolNoteId { get; private set; }
+    public Note? Note { get; private set; }
     [NotNull]
     public virtual Guid ProtocolInsuranceId { get; private set; }
     public Insurance Insurance { get; private set; }
@@ -45,7 +45,7 @@ public class Protocol : FullAuditedAggregateRoot<Guid>
         EndTime = DateTime.Now.AddDays(1);
     }
 
-    public Protocol(Guid id, DateTime startTime, DateTime endTime, ProtocolStatus protocolStatus, Guid protocolTypeId, Guid protocolNoteId, Guid protocolInsuranceId,
+    public Protocol(Guid id, DateTime startTime, DateTime? endTime, ProtocolStatus protocolStatus, Guid protocolTypeId, Guid? protocolNoteId, Guid protocolInsuranceId,
         Guid patientId, Guid departmentId, Guid doctorId) : base(id)
     {
         
@@ -63,12 +63,12 @@ public class Protocol : FullAuditedAggregateRoot<Guid>
 
     public void SetStartTime(DateTime startTime) => StartTime = Check.NotNull(startTime, nameof(startTime));
 
-    public void SetEndTime(DateTime endTime) => EndTime = endTime;
+    public void SetEndTime(DateTime? endTime) => EndTime = endTime;
 
     public void SetProtocolStatus(ProtocolStatus protocolStatus) => ProtocolStatus = protocolStatus;
     public void SetProtocolTypeId(Guid protocolTypeId) => ProtocolTypeId = Check.NotNull(protocolTypeId, nameof(protocolTypeId));
     
-    public void SetProtocolNoteId(Guid protocolNoteId) => ProtocolNoteId = protocolNoteId;
+    public void SetProtocolNoteId(Guid? protocolNoteId) => ProtocolNoteId = protocolNoteId;
 
     public void SetProtocolInsuranceId(Guid protocolInsuranceId) => ProtocolInsuranceId = Check.NotNull(protocolInsuranceId, nameof(protocolInsuranceId));
 
