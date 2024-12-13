@@ -49,7 +49,7 @@ namespace Pusula.Training.HealthCare.Cities
         [Authorize(HealthCarePermissions.Cities.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            HealthCareException.ThrowIfNull(await cityRepository.FindAsync(id), HealthCareException.CITY_NOT_FOUND_MESSAGE);
+            HealthCareException.ThrowIfNull(await cityRepository.FindAsync(id), HealthCareDomainErrorCodes.CityNotFound);
             await cityRepository.DeleteAsync(id);
         }
 
@@ -67,19 +67,8 @@ namespace Pusula.Training.HealthCare.Cities
 
 
         [Authorize(HealthCarePermissions.Cities.Delete)]
-        public virtual async Task DeleteAllAsync(GetCitiesInput input)
-        {
-            var cities = await cityRepository.GetListAsync(
-                input.FilterText,
-                input.Name,
-                input.Sorting,
-                int.MaxValue,
-                0
-            );
+        public virtual async Task DeleteAllAsync(GetCitiesInput input) => await cityRepository.DeleteAllAsync(input.FilterText, input.Name);
 
-            var idsToDelete = cities.Select(c => c.Id).ToList();
-            await cityRepository.DeleteManyAsync(idsToDelete);
-        }
 
         [AllowAnonymous]
         public virtual async Task<IRemoteStreamContent> GetListAsExcelFileAsync(CityExcelDownloadDto input)

@@ -50,7 +50,7 @@ namespace Pusula.Training.HealthCare.Districts
         [Authorize(HealthCarePermissions.Districts.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            HealthCareException.ThrowIfNull(await districtRepository.FindAsync(id), HealthCareException.DISTRICT_NOT_FOUND_MESSAGE);
+            HealthCareException.ThrowIfNull(await districtRepository.FindAsync(id), HealthCareDomainErrorCodes.DistrictNotFound);
             await districtRepository.DeleteAsync(id);
         }
 
@@ -68,19 +68,8 @@ namespace Pusula.Training.HealthCare.Districts
 
 
         [Authorize(HealthCarePermissions.Districts.Delete)]
-        public virtual async Task DeleteAllAsync(GetDistrictsInput input)
-        {
-            var districts = await districtRepository.GetListAsync(
-                input.FilterText,
-                input.Name,
-                input.Sorting,
-                int.MaxValue,
-                0
-            );
-
-            var idsToDelete = districts.Select(c => c.Id).ToList();
-            await districtRepository.DeleteManyAsync(idsToDelete);
-        }
+        public virtual async Task DeleteAllAsync(GetDistrictsInput input) => await districtRepository.DeleteAllAsync(input.FilterText, input.Name);
+        
 
         [AllowAnonymous]
         public virtual async Task<IRemoteStreamContent> GetListAsExcelFileAsync(DistrictExcelDownloadDto input)

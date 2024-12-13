@@ -236,19 +236,27 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
         Guid? secondaryVillageId = null,
         string? secondaryAddressDescription = null) =>
             query
-                .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.No.ToString().StartsWith(filterText!) || e.FirstName.StartsWith(filterText!) || e.LastName.StartsWith(filterText!) || e.MobilePhoneNumber.StartsWith(filterText!) || e.IdentityNumber.StartsWith(filterText!) || e.Email.StartsWith(filterText!) || e.PassportNumber.StartsWith(filterText!))
-                .WhereIf(!string.IsNullOrWhiteSpace(firstName), e => e.FirstName.StartsWith(firstName!))
-                .WhereIf(!string.IsNullOrWhiteSpace(lastName), e => e.LastName.StartsWith(lastName!))
+                .WhereIf(!string.IsNullOrWhiteSpace(filterText), e =>
+                e.No.ToString().Contains(filterText!) || 
+                e.FirstName.Contains(filterText!) ||
+                e.LastName.Contains(filterText!) ||
+                e.MobilePhoneNumber.Contains(filterText!) ||
+                e.IdentityNumber.Contains(filterText!) ||
+                e.Email!.Contains(filterText!) ||
+                e.PassportNumber!.Contains(filterText!))
+
+                .WhereIf(!string.IsNullOrWhiteSpace(firstName), e => e.FirstName.Contains(firstName!))
+                .WhereIf(!string.IsNullOrWhiteSpace(lastName), e => e.LastName.Contains(lastName!))
                 .WhereIf(birthDateMin.HasValue, e => e.BirthDate >= birthDateMin!.Value)
                 .WhereIf(birthDateMax.HasValue, e => e.BirthDate <= birthDateMax!.Value)
-                .WhereIf(!string.IsNullOrWhiteSpace(mobilePhoneNumber), e => e.MobilePhoneNumber.StartsWith(mobilePhoneNumber!))
-                .WhereIf(!string.IsNullOrWhiteSpace(identityNumber), e => e.IdentityNumber.StartsWith(identityNumber!))
-                .WhereIf(!string.IsNullOrWhiteSpace(passportNumber), e => e.PassportNumber.StartsWith(passportNumber!))
-                .WhereIf(!string.IsNullOrWhiteSpace(email), e => e.Email.StartsWith(email!))
-                .WhereIf(!string.IsNullOrWhiteSpace(emergencyPhoneNumber), e => e.EmergencyPhoneNumber.StartsWith(emergencyPhoneNumber!))
-                .WhereIf(no.HasValue, e => e.No.ToString().StartsWith(no!.Value.ToString()))
-                .WhereIf(!string.IsNullOrWhiteSpace(motherName), e => e.MotherName.StartsWith(motherName!))
-                .WhereIf(!string.IsNullOrWhiteSpace(fatherName), e => e.FatherName.StartsWith(fatherName!))
+                .WhereIf(!string.IsNullOrWhiteSpace(mobilePhoneNumber), e => e.MobilePhoneNumber.Contains(mobilePhoneNumber!))
+                .WhereIf(!string.IsNullOrWhiteSpace(identityNumber), e => e.IdentityNumber.Contains(identityNumber!))
+                .WhereIf(!string.IsNullOrWhiteSpace(passportNumber), e => e.PassportNumber!.Contains(passportNumber!))
+                .WhereIf(!string.IsNullOrWhiteSpace(email), e => e.Email!.Contains(email!))
+                .WhereIf(!string.IsNullOrWhiteSpace(emergencyPhoneNumber), e => e.EmergencyPhoneNumber!.Contains(emergencyPhoneNumber!))
+                .WhereIf(no.HasValue, e => e.No.ToString().Contains(no!.Value.ToString()))
+                .WhereIf(!string.IsNullOrWhiteSpace(motherName), e => e.MotherName!.Contains(motherName!))
+                .WhereIf(!string.IsNullOrWhiteSpace(fatherName), e => e.FatherName!.Contains(fatherName!))
                 .WhereIf(gender.HasValue, e => e.Gender == gender)
                 .WhereIf(bloodType.HasValue, e => e.BloodType == bloodType)
                 .WhereIf(companyId.HasValue, e => e.CompanyId == companyId)
@@ -256,11 +264,11 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
                 .WhereIf(primaryCityId.HasValue, e => e.PrimaryCityId == primaryCityId)
                 .WhereIf(primaryDistrictId.HasValue, e => e.PrimaryDistrictId == primaryDistrictId)
                 .WhereIf(primaryVillageId.HasValue, e => e.PrimaryVillageId == primaryVillageId)
-                .WhereIf(!string.IsNullOrWhiteSpace(primaryAddressDescription), e => e.PrimaryAddressDescription!.StartsWith(primaryAddressDescription!))  
+                .WhereIf(!string.IsNullOrWhiteSpace(primaryAddressDescription), e => e.PrimaryAddressDescription!.Contains(primaryAddressDescription!))  
                 .WhereIf(secondaryCityId.HasValue, e => e.SecondaryCityId == secondaryCityId)
                 .WhereIf(secondaryDistrictId.HasValue, e => e.SecondaryDistrictId == secondaryDistrictId)
                 .WhereIf(secondaryVillageId.HasValue, e => e.SecondaryVillageId == secondaryVillageId)
-                .WhereIf(!string.IsNullOrWhiteSpace(secondaryAddressDescription), e => e.SecondaryAddressDescription!.StartsWith(secondaryAddressDescription!));
+                .WhereIf(!string.IsNullOrWhiteSpace(secondaryAddressDescription), e => e.SecondaryAddressDescription!.Contains(secondaryAddressDescription!));
 
 
     //Company ve Country tablolarý ile join iþlemi yapýlýr. Entityler yok þu an önemli
@@ -334,31 +342,39 @@ protected virtual IQueryable<PatientWithNavigationProperties> ApplyFilter(
         string? secondaryAddressDescription = null) =>
 
             query
-                .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Patient.No.ToString().StartsWith(filterText!) || e.Patient.FirstName.StartsWith(filterText!) || e.Patient.LastName.StartsWith(filterText!) || e.Patient.MobilePhoneNumber.StartsWith(filterText!) || e.Patient.IdentityNumber.StartsWith(filterText!) || e.Patient.Email.StartsWith(filterText!) || e.Patient.PassportNumber.StartsWith(filterText!))
-                .WhereIf(!string.IsNullOrWhiteSpace(firstName), e => e.Patient.FirstName.StartsWith(firstName!))
-                .WhereIf(!string.IsNullOrWhiteSpace(lastName), e => e.Patient.LastName.StartsWith(lastName!))
-                .WhereIf(birthDateMin.HasValue, e => e.Patient.BirthDate >= birthDateMin!.Value)
-                .WhereIf(birthDateMax.HasValue, e => e.Patient.BirthDate <= birthDateMax!.Value)
-                .WhereIf(!string.IsNullOrWhiteSpace(mobilePhoneNumber), e => e.Patient.MobilePhoneNumber.StartsWith(mobilePhoneNumber!))
-                .WhereIf(!string.IsNullOrWhiteSpace(identityNumber), e => e.Patient.IdentityNumber.StartsWith(identityNumber!))
-                .WhereIf(!string.IsNullOrWhiteSpace(passportNumber), e => e.Patient.PassportNumber.StartsWith(passportNumber!))
-                .WhereIf(!string.IsNullOrWhiteSpace(email), e => e.Patient.Email.StartsWith(email!))
-                .WhereIf(!string.IsNullOrWhiteSpace(emergencyPhoneNumber), e => e.Patient.EmergencyPhoneNumber.StartsWith(emergencyPhoneNumber!))
-                .WhereIf(no.HasValue, e => e.Patient.No.ToString().StartsWith(no!.Value.ToString()))
-                .WhereIf(!string.IsNullOrWhiteSpace(motherName), e => e.Patient.MotherName.StartsWith(motherName!))
-                .WhereIf(!string.IsNullOrWhiteSpace(fatherName), e => e.Patient.FatherName.StartsWith(fatherName!))
-                .WhereIf(gender.HasValue, e => e.Patient.Gender == gender)
-                .WhereIf(bloodType.HasValue, e => e.Patient.BloodType == bloodType)
-                .WhereIf(companyId.HasValue, e => e.Patient.CompanyId == companyId)
-                .WhereIf(primaryCountryId.HasValue, e => e.Patient.PrimaryCountryId == primaryCountryId)
-                .WhereIf(primaryCityId.HasValue, e => e.Patient.PrimaryCityId == primaryCityId)
-                .WhereIf(primaryDistrictId.HasValue, e => e.Patient.PrimaryDistrictId == primaryDistrictId)
-                .WhereIf(primaryVillageId.HasValue, e => e.Patient.PrimaryVillageId == primaryVillageId)
-                .WhereIf(secondaryCountryId.HasValue, e => e.Patient.SecondaryCountryId == secondaryCountryId)
-                .WhereIf(secondaryCityId.HasValue, e => e.Patient.SecondaryCityId == secondaryCityId)
-                .WhereIf(secondaryDistrictId.HasValue, e => e.Patient.SecondaryDistrictId == secondaryDistrictId)
-                .WhereIf(secondaryVillageId.HasValue, e => e.Patient.SecondaryVillageId == secondaryVillageId)
-                .WhereIf(!string.IsNullOrWhiteSpace(secondaryAddressDescription), e => e.Patient.SecondaryAddressDescription!.StartsWith(secondaryAddressDescription!));
+                .WhereIf(!string.IsNullOrWhiteSpace(filterText), e =>
+                e.Patient!.No.ToString().Contains(filterText!) ||
+                e.Patient.FirstName.Contains(filterText!) ||
+                e.Patient.LastName.Contains(filterText!) ||
+                e.Patient.MobilePhoneNumber.Contains(filterText!) ||
+                e.Patient.IdentityNumber.Contains(filterText!) ||
+                e.Patient.Email!.Contains(filterText!) ||
+                e.Patient.PassportNumber!.Contains(filterText!))
+
+                .WhereIf(!string.IsNullOrWhiteSpace(firstName), e => e.Patient!.FirstName.Contains(firstName!))
+                .WhereIf(!string.IsNullOrWhiteSpace(lastName), e => e.Patient!.LastName.Contains(lastName!))
+                .WhereIf(birthDateMin.HasValue, e => e.Patient!.BirthDate >= birthDateMin!.Value)
+                .WhereIf(birthDateMax.HasValue, e => e.Patient!.BirthDate <= birthDateMax!.Value)
+                .WhereIf(!string.IsNullOrWhiteSpace(mobilePhoneNumber), e => e.Patient!.MobilePhoneNumber.Contains(mobilePhoneNumber!))
+                .WhereIf(!string.IsNullOrWhiteSpace(identityNumber), e => e.Patient!.IdentityNumber.Contains(identityNumber!))
+                .WhereIf(!string.IsNullOrWhiteSpace(passportNumber), e => e.Patient!.PassportNumber!.Contains(passportNumber!))
+                .WhereIf(!string.IsNullOrWhiteSpace(email), e => e.Patient!.Email!.Contains(email!))
+                .WhereIf(!string.IsNullOrWhiteSpace(emergencyPhoneNumber), e => e.Patient!.EmergencyPhoneNumber!.Contains(emergencyPhoneNumber!))
+                .WhereIf(no.HasValue, e => e.Patient!.No.ToString().Contains(no!.Value.ToString()))
+                .WhereIf(!string.IsNullOrWhiteSpace(motherName), e => e.Patient!.MotherName!.Contains(motherName!))
+                .WhereIf(!string.IsNullOrWhiteSpace(fatherName), e => e.Patient!.FatherName!.Contains(fatherName!))
+                .WhereIf(gender.HasValue, e => e.Patient!.Gender == gender)
+                .WhereIf(bloodType.HasValue, e => e.Patient!.BloodType == bloodType)
+                .WhereIf(companyId.HasValue, e => e.Patient!.CompanyId == companyId)
+                .WhereIf(primaryCountryId.HasValue, e => e.Patient!.PrimaryCountryId == primaryCountryId)
+                .WhereIf(primaryCityId.HasValue, e => e.Patient!.PrimaryCityId == primaryCityId)
+                .WhereIf(primaryDistrictId.HasValue, e => e.Patient!.PrimaryDistrictId == primaryDistrictId)
+                .WhereIf(primaryVillageId.HasValue, e => e.Patient!.PrimaryVillageId == primaryVillageId)
+                .WhereIf(secondaryCountryId.HasValue, e => e.Patient!.SecondaryCountryId == secondaryCountryId)
+                .WhereIf(secondaryCityId.HasValue, e => e.Patient!.SecondaryCityId == secondaryCityId)
+                .WhereIf(secondaryDistrictId.HasValue, e => e.Patient!.SecondaryDistrictId == secondaryDistrictId)
+                .WhereIf(secondaryVillageId.HasValue, e => e.Patient!.SecondaryVillageId == secondaryVillageId)
+                .WhereIf(!string.IsNullOrWhiteSpace(secondaryAddressDescription), e => e.Patient!.SecondaryAddressDescription!.Contains(secondaryAddressDescription!));
 
     #endregion
 }

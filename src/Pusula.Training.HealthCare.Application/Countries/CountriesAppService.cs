@@ -26,7 +26,7 @@ namespace Pusula.Training.HealthCare.Countries;
 [Authorize(HealthCarePermissions.Countries.Default)]
 public class CountriesAppService(
     ICountryRepository countryRepository,
-    CountryBusinessRules countryBusinessRules,
+    ICountryBusinessRules countryBusinessRules,
     CountryManager countryManager,
     IDistributedCache<CountryDownloadTokenCacheItem, string> downloadTokenCache)
     : HealthCareAppService, ICountriesAppService
@@ -51,7 +51,7 @@ public class CountriesAppService(
     [Authorize(HealthCarePermissions.Countries.Delete)]
     public virtual async Task DeleteAsync(Guid id)
     {
-        HealthCareException.ThrowIfNull(await countryRepository.FindAsync(id), HealthCareException.COUNTRY_NOT_FOUND_MESSAGE);
+        HealthCareException.ThrowIfNull(await countryRepository.FindAsync(id), HealthCareDomainErrorCodes.CountryNotFound);
         await countryRepository.DeleteAsync(id);
     }
 
