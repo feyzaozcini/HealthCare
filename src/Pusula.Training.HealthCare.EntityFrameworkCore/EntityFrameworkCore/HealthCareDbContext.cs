@@ -163,7 +163,7 @@ public class HealthCareDbContext :
                 b.Property(x => x.BirthDate).HasColumnName(nameof(Patient.BirthDate));
                 b.Property(x => x.IdentityNumber).HasColumnName(nameof(Patient.IdentityNumber)).HasMaxLength(PatientConsts.IdentityNumberMaxLength);
                 b.Property(x => x.PassportNumber).HasColumnName(nameof(Patient.PassportNumber));
-                b.Property(x => x.Email).HasColumnName(nameof(Patient.Email)).IsRequired().HasMaxLength(PatientConsts.EmailAddressMaxLength);
+                b.Property(x => x.Email).HasColumnName(nameof(Patient.Email)).IsRequired(false).HasMaxLength(PatientConsts.EmailAddressMaxLength);
                 b.Property(x => x.MobilePhoneNumber).HasColumnName(nameof(Patient.MobilePhoneNumber)).IsRequired().HasMaxLength(PatientConsts.PhoneNumberMaxLength);
                 b.Property(x => x.EmergencyPhoneNumber).HasColumnName(nameof(Patient.EmergencyPhoneNumber)).HasMaxLength(PatientConsts.PhoneNumberMaxLength);
                 b.Property(x => x.Gender).HasColumnName(nameof(Patient.Gender)).IsRequired();
@@ -171,7 +171,7 @@ public class HealthCareDbContext :
                 b.Property(x => x.MotherName).HasColumnName(nameof(Patient.MotherName));
                 b.Property(x => x.FatherName).HasColumnName(nameof(Patient.FatherName));
                 b.Property(x => x.BloodType).HasColumnName(nameof(Patient.BloodType));
-                b.Property(x => x.Type).HasColumnName(nameof(Patient.Type)).IsRequired();
+                b.Property(x => x.Type).HasColumnName(nameof(Patient.Type)).IsRequired(false);
                 b.Property(x => x.PrimaryAddressDescription).HasColumnName(nameof(Patient.PrimaryAddressDescription));
                 b.Property(x => x.SecondaryAddressDescription).HasColumnName(nameof(Patient.SecondaryAddressDescription));
                 b.HasOne<PatientCompany>().WithMany().IsRequired(false).HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.NoAction);
