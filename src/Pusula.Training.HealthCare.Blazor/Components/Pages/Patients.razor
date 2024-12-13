@@ -549,7 +549,7 @@
                             <Validation MessageLocalizer="@LH.Localize">
                                 <Field>
                                     <FieldLabel>@L["BloodType"]</FieldLabel>
-                                    <Select TValue="BloodType" @bind-SelectedValue="NewPatient.BloodType">
+                                    <Select TValue="BloodType?" @bind-SelectedValue="NewPatient.BloodType">
                                         <SelectItem Value="0" selected>@L["Select"]</SelectItem>
                                         @foreach (var bloodType in BloodTypesCollection)
                                         {
@@ -565,11 +565,11 @@
                         <Column ColumnSize="ColumnSize.Is3">
                             <Validation MessageLocalizer="@LH.Localize">
                                 <Field>
-                                    <FieldLabel>@L["Type"] *</FieldLabel>
-                                    <Select TValue="Pusula.Training.HealthCare.Patients.Type" @bind-SelectedValue="NewPatient.Type">
+                                    <FieldLabel>@L["Type"]</FieldLabel>
+                                    <Select TValue="Pusula.Training.HealthCare.Patients.Type?" @bind-SelectedValue="NewPatient.Type">
                                         @foreach (var type in TypesCollection)
                                         {
-                                            <SelectItem TValue="Pusula.Training.HealthCare.Patients.Type" Value="@type.Id">
+                                            <SelectItem TValue="Pusula.Training.HealthCare.Patients.Type?" Value="@type.Id">
                                                 @type.DisplayName
                                             </SelectItem>
                                         }

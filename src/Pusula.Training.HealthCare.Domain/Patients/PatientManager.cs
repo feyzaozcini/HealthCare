@@ -16,39 +16,26 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         DateTime birthDate, 
         string identityNumber, 
         string? passportNumber, 
-        string email, 
+        string? email, 
         string mobilePhoneNumber, 
         string? emergencyPhoneNumber, 
         Gender gender,
         string? motherName, 
         string? fatherName, 
-        BloodType bloodType, 
-        Type type,
+        BloodType? bloodType, 
+        Type? type,
         Guid? primaryCountryId,
         Guid? primaryCityId,
         Guid? primaryDistrictId,
         Guid? primaryVillageId,
-        string primaryAddressDescription,
+        string? primaryAddressDescription,
         Guid? secondaryCountryId,
         Guid? secondaryCityId,
         Guid? secondaryDistrictId,
         Guid? secondaryVillageId,
-        string secondaryAddressDescription
+        string? secondaryAddressDescription
     )
     {
-        Check.NotNull(firstName, nameof(firstName));
-        Check.Length(firstName, nameof(firstName), PatientConsts.FirstNameMaxLength, 0);
-        Check.NotNull(lastName, nameof(lastName));
-        Check.Length(lastName, nameof(lastName), PatientConsts.LastNameMaxLength, 0);
-        Check.NotNull(identityNumber, nameof(identityNumber));
-        Check.Length(identityNumber, nameof(identityNumber), PatientConsts.IdentityNumberMaxLength, 0);
-        Check.NotNull(email, nameof(email));
-        Check.Length(email, nameof(email), PatientConsts.EmailAddressMaxLength, 0);
-        Check.NotNull(mobilePhoneNumber, nameof(mobilePhoneNumber));
-        Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.PhoneNumberMaxLength, PatientConsts.PhoneNumberMinLength);
-        Check.Length(motherName, nameof(motherName), PatientConsts.FirstNameMaxLength, 0);
-        Check.Length(fatherName, nameof(fatherName), PatientConsts.FirstNameMaxLength, 0);
-
         var patient = new Patient(
          GuidGenerator.Create(),
          companyId,firstName, lastName, birthDate, identityNumber, passportNumber, email, mobilePhoneNumber, emergencyPhoneNumber,gender,
@@ -61,20 +48,20 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
 
     public virtual async Task<Patient> UpdateAsync(
         Guid id,
-        Guid companyId,
+        Guid? companyId,
         string firstName,
         string lastName,
         DateTime birthDate,
         string identityNumber,
-        string passportNumber,
-        string email,
+        string? passportNumber,
+        string? email,
         string mobilePhoneNumber,
-        string emergencyPhoneNumber,
+        string? emergencyPhoneNumber,
         Gender gender,
-        string motherName,
-        string fatherName,
-        BloodType bloodType,
-        Type type,
+        string? motherName,
+        string? fatherName,
+        BloodType? bloodType,
+        Type? type,
         Guid? primaryCountryId,
         Guid? primaryCityId,
         Guid? primaryDistrictId,
@@ -88,48 +75,32 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         [CanBeNull] string? concurrencyStamp = null
     )
     {
-        Check.NotNull(firstName, nameof(firstName));
-        Check.Length(firstName, nameof(firstName), PatientConsts.FirstNameMaxLength, 0);
-        Check.NotNull(lastName, nameof(lastName));
-        Check.Length(lastName, nameof(lastName), PatientConsts.LastNameMaxLength, 0);
-        Check.NotNull(identityNumber, nameof(identityNumber));
-        Check.Length(identityNumber, nameof(identityNumber), PatientConsts.IdentityNumberMaxLength, 0);
-        Check.Length(passportNumber, nameof(passportNumber), PatientConsts.PassportNumberMaxLength, PatientConsts.PassportNumberMinLength);
-        Check.NotNull(email, nameof(email));
-        Check.Length(email, nameof(email), PatientConsts.EmailAddressMaxLength, 0);
-        Check.NotNull(mobilePhoneNumber, nameof(mobilePhoneNumber));
-        Check.Length(mobilePhoneNumber, nameof(mobilePhoneNumber), PatientConsts.PhoneNumberMaxLength, PatientConsts.PhoneNumberMinLength);
-        Check.Length(emergencyPhoneNumber, nameof(emergencyPhoneNumber), PatientConsts.PhoneNumberMaxLength, PatientConsts.PhoneNumberMinLength);
-        Check.Length(motherName, nameof(motherName), PatientConsts.FirstNameMaxLength, 0);
-        Check.Length(fatherName, nameof(fatherName), PatientConsts.FirstNameMaxLength, 0);
-
         var patient = await patientRepository.GetAsync(id);
 
-        patient.CompanyId = companyId;
-        patient.FirstName = firstName;
-        patient.LastName = lastName;
-        patient.BirthDate = birthDate;
-        patient.IdentityNumber = identityNumber;
-        patient.PassportNumber = passportNumber;
-        patient.Email = email;
-        patient.MobilePhoneNumber = mobilePhoneNumber;
-        patient.EmergencyPhoneNumber = emergencyPhoneNumber;
-        patient.Gender = gender;
-        patient.MotherName = motherName;
-        patient.FatherName = fatherName;
-        patient.BloodType = bloodType;
-        patient.Type = type;
-        patient.PrimaryCountryId = primaryCountryId ?? Guid.Empty;
-        patient.PrimaryCityId = primaryCityId ?? Guid.Empty;
-        patient.PrimaryDistrictId = primaryDistrictId ?? Guid.Empty;
-        patient.PrimaryVillageId = primaryVillageId ?? Guid.Empty;
-        patient.PrimaryAddressDescription = primaryAddressDescription;
-        patient.SecondaryCountryId = secondaryCountryId ?? Guid.Empty;
-        patient.SecondaryCityId = secondaryCityId ?? Guid.Empty;
-        patient.SecondaryDistrictId = secondaryDistrictId ?? Guid.Empty;
-        patient.SecondaryVillageId = secondaryVillageId ?? Guid.Empty;
-        patient.SecondaryAddressDescription = secondaryAddressDescription;
-
+        patient.SetCompanyId(companyId);
+        patient.SetFirstName(firstName);
+        patient.SetLastName(lastName);
+        patient.SetBirthDate(birthDate);
+        patient.SetIdentityNumber(identityNumber);
+        patient.SetPassportNumber(passportNumber);
+        patient.SetEmail(email);
+        patient.SetMobilePhoneNumber(mobilePhoneNumber);
+        patient.SetEmergencyPhoneNumber(emergencyPhoneNumber);
+        patient.SetGender(gender);
+        patient.SetMotherName(motherName);
+        patient.SetFatherName(fatherName);
+        patient.SetBloodType(bloodType);
+        patient.SetType(type);
+        patient.SetPrimaryCountryId(primaryCountryId);
+        patient.SetPrimaryCityId(primaryCityId);
+        patient.SetPrimaryDistrictId(primaryDistrictId);
+        patient.SetPrimaryVillageId(primaryVillageId);
+        patient.SetPrimaryAddressDescription(primaryAddressDescription);
+        patient.SetSecondaryCountryId(secondaryCountryId);
+        patient.SetSecondaryCityId(secondaryCityId);
+        patient.SetSecondaryDistrictId(secondaryDistrictId);
+        patient.SetSecondaryVillageId(secondaryVillageId);
+        patient.SetSecondaryAddressDescription(secondaryAddressDescription);
         patient.SetConcurrencyStampIfNotNull(concurrencyStamp);
 
         return await patientRepository.UpdateAsync(patient);

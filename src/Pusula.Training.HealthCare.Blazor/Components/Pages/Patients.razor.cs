@@ -671,7 +671,7 @@ public partial class Patients
         {
             BirthDate = DateTime.Now,
 
-            PassportNumber = "",
+            //PassportNumber = "",
 
             //PrimaryCountryId = CountriesCodeCollection.Select(x => x.Id).FirstOrDefault(),
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Pusula.Training.HealthCare.Migrations
 {
     [DbContext(typeof(HealthCareDbContext))]
-    partial class HealthCareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241213115201_EmailIsRequiredFalse")]
+    partial class EmailIsRequiredFalse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1041,7 +1044,7 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("BirthDate");
 
-                    b.Property<int?>("BloodType")
+                    b.Property<int>("BloodType")
                         .HasColumnType("integer")
                         .HasColumnName("BloodType");
 
@@ -1077,6 +1080,7 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasColumnName("Email");
 
                     b.Property<string>("EmergencyPhoneNumber")
+                        .IsRequired()
                         .HasMaxLength(15)
                         .HasColumnType("character varying(15)")
                         .HasColumnName("EmergencyPhoneNumber");
@@ -1087,6 +1091,7 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasColumnName("ExtraProperties");
 
                     b.Property<string>("FatherName")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("FatherName");
 
@@ -1133,6 +1138,7 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasColumnName("MobilePhoneNumber");
 
                     b.Property<string>("MotherName")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("MotherName");
 
@@ -1143,6 +1149,7 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasDefaultValueSql("nextval('\"PatientNoSequence\"')");
 
                     b.Property<string>("PassportNumber")
+                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("PassportNumber");
 
@@ -1178,7 +1185,7 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.Property<Guid?>("SecondaryVillageId")
                         .HasColumnType("uuid");
 
-                    b.Property<int?>("Type")
+                    b.Property<int>("Type")
                         .HasColumnType("integer")
                         .HasColumnName("Type");
 
