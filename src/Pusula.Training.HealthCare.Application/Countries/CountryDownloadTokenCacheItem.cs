@@ -1,7 +1,7 @@
-﻿namespace Pusula.Training.HealthCare.Countries;
+﻿using Pusula.Training.HealthCare.Core;
 
-public class CountryDownloadTokenCacheItem
+namespace Pusula.Training.HealthCare.Countries;
+
+public class CountryDownloadTokenCacheItem : DownloadTokenCacheItem
 {
-    public string Token { get; set; } = null!;
-
 }

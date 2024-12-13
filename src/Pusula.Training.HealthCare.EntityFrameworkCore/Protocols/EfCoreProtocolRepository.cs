@@ -155,23 +155,22 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
     {
         return query
                 .WhereIf(!string.IsNullOrWhiteSpace(filterText), e =>
-                    e.No.ToString().StartsWith(filterText!) ||
-                    e.Patient.FirstName!.StartsWith(filterText!) ||
-                    e.Patient.LastName!.StartsWith(filterText!) ||
-                    e.Patient.No!.ToString().StartsWith(filterText!) ||
-                    e.ProtocolType.Name.StartsWith(filterText!) ||
-                    e.Note.Text.StartsWith(filterText!) ||
-                    e.Insurance.Name.StartsWith(filterText!) ||
-                    e.Department.Name.StartsWith(filterText!) ||
-                    e.Doctor.User.Name.StartsWith(filterText!) ||
-                    e.Doctor.User.Surname.StartsWith(filterText!) ||
-                    e.Doctor.Title.Name.StartsWith(filterText!))
+                e.No.ToString().Contains(filterText!) ||
+                e.Patient.FirstName!.Contains(filterText!) ||
+                e.Patient.LastName!.Contains(filterText!) ||
+                e.Patient.No!.ToString().Contains(filterText!) ||
+                e.ProtocolType.Name.Contains(filterText!) ||
+                e.Note!.Text!.Contains(filterText!) ||
+                e.Insurance.Name.Contains(filterText!) ||
+                e.Department.Name.Contains(filterText!) ||
+                e.Doctor.User.Name.Contains(filterText!) ||
+                e.Doctor.User.Surname.Contains(filterText!) ||
+                e.Doctor.Title.Name.Contains(filterText!))
 
                 .WhereIf(startTime.HasValue, e => e.StartTime >= startTime!.Value)
                 .WhereIf(endTime.HasValue, e => e.EndTime <= endTime!.Value)
-                .WhereIf(no.HasValue, e => e.No.ToString().StartsWith(no!.Value.ToString()))
+                .WhereIf(no.HasValue, e => e.No.ToString().Contains(no!.Value.ToString()))
                 .WhereIf(protocolStatus.HasValue, e => e.ProtocolStatus == protocolStatus!.Value)
-                //.WhereIf(protocolStatus.HasValue, e => e.ProtocolStatus.ToString() == protocolStatus.ToString())
                 .WhereIf(protocolTypeId != null && protocolTypeId != Guid.Empty, e => e.ProtocolTypeId == protocolTypeId)
                 .WhereIf(protocolNoteId != null && protocolNoteId != Guid.Empty, e => e.ProtocolNoteId == protocolNoteId)
                 .WhereIf(protocolInsuranceId != null && protocolInsuranceId != Guid.Empty, e => e.ProtocolInsuranceId == protocolInsuranceId)

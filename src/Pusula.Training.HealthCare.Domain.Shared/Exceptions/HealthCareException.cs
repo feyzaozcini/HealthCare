@@ -14,19 +14,6 @@ namespace Pusula.Training.HealthCare.Exceptions
 
         public const string DEFAULT_ERROR_CODE = "HCE-500";
 
-        public const string COUNTRY_NOT_FOUND_MESSAGE = "The specified country was not found.";
-
-        public const string CITY_NOT_FOUND_MESSAGE = "The specified city was not found.";
-
-        public const string DISTRICT_NOT_FOUND_MESSAGE = "The specified district was not found.";
-
-        public const string VILLAGE_NOT_FOUND_MESSAGE = "The specified village was not found.";
-
-
-
-
-
-
 
         public static void Throw(string? message) => ThrowIf(message,true);
 

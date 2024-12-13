@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pusula.Training.HealthCare.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace Pusula.Training.HealthCare.Insurances
 {
-    public class InsuranceDownloadTokenCacheItem
+    public class InsuranceDownloadTokenCacheItem : DownloadTokenCacheItem
     {
-        public string Token { get; set; } = null!;
     }
 }

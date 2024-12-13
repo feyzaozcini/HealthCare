@@ -1,8 +1,8 @@
+using Pusula.Training.HealthCare.Core;
 using System;
 
 namespace Pusula.Training.HealthCare.Departments;
 
-public class DepartmentDownloadTokenCacheItem
+public class DepartmentDownloadTokenCacheItem : DownloadTokenCacheItem
 {
-    public string Token { get; set; } = null!;
 }

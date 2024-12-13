@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using MiniExcelLibs;
+using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.LabRequests;
 using Pusula.Training.HealthCare.Notes;
+using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -27,23 +29,14 @@ namespace Pusula.Training.HealthCare.Protocols
         NoteManager noteManager,
         ProtocolManager protocolManager, 
         IDistributedCache<ProtocolDownloadTokenCacheItem, string> downloadTokenCache, 
-        IRepository<Patients.Patient, Guid> patientRepository, 
-        IRepository<Departments.Department, Guid> departmentRepository) : HealthCareAppService, IProtocolsAppService
+        IPatientRepository patientRepository, 
+        IDepartmentRepository departmentRepository) : HealthCareAppService, IProtocolsAppService
     {
 
 
         [Authorize(HealthCarePermissions.Protocols.Create)]
         public virtual async Task<ProtocolDto> CreateAsync(ProtocolCreateDto input)
         {
-            if (input.PatientId == default)
-            {
-                throw new UserFriendlyException(L["The {0} field is required.", L["Patient"]]);
-            }
-            if (input.DepartmentId == default)
-            {
-                throw new UserFriendlyException(L["The {0} field is required.", L["Department"]]);
-            }
-
             var note = await noteManager.CreateAsync(input.NoteText);
 
             var protocol = await protocolManager.CreateAsync(
@@ -169,15 +162,6 @@ namespace Pusula.Training.HealthCare.Protocols
         [Authorize(HealthCarePermissions.Protocols.Edit)]
         public virtual async Task<ProtocolDto> UpdateAsync(Guid id, ProtocolUpdateDto input)
         {
-            if (input.PatientId == default)
-            {
-                throw new UserFriendlyException(L["The {0} field is required.", L["Patient"]]);
-            }
-            if (input.DepartmentId == default)
-            {
-                throw new UserFriendlyException(L["The {0} field is required.", L["Department"]]);
-            }
-
             var protocol = await protocolManager.UpdateAsync(
             id,
             input.StartTime, input.EndTime, input.ProtocolStatus, input.ProtocolTypeId, input.ProtocolNoteId,

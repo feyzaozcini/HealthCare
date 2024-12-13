@@ -48,7 +48,7 @@ namespace Pusula.Training.HealthCare.Villages
         [Authorize(HealthCarePermissions.Villages.Delete)]
         public virtual async Task DeleteAsync(Guid id)
         {
-            HealthCareException.ThrowIfNull(await villageRepository.FindAsync(id), HealthCareException.VILLAGE_NOT_FOUND_MESSAGE);
+            HealthCareException.ThrowIfNull(await villageRepository.FindAsync(id), HealthCareDomainErrorCodes.VillageNotFound);
             await villageRepository.DeleteAsync(id);
         }
 
@@ -66,19 +66,7 @@ namespace Pusula.Training.HealthCare.Villages
 
 
         [Authorize(HealthCarePermissions.Villages.Delete)]
-        public virtual async Task DeleteAllAsync(GetVillagesInput input)
-        {
-            var villages = await villageRepository.GetListAsync(
-                input.FilterText,
-                input.Name,
-                input.Sorting,
-                int.MaxValue,
-                0
-            );
-
-            var idsToDelete = villages.Select(c => c.Id).ToList();
-            await villageRepository.DeleteManyAsync(idsToDelete);
-        }
+        public virtual async Task DeleteAllAsync(GetVillagesInput input) => await villageRepository.DeleteAllAsync(input.FilterText, input.Name);
 
 
         [AllowAnonymous]
