@@ -13,9 +13,8 @@ namespace Pusula.Training.HealthCare.Notes
     {
         public Guid Id { get; set; }
 
-        [Required]
         [StringLength(NoteConsts.TextMaxLength)]
-        public string Text { get; set; } = null!;
+        public string? Text { get; set; } 
         public string ConcurrencyStamp { get; set; } = null!;
     }
 }

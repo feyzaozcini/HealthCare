@@ -10,15 +10,15 @@ namespace Pusula.Training.HealthCare.Protocols
     {
         [Required]
         public virtual DateTime StartTime { get; set; }
-        public virtual DateTime EndTime { get; set; }
+        public virtual DateTime? EndTime { get; set; }
         [Required]
         public virtual int No { get; set; }
         public ProtocolStatus ProtocolStatus { get; set; }
         [Required]
         public virtual Guid ProtocolTypeId { get; set; }
         public string ProtocolTypeName { get; set; }
-        public virtual Guid ProtocolNoteId { get; set; }
-        public string NoteText { get; set; }
+        public virtual Guid? ProtocolNoteId { get; set; }
+        public string? NoteText { get; set; }
 
         [Required]
         public virtual Guid ProtocolInsuranceId { get; set; }

@@ -24,7 +24,7 @@ namespace Pusula.Training.HealthCare.Protocols
     [Authorize(HealthCarePermissions.Protocols.Default)]
     public class ProtocolsAppService(
         IProtocolRepository protocolRepository, 
-        INoteRepository noteRepository,
+        NoteManager noteManager,
         ProtocolManager protocolManager, 
         IDistributedCache<ProtocolDownloadTokenCacheItem, string> downloadTokenCache, 
         IRepository<Patients.Patient, Guid> patientRepository, 
@@ -44,15 +44,10 @@ namespace Pusula.Training.HealthCare.Protocols
                 throw new UserFriendlyException(L["The {0} field is required.", L["Department"]]);
             }
 
-            // Yeni bir Note oluþtur ve kaydet
-            var note = new Note(Guid.NewGuid(), input.NoteText ?? string.Empty);
-            await noteRepository.InsertAsync(note);
-
-            // Yeni Note'un ID'sini ProtocolNoteId olarak ata
-            input.ProtocolNoteId = note.Id;
+            var note = await noteManager.CreateAsync(input.NoteText);
 
             var protocol = await protocolManager.CreateAsync(
-            input.StartTime, input.EndTime, input.ProtocolStatus, input.ProtocolTypeId, input.ProtocolNoteId,
+            input.StartTime, input.EndTime, input.ProtocolStatus, input.ProtocolTypeId, note.Id,
             input.ProtocolInsuranceId, input.PatientId, input.DepartmentId, input.DoctorId
             );
 
