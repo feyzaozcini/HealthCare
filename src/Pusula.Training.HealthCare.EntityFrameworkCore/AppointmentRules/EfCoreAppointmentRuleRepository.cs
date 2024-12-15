@@ -33,11 +33,13 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Guid? departmentId = null, 
             Gender? gender = null,
             int? age = null,
+            int? minAge = null,
+            int? maxAge = null,
             string? description = null, 
             CancellationToken cancellationToken = default)
         {
             var query = await GetQueryForNavigationPropertiesAsync();
-            query = ApplyFilter(query, filterText,doctorId, departmentId,gender,age,description);
+            query = ApplyFilter(query, filterText,doctorId, departmentId,gender,age,minAge,maxAge,description);
             var ids = query.Select(x => x.AppointmentRule.Id);
             await DeleteManyAsync(ids, cancellationToken: GetCancellationToken(cancellationToken));
         }
@@ -48,11 +50,13 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Guid? departmentId = null, 
             Gender? gender = null,
             int? age = null,
+            int? minAge = null,
+            int? maxAge = null,
             string? description = null, 
             CancellationToken cancellationToken = default)
         {
             var query = await GetQueryForNavigationPropertiesAsync();
-            query = ApplyFilter(query, filterText, doctorId, departmentId, gender,age,description);
+            query = ApplyFilter(query, filterText, doctorId, departmentId, gender,age,minAge,maxAge,description);
 
             return await query.LongCountAsync(GetCancellationToken(cancellationToken));
         }
@@ -63,13 +67,15 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Guid? departmentId = null, 
             Gender? gender = null,
             int? age = null,
+            int? minAge = null,
+            int? maxAge = null,
             string? description = null, 
             string? sorting = null, 
             int maxResultCount = int.MaxValue, 
             int skipCount = 0, 
             CancellationToken cancellationToken = default)
         {
-            var query = ApplyFilter(await GetQueryableAsync(), filterText,  doctorId, departmentId,gender,age,description);
+            var query = ApplyFilter(await GetQueryableAsync(), filterText,  doctorId, departmentId,gender,age,minAge,maxAge,description);
             query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? AppointmentRuleConst.GetDefaultSorting(false) : sorting);
             return await query.Page(skipCount, maxResultCount).ToListAsync(cancellationToken);
         }
@@ -80,6 +86,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Guid? departmentId = null,
             Gender? gender = null,
             int? age = null,
+            int? minAge = null,
+            int? maxAge = null,
             string? description = null, 
             string? sorting = null, 
             int maxResultCount = int.MaxValue, 
@@ -87,7 +95,7 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             CancellationToken cancellationToken = default)
         {
             var query = await GetQueryForNavigationPropertiesAsync();
-            query = ApplyFilter(query, filterText,doctorId, departmentId, gender,age,description);
+            query = ApplyFilter(query, filterText,doctorId, departmentId, gender,age,minAge,maxAge,description);
             query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? AppointmentRuleConst.GetDefaultSorting(true) : sorting);
             return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
         }
@@ -117,6 +125,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Guid? departmentId = null,
             Gender? gender = null,
             int? age = null,
+            int? minAge = null,
+            int? maxAge = null,
             string? description = null) =>
                 query
                     .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.Description!.Contains(filterText!))
@@ -150,6 +160,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Guid? departmentId = null,
             Gender? gender = null,
             int? age = null,
+            int? minAge = null,
+            int? maxAge = null,
             string? description = null) =>
                 query
                      .WhereIf(!string.IsNullOrWhiteSpace(filterText), e => e.AppointmentRule.Description!.Contains(filterText!))

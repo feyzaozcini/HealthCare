@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories;
@@ -24,6 +21,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Guid? departmentId = null,
             Gender? gender = null,
             int? age = null,
+            int? minAge = null,
+            int? maxAge = null,
             string? description = null,
             CancellationToken cancellationToken = default
         );
@@ -37,6 +36,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Guid? departmentId = null,
             Gender? gender = null,
             int? age = null,
+            int? minAge = null,
+            int? maxAge = null,
             string? description = null,
             string? sorting = null,
             int maxResultCount = int.MaxValue,
@@ -50,6 +51,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Guid? departmentId = null,
             Gender? gender = null,
             int? age = null,
+            int? minAge = null,
+            int? maxAge = null,
             string? description = null,
             string? sorting = null,
             int maxResultCount = int.MaxValue,
@@ -63,6 +66,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
             Guid? departmentId = null,
             Gender? gender = null,
             int? age = null,
+            int? minAge = null,
+            int? maxAge = null,
             string? description = null,
             CancellationToken cancellationToken = default
         );

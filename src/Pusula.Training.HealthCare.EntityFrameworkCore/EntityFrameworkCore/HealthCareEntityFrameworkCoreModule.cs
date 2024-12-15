@@ -38,6 +38,7 @@ using Pusula.Training.HealthCare.Insurances;
 using Pusula.Training.HealthCare.AppointmentRules;
 using Pusula.Training.HealthCare.PainTypes;
 using Pusula.Training.HealthCare.PainDetails;
+using Pusula.Training.HealthCare.DoctorWorkSchedules;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -98,6 +99,7 @@ public class HealthCareEntityFrameworkCoreModule : AbpModule
             options.AddRepository<AppointmentRule, EfCoreAppointmentRuleRepository>();
             options.AddRepository<PainType, EfCorePainTypeRepository>();
             options.AddRepository<PainDetail, EfCorePainDetailRepository>();
+            options.AddRepository<DoctorWorkSchedule, EfCoreDoctorWorkScheduleRepository>();
 
 
 

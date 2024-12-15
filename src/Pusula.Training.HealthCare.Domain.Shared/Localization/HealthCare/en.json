@@ -179,6 +179,7 @@
     "Menu:Treatment": "Treatment",
     "Menu:IcdList": "Icd List",
     "Menu:DoctorTaskList": "Doctor Task List",
-    "Menu:DiagnosisReport": "Diagnosis Report"
+    "Menu:DiagnosisReport": "Diagnosis Report",
+    "Menu:DoctorWorkSchedule": "Doctor Work Schedule"
   }
 }

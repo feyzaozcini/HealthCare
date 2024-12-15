@@ -38,6 +38,7 @@ using Pusula.Training.HealthCare.AppointmentRules;
 using System.Collections.Generic;
 using Pusula.Training.HealthCare.PainTypes;
 using Pusula.Training.HealthCare.PainDetails;
+using Pusula.Training.HealthCare.DoctorWorkSchedules;
 
 
 namespace Pusula.Training.HealthCare;
@@ -349,5 +350,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<PainDetail, PainDetailDto>()
            .ForMember(dest => dest.PainTypeName, opt => opt.MapFrom(x => x.PainType.Name))
            .ReverseMap();
+
+
+        CreateMap<DoctorWorkSchedule, DoctorWorkScheduleDto>();
+        CreateMap<DoctorWorkSchedule, DoctorWorkScheduleWithNavigationPropertiesDto>();
+        CreateMap<DoctorWorkScheduleWithNavigationProperties, DoctorWorkScheduleWithNavigationPropertiesDto>();
+        CreateMap<DoctorWorkScheduleDto, DoctorWorkScheduleWithNavigationPropertiesDto>();
     }
 }

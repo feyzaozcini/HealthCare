@@ -9,8 +9,14 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
 {
     public interface IAppointmentTypeRepository : IRepository<AppointmentType, Guid>
     {
+        Task<List<AppointmentType>> GetAppointmentTypesByDoctorIdsAsync(List<Guid> doctorIds);
+
         Task<List<DoctorWithNavigationProperties>> GetDoctorsByAppointmentTypeIdAsync(Guid appointmentTypeId);
+
+        Task<List<AppointmentType>> GetAppointmentTypesForDoctorAsync(Guid doctorId);
+
         Task RemoveAllDoctorsByAppointmentTypeIdAsync(Guid appointmentTypeId);
+
         Task DeleteAllAsync(
             string? filterText = null,
             string? name = null,

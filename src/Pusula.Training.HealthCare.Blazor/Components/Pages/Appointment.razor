@@ -14,6 +14,8 @@
 @using Pusula.Training.HealthCare.Patients
 @using Pusula.Training.HealthCare.Departments
 @using Pusula.Training.HealthCare.Doctors
+@using Pusula.Training.HealthCare.DoctorWorkSchedules
+@using Pusula.Training.HealthCare.AppointmentTypes
 @using Pusula.Training.HealthCare.Blazor.Containers
 @using Volo.Abp
 @inherits HealthCareComponentBase
@@ -22,6 +24,9 @@
 @inject IDepartmentsAppService DepartmentsAppService
 @inject IDoctorsAppService DoctorsAppService
 @inject IPatientsAppService PatientsAppService
+@inject IAppointmentTypeAppService AppointmentTypesAppService
+@inject IAppointmentTypeRepository AppointmentTypeRepository
+@inject IDoctorWorkSchedulesAppService DoctorWorkSchedulesAppService
 
 @inject IJSRuntime JSRuntime
 
@@ -50,7 +55,8 @@
                                     Placeholder="Doktor seçiniz..."
                                     CssClass="custom-dropdown"
                                     TItem="DoctorWithNavigationPropertiesDto"
-                                    TValue="Guid">
+                                    TValue="Guid"
+                                     >
                         <DropDownListFieldSettings Value="Doctor.Id" Text="FullName"></DropDownListFieldSettings>
                         <DropDownListEvents TValue="Guid" TItem="DoctorWithNavigationPropertiesDto" ValueChange="OnDoctorValueChange"></DropDownListEvents>
                     </SfDropDownList>
@@ -69,7 +75,7 @@
 
 <SfToast @ref="ToastObj" />
 <!-- Randevu Takvimi Ekranı -->
-<SfSchedule TValue="FlatAppointmentDto" Width="100%" Height="650px" @bind-SelectedDate="@CurrentDate" @bind-CurrentView="@CurrentView" @ref="SfScheduleInstance" StartHour="09:00" EndHour="18:00">
+<SfSchedule TValue="FlatAppointmentDto" Width="100%" Height="650px" @bind-SelectedDate="@CurrentDate" @bind-CurrentView="@CurrentView" @ref="SfScheduleInstance" StartHour="@startHour" EndHour="@endHour" WorkDays="@_workingDays" >
     <ScheduleTemplates>
         <EditorTemplate >
             @{ 
@@ -82,10 +88,10 @@
                     <tr>
                         <td class="e-textlabel">Appointment Type</td>
                         <td colspan="4">
-                            <SfDropDownList DataSource="@AppointmentTypesCollection"
+                            <SfDropDownList DataSource="@FilteredAppointmentTypes"
                                             Placeholder="Select Appointment Type"
                                             @bind-Value="@NewAppointment.AppointmentTypeId">
-                                <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
+                                <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
                             </SfDropDownList>
                         </td>
                     </tr>
@@ -134,13 +140,13 @@
             <button id="saveButton" class="e-control e-btn e-primary" data-ripple="true" @onclick="CreateAndCloseModal">Save</button>
         </EditorFooterTemplate>
     </ScheduleTemplates>
-
+    <ScheduleTimeScale Enable="@GridLine" Interval="@IntervalValue" SlotCount="@SlotValue"></ScheduleTimeScale>
     <ScheduleEventSettings TValue="FlatAppointmentDto" DataSource="@AppointmentList" EnableTooltip="true">
     </ScheduleEventSettings>
     <ScheduleViews>
-        <ScheduleView Option="View.Day"></ScheduleView>
-        <ScheduleView Option="View.Week"></ScheduleView>
-        <ScheduleView Option="View.WorkWeek"></ScheduleView>
+        <ScheduleView Option="View.Day" Readonly="@(CurrentDate < DateTime.Now.AddDays(-7))"></ScheduleView>
+        <ScheduleView Option="View.Week" Readonly="@(CurrentDate < DateTime.Now.AddDays(-7))"></ScheduleView>
+        <ScheduleView Option="View.WorkWeek" Readonly="@(CurrentDate < DateTime.Now.AddDays(-7))"></ScheduleView>
     </ScheduleViews>
 </SfSchedule>
 

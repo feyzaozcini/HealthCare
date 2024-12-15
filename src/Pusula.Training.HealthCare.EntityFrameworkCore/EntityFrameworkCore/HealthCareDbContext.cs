@@ -47,6 +47,7 @@ using Pusula.Training.HealthCare.Insurances;
 using Pusula.Training.HealthCare.AppointmentRules;
 using Pusula.Training.HealthCare.PainTypes;
 using Pusula.Training.HealthCare.PainDetails;
+using Pusula.Training.HealthCare.DoctorWorkSchedules;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -92,7 +93,7 @@ public class HealthCareDbContext :
     public DbSet<AppointmentRule> AppointmentRules { get; set; }
     public DbSet<PainType> PainTypes { get; set; } = null!;
     public DbSet<PainDetail> PainDetails { get; set; } = null!;
-
+    public DbSet<DoctorWorkSchedule> DoctorWorkSchedules { get; set; } = null!;
 
     #region Entities from the modules
 
@@ -627,6 +628,8 @@ public class HealthCareDbContext :
                 b.ConfigureByConvention();
                 b.Property(x => x.Gender).HasColumnName(nameof(AppointmentRule.Gender));
                 b.Property(x => x.Age).HasColumnName(nameof(AppointmentRule.Age));
+                b.Property(x => x.MinAge).HasColumnName(nameof(AppointmentRule.MinAge));
+                b.Property(x => x.MaxAge).HasColumnName(nameof(AppointmentRule.MaxAge));
                 b.Property(x => x.Description).HasColumnName(nameof(AppointmentRule.Description));
                 b.HasOne<Doctor>().WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne<Department>().WithMany().IsRequired(false).HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
@@ -656,6 +659,16 @@ public class HealthCareDbContext :
 
             });
 
+            builder.Entity<DoctorWorkSchedule>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "DoctorWorkSchedules", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.WorkingDays).HasColumnName(nameof(DoctorWorkSchedule.WorkingDays)).IsRequired();
+                b.Property(x => x.StartHour).HasColumnName(nameof(DoctorWorkSchedule.StartHour)).IsRequired();
+                b.Property(x => x.EndHour).HasColumnName(nameof(DoctorWorkSchedule.EndHour)).IsRequired();
+                b.HasOne<Doctor>().WithOne().HasForeignKey<DoctorWorkSchedule>(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+            }
+             );
         }
 
         //builder.Entity<YourEntity>(b =>

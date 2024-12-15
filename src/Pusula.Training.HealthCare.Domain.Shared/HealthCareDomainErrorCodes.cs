@@ -37,7 +37,12 @@ public static class HealthCareDomainErrorCodes
     public const string DiagnosisAlreadyExist = "Böyle bir tanı zaten mevcut";
     public const string PainTypeAlreadyExist = "Böyle bir Ağrı tipi zaten mevcut";
 
-
+    //Appointment
     public const string DoctorScheduleConflict = "Bu tarih aralığı başka bir randevu ile çakışmaktadır.";
     public const string DoctorRules = "Doktor için Yaş ve Cinsiyet Kısıtlmasına Uyulmamaktadır.";
+
+    //AppointmentType
+    public const string DoctorAlreadyAssignedToAppointmentType = "Doktor zaten bu randevu tipine atanmış.";
+
+    public const string DoctorWorkScheduleConflict = "Doktorun çalışma programı zaten mevcut.";
 }

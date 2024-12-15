@@ -41,10 +41,12 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private List<DepartmentDto> FilteredDepartments = new();
         private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
-
+        private int IntervalValue { get; set; } = 60;
+        private int SlotValue { get; set; } = 4;
+        private bool GridLine { get; set; } = true;
         private PatientCreateDto NewPatient = new();
         private bool IsPatientDialogOpen = false;
-
+        private List<Pusula.Training.HealthCare.AppointmentTypes.AppointmentType> FilteredAppointmentTypes { get; set; } = new();
         private string ErrorMessage { get; set; } = string.Empty;
         private string FilterText = "";
         private bool IsPatientSelectionPopupVisible { get; set; }
@@ -59,6 +61,10 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private bool AllPatientsSelected { get; set; }
         private List<PatientWithNavigationPropertiesDto> SelectedPatients { get; set; } = [];
         private Guid SelectedPatientId;
+
+        private int[] _workingDays = new int[] { 1,2,4,3,5 };
+        public string startHour = "09:00";
+        public string endHour = "18:00";
 
         private SfToast? ToastObj;
 
@@ -91,6 +97,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
             ToastObj ??= new SfToast();
         }
+
         public Appointment()
         {
             Filter = new GetPatientsInput
@@ -101,6 +108,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             };
             PatientList = [];
         }
+
         private async Task LoadInitialDataAsync()
         {
 
@@ -152,6 +160,8 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             }).ToList();
 
         }
+
+        
         #region Doctor Department Selection
         private async Task OnDepartmentValueChange(ChangeEventArgs<Guid, DepartmentDto> args)
         {
@@ -184,6 +194,26 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private async Task SelectDoctorAsync(DoctorWithNavigationPropertiesDto doctor)
         {
             SelectedDoctor = doctor;
+            // API çağrısı: Doktorun randevu türlerini getir
+            FilteredAppointmentTypes = await AppointmentTypeRepository.GetAppointmentTypesForDoctorAsync(SelectedDoctor.Doctor.Id);
+
+            var schedule = await DoctorWorkSchedulesAppService.GetScheduleForDoctorAsync(SelectedDoctor.Doctor.Id);
+            if (schedule != null && schedule.Any())
+            {
+                // Eğer doktorun özel bir programı varsa, alınan değerleri ata
+                var doctorSchedule = schedule.First(); // İlk programı seç (eğer birden fazlaysa bunu genişletebilirsiniz)
+                _workingDays = doctorSchedule.WorkingDays;
+                startHour = doctorSchedule.StartHour;
+                endHour = doctorSchedule.EndHour;
+            }
+            else
+            {
+                 _workingDays = new int[] { 1, 2, 4, 3, 5 };
+                 startHour = "09:00";
+                 endHour = "18:00";
+            }
+            // Front-end'i yenile
+            StateHasChanged();
             await LoadAppointmentsAsync();  //Seçilen doktroun randevularını getirmek için çağırıldı
             await Task.CompletedTask;
         }
@@ -248,7 +278,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             }
             await CreateAppointment();// Randevu oluşturma işlemini çağır
             await LoadAppointmentsAsync(); // Verileri yeniden yükle
-                                           // await SfScheduleInstance.Refresh(); // Takvimi güncelle
+            // await SfScheduleInstance.Refresh(); // Takvimi güncelle
             ClearNewAppointment(); // Formdaki bilgileri temizle
             SfScheduleInstance.CloseEditor(); // Modalı kapat
 
@@ -415,6 +445,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             public string Description { get; set; }
             public bool IsAllDay { get; set; }
             public bool IsBlock { get; set; }
+            public bool IsReadOnly { get; set; }
             public string RecurrenceRule { get; set; }
             public string RecurrenceException { get; set; }
             public Nullable<int> RecurrenceID { get; set; }

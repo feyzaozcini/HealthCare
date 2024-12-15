@@ -87,7 +87,7 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Age")
+                    b.Property<int?>("Age")
                         .HasColumnType("integer")
                         .HasColumnName("Age");
 
@@ -95,16 +95,23 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("Description");
 
                     b.Property<Guid?>("DoctorId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Gender")
+                    b.Property<int?>("Gender")
                         .HasColumnType("integer")
                         .HasColumnName("Gender");
+
+                    b.Property<int?>("MaxAge")
+                        .HasColumnType("integer")
+                        .HasColumnName("MaxAge");
+
+                    b.Property<int?>("MinAge")
+                        .HasColumnType("integer")
+                        .HasColumnName("MinAge");
 
                     b.HasKey("Id");
 
@@ -562,6 +569,37 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.ToTable("AppDoctorDepartments", (string)null);
+                });
+
+            modelBuilder.Entity("Pusula.Training.HealthCare.DoctorWorkSchedules.DoctorWorkSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DoctorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("EndHour")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("EndHour");
+
+                    b.Property<string>("StartHour")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("StartHour");
+
+                    b.Property<int[]>("WorkingDays")
+                        .IsRequired()
+                        .HasColumnType("integer[]")
+                        .HasColumnName("WorkingDays");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorId")
+                        .IsUnique();
+
+                    b.ToTable("AppDoctorWorkSchedules", (string)null);
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.Doctors.Doctor", b =>
@@ -3649,6 +3687,15 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("Doctor");
+                });
+
+            modelBuilder.Entity("Pusula.Training.HealthCare.DoctorWorkSchedules.DoctorWorkSchedule", b =>
+                {
+                    b.HasOne("Pusula.Training.HealthCare.Doctors.Doctor", null)
+                        .WithOne()
+                        .HasForeignKey("Pusula.Training.HealthCare.DoctorWorkSchedules.DoctorWorkSchedule", "DoctorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.Doctors.Doctor", b =>

@@ -13,10 +13,14 @@ namespace Pusula.Training.HealthCare.AppointmentRules
 
         public Guid? DepartmentId { get; set; }
 
-        public Gender Gender { get; set; }
+        public Gender? Gender { get; set; }
 
-        public int Age { get; set; }
+        public int? Age { get; set; }
 
-        public string Description { get; set; } = string.Empty;
+        public int? MinAge { get; set; }
+
+        public int? MaxAge { get; set; }
+
+        public string? Description { get; set; } = string.Empty;
     }
 }

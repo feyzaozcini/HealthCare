@@ -69,6 +69,13 @@
     "Enum:PainRhythm.Continually": "Surekli",
     "Enum:PainRhythm.Intermittent": "Aralikli",
     "Menu:Patient": "Hasta",
-    "Menu:PRM": "Vezne"
+    "Menu:PRM": "Vezne",
+    "Menu:Appointment": "Randevu",
+    "Menu:AppointmentList": "Randevu Listesi",
+    "Menu:AppointmentType": "Randevu Türleri",
+    "Menu:AppointmentSchedule": "Randevu Planlama",
+    "Menu:AppointmentReport": "Raneduv Raporu",
+    "Menu:AppointmentRule": "Randevu Kuralları",
+    "Menu:DoctorWorkSchedule": "Doktor Çalışma Zamanı Planlama"
   }
 }
