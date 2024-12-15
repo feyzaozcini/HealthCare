@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Appointments;
+using Pusula.Training.HealthCare.Core.Rules.AppointmentTypes;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Permissions;
@@ -20,6 +21,7 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
     [Authorize(HealthCarePermissions.AppointmentTypes.Default)]
     public class AppointmentTypeAppService(IAppointmentTypeRepository appointmentTypeRepository,
     AppointmentTypeManager appointmentTypeManager,
+    IAppointmentTypeBusinessRules appointmentTypeBusinessRules,
     IDistributedCache<AppointmentTypeDownloadTokenCacheItem, string> downloadTokenCache)
     : HealthCareAppService, IAppointmentTypeAppService
     {
@@ -27,6 +29,8 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
         [Authorize(HealthCarePermissions.AppointmentTypes.Create)]
         public virtual async Task<AppointmentTypeDto> CreateAsync(AppointmentTypeCreateDto input)
         {
+            await appointmentTypeBusinessRules.ValidateDoctorsNotAssignedToAnotherAppointmentTypeAsync(input.DoctorIds, input.Name);
+
             var appointmentType = await appointmentTypeManager.CreateAsync(
             input.Name,
             input.DurationInMinutes,

@@ -15,6 +15,19 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
     internal class EfCoreAppointmentTypeRepository(IDbContextProvider<HealthCareDbContext> dbContextProvider)
     : EfCoreRepository<HealthCareDbContext, AppointmentType, Guid>(dbContextProvider), IAppointmentTypeRepository
     {
+        public async Task<List<AppointmentType>> GetAppointmentTypesForDoctorAsync(Guid doctorId)
+        {
+            var dbContext = await GetDbContextAsync();
+
+            // AppointmentType'ları ve ilişkili bilgileri getir
+            var appointmentTypes = await dbContext.DoctorAppoinmentTypes
+                .Where(da => da.DoctorId == doctorId) // Doktora göre filtrele
+                .Select(da => da.AppoinmentType)      // AppointmentType'ı seç
+                .Distinct()                           // Aynı AppointmentType'ı tekrarlamamak için
+                .ToListAsync();
+
+            return appointmentTypes;
+        }
         public async Task<List<DoctorWithNavigationProperties>> GetDoctorsByAppointmentTypeIdAsync(Guid appointmentTypeId)
         {
             var dbContext = await GetDbContextAsync();
@@ -37,6 +50,20 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
                 Title = d.Title!,
                 User = d.User!
             }).ToList();
+        }
+
+        public async Task<List<AppointmentType>> GetAppointmentTypesByDoctorIdsAsync(List<Guid> doctorIds)
+        {
+            var dbContext = await GetDbContextAsync();
+
+            // Verilen doktor ID'lerine sahip AppointmentType'ları 
+            var appointmentTypes = await dbContext.DoctorAppoinmentTypes
+                .Where(dd => doctorIds.Contains(dd.DoctorId)) // DoctorId'leri filtrele
+                .Select(dd => dd.AppoinmentType) // İlgili AppointmentType'ları seç
+                .Distinct() // Aynı AppointmentType'ları bir kez al
+                .ToListAsync();
+
+            return appointmentTypes; // AppointmentType listesini döndür
         }
 
         //doktorları önce silmek için
@@ -113,5 +140,7 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
                 )
                 .WhereIf(!string.IsNullOrWhiteSpace(name), e => e.Name.Contains(name!));
         }
+
+        
     }
 }

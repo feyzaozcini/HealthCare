@@ -37,7 +37,7 @@ public class HealthCareMenus
     public const string AppointmentDefinitions = Appointment + ".Definitions";
     public const string AppointmentOperations = Appointment + ".Operations";
     public const string AppointmentReports = Appointment + ".Reports";
-
+    public const string DoctorWorkSchedule = AppointmentDefinitions + ".DoctorWorkSchedule";
     public const string AppointmentType = AppointmentDefinitions + ".AppointmentType";
     public const string AppointmentRule = AppointmentDefinitions + ".AppointmentRule";
     public const string AppoinmentSchedule = AppointmentOperations + ".AppointmentSchedule";

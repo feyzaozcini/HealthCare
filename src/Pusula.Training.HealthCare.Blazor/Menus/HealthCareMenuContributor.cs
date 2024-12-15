@@ -233,15 +233,21 @@ public class HealthCareMenuContributor : IMenuContributor
             l["Menu:Definitions"],
             icon: "fa fa-sliders-h"
         ).AddItem(new ApplicationMenuItem(
+            HealthCareMenus.DoctorWorkSchedule,
+            l["Menu:DoctorWorkSchedule"],
+            "/doctorWorkSchedule",
+            icon: "fa fa-clock-o"
+        )).AddItem(new ApplicationMenuItem(
             HealthCareMenus.AppointmentType,
             l["Menu:AppointmentType"],
             "/appointment-types",
             icon: "fa fa-list-ul"
-        )).AddItem(new ApplicationMenuItem(
+        ))
+        .AddItem(new ApplicationMenuItem(
             HealthCareMenus.AppointmentRule,
             l["Menu:AppointmentRule"],
             "/appointmentRule",
-            icon: "fa fa-list-ul"
+            icon: "fa fa-tasks"
         )));
 
         appoinmentMenu.AddItem(new ApplicationMenuItem(

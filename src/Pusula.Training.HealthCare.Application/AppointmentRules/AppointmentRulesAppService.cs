@@ -28,8 +28,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
 
         public virtual async Task<PagedResultDto<AppointmentRuleWithNavigationPropertiesDto>> GetListAsync(GetAppointmentRulesInput input)
         {
-            var totalCount = await appointmentRuleRepository.GetCountAsync(input.FilterText, input.DoctorId,input.DepartmentId,input.Gender,input.Age,input.Description);
-            var items = await appointmentRuleRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.DoctorId,input.DepartmentId,input.Gender,input.Age,input.Description ,input.Sorting, input.MaxResultCount, input.SkipCount);
+            var totalCount = await appointmentRuleRepository.GetCountAsync(input.FilterText, input.DoctorId,input.DepartmentId,input.Gender,input.Age,input.MinAge,input.MaxAge,input.Description);
+            var items = await appointmentRuleRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.DoctorId,input.DepartmentId,input.Gender,input.Age, input.MinAge, input.MaxAge, input.Description ,input.Sorting, input.MaxResultCount, input.SkipCount);
 
             return new PagedResultDto<AppointmentRuleWithNavigationPropertiesDto>
             {
@@ -97,6 +97,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
                 input.DepartmentId,
                 input.Gender,
                 input.Age,
+                input.MinAge,
+                input.MaxAge,
                 input.Description
             );
 
@@ -111,6 +113,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
                     input.DepartmentId,
                     input.Gender,
                     input.Age,
+                    input.MinAge,
+                    input.MaxAge,
                     input.Description
                 ));
         }

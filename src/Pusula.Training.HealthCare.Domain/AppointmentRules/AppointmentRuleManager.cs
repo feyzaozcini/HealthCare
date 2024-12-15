@@ -9,9 +9,11 @@ namespace Pusula.Training.HealthCare.AppointmentRules
         public virtual async Task<AppointmentRule> CreateAsync(
             Guid? doctorId, 
             Guid? departmentId, 
-            Gender gender, 
-            int age, 
-            string description)
+            Gender? gender, 
+            int? age, 
+            int? minAge,
+            int? maxAge,
+            string? description)
         {
             var appointmentRule = new AppointmentRule(
                 GuidGenerator.Create(),
@@ -19,6 +21,8 @@ namespace Pusula.Training.HealthCare.AppointmentRules
                 departmentId,
                 gender,
                 age,
+                minAge,
+                maxAge,
                 description
             );
 
@@ -28,18 +32,22 @@ namespace Pusula.Training.HealthCare.AppointmentRules
 
         public virtual async Task<AppointmentRule> UpdateAsync(
             Guid id,
-            Guid doctorId,
-            Guid departmentId,
-            Gender gender,
-            int age,
-            string description
+            Guid? doctorId,
+            Guid? departmentId,
+            Gender? gender,
+            int? age,
+            int? minAge,
+            int? maxAge,
+            string? description
         )
         {
             var appointmentRule = await appointmentRuleRepository.GetAsync(id);
-            appointmentRule.DoctorId = doctorId;
-            appointmentRule.DepartmentId = departmentId;
+            appointmentRule.SetDoctorId(doctorId);
+            appointmentRule.SetDepartmentId(departmentId);
             appointmentRule.SetGender(gender);
             appointmentRule.SetAge(age);
+            appointmentRule.SetMinAge(minAge);
+            appointmentRule.SetMaxAge(maxAge);
             appointmentRule.SetDescription(description);
 
             return await appointmentRuleRepository.UpdateAsync(appointmentRule);

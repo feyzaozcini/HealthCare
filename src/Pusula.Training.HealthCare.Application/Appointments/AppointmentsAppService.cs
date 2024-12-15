@@ -122,16 +122,23 @@ namespace Pusula.Training.HealthCare.Appointments
         public virtual async Task<AppointmentDto> CreateAsync(AppointmentCreateDto input)
         {
             await CheckRulesAsync(input);
+            // AppointmentType üzerinden DoctorAppointmentTypes'a eriş
+            var appointmentType = await appointmentTypeRepository.GetAsync(input.AppointmentTypeId);
 
             await appointmentBusinessRules.AppointmentDatesCannotOverlapForDoctor(input.DepartmentId,input.DoctorId,input.StartDate, input.EndDate);
+            // Doktorun bu appointment type ile ilişkisini kontrol et
+            var doctorAppointmentType = appointmentType.DoctorAppointmentTypes
+                .FirstOrDefault(dat => dat.DoctorId == input.DoctorId);
+            var startDate = input.StartDate;
+            var endDate = startDate.AddMinutes(appointmentType.DurationInMinutes);
 
-            var appointment= await appointmentManager.CreateAsync(
+            var appointment = await appointmentManager.CreateAsync(
                 input.PatientId,
                 input.DoctorId,
                 input.DepartmentId,
                 input.AppointmentTypeId,
-                input.StartDate,
-                input.EndDate,
+                startDate,
+                endDate,
                 input.Note,
                 input.AppointmentStatus,
                 input.IsBlock
@@ -193,23 +200,24 @@ namespace Pusula.Training.HealthCare.Appointments
 
             
             var departmentRules = await appointmentRuleRepository.GetRulesForDepartmentAsync(input.DepartmentId);
-            //var doctorRules = await appointmentRuleRepository.GetRulesForDoctorAsync(input.DoctorId);
-           // var allRules = departmentRules.Concat(doctorRules).ToList();
+            var doctorRules = await appointmentRuleRepository.GetRulesForDoctorAsync(input.DoctorId);
+            var allRules = departmentRules.Concat(doctorRules).ToList();
 
             //Çocuk departmanına tanımlanmış 18 yaşından büyüklerin girememesi
-            foreach (var rule in departmentRules)
+            foreach (var rule in allRules)
             {
-                //Şimdili çocuk departmanı için yazıldı eğer hasta 18 yaşından büyükse randevu alamaz
-                // Eğer yaş kısıtlaması varsa ve 0'dan büyükse kontrol et
-                if (rule.Age > 0 && patientAge > rule.Age)
+                if ((rule.MinAge.HasValue && patientAge < rule.MinAge) ||
+            (rule.MaxAge.HasValue && patientAge > rule.MaxAge))
                 {
                     await appointmentBusinessRules.AppointmentCannotCreate();
                 }
 
-                // Eğer cinsiyet kısıtlaması varsa ve "Belirtilmemiş" değilse kontrol et
-                if (rule.Gender != Pusula.Training.HealthCare.AppointmentRules.Gender.Unspecified && patientGender != rule.Gender.ToString())
+                if (rule.Gender.HasValue && rule.Gender != Pusula.Training.HealthCare.AppointmentRules.Gender.Unspecified && rule.Gender != null)
                 {
-                    await appointmentBusinessRules.AppointmentCannotCreate();
+                    if (patientGender != rule.Gender.ToString())
+                    {
+                        await appointmentBusinessRules.AppointmentCannotCreate();
+                    }
                 }
             }
         }
