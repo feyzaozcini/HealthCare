@@ -1,0 +1,113 @@
+﻿@page "/doctorWorkSchedule"
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Popups
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Notifications
+@using Pusula.Training.HealthCare.Shared;
+@using Pusula.Training.HealthCare.DoctorWorkSchedules
+@using Pusula.Training.HealthCare.Doctors
+@using Volo.Abp;
+@inject IDoctorsAppService DoctorsAppService
+@inject IDoctorWorkSchedulesAppService DoctorWorkScheduleAppService
+
+<SfToast @ref="ToastObj" />
+<div class="row mb-2">
+    <div class="col text-end">
+        <button class="btn btn-success" @onclick="OpenAddModal">+ Add Work Schedule</button>
+    </div>
+</div>
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <SfGrid DataSource="@DoctorWorkSchedulers" AllowPaging="true">
+            <GridPageSettings PageSize="12"></GridPageSettings>
+            <GridColumns>
+                <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="200" />
+                <GridColumn HeaderText="Working Days" Width="250">
+                    <Template>
+                        @{
+                            // Çalışma günlerini, haftanın günlerine çevirerek göstermek
+                            var workingDays = (context as DoctorWorkSchedulerListItem).WorkingDays;
+                            var dayNames = WeekDays.Where(w => workingDays.Contains((int)w.GetType().GetProperty("Value").GetValue(w)))
+                            .Select(w => w.GetType().GetProperty("Text").GetValue(w)?.ToString());
+                            <span>@string.Join(", ", dayNames)</span>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="StartHour" HeaderText="Start Hour" Width="100" />
+                <GridColumn Field="EndHour" HeaderText="End Hour" Width="100" />
+                <GridColumn HeaderText="Actions" Width="150" TextAlign="TextAlign.Center">
+                    <Template>
+                        <button class="btn btn-warning me-2" @onclick="(() => OpenEditModal((context as DoctorWorkSchedulerListItem)))">Edit</button>
+                        <button class="btn btn-danger" @onclick="(() => DeleteDoctorWorkSchedule((context as DoctorWorkSchedulerListItem).Id))">Delete</button>
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+</div>
+
+<!-- Modal for Adding Work Schedule -->
+<SfDialog IsModal="true" Width="600px" Visible="@IsAddModalOpen" Header="Add Work Schedule" OnClose="() => IsAddModalOpen = false">
+    <DialogTemplates>
+        <Content>
+            <div class="mt-2">
+                <label>Select Doctor:</label>
+                <SfDropDownList TValue="Guid" TItem="DoctorListItems" DataSource="@Doctors" @bind-Value="NewDoctorWorkSchedule.DoctorId" Placeholder="Select Doctor">
+                    <DropDownListFieldSettings Text="Name" Value="Id" />
+                </SfDropDownList>
+            </div>
+            <div class="mt-2">
+                <label>Working Days:</label>
+                <SfMultiSelect TValue="int[]" TItem="object" DataSource="@WeekDays" @bind-Value="NewDoctorWorkSchedule.WorkingDays">
+                    <MultiSelectFieldSettings Text="Text" Value="Value" />
+                </SfMultiSelect>
+            </div>
+            <div class="mt-2">
+                <label>Start Hour:</label>
+                <input type="text" class="form-control" @bind="NewDoctorWorkSchedule.StartHour" />
+            </div>
+            <div class="mt-2">
+                <label>End Hour:</label>
+                <input type="text" class="form-control" @bind="NewDoctorWorkSchedule.EndHour" />
+            </div>
+        </Content>
+        <FooterTemplate>
+            <button class="btn btn-primary" @onclick="SaveAppointmentType">Save</button>
+            <button class="btn btn-secondary" @onclick="() => IsAddModalOpen = false">Cancel</button>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+<!-- Modal for Editing Appointment Type -->
+<SfDialog IsModal="true" Width="600px" Visible="@IsEditModalOpen" Header="Edit Doctor Work Schedule" OnClose="OnEditModalClose">
+    <DialogTemplates>
+        <Content>
+            <div class="mt-2">
+                <label>Select Doctor:</label>
+                <SfDropDownList TValue="Guid" TItem="DoctorListItems" DataSource="@Doctors" @bind-Value="EditDoctorWorkSchedule.DoctorId" Placeholder="Select Doctor">
+                    <DropDownListFieldSettings Text="Name" Value="Id" />
+                </SfDropDownList>
+            </div>
+            <div class="mt-2">
+                <label>Working Days:</label>
+                <SfMultiSelect TValue="int[]" TItem="object" DataSource="@WeekDays" @bind-Value="EditDoctorWorkSchedule.WorkingDays">
+                    <MultiSelectFieldSettings Text="Text" Value="Value" />
+                </SfMultiSelect>
+            </div>
+            <div class="mt-2">
+                <label>Start Hour:</label>
+                <input type="text" class="form-control" @bind="EditDoctorWorkSchedule.StartHour" />
+            </div>
+            <div class="mt-2">
+                <label>End Hour:</label>
+                <input type="text" class="form-control" @bind="EditDoctorWorkSchedule.EndHour" />
+            </div>
+        </Content>
+        <FooterTemplate>
+            <button class="btn btn-primary" @onclick="UpdateDoctorWorkSchedule">Save</button>
+            <button class="btn btn-secondary" @onclick="() => IsEditModalOpen = false">Cancel</button>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
