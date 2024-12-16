@@ -1,6 +1,8 @@
 using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.TestGroupItems;
 using Pusula.Training.HealthCare.TestGroups;
+using Syncfusion.Blazor.DataForm;
+using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
 using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Popups;
@@ -21,7 +23,7 @@ public partial class TestGroups
     private GetTestGroupItemsInput? TestGroupItemsFilter { get; set; }
     private GetTestGroupsInput? TestGroupsFilter { get; set; }
 
-
+    SfGrid<TestGroupItemDto> Grid;
     private TestGroupItemsCreateDto CreateTestGroupItemsDto = new();
     private TestGroupItemsUpdateDto UpdateTestGroupItemsDto = new();
     private TestGroupsCreateDto CreateTestGroupsDto = new();
@@ -29,6 +31,7 @@ public partial class TestGroups
 
     private SfToast? ToastObj;
     private string ErrorMessage = string.Empty;
+    private SfDataForm? DataForm;
 
 
     private string SelectedDescription = string.Empty;
@@ -42,6 +45,7 @@ public partial class TestGroups
     private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
     private int CurrentPage { get; set; } = 1;
     private long TotalCount;
+    SfTextBox TextBoxSearchObj { get; set; }
 
     //Modal yönetimi
     private SfDialog? CreateTestGroupItemsDialog;
@@ -353,6 +357,15 @@ public partial class TestGroups
     }
 
     #endregion
+
+    private async void AddDateIcon()
+    {
+        if (TextBoxSearchObj != null)
+        {
+            //Add icon to the TextBox
+            await TextBoxSearchObj.AddIconAsync("append", "e-icons e-search-icon");
+        }
+    }
     //#region Permission
     ////Yetkilendirme
     //private async Task SetPermissionsAsync()

@@ -1,4 +1,5 @@
 ﻿@page "/test-results-report"
+@using Pusula.Training.HealthCare.Blazor.Models
 @using Pusula.Training.HealthCare.TestProcesses
 @using Syncfusion.Licensing
 
@@ -10,11 +11,12 @@
                    FloatLabelType="FloatLabelType.Never"
                    @bind-Value="TestProcessesFilter!.FilterText"
                    Width="50%"
+                   CssClass="lab-textbox"
                    Input="OnInputChange">
         </SfTextBox>
     </div>
 
-    <SfButton CssClass="e-warning e-icon-left e-medium ml-auto"
+    <SfButton CssClass="e-icon-left lab-button"
               Content="Sonuç Yazdır"
               IconCss="e-icons e-print"
               OnClick="OnPrintClick">
@@ -22,9 +24,30 @@
 </div>
 
 <SfGrid @ref="TestProcessesGrid" DataSource="@TestResultsList" AllowPaging="false" AllowSorting="true" Height="700px">
-    <GridEvents TValue="TestProcessDto" RowDataBound="RowBound"></GridEvents>
     <GridColumns>
         <GridColumn Field=@nameof(TestProcessDto.ProtocolNo) Width="100%" HeaderText="Protokol No" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field="@nameof(TestProcessDto.Result)" Width="100%" HeaderText="Değer" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is TestProcessDto testProcess)
+                {
+                    var gridItem = new TestResultCalculateModel(testProcess);
+
+                    <span style="@gridItem.TextStyle">
+                        <span>@gridItem.Icon</span> @gridItem.Text
+                    </span>
+                }
+            </Template>
+        </GridColumn>
+        <GridColumn Field=@nameof(TestProcessDto.Result) Width="50%" HeaderText="Değer" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(TestProcessDto.TestUnit) Width="50%" HeaderText="" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn HeaderText="Min-Max Değer" Width="100%" TextAlign="TextAlign.Center">
+            <Template Context="context">
+                @if (context is TestProcessDto testProcess)
+                {
+                    @($"{testProcess.TestMinValue} - {testProcess.TestMaxValue}")
+                }
+            </Template>
+        </GridColumn>
         <GridColumn HeaderText="Hasta Ad-Soyad" Width="100%" TextAlign="TextAlign.Center">
             <Template Context="context">
                 @if (context is TestProcessDto testProcess)
@@ -40,7 +63,7 @@
                     @($"{testProcess.DoctorName} {testProcess.DoctorSurname}")
                 }
             </Template>
-        </GridColumn>    
+        </GridColumn>      
         <GridColumn HeaderText="Test Adı" Width="100%" TextAlign="TextAlign.Center">
             <Template Context="context">
                 @if (context is TestProcessDto testProcess)
@@ -49,26 +72,6 @@
                 }
             </Template>
         </GridColumn>
-        <GridColumn HeaderText="Min-Max Değer" Width="100%" TextAlign="TextAlign.Center">
-            <Template Context="context">
-                @if (context is TestProcessDto testProcess)
-                {
-                    @($"{testProcess.TestMinValue} - {testProcess.TestMaxValue}")
-                }
-            </Template>
-        </GridColumn>      
-        <GridColumn Field=@nameof(TestProcessDto.Result) Width="100%" HeaderText="Değer" TextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn Field=@nameof(TestProcessDto.TestUnit) Width="100%" HeaderText="" TextAlign="TextAlign.Center"></GridColumn>
         <GridColumn Field=@nameof(TestProcessDto.ResultDate) HeaderText="Result Date" Width="100%" TextAlign="TextAlign.Center"></GridColumn>
     </GridColumns>
 </SfGrid>
-
-<style>
-    .bg-success {
-        background-color: #639833 !important;
-    }
-
-    .bg-danger {
-        background-color: #A33B3B !important;
-    }
-</style>

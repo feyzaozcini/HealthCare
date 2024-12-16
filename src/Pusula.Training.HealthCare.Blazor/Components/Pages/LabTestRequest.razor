@@ -37,7 +37,7 @@ else
                 </ToolbarItem>
                 <ToolbarItem Align="ItemAlign.Right">
                     <Template>
-                        <SfButton CssClass="e-flat e-small e-icon-left" IconCss="e-icons e-clock" Content="İstem Tarihçesi" OnClick="OpenHistoryModal"></SfButton>
+                        <SfButton CssClass="e-icon-left e-small lab-button" IconCss="e-icons e-clock" Content="İstem Tarihçesi" OnClick="OpenHistoryModal"></SfButton>
                     </Template>
                 </ToolbarItem>
             </ToolbarItems>
@@ -50,6 +50,7 @@ else
             <SfTextBox Placeholder="Test Ara"
                        FloatLabelType="FloatLabelType.Never"
                        @bind-Value="TestGroupItemsFilter!.FilterText"
+                       CssClass="lab-textbox"
                        Width="100%"
                        Input="@(async (args) => await SearchAsync(args))">
             </SfTextBox>
@@ -131,7 +132,7 @@ else
     @*Patient Test Requests*@
     <div class="container-fluid py-2">
         <div class="d-flex justify-content-end">
-            <SfButton CssClass="e-warning e-icon-left e-medium"
+            <SfButton CssClass="e-icon-left lab-button"
                       Content="İstem Yazdır"
                       IconCss="e-icons e-print"
                       OnClick="OnTestProcessesPrintClick">
@@ -164,7 +165,7 @@ else
                         @if (context is TestProcessDto testProcess)
                         {
                             <div class="d-flex justify-content-center">
-                                <SfButton CssClass="e-small e-danger" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(testProcess.Id))"></SfButton>
+                                <SfButton CssClass="e-small e-link" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(testProcess.Id))"></SfButton>
                             </div>
                         }
                     </Template>
@@ -202,7 +203,7 @@ else
         <DialogTemplates>
             <Content>
                 <div class="d-flex justify-content-end align-items-center w-100 mb-1">
-                    <SfButton CssClass="e-warning e-icon-left e-medium"
+                    <SfButton CssClass="e-icon-left lab-button"
                               Content="Yazdır"
                               IconCss="e-icons e-print"
                               OnClick="OnTestResultsPrintClick">
