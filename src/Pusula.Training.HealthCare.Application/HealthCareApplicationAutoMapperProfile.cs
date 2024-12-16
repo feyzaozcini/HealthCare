@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using Pusula.Training.HealthCare.PainTypes;
 using Pusula.Training.HealthCare.PainDetails;
 using Pusula.Training.HealthCare.DoctorWorkSchedules;
+using Pusula.Training.HealthCare.BlackLists;
 
 
 namespace Pusula.Training.HealthCare;
@@ -356,5 +357,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<DoctorWorkSchedule, DoctorWorkScheduleWithNavigationPropertiesDto>();
         CreateMap<DoctorWorkScheduleWithNavigationProperties, DoctorWorkScheduleWithNavigationPropertiesDto>();
         CreateMap<DoctorWorkScheduleDto, DoctorWorkScheduleWithNavigationPropertiesDto>();
+
+
+        CreateMap<BlackList, BlackListDto>();
+        CreateMap<BlackList, BlackListWithNavigationPropertiesDto>();
+        CreateMap<BlackListWithNavigationProperties, BlackListWithNavigationPropertiesDto>();
+        CreateMap<BlackListDto, BlackListWithNavigationPropertiesDto>();
     }
 }

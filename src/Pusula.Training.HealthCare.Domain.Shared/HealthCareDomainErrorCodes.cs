@@ -45,4 +45,6 @@ public static class HealthCareDomainErrorCodes
     public const string DoctorAlreadyAssignedToAppointmentType = "Doktor zaten bu randevu tipine atanmış.";
 
     public const string DoctorWorkScheduleConflict = "Doktorun çalışma programı zaten mevcut.";
+
+    public const string PatientWasBlockedByDoctor = "Hasta doktor tarafından engellenmiştir.";
 }
