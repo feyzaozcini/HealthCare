@@ -48,6 +48,7 @@ using Pusula.Training.HealthCare.AppointmentRules;
 using Pusula.Training.HealthCare.PainTypes;
 using Pusula.Training.HealthCare.PainDetails;
 using Pusula.Training.HealthCare.DoctorWorkSchedules;
+using Pusula.Training.HealthCare.BlackLists;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -94,7 +95,7 @@ public class HealthCareDbContext :
     public DbSet<PainType> PainTypes { get; set; } = null!;
     public DbSet<PainDetail> PainDetails { get; set; } = null!;
     public DbSet<DoctorWorkSchedule> DoctorWorkSchedules { get; set; } = null!;
-
+    public DbSet<BlackList> BlackLists { get; set; } = null!;
     #region Entities from the modules
 
     /* Notice: We only implemented IIdentityDbContext and ITenantManagementDbContext
@@ -669,6 +670,16 @@ public class HealthCareDbContext :
                 b.HasOne<Doctor>().WithOne().HasForeignKey<DoctorWorkSchedule>(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
             }
              );
+
+            builder.Entity<BlackList>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "BlackLists", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.BlackListStatus).HasColumnName(nameof(BlackList.BlackListStatus)).IsRequired();
+                b.Property(x => x.Note).HasColumnName(nameof(BlackList.Note));
+                b.HasOne<Patient>().WithMany().IsRequired(false).HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Doctor>().WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+            });
         }
 
         //builder.Entity<YourEntity>(b =>

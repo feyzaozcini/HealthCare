@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.AppointmentRules;
 using Pusula.Training.HealthCare.AppointmentTypes;
 using Pusula.Training.HealthCare.Core.Rules.Appointments;
+using Pusula.Training.HealthCare.Core.Rules.BlackLists;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Patients;
@@ -31,6 +32,7 @@ namespace Pusula.Training.HealthCare.Appointments
         IDepartmentRepository departmentRepository,
         IAppointmentTypeRepository appointmentTypeRepository,
         IAppointmentBusinessRules appointmentBusinessRules,
+        IBlackListBusinessRules blackListBusinessRules,
         IAppointmentRuleRepository appointmentRuleRepository
         ) : HealthCareAppService, IAppointmentsAppService
     {
@@ -126,6 +128,10 @@ namespace Pusula.Training.HealthCare.Appointments
             var appointmentType = await appointmentTypeRepository.GetAsync(input.AppointmentTypeId);
 
             await appointmentBusinessRules.AppointmentDatesCannotOverlapForDoctor(input.DepartmentId,input.DoctorId,input.StartDate, input.EndDate);
+            
+            //Hastanın black listte olup olmadığı kontrol edilir
+            await blackListBusinessRules.ValidateBlackList(input.PatientId, input.DoctorId);
+            
             // Doktorun bu appointment type ile ilişkisini kontrol et
             var doctorAppointmentType = appointmentType.DoctorAppointmentTypes
                 .FirstOrDefault(dat => dat.DoctorId == input.DoctorId);
@@ -145,7 +151,6 @@ namespace Pusula.Training.HealthCare.Appointments
             );
 
             return ObjectMapper.Map<Appointment, AppointmentDto>(appointment);
-            
         }
        
         [Authorize(HealthCarePermissions.Appointments.Delete)]
