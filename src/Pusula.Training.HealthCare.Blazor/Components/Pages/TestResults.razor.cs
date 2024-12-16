@@ -1,9 +1,12 @@
+using Blazorise;
+using Microsoft.AspNetCore.Components;
 using Pusula.Training.HealthCare.TestProcesses;
 using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -25,26 +28,6 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             TestResultsList = result.Items
             .Where(test => test.Result.HasValue)
             .ToList();
-        }
-
-        //Belirlenen kurala göre row background-color'ýný güncelleme.
-        public void RowBound(RowDataBoundEventArgs<TestProcessDto> args)
-        {
-            if (args.Data.Result.HasValue)
-            {
-                var result = args.Data.Result.Value;
-                var minValue = args.Data.TestMinValue;
-                var maxValue = args.Data.TestMaxValue;
-
-                if (result < minValue || result > maxValue)
-                {
-                    args.Row.AddClass(new string[] { "bg-danger" });
-                }
-                else
-                {
-                    args.Row.AddClass(new string[] { "bg-success" });
-                }
-            }
         }
 
         private async Task OnPrintClick()

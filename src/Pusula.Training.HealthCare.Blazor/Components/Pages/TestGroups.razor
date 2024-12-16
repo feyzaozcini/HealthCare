@@ -13,18 +13,20 @@
 
 <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
     <div>
-        <SfButton CssClass="e-medium e-success" Content="Test Grubu Ekle" OnClick="OpenTestGroupsCreateModal"></SfButton>
+        <SfButton CssClass="e-medium lab-button" Content="Test Grubu Ekle" OnClick="OpenTestGroupsCreateModal"></SfButton>
     </div>
     <div class="flex-grow-1 d-flex justify-content-center">
         <SfTextBox Placeholder="Test Ara"
                    FloatLabelType="FloatLabelType.Never"
                    @bind-Value="TestGroupItemsFilter!.FilterText"
+                   CssClass="lab-textbox"
+                   @ref="TextBoxSearchObj"
                    Width="50%"
                    Input="@(async (args) => await SearchAsync(args))">
         </SfTextBox>
     </div>
     <div>
-        <SfButton CssClass="e-medium e-success" Content="Test Ekle" OnClick="OpenTestGroupItemsCreateModal"></SfButton>
+        <SfButton CssClass="e-medium lab-button" Content="Test Ekle" OnClick="OpenTestGroupItemsCreateModal"></SfButton>
     </div>
 </div>
 
@@ -45,13 +47,13 @@
                     </Template>
                 </GridColumn>
 
-                <GridColumn HeaderText="Actions" Width="30" TextAlign="TextAlign.Center">
+                <GridColumn Width="30" TextAlign="TextAlign.Center">
                     <Template>
                         @if (context is TestGroupDto testGroup)
                         {
                             <div class="d-flex justify-content-center">
-                                <SfButton CssClass="e-small e-primary" IconCss="e-icons e-edit" OnClick="(() => OpenTestGroupUpdateModal(testGroup))"></SfButton>
-                                <SfButton CssClass="e-small e-danger" IconCss="e-icons e-delete" OnClick="(() => OpenTestGroupDeleteModal(testGroup.Id))"></SfButton>
+                                <SfButton CssClass="e-small e-link" IconCss="e-icons e-edit" OnClick="(() => OpenTestGroupUpdateModal(testGroup))"></SfButton>
+                                <SfButton CssClass="e-small e-link" IconCss="e-icons e-delete" OnClick="(() => OpenTestGroupDeleteModal(testGroup.Id))"></SfButton>
                             </div>
                         }
                     </Template>
@@ -74,8 +76,8 @@
                         }
                     </Template>
                 </GridColumn>
-                <GridColumn Field=@nameof(TestGroupItemDto.Name) HeaderText="Test Adı" Width="100" TextAlign="TextAlign.Left"></GridColumn>
-                <GridColumn Field=@nameof(TestGroupItemDto.TestType) HeaderText="Test Tipi" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+                <GridColumn Field=@nameof(TestGroupItemDto.Name) HeaderText="Test Adı" Width="50" TextAlign="TextAlign.Left"></GridColumn>
+                <GridColumn Field=@nameof(TestGroupItemDto.TestType) HeaderText="Test Tipi" Width="50" TextAlign="TextAlign.Center"></GridColumn>
                 <GridColumn HeaderText="Tahmini Süre" Width="25" TextAlign="TextAlign.Center">
                     <Template>
                         @if (context is TestGroupItemDto testGroupItem)
@@ -89,20 +91,19 @@
                         @if (context is TestGroupItemDto testGroupItem)
                         {
                             <SfButton CssClass="e-small e-link"
-                                      OnClick="(() => OpenDescriptionModal(testGroupItem.Description))"
-                                      Style="@(string.IsNullOrEmpty(testGroupItem.Description) ? "display:none;" : "")">
-                                <i class="fa-regular fa-file"></i>
+                                      OnClick="(() => OpenDescriptionModal(testGroupItem.Description))">
+                                <SfIcon IconCss="fa-regular fa-file"></SfIcon>
                             </SfButton>
                         }
                     </Template>
                 </GridColumn>
-                <GridColumn HeaderText="Actions" Width="30" TextAlign="TextAlign.Center">
+                <GridColumn Width="30" TextAlign="TextAlign.Center">
                     <Template>
                         @if (context is TestGroupItemDto testGroupItem)
                         {
                             <div class="d-flex justify-content-center">
-                                <SfButton CssClass="e-small e-primary" IconCss="e-icons e-edit" OnClick="(() => OpenTestGroupItemUpdateModal(testGroupItem))"></SfButton>
-                                <SfButton CssClass="e-small e-danger" IconCss="e-icons e-delete" OnClick="(() => OpenTestGroupItemDeleteModal(testGroupItem.Id))"></SfButton>
+                                <SfButton CssClass="e-small e-link" IconCss="e-icons e-edit" OnClick="(() => OpenTestGroupItemUpdateModal(testGroupItem))"></SfButton>
+                                <SfButton CssClass="e-small e-link" IconCss="e-icons e-delete" OnClick="(() => OpenTestGroupItemDeleteModal(testGroupItem.Id))"></SfButton>
                             </div>
                         }
                     </Template>
@@ -189,7 +190,7 @@
                 <div class="row mt-2 mb-2">
                     <div class="col-12 text-end">
                         <SfButton CssClass="e-success e-small m-1" Content="Kaydet" Type="Submit"></SfButton>
-                        <SfButton CssClass="e-secondary e-small m-1" Content="İptal" OnClick="CloseTestGroupCreateModal"></SfButton>
+                    <SfButton CssClass="e-secondary e-small m-1" Content="İptal" OnClick="CloseTestGroupCreateModal"></SfButton>
                     </div>
                 </div>
             </EditForm>
@@ -317,8 +318,3 @@
 <SfToast @ref="ToastObj" Width="300px">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
-
-
-@*  ****************** YAPILACAKLAR ******************
-    - LabGroups ve LabGroupItems Cache alınacak (inş.)
-*@

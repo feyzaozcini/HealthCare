@@ -12,6 +12,7 @@
         <SfTextBox Placeholder="Protokol Ara"
                    FloatLabelType="FloatLabelType.Never"
                    @bind-Value="LabRequestsFilter!.FilterText"
+                   CssClass="lab-textbox"
                    Width="50%"
                    Input="OnInputChange">
         </SfTextBox>
@@ -20,7 +21,7 @@
     <div>
         @if (LabRequestService.SelectedLabRequest != null)
         {
-            <SfButton OnClick="RedirectToTestRequest" CssClass="e-medium e-success" Content="Test İste"></SfButton>
+            <SfButton OnClick="RedirectToTestRequest" CssClass="e-medium lab-button" Content="Test İste"></SfButton>
         }
     </div>
 </div>

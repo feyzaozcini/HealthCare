@@ -10,15 +10,76 @@
     z-index: 1000;
 }
 
-#blazor-error-ui .dismiss {
-    cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
-}
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
 :root .lpx-brand-logo {
     --lpx-logo: url('/images/logo/leptonx/halledeviz_logo.png');
     --lpx-logo-icon: url('/images/logo/leptonx/halledeviz_logo.png');
 }
 
 
+/* LAB CSS CLASSES*/
+
+/*Searchbox*/
+.lab-textbox.e-control-wrapper.e-input-group {
+    border: 2px solid #f72585 !important;
+    border-radius: 10px;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+    .lab-textbox.e-control-wrapper.e-input-group:focus-within {
+        border-radius: 10px !important;
+        border: 2px solid #f72585 !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+/*Button*/
+.lab-button.e-btn {
+    border: 2px solid #f72585 !important;
+    border-radius: 10px;
+    background-color: #f72585;
+    color: white;
+}
+
+/*Tab*/
+.lab-tab.e-tab .e-tab-header .e-toolbar-item .e-tab-wrap:hover {
+    background: #FFADDB !important;
+    color: white;
+    font-weight: bold;
+}
+
+.lab-tab.e-tab .e-tab-header .e-hor-nav .e-popup-up-icon:hover,
+.e-tab .e-tab-header .e-hor-nav .e-popup-down-icon:hover {
+    background: #FFADDB !important;
+}
+
+.lab-tab.e-tab .e-tab-header .e-toolbar-item.e-active {
+    background: #f72585;
+}
+
+.bg-danger {
+    background-color: #A33B3B !important;
+}
+
+.icon-alert::before {
+    content: '\e7b3'; /* Syncfusion warning icon kodu */
+    font-family: 'e-icons';
+    color: red; /* Uyarý rengi */
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+.icon-safe::before {
+    content: '\e7b2'; /* Syncfusion check icon kodu */
+    font-family: 'e-icons';
+    color: green; /* Güvenli rengi */
+    font-size: 18px;
+    margin-right: 5px;
+}

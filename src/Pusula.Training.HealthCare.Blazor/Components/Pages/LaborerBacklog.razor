@@ -10,93 +10,94 @@
     <SfTextBox Placeholder="Protokol Ara"
                FloatLabelType="FloatLabelType.Never"
                @bind-Value="LabRequestsFilter!.FilterText"
+               CssClass="lab-textbox"
                Width="50%"
                Input="OnInputChange">
     </SfTextBox>
 </div>
 
- <div class="d-flex flex-row">
-<SfTab>
-    <TabItems>
-        @*İş Listesi Tab'ı*@
-        <TabItem>
+<div class="d-flex flex-row">
+    <SfTab CssClass="lab-tab">
+        <TabItems>
+            @*İş Listesi Tab'ı*@
+            <TabItem>
                 <HeaderTemplate>İş Listesi</HeaderTemplate>
 
                 <ContentTemplate>
-                <SfGrid DataSource="@InProgressLabRequests" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="750px" AllowResizing="false" GridLines="@GridLine.Both">
-                    <GridColumns>
-                        <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10" TextAlign="TextAlign.Center"></GridColumn>
-                        <GridColumn Field=@nameof(LabRequestDto.CreationTime) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>
-                        <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
-                            <Template Context="context">
-                                @if (context is LabRequestDto labrequest)
-                                {
-                                    <span>@labrequest.PatientName @labrequest.PatientSurname</span>
-                                }
-                            </Template>
-                        </GridColumn>
-                        <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
-                            <Template Context="context">
-                                @if (context is LabRequestDto labrequest)
-                                {
-                                    <span>@labrequest.DoctorName @labrequest.DoctorSurname</span>
-                                }
-                            </Template>
-                        </GridColumn>
+                    <SfGrid DataSource="@InProgressLabRequests" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="750px" AllowResizing="false" GridLines="@GridLine.Both">
+                        <GridColumns>
+                            <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10" TextAlign="TextAlign.Center"></GridColumn>
+                            <GridColumn Field=@nameof(LabRequestDto.CreationTime) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>
+                            <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is LabRequestDto labrequest)
+                                    {
+                                        <span>@labrequest.PatientName @labrequest.PatientSurname</span>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is LabRequestDto labrequest)
+                                    {
+                                        <span>@labrequest.DoctorName @labrequest.DoctorSurname</span>
+                                    }
+                                </Template>
+                            </GridColumn>
                             <GridColumn Field=@nameof(LabRequestDto.Status) HeaderText="Protokol Durumu" Width="25" TextAlign="TextAlign.Center"></GridColumn>
 
-                        <GridColumn Width="25" TextAlign="TextAlign.Center">
-                            <Template Context="context">
-                                @if (context is LabRequestDto labRequest)
-                                {
-                                    <SfButton CssClass="e-small e-primary" OnClick="(() => OpenResultUpdateModal(labRequest))">Sonuç Gir</SfButton>
-                                }
-                            </Template>
-                        </GridColumn>
-                    </GridColumns>
-                </SfGrid>
-            </ContentTemplate>
-        </TabItem>
-        @*Biten İşler Tab'ı*@
-        <TabItem>
+                            <GridColumn Width="25" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is LabRequestDto labRequest)
+                                    {
+                                        <SfButton CssClass="e-small lab-button" OnClick="(() => OpenResultUpdateModal(labRequest))">Sonuç Gir</SfButton>
+                                    }
+                                </Template>
+                            </GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+                </ContentTemplate>
+            </TabItem>
+            @*Biten İşler Tab'ı*@
+            <TabItem>
                 <HeaderTemplate>Biten İşler</HeaderTemplate>
 
                 <ContentTemplate>
-                <SfGrid DataSource="@CompletedLabRequests" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="750px" AllowResizing="false" GridLines="@GridLine.Both">
-                    <GridColumns>
-                        <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10" TextAlign="TextAlign.Center"></GridColumn>
-                        <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>
-                        <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
-                            <Template Context="context">
-                                @if (context is LabRequestDto labrequest)
-                                {
-                                    <span>@labrequest.PatientName @labrequest.PatientSurname</span>
-                                }
-                            </Template>
-                        </GridColumn>
-                        <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
-                            <Template Context="context">
-                                @if (context is LabRequestDto labrequest)
-                                {
-                                    <span>@labrequest.DoctorName @labrequest.DoctorSurname</span>
-                                }
-                            </Template>
-                        </GridColumn>
-                        <GridColumn Field=@nameof(LabRequestDto.Status) HeaderText="Protokol Durumu" Width="25" TextAlign="TextAlign.Center"></GridColumn>
-                        <GridColumn Width="25" TextAlign="TextAlign.Center">
-                            <Template Context="context">
-                                @if (context is LabRequestDto labRequest)
-                                {
-                                    <SfButton CssClass="e-small e-primary" OnClick="(() => OpenResultUpdateModal(labRequest))">Sonuç Değiştir</SfButton>
-                                }
-                            </Template>
-                        </GridColumn>
-                    </GridColumns>
-                </SfGrid>
-            </ContentTemplate>
-        </TabItem>
-    </TabItems>
-</SfTab>
+                    <SfGrid DataSource="@CompletedLabRequests" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="750px" AllowResizing="false" GridLines="@GridLine.Both">
+                        <GridColumns>
+                            <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10" TextAlign="TextAlign.Center"></GridColumn>
+                            <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>
+                            <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is LabRequestDto labrequest)
+                                    {
+                                        <span>@labrequest.PatientName @labrequest.PatientSurname</span>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is LabRequestDto labrequest)
+                                    {
+                                        <span>@labrequest.DoctorName @labrequest.DoctorSurname</span>
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn Field=@nameof(LabRequestDto.Status) HeaderText="Protokol Durumu" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+                            <GridColumn Width="25" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is LabRequestDto labRequest)
+                                    {
+                                        <SfButton CssClass="e-small lab-button" OnClick="(() => OpenResultUpdateModal(labRequest))">Sonuç Değiştir</SfButton>
+                                    }
+                                </Template>
+                            </GridColumn>
+                        </GridColumns>
+                    </SfGrid>
+                </ContentTemplate>
+            </TabItem>
+        </TabItems>
+    </SfTab>
 </div>
 
 @*Sonuç Gir Dialog*@
