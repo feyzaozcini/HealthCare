@@ -24,7 +24,7 @@
                 <HeaderTemplate>İş Listesi</HeaderTemplate>
 
                 <ContentTemplate>
-                    <SfGrid DataSource="@InProgressLabRequests" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="750px" AllowResizing="false" GridLines="@GridLine.Both">
+                    <SfGrid DataSource="@InProgressLabRequests" ID="lab-grid"  AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="800px" AllowResizing="false" GridLines="@GridLine.Both">
                         <GridColumns>
                             <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10" TextAlign="TextAlign.Center"></GridColumn>
                             <GridColumn Field=@nameof(LabRequestDto.CreationTime) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>

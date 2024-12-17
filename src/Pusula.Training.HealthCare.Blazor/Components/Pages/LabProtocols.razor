@@ -26,7 +26,7 @@
     </div>
 </div>
 
-<SfGrid DataSource="@LabRequestsList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
+<SfGrid DataSource="@LabRequestsList" ID="lab-grid" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="800px">
     <GridEvents TValue="LabRequestDto" RowSelected="RowSelectHandler"></GridEvents>
     <GridColumns>
         <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10"></GridColumn>
