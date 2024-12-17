@@ -64,22 +64,46 @@
     background: #f72585;
 }
 
-.bg-danger {
-    background-color: #A33B3B !important;
-}
-
+/*Test Result Info*/
 .icon-alert::before {
-    content: '\e7b3'; /* Syncfusion warning icon kodu */
+    content: '\e7b3'; 
     font-family: 'e-icons';
-    color: red; /* Uyarý rengi */
+    color: red; 
     font-size: 18px;
     margin-right: 5px;
 }
 
 .icon-safe::before {
-    content: '\e7b2'; /* Syncfusion check icon kodu */
+    content: '\e7b2'; 
     font-family: 'e-icons';
-    color: green; /* Güvenli rengi */
+    color: green; 
     font-size: 18px;
     margin-right: 5px;
 }
+
+/*Lab Grid*/
+#lab-grid {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+}
+
+    #lab-grid .e-gridheader,
+    #lab-grid .e-gridfooter {
+        border-radius: 10px 10px 0 0;
+    }
+
+    #lab-grid .e-gridcontent {
+        border-radius: 0 0 10px 10px;
+    }
+
+/*Lab Toolbar*/
+.lab-toolbar .e-toolbar {
+    border-radius: 10px; 
+    border: 1px solid #ccc; 
+    overflow: hidden; 
+}
+
+    .lab-toolbar .e-toolbar .e-tbar-btn {
+        border-radius: 5px; 
+    }

@@ -35,7 +35,7 @@
 <div class="container-fluid d-flex flex-row">
     @*Sol Panel*@
     <div class="col-2">
-        <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
+        <SfGrid DataSource="@TestGroupsList" ID="lab-grid" Width="100%" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="800px">
             <GridColumns>
                 <!-- Grup Adı Sütunu -->
                 <GridColumn Field="@nameof(TestGroupDto.Name)" HeaderText="Test Grupları" Width="70">
@@ -64,7 +64,7 @@
     @*Sağ Panel*@
     <div class="col-10">
         @*Data Grid*@
-        <SfGrid DataSource="@TestGroupItemsList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
+        <SfGrid DataSource="@TestGroupItemsList" ID="lab-grid" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="800px">
             <GridColumns>
                 <GridColumn Field=@nameof(TestGroupItemDto.Code) HeaderText="Test Kodu" Width="25"></GridColumn>
                 <GridColumn HeaderText="Test Grubu" Width="25">

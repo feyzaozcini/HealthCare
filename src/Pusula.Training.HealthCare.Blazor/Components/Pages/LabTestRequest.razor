@@ -22,26 +22,22 @@
 }
 else
 {
-    @*Patient Details Bar*@
-    <div class="w-100 mb-1 border-bottom shadow">
-        <SfToolbar CssClass="e-fill e-flat">
-            <ToolbarItems>
-                <ToolbarItem Align="ItemAlign.Center">
-                    <Template>
-                        <div class="d-flex align-items-center">
-                            <span class="fw-bold fs-5">
-                                @($"{LabRequestService.SelectedLabRequest!.PatientName ?? "Ad"} {LabRequestService.SelectedLabRequest!.PatientSurname ?? "Soyad"}, {LabRequestService.SelectedLabRequest!.PatientBirthDate:dd.MM.yyyy}, {LabRequestService.SelectedLabRequest!.InsuranceName}")
-                            </span>
-                        </div>
-                    </Template>
-                </ToolbarItem>
-                <ToolbarItem Align="ItemAlign.Right">
-                    <Template>
-                        <SfButton CssClass="e-icon-left e-small lab-button" IconCss="e-icons e-clock" Content="İstem Tarihçesi" OnClick="OpenHistoryModal"></SfButton>
-                    </Template>
-                </ToolbarItem>
-            </ToolbarItems>
-        </SfToolbar>
+    <div class="w-100 d-flex justify-content-between align-items-center">
+        @* Ortadaki Buton (Hasta Bilgileri) *@
+        <div class="flex-grow-1 text-center">
+            <SfButton CssClass="e-outline"
+                      IconCss="e-icons e-user"
+                      Content="@($"{LabRequestService.SelectedLabRequest!.PatientName ?? "Ad"} {LabRequestService.SelectedLabRequest!.PatientSurname ?? "Soyad"}")"
+                      @onclick="OpenPatientDetailsModal" />
+        </div>
+
+        @* Sağdaki Buton *@
+        <div>
+            <SfButton CssClass="e-icon-left e-small lab-button"
+                      IconCss="e-icons e-clock"
+                      Content="İstem Tarihçesi"
+                      OnClick="OpenHistoryModal"></SfButton>
+        </div>
     </div>
 
     @*Test Groups & Items Data Grid*@
@@ -54,22 +50,14 @@ else
                        Width="100%"
                        Input="@(async (args) => await SearchAsync(args))">
             </SfTextBox>
-
-        </div>
-        <div class="col-10">
-            <SfToolbar>
-                <ToolbarItems>
-
-                </ToolbarItems>
-            </SfToolbar>
         </div>
     </div>
 
     @*Test Groups & Items Data Grid*@
-    <div class="d-flex flex-row">
+    <div class="d-flex flex-row mt-0 border-bottom pb-2">
         @*Sol*@
         <div class="col-2">
-            <SfGrid DataSource="@TestGroupsList" Width="100%" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
+            <SfGrid DataSource="@TestGroupsList" ID="lab-grid" Width="100%" AllowPaging="false" AllowSorting="false" RowHeight="40" Height="300px">
                 <GridColumns>
                     <GridColumn Field="@nameof(TestGroup.Name)" HeaderText="Laboratuvar" Width="70" HeaderTextAlign="TextAlign.Left">
                         <Template Context="group">
@@ -85,7 +73,7 @@ else
 
         @*Sağ*@
         <div class="col-10">
-            <SfGrid DataSource="@TestGroupItemsList" AllowPaging="false" AllowSorting="false" RowHeight="35" Height="300px">
+            <SfGrid DataSource="@TestGroupItemsList" ID="lab-grid" AllowPaging="false" AllowSorting="false" RowHeight="40" Height="300px">
                 <GridColumns>
                     <GridColumn Width="3%">
                         <Template>
@@ -122,12 +110,6 @@ else
             </SfGrid>
         </div>
     </div>
-    @*Data Grid Bottom Bar*@
-    <div class="mt-0 border-bottom pb-2">
-        <SfToolbar>
-
-        </SfToolbar>
-    </div>
 
     @*Patient Test Requests*@
     <div class="container-fluid py-2">
@@ -141,35 +123,35 @@ else
     </div>
 
     @*Requests List*@
-    <SfGrid @ref="TestProcessesGrid" DataSource="@TestProcessesList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="300px" PrintMode="PrintMode.AllPages">
+    <SfGrid @ref="TestProcessesGrid" ID="lab-grid" DataSource="@TestProcessesList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="300px" PrintMode="PrintMode.AllPages">
         <GridColumns>
             <GridColumn Field="@nameof(TestProcessDto.CreationTime)" HeaderText="İstem Tarihi" TextAlign="TextAlign.Center"></GridColumn>
             <GridColumn HeaderText="İsteyen Doktor" TextAlign="TextAlign.Center">
-                    <Template Context="context">
-                        @if (context is TestProcessDto testProcess)
-                        {
-                            <span>@testProcess.DoctorName @testProcess.DoctorSurname</span>
-                        }
-                    </Template>
-                </GridColumn>
-                <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)"
-                            HeaderText="İstenen Test"
-                            TextAlign="TextAlign.Center">
-                </GridColumn>
-                <GridColumn Field="@nameof(TestProcessDto.Status)"
-                            HeaderText="İşlem Durumu"
-                            TextAlign="TextAlign.Center">
-                </GridColumn>
-                <GridColumn HeaderText="" TextAlign="TextAlign.Right">
-                    <Template>
-                        @if (context is TestProcessDto testProcess)
-                        {
-                            <div class="d-flex justify-content-center">
-                                <SfButton CssClass="e-small e-link" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(testProcess.Id))"></SfButton>
-                            </div>
-                        }
-                    </Template>
-                </GridColumn>
+                <Template Context="context">
+                    @if (context is TestProcessDto testProcess)
+                    {
+                        <span>@testProcess.DoctorName @testProcess.DoctorSurname</span>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)"
+                        HeaderText="İstenen Test"
+                        TextAlign="TextAlign.Center">
+            </GridColumn>
+            <GridColumn Field="@nameof(TestProcessDto.Status)"
+                        HeaderText="İşlem Durumu"
+                        TextAlign="TextAlign.Center">
+            </GridColumn>
+            <GridColumn HeaderText="" TextAlign="TextAlign.Right">
+                <Template>
+                    @if (context is TestProcessDto testProcess)
+                    {
+                        <div class="d-flex justify-content-center">
+                            <SfButton CssClass="e-small e-link" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(testProcess.Id))"></SfButton>
+                        </div>
+                    }
+                </Template>
+            </GridColumn>
         </GridColumns>
     </SfGrid>
 
@@ -230,6 +212,22 @@ else
                 </div>
             </Content>
         </DialogTemplates>
+    </SfDialog>
+    
+    /*Patient Details Modal*/
+    <SfDialog @ref="PatientDetailsModal" Width="400px" IsModal="true" ShowCloseIcon="true" Visible="false">
+        <Syncfusion.Blazor.Cards.SfCard>
+            <Syncfusion.Blazor.Cards.CardHeader Title="Hasta Bilgileri">
+            </Syncfusion.Blazor.Cards.CardHeader>
+            <Syncfusion.Blazor.Cards.CardContent EnableSeparator="true">
+                <p><strong>Adı:</strong> @LabRequestService.SelectedLabRequest!.PatientName</p>
+                <p><strong>Soyadı:</strong> @LabRequestService.SelectedLabRequest!.PatientSurname</p>
+                <p><strong>Doğum Tarihi:</strong> @LabRequestService.SelectedLabRequest!.PatientBirthDate</p>
+            </Syncfusion.Blazor.Cards.CardContent>
+            <Syncfusion.Blazor.Cards.CardContent EnableSeparator="true">
+                <p><strong>Sigorta:</strong> @LabRequestService.SelectedLabRequest!.InsuranceName</p>
+            </Syncfusion.Blazor.Cards.CardContent>
+        </Syncfusion.Blazor.Cards.SfCard>
     </SfDialog>
 }
 

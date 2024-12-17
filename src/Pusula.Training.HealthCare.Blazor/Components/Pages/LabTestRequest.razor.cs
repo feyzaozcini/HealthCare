@@ -24,13 +24,11 @@ public partial class LabTestRequest
     private List<TestGroupDto> TestGroupsList { get; set; } = new List<TestGroupDto>();
     private List<TestProcessDto> TestProcessesList = new();
     private List<TestProcessDto> ApprovedTestProcesses { get; set; } = new();
-    //private List<TestProcessesCreateDto> CreatedTestProcesses { get; set; } = new();
     private IReadOnlyList<LookupDto<Guid>> TestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
     private GetTestGroupItemsInput? TestGroupItemsFilter { get; set; }
     private GetTestGroupsInput? TestGroupsFilter { get; set; }
     private GetTestProcessesInput? TestProcessesFilter { get; set; }
 
-    //private LabRequestDto? LabRequest { get; set; }
     private SfGrid<TestProcessDto>? TestProcessesGrid;
     private SfGrid<TestProcessDto>? TestResultsGrid;
     private List<TestProcessDto> CompletedTestProcesses { get; set; } = new();
@@ -82,12 +80,7 @@ public partial class LabTestRequest
             await TestProcessesGrid.PrintAsync();
         }
     }
-    private SfDialog? PatientDetailsDialog;
 
-    private void OpenPatientDetailsDialog()
-    {
-        PatientDetailsDialog?.ShowAsync();
-    }
     private async Task OnTestResultsPrintClick()
     {
         if (TestResultsGrid != null)
@@ -205,9 +198,9 @@ public partial class LabTestRequest
     #endregion
 
     #region Modals
-    private async Task OpenPatientDetailsModal()
+    private void OpenPatientDetailsModal()
     {
-        await PatientDetailsModal!.ShowAsync();
+        PatientDetailsModal!.ShowAsync();
     }
     private async Task ClosePatientDetailsModal()
     {

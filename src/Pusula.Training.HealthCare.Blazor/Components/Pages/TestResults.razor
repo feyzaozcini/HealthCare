@@ -23,7 +23,7 @@
     </SfButton>
 </div>
 
-<SfGrid @ref="TestProcessesGrid" DataSource="@TestResultsList" AllowPaging="false" AllowSorting="true" Height="700px">
+<SfGrid @ref="TestProcessesGrid" ID="lab-grid" DataSource="@TestResultsList" AllowPaging="false" AllowSorting="true" Height="800px" RowHeight="40">
     <GridColumns>
         <GridColumn Field=@nameof(TestProcessDto.ProtocolNo) Width="100%" HeaderText="Protokol No" TextAlign="TextAlign.Center"></GridColumn>
         <GridColumn Field="@nameof(TestProcessDto.Result)" Width="100%" HeaderText="Değer" TextAlign="TextAlign.Center">
@@ -72,6 +72,11 @@
                 }
             </Template>
         </GridColumn>
-        <GridColumn Field=@nameof(TestProcessDto.ResultDate) HeaderText="Result Date" Width="100%" TextAlign="TextAlign.Center"></GridColumn>
+        <GridColumn Field=@nameof(TestProcessDto.ResultDate) HeaderText="Sonuçlanma T." Width="100%" TextAlign="TextAlign.Center"></GridColumn>
     </GridColumns>
 </SfGrid>
+
+<style>
+
+
+</style>
