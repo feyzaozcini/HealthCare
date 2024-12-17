@@ -248,6 +248,11 @@ public class HealthCareMenuContributor : IMenuContributor
             l["Menu:AppointmentRule"],
             "/appointmentRule",
             icon: "fa fa-tasks"
+        )).AddItem(new ApplicationMenuItem(
+            HealthCareMenus.Blacklist,
+            l["Menu:Blacklist"],
+            "/blacklist",
+            icon: "fa fa-ban"
         )));
 
         appoinmentMenu.AddItem(new ApplicationMenuItem(

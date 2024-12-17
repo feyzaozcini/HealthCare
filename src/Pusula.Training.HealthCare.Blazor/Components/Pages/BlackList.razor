@@ -1,0 +1,141 @@
+﻿@page "/blacklist"
+
+@using Pusula.Training.HealthCare.Shared
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Buttons
+@using Pusula.Training.HealthCare.Doctors
+@using Pusula.Training.HealthCare.BlackLists
+@using Pusula.Training.HealthCare.Patients
+@using Volo.Abp;
+
+@inject IDoctorsAppService DoctorsAppService
+@inject IBlackListsAppService BlackListAppService
+@inject IPatientsAppService PatientsAppService
+
+<div class="row mb-2">
+    <div class="col text-end">
+        <button class="btn custom-add-button" @onclick="OpenAddModal">+ Add Black List Item</button>
+    </div>
+</div>
+<div class="col-lg-12 control-section">
+    <div class="content-wrapper">
+        <SfGrid DataSource="@BlackListItems" AllowPaging="true">
+            <GridPageSettings PageSize="10"></GridPageSettings>
+            <GridColumns>
+                <GridColumn TextAlign="TextAlign.Center" Field="DoctorFullName" HeaderText="Doctor" Width="100" />
+                <GridColumn TextAlign="TextAlign.Center" Field="PatientFullName" HeaderText="Patient" Width="100" />
+                <GridColumn TextAlign="TextAlign.Center" Field="BlackListStatus" HeaderText="Status" Width="100" />
+                <GridColumn TextAlign="TextAlign.Center" Field="Note" HeaderText="Note" Width="150" />
+                <GridColumn HeaderText="Actions" Width="150" TextAlign="TextAlign.Center">
+                    <Template>
+                        <button class="btn custom-add-button" @onclick="(() => OpenEditDialog((context as BlackListItem)))">Edit</button>
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+</div>
+
+<SfDialog IsModal="true" Width="600px" Visible="@IsAddModalOpen" Header="Add Black List Item" OnClose="() => IsAddModalOpen = false">
+    <DialogTemplates>
+        <Content>
+            <div class="mt-2">
+                <label>Select Doctor:</label>
+                <SfDropDownList TValue="Guid" 
+                    TItem="DoctorListItems" 
+                    DataSource="@Doctors" 
+                    @bind-Value="NewBlackList.DoctorId" 
+                    Placeholder="Select Doctor"
+                    CssClass="e-custom">
+                    <DropDownListFieldSettings Text="Name" Value="Id" />
+                </SfDropDownList>
+            </div>
+            <div class="mt-2">
+                <label>Select Patient:</label>
+                <SfDropDownList TValue="Guid" 
+                    TItem="PatientListItems" 
+                    DataSource="@Patients" 
+                    @bind-Value="NewBlackList.PatientId" 
+                    Placeholder="Select Patient"
+                    CssClass="e-custom">
+                    <DropDownListFieldSettings Text="Name" Value="Id" />
+                </SfDropDownList>
+            </div>
+            <div class="mt-2">
+                <label>Select Status:</label>
+                <SfDropDownList DataSource="@BlackListStatusCoolection"
+                                Placeholder="Black List Status"
+                                CssClass="e-custom"
+                                @bind-Value="@NewBlackList.BlackListStatus">
+                    <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+            <div class="mt-2">
+                <SfTextArea Placeholder="Note"
+                            CssClass="e-corner"
+                            @bind-Value="@NewBlackList.Note">
+                </SfTextArea>
+            </div>
+        </Content>
+        <FooterTemplate>
+            <button type="submit" class="btn btn-primary" @onclick="SaveBlackList">Save</button>
+            <button type="button" class="btn btn-secondary" @onclick="() => IsAddModalOpen = false">Cancel</button>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+<SfDialog @bind-Visible="@IsEditModalOpen" Width="400px" Header="Edit Blacklist Status">
+    <DialogTemplates>
+        <Content>
+            <div>
+                <h5>Change Status for: @SelectedBlackList?.PatientFullName</h5>
+                <SfDropDownList DataSource="@BlackListStatusCoolection"
+                                @bind-Value="@SelectedBlackListStatus">
+                    <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
+                </SfDropDownList>
+            </div>
+        </Content>
+        <FooterTemplate>
+            <button class="btn btn-success" @onclick="UpdateBlackListStatus">Save</button>
+            <button class="btn btn-secondary" @onclick="CloseDialog">Cancel</button>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+
+
+<style>
+    .e-custom.e-input-group, .e-custom.e-input-group.e-control-wrapper {
+        height: 40px;
+        border-radius: 10px !important; /* Köşeleri yuvarlamak için */
+        border: 1px solid #f72585 !important; /* Yumuşak bir çerçeve */
+        padding: 5px;
+        border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
+        box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
+    }
+
+    .e-input-group.e-corner {
+        border-radius: 10px !important;
+        border: 1px solid #f72585 !important;
+        width: 100% !important;
+        padding: 5px;
+        border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
+        box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
+    }
+
+    .custom-add-button {
+        background-color: #f72585 !important; /* Arka plan rengi */
+        border-color: #f72585 !important; /* Kenar rengi */
+        color: #ffffff !important; /* Yazı rengi */
+        border-radius: 6px; /* Köşeleri yuvarlama (opsiyonel) */
+        padding: 8px 16px; /* İç boşluk ayarı */
+    }
+
+        .custom-add-button:hover {
+            background-color: #d61e70 !important; /* Hover efekti için renk */
+            border-color: #d61e70 !important;
+        }
+</style>
+

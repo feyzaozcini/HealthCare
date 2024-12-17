@@ -180,6 +180,7 @@
     "Menu:IcdList": "Icd List",
     "Menu:DoctorTaskList": "Doctor Task List",
     "Menu:DiagnosisReport": "Diagnosis Report",
-    "Menu:DoctorWorkSchedule": "Doctor Work Schedule"
+    "Menu:DoctorWorkSchedule": "Doctor Work Schedule",
+    "Menu:Blacklist": "Blacklist"
   }
 }

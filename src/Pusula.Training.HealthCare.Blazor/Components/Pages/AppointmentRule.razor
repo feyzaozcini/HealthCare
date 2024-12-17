@@ -42,7 +42,7 @@
                                 TItem="DepartmentDto"
                                 Placeholder="Departman seçiniz..."
                                 DataSource="@FilteredDepartments"
-                                CssClass="custom-dropdown">
+                                CssClass="e-custom">
                     <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
                     <DropDownListEvents TValue="Guid" TItem="DepartmentDto" ValueChange="OnDepartmentValueChange"></DropDownListEvents>
                 </SfDropDownList>
@@ -52,7 +52,8 @@
                 <SfDropDownList DataSource="@FilteredDoctors"
                                 Placeholder="Doktor seçiniz..."
                                 TItem="DoctorWithNavigationPropertiesDto"
-                                TValue="Guid">
+                                TValue="Guid"
+                                CssClass="e-custom">
                     <DropDownListFieldSettings Value="Doctor.Id" Text="FullName"></DropDownListFieldSettings>
                     <DropDownListEvents TValue="Guid" TItem="DoctorWithNavigationPropertiesDto" ValueChange="OnDoctorValueChange"></DropDownListEvents>
                 </SfDropDownList>
@@ -60,18 +61,21 @@
             <div class="mt-2">
                 <SfNumericTextBox TValue="int?"
                                   Placeholder="MinAge"
+                                  CssClass="e-custom"
                                   @bind-Value="@NewAppointmentRule.MinAge">
                 </SfNumericTextBox>
             </div>
             <div class="mt-2">
                 <SfNumericTextBox TValue="int?"
                                   Placeholder="MaxAge"
+                                  CssClass="e-custom"
                                   @bind-Value="@NewAppointmentRule.MaxAge">
                 </SfNumericTextBox>
             </div>
             <div class="mt-2">
                 <SfDropDownList DataSource="@GendersCollection"
                                 Placeholder="Gender"
+                                CssClass="e-custom"
                                 @bind-Value="@NewAppointmentRule.Gender">
                     <DropDownListFieldSettings Value="Id" Text="DisplayName"></DropDownListFieldSettings>
                 </SfDropDownList>
@@ -91,17 +95,12 @@
 
 
 <style>
-    .custom-dropdown .e-dropdownbase,
-    .custom-dropdown .e-input,
-    .custom-dropdown .e-ddl.e-input {
+    .e-custom.e-input-group, .e-custom.e-input-group.e-control-wrapper {
+        height: 40px;
         border-radius: 10px !important; /* Köşeleri yuvarlamak için */
-        border: 1px solid #d1d5db; /* Yumuşak bir çerçeve */
+        border: 1px solid #f72585 !important; /* Yumuşak bir çerçeve */
         padding: 5px;
+        border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
+        box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
     }
-
-        .custom-dropdown .e-dropdownbase:hover,
-        .custom-dropdown .e-input:hover {
-            border-color: #a3bffa; /* Hover durumunda çerçeve rengi */
-            box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
-        }
 </style>
