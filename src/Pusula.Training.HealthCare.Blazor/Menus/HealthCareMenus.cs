@@ -46,6 +46,9 @@ public class HealthCareMenus
     public const string AppointmentReport = AppointmentReports + ".AppointmentReports";
 
     public const string Patient = Prefix + ".Patient";
+    public const string PatientDefinitions = Patient + ".Definitions";
+    public const string PatientDefinitionsInsurances = PatientDefinitions + ".Insurances";
+    public const string PatientDefinitionsProtocolTypes = PatientDefinitions + ".ProtocolTypes";
     public const string PatientOperations = Patient + ".Operations";
     public const string PatientOperationsPrm = PatientOperations + ".PRM";
     public const string PatientReports = Patient + ".Reports";

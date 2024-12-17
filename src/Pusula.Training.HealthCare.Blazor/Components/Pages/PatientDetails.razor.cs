@@ -1,5 +1,4 @@
-﻿using Pusula.Training.HealthCare.Patients;
-using Pusula.Training.HealthCare.Protocols;
+﻿using Pusula.Training.HealthCare.Protocols;
 using Syncfusion.Blazor.Inputs;
 using Syncfusion.Blazor.Popups;
 using System.Collections.Generic;

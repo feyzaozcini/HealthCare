@@ -1,0 +1,101 @@
+﻿@page "/insurances"
+
+@using Pusula.Training.HealthCare.Insurances
+
+@inject IInsurancesAppService InsurancesAppService
+
+<div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+    <div class="flex-grow-1 d-flex justify-content-center">
+        <SfTextBox Placeholder="Sigorta Ara"
+                   FloatLabelType="FloatLabelType.Never"
+                   @bind-Value="InsurancesFilter!.FilterText"
+                   CssClass="lab-textbox"
+                   @ref="TextBoxSearchObj"
+                   Width="50%"
+                   Input="@(async (args) => await SearchAsync(args))">
+        </SfTextBox>
+    </div>
+    <div>
+        <SfButton CssClass="e-medium lab-button" Content="Sigorta Ekle" OnClick="OpenInsurancesCreateModal"></SfButton>
+    </div>
+</div>
+
+    @*Data Grid*@
+    <SfGrid DataSource="@InsurancesList" ID="lab-grid" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="600px">
+            <GridColumns>
+                
+                <GridColumn Field=@nameof(InsuranceDto.Name) HeaderText="Sigorta Adı" Width="50" TextAlign="TextAlign.Left"></GridColumn>
+                <GridColumn Width="30" TextAlign="TextAlign.Center">
+                    <Template>
+                    @if (context is InsuranceDto insurance)
+                        {
+                            <div class="d-flex justify-content-center">
+                            <SfButton CssClass="e-small e-link" IconCss="e-icons e-edit" OnClick="(() => OpenInsuranceUpdateModal(insurance))"></SfButton>
+                            <SfButton CssClass="e-small e-link" IconCss="e-icons e-delete" OnClick="(() => OpenInsuranceDeleteModal(insurance.Id))"></SfButton>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+
+@*Create Insurance Modal*@
+<SfDialog @ref="CreateInsurancesDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Sigorta Ekle" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <EditForm Model="@CreateInsurancesDto" OnValidSubmit="AddInsurance" class="needs-validation" novalidate>
+                <DataAnnotationsValidator />
+                <div class="row">
+                    <div class="col-12">
+                        <label for="insuranceName">Sigorta Adı</label>
+                        <input type="text" id="insuranceName" class="form-control" @bind="CreateInsurancesDto.Name" placeholder="Sigorta Adı" />
+                        <ValidationMessage For="@(() => CreateInsurancesDto.Name)" />
+                    </div>
+                </div>
+                <div class="row mt-2 mb-2">
+                    <div class="col-12 text-end">
+                        <SfButton CssClass="e-success e-medium m-1" Content="Kaydet" Type="Submit"></SfButton>
+                        <SfButton CssClass="e-secondary e-medium m-1" Content="İptal" OnClick="CloseInsuranceCreateModal"></SfButton>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+@*Delete Insurance Modal*@
+<SfDialog @ref="DeleteInsurancesDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Silme İşlemi" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <p>Silmek istediğinize emin misiniz?</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="e-small e-danger" OnClick="ConfirmInsuranceDelete">Evet</SfButton>
+            <SfButton CssClass="e-small e-primary" OnClick="CloseInsuranceDeleteModal">Hayır</SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+@*Update Insurance Form*@
+<SfDialog @ref="UpdateInsurancesDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Sigorta Güncelleme" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <EditForm Model="@UpdateInsruancesDto" OnValidSubmit="UpdateInsurance" class="needs-validation" novalidate>
+                <DataAnnotationsValidator />
+                <div class="row">
+                    <div class="col-12">
+                        <label for="insuranceName">Sigorta Adı</label>
+                        <input type="text" id="insuranceName" class="form-control" @bind="UpdateInsruancesDto.Name" placeholder="Sigorta Adı" />
+                        <ValidationMessage For="@(() => UpdateInsruancesDto.Name)" />
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12 text-end">
+                        <SfButton CssClass="e-success e-medium m-2" Content="Kaydet" Type="Submit"></SfButton>
+                        <SfButton CssClass="e-secondary e-medium m-2" Content="İptal" OnClick="CloseInsuranceUpdateModal"></SfButton>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+</SfDialog>

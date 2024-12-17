@@ -19,6 +19,7 @@ public class HealthCareMenuContributor : IMenuContributor
             await ConfigureMainMenuAsync(context);
         }
     }
+    
 
     private Task ConfigureMainMenuAsync(MenuConfigurationContext context)
     {
@@ -36,31 +37,10 @@ public class HealthCareMenuContributor : IMenuContributor
             )
         );
 
-        
-
         ConfigureTenantMenu(administration, MultiTenancyConsts.IsEnabled);
-
 
         administration.SetSubItemOrder(IdentityMenuNames.GroupName, 2);
         administration.SetSubItemOrder(SettingManagementMenus.GroupName, 3);
-
-        //context.Menu.AddItem(
-        //    new ApplicationMenuItem(
-        //        HealthCareMenus.Protocols,
-        //        l["Menu:Protocols"],
-        //        url: "/protocols",
-        //        icon: "fa fa-file-alt",
-        //        requiredPermissionName: HealthCarePermissions.Protocols.Default)
-        //);
-
-        //context.Menu.AddItem(
-        //    new ApplicationMenuItem(
-        //        HealthCareMenus.Departments,
-        //        l["Menu:Departments"],
-        //        url: "/departments",
-        //        icon: "fa fa-file-alt",
-        //        requiredPermissionName: HealthCarePermissions.Departments.Default)
-        //);
 
         #region Patient Tabs
 
@@ -69,6 +49,27 @@ public class HealthCareMenuContributor : IMenuContributor
             l["Menu:Patient"],
             icon: "fa fa-user-injured"
         );
+
+        patientMenu.AddItem(
+        new ApplicationMenuItem(
+            HealthCareMenus.PatientDefinitions,
+            l["Menu:Definitions"],
+            icon: "fa fa-cogs"
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.PatientDefinitionsInsurances,
+                    l["Menu:Insurances"],
+                    url: "/insurances",
+                    icon: "fa fa-shield-alt"
+                )
+            ).AddItem(
+                new ApplicationMenuItem(
+                    HealthCareMenus.PatientDefinitionsProtocolTypes,
+                    l["Menu:ProtocolTypes"],
+                    url: "/protocol-types",
+                    icon: "fa fa-id-card"
+                )
+        ));
 
         patientMenu.AddItem(
         new ApplicationMenuItem(
@@ -82,7 +83,6 @@ public class HealthCareMenuContributor : IMenuContributor
                     url: "/patients",
                     icon: "fa fa-users"
                 )
-            
             ));
 
         patientMenu.AddItem(
@@ -218,8 +218,6 @@ public class HealthCareMenuContributor : IMenuContributor
         )));
         #endregion
 
-        context.Menu.AddItem(patientMenu);
-
         #region Appointments Tabs
         // Randevu başlığı ve alt menüleri
         var appoinmentMenu = new ApplicationMenuItem(
@@ -262,7 +260,7 @@ public class HealthCareMenuContributor : IMenuContributor
         ).AddItem(new ApplicationMenuItem(
             HealthCareMenus.AppoinmentSchedule,
             l["Menu:AppointmentSchedule"],
-            url:"/appointment",
+            url: "/appointment",
             icon: "fa fa-calendar-alt"
         )));
 
@@ -284,12 +282,14 @@ public class HealthCareMenuContributor : IMenuContributor
                 l["Menu:AppointmentReport"],
                 url: "/appointmentReport",
                 icon: "fa fa-file-alt"
-               ) ));
-        
+               )));
+
         #endregion
+
+        context.Menu.AddItem(patientMenu);
         context.Menu.AddItem(treatmentMenu);
-        context.Menu.AddItem(labMenu);
         context.Menu.AddItem(appoinmentMenu);
+        context.Menu.AddItem(labMenu);
 
         return Task.CompletedTask;
     }
