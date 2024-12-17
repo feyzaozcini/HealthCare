@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Pusula.Training.HealthCare.Appointments;
-using Pusula.Training.HealthCare.AppointmentTypes;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
 using Pusula.Training.HealthCare.Patients;
@@ -78,7 +76,7 @@ namespace Pusula.Training.HealthCare.BlackLists
         {
             var query = await GetQueryForNavigationPropertiesAsync();
             query = ApplyFilter(query, filterText, blackListStatus, note, patientId, doctorId);
-            query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? AppointmentConst.GetDefaultSorting(true) : sorting);
+            query = query.OrderBy(string.IsNullOrWhiteSpace(sorting) ? BlackListConst.GetDefaultSorting(true) : sorting);
             return await query.PageBy(skipCount, maxResultCount).ToListAsync(cancellationToken);
         }
 

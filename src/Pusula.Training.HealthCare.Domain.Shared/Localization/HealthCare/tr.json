@@ -74,8 +74,9 @@
     "Menu:AppointmentList": "Randevu Listesi",
     "Menu:AppointmentType": "Randevu Türleri",
     "Menu:AppointmentSchedule": "Randevu Planlama",
-    "Menu:AppointmentReport": "Raneduv Raporu",
+    "Menu:AppointmentReport": "Randevu Raporu",
     "Menu:AppointmentRule": "Randevu Kuralları",
-    "Menu:DoctorWorkSchedule": "Doktor Çalışma Zamanı Planlama"
+    "Menu:DoctorWorkSchedule": "Doktor Çalışma Zamanı Planlama",
+    "Menu:Blacklist": "Kara Liste"
   }
 }
