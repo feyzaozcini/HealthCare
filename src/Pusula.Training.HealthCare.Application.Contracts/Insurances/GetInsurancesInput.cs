@@ -15,6 +15,10 @@ namespace Pusula.Training.HealthCare.Insurances
 
         public GetInsurancesInput()
         {
+            FilterText = string.Empty;
+            Name = string.Empty;
+            MaxResultCount = PagedAndSortedResultRequestDto.MaxMaxResultCount;
+            SkipCount = 0;
         }
     }
 }

@@ -11,6 +11,7 @@
         <SfTextBox Placeholder="Protokol Ara"
                    FloatLabelType="FloatLabelType.Never"
                    @bind-Value="ProtocolsFilter!.FilterText"
+                   CssClass="lab-textbox"
                    Width="50%"
                    Input="OnInputChange">
         </SfTextBox>
@@ -19,7 +20,7 @@
 
 @* ************************* PROTOCOL LIST MODAL ************************* *@
 
-<SfGrid DataSource="@ProtocolsList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="700px">
+<SfGrid DataSource="@ProtocolsList" AllowPaging="false" ID="lab-grid" AllowSorting="true" RowHeight="40" Height="700px">
     <GridColumns>
 
         <GridColumn Field=@nameof(ProtocolDto.PatientNo) HeaderText="Patient No" Width="7"></GridColumn>

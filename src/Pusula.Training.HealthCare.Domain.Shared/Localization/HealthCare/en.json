@@ -181,6 +181,10 @@
     "Menu:DoctorTaskList": "Doctor Task List",
     "Menu:DiagnosisReport": "Diagnosis Report",
     "Menu:DoctorWorkSchedule": "Doctor Work Schedule",
-    "Menu:Blacklist": "Blacklist"
+    "Menu:Blacklist": "Blacklist",
+    "Menu:DoctorWorkSchedule": "Doctor Work Schedule",
+    "Menu:Insurances": "Insurance",
+    "Menu:ProtocolTypes": "Protocol Type"
+
   }
 }

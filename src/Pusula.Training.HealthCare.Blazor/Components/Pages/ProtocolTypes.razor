@@ -1,0 +1,101 @@
+﻿@page "/protocol-types"
+
+@using Pusula.Training.HealthCare.ProtocolTypes
+
+@inject IProtocolTypesAppService ProtocolTypesAppService
+
+<div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+    <div class="flex-grow-1 d-flex justify-content-center">
+        <SfTextBox Placeholder="Protokol Tipi Ara"
+                   FloatLabelType="FloatLabelType.Never"
+                   @bind-Value="ProtocolTypesFilter!.FilterText"
+                   CssClass="lab-textbox"
+                   @ref="TextBoxSearchObj"
+                   Width="50%"
+                   Input="@(async (args) => await SearchAsync(args))">
+        </SfTextBox>
+    </div>
+    <div>
+        <SfButton CssClass="e-medium lab-button" Content="Protokol Tipi Ekle" OnClick="OpenProtocolTypesCreateModal"></SfButton>
+    </div>
+</div>
+
+@*Data Grid*@
+<SfGrid DataSource="@ProtocolTypesList" ID="lab-grid" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="600px">
+    <GridColumns>
+
+        <GridColumn Field=@nameof(ProtocolTypeDto.Name) HeaderText="Protokol Tipi" Width="50" TextAlign="TextAlign.Left"></GridColumn>
+        <GridColumn Width="30" TextAlign="TextAlign.Center">
+            <Template>
+                @if (context is ProtocolTypeDto protocolType)
+                {
+                    <div class="d-flex justify-content-center">
+                        <SfButton CssClass="e-small e-link" IconCss="e-icons e-edit" OnClick="(() => OpenProtocolTypeUpdateModal(protocolType))"></SfButton>
+                        <SfButton CssClass="e-small e-link" IconCss="e-icons e-delete" OnClick="(() => OpenProtocolTypeDeleteModal(protocolType.Id))"></SfButton>
+                    </div>
+                }
+            </Template>
+        </GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@*Create Protocol Type Modal*@
+<SfDialog @ref="CreateProtocolTypesDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Protokol Tipi Ekle" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <EditForm Model="@CreateProtocolTypesDto" OnValidSubmit="AddProtocolType" class="needs-validation" novalidate>
+                <DataAnnotationsValidator />
+                <div class="row">
+                    <div class="col-12">
+                        <label for="insuranceName">Protokol Tipi</label>
+                        <input type="text" id="insuranceName" class="form-control" @bind="CreateProtocolTypesDto.Name" placeholder="Protokol Tipi" />
+                        <ValidationMessage For="@(() => CreateProtocolTypesDto.Name)" />
+                    </div>
+                </div>
+                <div class="row mt-2 mb-2">
+                    <div class="col-12 text-end">
+                        <SfButton CssClass="e-success e-medium m-1" Content="Kaydet" Type="Submit"></SfButton>
+                        <SfButton CssClass="e-secondary e-medium m-1" Content="İptal" OnClick="CloseProtocolTypeCreateModal"></SfButton>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+</SfDialog>
+
+@*Delete Protocol Type Modal*@
+<SfDialog @ref="DeleteProtocolTypesDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Silme İşlemi" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <p>Silmek istediğinize emin misiniz?</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="e-small e-danger" OnClick="ConfirmProtocolTypeDelete">Evet</SfButton>
+            <SfButton CssClass="e-small e-primary" OnClick="CloseProtocolTypeDeleteModal">Hayır</SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+@*Update Protocol Type Form*@
+<SfDialog @ref="UpdateProtocolTypesDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Protokol Tipi Güncelleme" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <EditForm Model="@UpdateProtocolTypesDto" OnValidSubmit="UpdateProtocolType" class="needs-validation" novalidate>
+                <DataAnnotationsValidator />
+                <div class="row">
+                    <div class="col-12">
+                        <label for="insuranceName">Protokol Tipi</label>
+                        <input type="text" id="insuranceName" class="form-control" @bind="UpdateProtocolTypesDto.Name" placeholder="Protokol Tipi" />
+                        <ValidationMessage For="@(() => UpdateProtocolTypesDto.Name)" />
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12 text-end">
+                        <SfButton CssClass="e-success e-medium m-2" Content="Kaydet" Type="Submit"></SfButton>
+                        <SfButton CssClass="e-secondary e-medium m-2" Content="İptal" OnClick="CloseProtocolTypeUpdateModal"></SfButton>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+</SfDialog>

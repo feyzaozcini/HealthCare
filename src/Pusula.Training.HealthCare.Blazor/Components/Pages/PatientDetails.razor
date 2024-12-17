@@ -192,13 +192,14 @@
                 <SfTextBox Placeholder="Protokol Ara"
                            FloatLabelType="FloatLabelType.Never"
                            @bind-Value="ProtocolsFilter!.FilterText"
+                           CssClass="lab-textbox"
                            Width="50%"
                            Input="OnInputChange">
                 </SfTextBox>
             </div>
         </div>
         <div class="sfgrid-container">
-            <SfGrid DataSource="@ProtocolsList" TValue="ProtocolDto" AllowPaging="true" AllowSorting="true" RowHeight="40" Height="700px">
+            <SfGrid DataSource="@ProtocolsList" TValue="ProtocolDto" ID="lab-grid" AllowPaging="true" AllowSorting="true" RowHeight="40" Height="700px">
                 <GridColumns>
 
                     <!-- Protocol No -->
@@ -255,8 +256,8 @@
                 </GridColumns>
             </SfGrid>
         </div>
-    </div>
-</div>
+                </div>
+                    </div>
 
 @* ************************* NOTE LIST MODAL ************************* *@
 
