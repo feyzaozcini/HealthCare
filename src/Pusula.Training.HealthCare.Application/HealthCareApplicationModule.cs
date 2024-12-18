@@ -21,12 +21,9 @@ using Volo.Abp.BackgroundWorkers;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Pusula.Training.HealthCare.Workers;
-using Pusula.Training.HealthCare.Countries;
 using Volo.Abp.AspNetCore.ExceptionHandling;
-using Pusula.Training.HealthCare.Patients;
-using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.UserProfiles;
-using Pusula.Training.HealthCare.Appointments;
+using Pusula.Training.HealthCare.EmailServices;
 
 namespace Pusula.Training.HealthCare;
 
@@ -90,6 +87,13 @@ public class HealthCareApplicationModule : AbpModule
        
         
         context.Services.AddTransient<UserProfileManager>();
-        
+
+        context.Services.AddSingleton(new EmailService(
+                   "smtp.gmail.com", // Gmail için SMTP sunucusu
+                   587,                   // TLS portu
+                   "hhalledeviz@gmail.com", // Gmail kullanıcı adı
+                   "asxj ddfe ifet ntkw"  // Gmail uygulama şifresi
+               ));
+
     }
 }
