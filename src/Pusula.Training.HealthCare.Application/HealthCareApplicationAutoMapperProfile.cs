@@ -40,6 +40,8 @@ using Pusula.Training.HealthCare.PainTypes;
 using Pusula.Training.HealthCare.PainDetails;
 using Pusula.Training.HealthCare.DoctorWorkSchedules;
 using Pusula.Training.HealthCare.BlackLists;
+using Pusula.Training.HealthCare.SystemChecks;
+using Pusula.Training.HealthCare.FollowUpPlans;
 
 
 namespace Pusula.Training.HealthCare;
@@ -363,5 +365,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<BlackList, BlackListWithNavigationPropertiesDto>();
         CreateMap<BlackListWithNavigationProperties, BlackListWithNavigationPropertiesDto>();
         CreateMap<BlackListDto, BlackListWithNavigationPropertiesDto>();
+
+        CreateMap<SystemCheck, SystemCheckDto>().ReverseMap();
+
+        CreateMap<FollowUpPlan, FollowUpPlanDto>().ReverseMap();
+
+
     }
 }

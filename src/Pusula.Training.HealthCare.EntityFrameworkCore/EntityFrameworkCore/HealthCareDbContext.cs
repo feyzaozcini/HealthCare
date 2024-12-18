@@ -49,6 +49,9 @@ using Pusula.Training.HealthCare.PainTypes;
 using Pusula.Training.HealthCare.PainDetails;
 using Pusula.Training.HealthCare.DoctorWorkSchedules;
 using Pusula.Training.HealthCare.BlackLists;
+using Pusula.Training.HealthCare.SystemChecks;
+using Pusula.Training.HealthCare.FollowUpPlans;
+
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -94,6 +97,11 @@ public class HealthCareDbContext :
     public DbSet<AppointmentRule> AppointmentRules { get; set; }
     public DbSet<PainType> PainTypes { get; set; } = null!;
     public DbSet<PainDetail> PainDetails { get; set; } = null!;
+
+    public DbSet<SystemCheck> SystemChecks { get; set; } = null!;
+    public DbSet<FollowUpPlan> FollowUpPlans { get; set; } = null!;
+
+
     public DbSet<DoctorWorkSchedule> DoctorWorkSchedules { get; set; } = null!;
     public DbSet<BlackList> BlackLists { get; set; } = null!;
     #region Entities from the modules
@@ -679,6 +687,37 @@ public class HealthCareDbContext :
                 b.Property(x => x.Note).HasColumnName(nameof(BlackList.Note));
                 b.HasOne<Patient>().WithMany().IsRequired(false).HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
                 b.HasOne<Doctor>().WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+            });
+            builder.Entity<SystemCheck>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "SystemChecks", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+
+                b.Property(x => x.ProtocolId).HasColumnName(nameof(SystemCheck.ProtocolId)).IsRequired();
+                b.Property(x => x.GeneralSystemCheck).HasColumnName(nameof(SystemCheck.GeneralSystemCheck)).IsRequired();
+                b.Property(x => x.GenitoUrinary).HasColumnName(nameof(SystemCheck.GenitoUrinary)).IsRequired(false);
+                b.Property(x => x.Skin).HasColumnName(nameof(SystemCheck.Skin)).IsRequired(false);
+                b.Property(x => x.Respiratory).HasColumnName(nameof(SystemCheck.Respiratory)).IsRequired(false);
+                b.Property(x => x.Nervous).HasColumnName(nameof(SystemCheck.Nervous)).IsRequired(false);
+                b.Property(x => x.MusculoSkeletal).HasColumnName(nameof(SystemCheck.MusculoSkeletal)).IsRequired(false);
+                b.Property(x => x.Circulatory).HasColumnName(nameof(SystemCheck.Circulatory)).IsRequired(false);
+                b.Property(x => x.GastroIntestinal).HasColumnName(nameof(SystemCheck.GastroIntestinal)).IsRequired(false);
+                b.Property(x => x.Description).HasColumnName(nameof(SystemCheck.Description)).IsRequired(false);
+                b.HasOne(x => x.Protocol).WithOne().HasForeignKey<SystemCheck>(x => x.ProtocolId).IsRequired().OnDelete(DeleteBehavior.Cascade);
+
+            });
+
+            builder.Entity<FollowUpPlan>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "FollowUpPlans", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+
+                b.Property(x => x.ProtocolId).HasColumnName(nameof(FollowUpPlan.ProtocolId)).IsRequired();
+                b.Property(x => x.Note).HasColumnName(nameof(FollowUpPlan.Note)).HasMaxLength(FollowUpPlanConsts.NoteMaxLength).IsRequired(false);
+                b.Property(x => x.FollowUpType).HasColumnName(nameof(FollowUpPlan.FollowUpType)).IsRequired();
+                b.Property(x => x.IsSurgeryScheduled).HasColumnName(nameof(FollowUpPlan.IsSurgeryScheduled)).IsRequired();
+                b.HasOne(x => x.Protocol).WithOne().HasForeignKey<FollowUpPlan>(x => x.ProtocolId).IsRequired().OnDelete(DeleteBehavior.Cascade);
+
             });
         }
 

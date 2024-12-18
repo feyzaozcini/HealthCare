@@ -8,6 +8,9 @@
 @using Pusula.Training.HealthCare.Diagnoses
 @using Pusula.Training.HealthCare.ExaminationDiagnoses
 @using Pusula.Training.HealthCare.Protocols
+@using Pusula.Training.HealthCare.SystemChecks
+@using Pusula.Training.HealthCare.FollowUpPlans
+
 
 
 @using Volo.Abp.Localization
@@ -31,33 +34,18 @@
 @inject IDiagnosisAppService DiagnosisAppService
 @inject IExaminationDiagnosisAppService ExaminationDiagnosisAppService
 @inject IProtocolsAppService ProtocolAppService
+@inject ISystemChecksAppService SystemCheckAppService
+@inject IFollowUpPlansAppService FollowUpPlanAppService
+
 
 
 <p>Protocol ID: @ProtocolId Patient ID: @PatientId</p>
 
-#<!-- #region patient card -->
-<!-- Hasta Kartı -->
-@* <div class="patient-card-container">
-    <SfCard CssClass="e-card e-card-horizontal patient-card">
-        <div class="e-card-header">
-            <div class="e-card-header-image">
-                <img src="https://via.placeholder.com/50" alt="Patient" />
-            </div>
-            <div class="e-card-header-text">
-                <h4>@($"{Patient.FirstName} {Patient.LastName}")</h4>
-                <p>
-                    <strong>Yaş:</strong> @CalculateAge(Patient.BirthDate) |
-                    <strong>Doğum Tarihi:</strong> @Patient.BirthDate.ToString("dd.MM.yyyy")
-                </p>
-            </div>
-        </div>
-        <div class="e-card-content">
-            <p><strong>Hasta No:</strong> @Patient.No | <strong>Ülke:</strong> TR</p>
-            <p><strong>Bölüm:</strong> Genel Cerrahi</p>
-            <p><strong>Doktor:</strong> Uzm. Dr. Ahmet Hulusi Arslan</p>
-        </div>
-    </SfCard>
-</div> *@
+@*Toast*@
+<SfToast @ref="ToastObj" Width="300px">
+    <ToastPosition X="Right" Y="Top"></ToastPosition>
+</SfToast>
+
 
 <div class="patient-card-container">
     <SfCard CssClass="e-card e-card-horizontal patient-card">
@@ -139,6 +127,26 @@
                 </SfCard>
             </div>
             <!-- Özgeçmiş Kartı END -->
+            <!-- Sistem Sorgusu Kartı START -->
+            <div class="mb-3">
+                <SfCard CssClass="e-shadow">
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <div class="d-flex justify-content-between align-items-center" style="width: 100%;">
+                            <strong>Sistem Sorgusu</strong>
+                            <span @onclick="OpenSystemCheckModal" style="cursor: pointer; color: #007bff; font-size: 0.9rem; text-decoration: none;">
+                                Sistem Sorgulama
+                            </span>
+                        </div>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+
+                    <CardContent>
+                        <div class="mb-3">
+                            <SfTextArea @bind-Value="systemCheckDto.Description" Placeholder="Açıklama" CssClass="form-control" />
+                        </div>
+                    </CardContent>
+                </SfCard>
+            </div>
+            <!-- Sistem Sorgusu Kartı END -->
             <!-- Psychological State START -->
             <div class="mb-3">
                 <SfCard CssClass="e-shadow">
@@ -402,12 +410,12 @@
 
                             <!-- Butonlar -->
                             <div class="btn-group ms-3" role="group">
-                              @*   @foreach (var type in Enum.GetValues(typeof(DiagnosisType)))
+                                @*   @foreach (var type in Enum.GetValues(typeof(DiagnosisType)))
                                 {
-                                    <SfButton CssClass="@GetDiagnosisTypeButtonClass((DiagnosisType)type)"
-                                              @onclick="() => SetDiagnosisType((DiagnosisType)type)">
-                                        @type
-                                    </SfButton>
+                                <SfButton CssClass="@GetDiagnosisTypeButtonClass((DiagnosisType)type)"
+                                @onclick="() => SetDiagnosisType((DiagnosisType)type)">
+                                @type
+                                </SfButton>
                                 } *@
 
                                 <div class="btn-group ms-3" role="group">
@@ -483,13 +491,72 @@
                 </SfCard>
             </div>
             <!-- Tanılar (ICD-10) Kartı END -->
+            <!-- İzlem Plan Kartı START -->
+            <div class="mb-3">
+                <SfCard CssClass="e-shadow">
+
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <div style="display: flex; justify-content: flex-start; padding: 10px;">
+                            <strong>İzlem ve Plan</strong>
+                        </div>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+
+
+                    <CardContent>
+                        <!-- acıklama Alanı -->
+                        <div class="mb-3">
+                            <SfTextBox Placeholder="Tedavi notu" CssClass="followUp-textbox" @bind-Value="followUpPlanDto.Note"> </SfTextBox>
+                        </div>
+
+                        <div class="btn-group me-3" role="group" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            @foreach (var type in Enum.GetValues(typeof(FollowUpType)))
+                            {
+                                <SfButton CssClass="@GetButtonClass((FollowUpType)type)"
+                                          @onclick="() => SetFollowUpType((FollowUpType)type)"
+                                          Style="margin-bottom: 4px; border-radius: 10px;">
+                                    @Localizer[$"Enum:FollowUpType.{type}"]
+                                </SfButton>
+                            }
+                        </div>
+
+                        <div class="mb-3">
+                            <!-- Başlık ve Buton Grubu Aynı Satırda -->
+                            <div class="d-flex align-items-center justify-content-start gap-3">
+                                <!-- Başlık -->
+                                <strong>Ameliyat Planlanacak mı?</strong>
+
+                                <!-- Buton Grubu -->
+                                <div class="btn-group" role="group">
+                                    <SfButton CssClass="@($"btn-left {GetSurgeryButtonClass(true)}")"
+                                              @onclick="() => SetSurgeryPlan(true)">
+                                        Evet
+                                    </SfButton>
+                                  
+                                    <SfButton CssClass="@($"btn-right {GetSurgeryButtonClass(false)}")"
+                                              @onclick="() => SetSurgeryPlan(false)">
+                                        Hayır
+                                    </SfButton>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kaydet Butonu -->
+                        <div class="text-end mt-3">
+                            <SfButton CssClass="e-primary" @onclick="SaveFollowUpPlan">
+                                Kaydet
+                            </SfButton>
+                        </div>
+                    </CardContent>
+                </SfCard>
+            </div>
+            <!-- İzlem Plan Kartı END -->
+
         </div>
 
     </div>
 </div>
 
 <!---------------- Fallrisk  MODAL START ----------------->
-
 <SfDialog @bind-Visible="isFallRiskModalOpen" Width="400px" Header="Düşme Riski Detayları" IsModal="true" ShowCloseIcon="true" CloseOnEscape="true">
     <DialogTemplates>
         <Content>
@@ -609,13 +676,272 @@
     </DialogTemplates>
 
 </SfDialog>
-
 <!-----------Fallrisk  MODAL END ------------------->
 
+<!-- SYSTEM CHECK MODAL START -->
+<SfDialog @bind-Visible="isSystemModalOpen"
+          ShowCloseIcon="true"
+          Width="100%"
+          Height="100%"
+          CssClass="e-fixed">
+    <DialogPositionData X="0" Y="0"></DialogPositionData>
+    <div class="container">
+        <DialogTemplates>
+            <Header>
+                <SfCard CssClass="dialog-header-card e-shadow">
+                    <CardContent>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Sol Taraf: Sistem Sorgulama Başlığı -->
+                            <strong>Sistem Sorgulama</strong>
 
+                            <!-- Sağ Taraf: Hasta Bilgileri -->
+                            <div class="patient-info">
+                                Hasta Adı: Ahmet Yılmaz | Yaş: 35 | Cinsiyet: Erkek
+                            </div>
+                        </div>
+                    </CardContent>
+                </SfCard>
+            </Header>
+        </DialogTemplates>
+        <div class="row">
+            <!-- Sol Taraf -->
+            <div class="col-6">
+                <!-- Genel Sistem Sorgusu -->
+                <SfCard CssClass="mb-3">
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <strong>Genel Sistem Sorgusu</strong>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+                    <CardContent>
+                        <div class="btn-group" role="group">
+
+                            <!-- Normal Butonu -->
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.GeneralSystemCheck, true)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.GeneralSystemCheck, value => systemCheckDto.GeneralSystemCheck = value, true)">
+                                Normal
+                            </SfButton>
+
+                            <!-- Normal Değil Butonu -->
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.GeneralSystemCheck, false)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.GeneralSystemCheck, value => systemCheckDto.GeneralSystemCheck = value, false)">
+                                Normal değil
+                            </SfButton>
+                        </div>
+
+                    </CardContent>
+                </SfCard>
+
+                <!-- Genitoüriner Sistem -->
+                <SfCard CssClass="mb-3">
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <strong>Genitoüriner Sistem</strong>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+                    <CardContent>
+                        <div class="btn-group" role="group">
+
+
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.GenitoUrinary, true)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.GenitoUrinary, value => systemCheckDto.GenitoUrinary = value, true)">
+                                Normal
+                            </SfButton>
+
+                            <!-- Normal Değil Butonu -->
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.GenitoUrinary, false)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.GenitoUrinary, value => systemCheckDto.GenitoUrinary = value, false)">
+                                Normal değil
+                            </SfButton>
+                        </div>
+                    </CardContent>
+                </SfCard>
+
+                <!-- Deri -->
+                <SfCard CssClass="mb-3">
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <strong>Deri</strong>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+                    <CardContent>
+                        <div class="btn-group" role="group">
+
+
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.Skin, true)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.Skin, value => systemCheckDto.Skin = value, true)">
+                                Normal
+                            </SfButton>
+
+                            <!-- Normal Değil Butonu -->
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.Skin, false)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.Skin, value => systemCheckDto.Skin = value, false)">
+                                Normal değil
+                            </SfButton>
+                        </div>
+                    </CardContent>
+                </SfCard>
+
+                <!-- Solunum Sistemi -->
+                <SfCard CssClass="mb-3">
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <strong>Solunum Sistemi</strong>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+                    <CardContent>
+                        <div class="btn-group" role="group">
+
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.Respiratory, true)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.Respiratory, value => systemCheckDto.Respiratory = value, true)">
+                                Normal
+                            </SfButton>
+
+                            <!-- Normal Değil Butonu -->
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.Respiratory, false)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.Respiratory, value => systemCheckDto.Respiratory = value, false)">
+                                Normal değil
+                            </SfButton>
+                        </div>
+                    </CardContent>
+                </SfCard>
+            </div>
+
+            <!-- Sağ Taraf -->
+            <div class="col-6">
+                <!-- Sinir Sistemi -->
+                <SfCard CssClass="mb-3">
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <strong>Sinir Sistemi</strong>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+                    <CardContent>
+                        <div class="btn-group" role="group">
+
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.Nervous, true)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.Nervous, value => systemCheckDto.Nervous = value, true)">
+                                Normal
+                            </SfButton>
+
+                            <!-- Normal Değil Butonu -->
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.Nervous, false)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.Nervous, value => systemCheckDto.Nervous = value, false)">
+                                Normal değil
+                            </SfButton>
+                        </div>
+                    </CardContent>
+                </SfCard>
+
+                <!-- Kas - İskelet Sistemi -->
+                <SfCard CssClass="mb-3">
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <strong>Kas - İskelet Sistemi</strong>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+                    <CardContent>
+                        <div class="btn-group" role="group">
+
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.MusculoSkeletal, true)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.MusculoSkeletal, value => systemCheckDto.MusculoSkeletal = value, true)">
+                                Normal
+                            </SfButton>
+
+                            <!-- Normal Değil Butonu -->
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.MusculoSkeletal, false)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.MusculoSkeletal, value => systemCheckDto.MusculoSkeletal = value, false)">
+                                Normal değil
+                            </SfButton>
+                        </div>
+                    </CardContent>
+                </SfCard>
+
+                <!-- Dolaşım Sistemi -->
+                <SfCard CssClass="mb-3">
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <strong>Dolaşım Sistemi</strong>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+                    <CardContent>
+                        <div class="btn-group" role="group">
+
+
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.Circulatory, true)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.Circulatory, value => systemCheckDto.Circulatory = value, true)">
+                                Normal
+                            </SfButton>
+
+                            <!-- Normal Değil Butonu -->
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.Circulatory, false)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.Circulatory, value => systemCheckDto.Circulatory = value, false)">
+                                Normal değil
+                            </SfButton>
+                        </div>
+                    </CardContent>
+                </SfCard>
+
+                <!-- Gastrointestinal Sistem -->
+                <SfCard CssClass="mb-3">
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <strong>Gastrointestinal Sistem</strong>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+                    <CardContent>
+                        <div class="btn-group" role="group">
+
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.GastroIntestinal, true)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.GastroIntestinal, value => systemCheckDto.GastroIntestinal = value, true)">
+                                Normal
+                            </SfButton>
+
+                            <!-- Normal Değil Butonu -->
+                            <SfButton CssClass="@GetSystemCheckButtonClass(systemCheckDto.GastroIntestinal, false)"
+                                      @onclick="() => ToggleState(() => systemCheckDto.GastroIntestinal, value => systemCheckDto.GastroIntestinal = value, false)">
+                                Normal değil
+                            </SfButton>
+                        </div>
+                    </CardContent>
+                </SfCard>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <DialogTemplates>
+        <FooterTemplate>
+            <div class="d-flex justify-content-end">
+                <SfButton CssClass="e-success" @onclick="OnSaveSystemCheck">Kaydet</SfButton>
+            </div>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+<!-- SYSTEM CHECK MODAL END -->
 
 
 <style>
+
+    
+    .followUp-textbox {
+        height: 50px;
+        padding: 10px;
+        font-size: 1rem; /* Yazı boyutunu büyütmek istersen */
+    }
+
+    /* Grup içindeki tüm butonlar düz köşeler */
+    .btn-group .e-primary,
+    .btn-group .e-outline {
+        border-radius: 0;
+        margin: 0;
+    }
+
+    /* Sol buton için sol köşeleri yuvarlat */
+    .btn-group .btn-left.e-btn {
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+
+    /* Sağ buton için sağ köşeleri yuvarlat */
+    .btn-group .btn-right.e-btn {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+    .e-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        z-index: 1000;
+        overflow: hidden;
+    }
 
     .physical-examination .form-label {
         font-size: 0.7rem; /* Label boyutunu daha da küçült */

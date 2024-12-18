@@ -1,24 +1,24 @@
-using AutoMapper.Internal.Mappers;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Pusula.Training.HealthCare.Anamneses;
-using Pusula.Training.HealthCare.Diagnoses;
 using Pusula.Training.HealthCare.ExaminationDiagnoses;
 using Pusula.Training.HealthCare.FallRisks;
+using Pusula.Training.HealthCare.FollowUpPlans;
 using Pusula.Training.HealthCare.PainDetails;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.PhysicalExaminations;
 using Pusula.Training.HealthCare.Protocols;
 using Pusula.Training.HealthCare.PshychologicalStates;
 using Pusula.Training.HealthCare.Shared;
+using Pusula.Training.HealthCare.SystemChecks;
+using Pusula.Training.HealthCare.TestGroups;
+using Syncfusion.Blazor.Notifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.ObjectMapping;
-using YamlDotNet.Core.Tokens;
+using Volo.Abp.Validation;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -34,6 +34,38 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private ProtocolDto protocolDto { get; set; } = new();
 
+        #region Toast and Error handling
+
+        private SfToast? ToastObj;
+
+        private async Task ShowToast(string message, bool isSuccess = true)
+        {
+            await ToastObj!.ShowAsync(new ToastModel
+            {
+                Content = message,
+                CssClass = isSuccess ? "e-toast-success" : "e-toast-danger",
+                Timeout = 3000,
+                ShowCloseButton = true
+            });
+        }
+        public async Task HandleError(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (UserFriendlyException ex)
+            {
+              
+                await ShowToast(ex.Message, false);
+            }
+            catch (Exception)
+            {
+
+               await ShowToast("Bir hata oluþtu. Lütfen tekrar deneyin.", false);
+            }
+        }
+        #endregion
         protected override async Task OnInitializedAsync()
         {
             // Hasta bilgilerini çek
@@ -45,6 +77,9 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             await LoadIcdListAsync();
             await LoadExaminationDiagnosesAsync();
             await GetProtocolAsync();
+            await LoadSystemCheckAsync();
+            await LoadFollowUpPlanAsync();
+            ToastObj ??= new SfToast();
         }
 
         private async Task GetProtocolAsync()
@@ -867,6 +902,265 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             IcdList = result.Items.ToList(); // Servisten gelen verileri IcdList'e atýyoruz
         }
 
+        #endregion
+
+        #region SISTEM SORGUSU
+
+        private SystemCheckDto systemCheckDto = new SystemCheckDto();
+        private SystemCheckCreateDto systemCheckCreateDto = new SystemCheckCreateDto();
+        private SystemCheckUpdateDto systemCheckUpdateDto = new SystemCheckUpdateDto();
+
+
+        private bool isSystemModalOpen = false;
+        private bool isExistingSystemCheck = false;
+       
+
+      
+        private void ToggleState(Func<bool?> getState, Action<bool?> setState, bool buttonState)
+        {
+            // Mevcut durumu kontrol et ve güncelle
+            var currentState = getState();
+
+            // Eðer mevcut durum týklanan butonun durumuyla aynýysa null yap yani seçimi kaldýr
+            setState(currentState == buttonState ? null : buttonState);
+        }
+        private string GetSystemCheckButtonClass(bool? currentState, bool buttonState)
+        {
+            // Eðer buton seçiliyse primary, deðilse outline
+           
+            if (currentState == null)
+            {
+                // Null durumunda her iki buton da outline olur
+                return "e-outline";
+            }
+
+            // Seçili durumu kontrol et
+            return currentState == buttonState
+                ? "e-primary"
+                : "e-outline";
+        }
+        private async Task LoadSystemCheckAsync()
+        {
+            try
+            {
+               
+                var result = await SystemCheckAppService.GetByProtocolIdAsync(ProtocolId);
+
+                if (result != null)
+                {
+                    systemCheckDto = result;
+                    isExistingSystemCheck = true;
+                }
+                else
+                {
+                    
+                    systemCheckDto = new SystemCheckDto();
+                    isExistingSystemCheck = false;
+                }
+            }
+            catch (Exception ex)
+            {
+               
+                Console.WriteLine($"Hata oluþtu: {ex.Message}");
+                
+            }
+        }
+
+        private async Task OnSaveSystemCheck()
+        {
+            try
+            {
+                if (isExistingSystemCheck)
+                {
+                    await UpdateSystemCheckAsync();
+                }
+                else
+                {
+                    await CreateSystemCheckAsync();
+                }
+
+                isSystemModalOpen= false;
+            }
+            catch (Exception ex)
+            {
+                // Hata yönetimi
+                Console.WriteLine($"Kaydetme iþlemi sýrasýnda hata oluþtu: {ex.Message}");
+            }
+        }
+
+        #region Create
+
+        private async Task CreateSystemCheckAsync()
+        {
+            await HandleError(async () =>
+            {
+                var createDto = new SystemCheckCreateDto
+                {
+                    ProtocolId = ProtocolId,
+                    GeneralSystemCheck = systemCheckDto.GeneralSystemCheck,
+                    GenitoUrinary = systemCheckDto.GenitoUrinary,
+                    Skin = systemCheckDto.Skin,
+                    Respiratory = systemCheckDto.Respiratory,
+                    Nervous = systemCheckDto.Nervous,
+                    MusculoSkeletal = systemCheckDto.MusculoSkeletal,
+                    Circulatory = systemCheckDto.Circulatory,
+                    GastroIntestinal = systemCheckDto.GastroIntestinal,
+                    Description = systemCheckDto.Description
+                };
+
+
+                await SystemCheckAppService.CreateAsync(createDto);
+                isSystemModalOpen = false;
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+
+        #region Update
+        private async Task UpdateSystemCheckAsync()
+        {
+            await HandleError(async () =>
+            {
+                var updateDto = new SystemCheckUpdateDto
+                {
+                    Id = systemCheckDto.Id,
+                    ProtocolId = ProtocolId,
+                    GeneralSystemCheck = systemCheckDto.GeneralSystemCheck,
+                    GenitoUrinary = systemCheckDto.GenitoUrinary,
+                    Skin = systemCheckDto.Skin,
+                    Respiratory = systemCheckDto.Respiratory,
+                    Nervous = systemCheckDto.Nervous,
+                    MusculoSkeletal = systemCheckDto.MusculoSkeletal,
+                    Circulatory = systemCheckDto.Circulatory,
+                    GastroIntestinal = systemCheckDto.GastroIntestinal,
+                    Description = systemCheckDto.Description
+                };
+
+
+                await SystemCheckAppService.UpdateAsync(updateDto);
+                isSystemModalOpen = false;
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+
+        #endregion
+        private void OpenSystemCheckModal()
+        {
+            isSystemModalOpen = true;
+        }
+        #endregion
+
+        #region IZLEM VE PLAN
+        private FollowUpType selectedFollowUpType;
+        private bool isSurgeryPlanned;
+        private FollowUpPlanDto followUpPlanDto = new FollowUpPlanDto();
+        private bool isExistingFollowUpPlan;
+
+        private async Task LoadFollowUpPlanAsync()
+        {
+            try
+            {
+                var result = await FollowUpPlanAppService.GetByProtocolIdAsync(ProtocolId);
+
+                if (result != null)
+                {
+                    followUpPlanDto = result;
+                    isExistingFollowUpPlan = true;
+                    selectedFollowUpType = followUpPlanDto.FollowUpType;
+                }
+                else
+                {
+
+                    followUpPlanDto = new FollowUpPlanDto();
+                    isExistingFollowUpPlan = false;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Hata oluþtu: {ex.Message}");
+
+            }
+        }
+        private async Task SaveFollowUpPlan()
+        {
+            try
+            {
+                if (isExistingFollowUpPlan)
+                {
+                    await UpdateFollowUpPlanAsync();
+                   
+                }
+                else
+                {
+                    await CreateFollowUpPlanAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Hata yönetimi
+                Console.WriteLine($"Kaydetme iþlemi sýrasýnda hata oluþtu: {ex.Message}");
+            }
+        }
+
+        #region Create
+        private async Task CreateFollowUpPlanAsync()
+        {
+            await HandleError(async () =>
+            {
+                var createDto = new FollowUpPlanCreateDto
+                {
+                    ProtocolId = ProtocolId,
+                    Note = followUpPlanDto.Note,
+                    FollowUpType = selectedFollowUpType,
+                    IsSurgeryScheduled = isSurgeryPlanned,
+                };
+
+                await FollowUpPlanAppService.CreateAsync(createDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+
+        #region UPDATE
+        private async Task UpdateFollowUpPlanAsync()
+        {
+            await HandleError(async () =>
+            {
+                var updateDto = new FollowUpPlanUpdateDto
+                {
+                    Id = followUpPlanDto.Id,
+                    ProtocolId = ProtocolId,
+                    Note = followUpPlanDto.Note,
+                    FollowUpType = selectedFollowUpType,
+                    IsSurgeryScheduled = isSurgeryPlanned,
+                };
+
+                await FollowUpPlanAppService.UpdateAsync(updateDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+      
+        private string GetSurgeryButtonClass(bool value)
+        {
+            return isSurgeryPlanned == value ? "e-primary" : "e-outline";
+        }
+
+        // Ameliyat planýný ayarlayan metot
+        private void SetSurgeryPlan(bool value)
+        {
+            isSurgeryPlanned = value;
+        }
+        private void SetFollowUpType(FollowUpType type)
+        {
+            selectedFollowUpType = type;
+        }
+
+        private string GetButtonClass(FollowUpType followUpType)
+        {
+            return followUpType == selectedFollowUpType ? "e-primary" : "e-outline";
+        }
         #endregion
     }
 }
