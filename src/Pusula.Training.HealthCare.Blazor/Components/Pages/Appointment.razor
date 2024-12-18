@@ -30,9 +30,9 @@
 
 @inject IJSRuntime JSRuntime
 
-<div class="stepper-container" style="max-width: 1600px; margin: 0 auto; padding: 40px;">
-    <div class="card shadow-lg border-0">
-        <div class="card-body">
+<div class="stepper-container" style="max-width: 1700px; margin: 0 auto; padding: 20px;">
+    <div class="card custom-card">
+        <div class="custom-card-body">
             <!-- Hasta . Departman ve Doktor Seçim Alanları -->
             <div class="row mb-4 align-items-center">
                 <!-- Departman Seçimi -->
@@ -41,7 +41,7 @@
                     <SfDropDownList TValue="Guid"
                                     TItem="DepartmentDto"
                                     Placeholder="Departman seçiniz..."
-                                    CssClass="custom-dropdown"
+                                    CssClass="e-custom"
                                     DataSource="@FilteredDepartments">
                         <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
                         <DropDownListEvents TValue="Guid" TItem="DepartmentDto" ValueChange="OnDepartmentValueChange"></DropDownListEvents>
@@ -53,7 +53,7 @@
                     <h5 style="color: #495057;">Doktor</h5>
                     <SfDropDownList DataSource="@FilteredDoctors"
                                     Placeholder="Doktor seçiniz..."
-                                    CssClass="custom-dropdown"
+                                    CssClass="e-custom"
                                     TItem="DoctorWithNavigationPropertiesDto"
                                     TValue="Guid"
                                      >
@@ -64,8 +64,8 @@
 
                 <!-- Hasta Seçim Butonu -->
                 <div class="col-md-2 mb-3">
-                    <button class="btn btn-primary px-3 py-2" style="font-size: 14px; margin-top: 32px;" @onclick="OpenPatientSelectionPopup">
-                        <i class="fas fa-user-plus me-2"></i> Hasta Seç
+                    <button class="btn custom-add-button" @onclick="OpenPatientSelectionPopup">
+                        Hasta Seç
                     </button>
                 </div>
             </div>
@@ -230,7 +230,7 @@
                     <GridColumn Field="Patient.IdentityNumber" HeaderText="@L["IdentityNumber"]" Width="150"></GridColumn>
                     <GridColumn Width="100" HeaderText="@L["Select"]">
                         <Template>
-                            <SfButton CssClass="e-primary" OnClick="() => SelectPatient((PatientWithNavigationPropertiesDto)context)">
+                            <SfButton CssClass="btn custom-add-button" OnClick="() => SelectPatient((PatientWithNavigationPropertiesDto)context)">
                                 @L["Select"]
                             </SfButton>
                         </Template>
@@ -241,7 +241,7 @@
     </CardBody>
 </Card>
     <DialogPositionData X="200" Y="100" />
-    <button class="e-btn e-primary" style="position: absolute; top: 120px; right: 120px;" @onclick="OpenPatientDialog">New Patient</button>
+    <button class="btn custom-add-button" style="position: absolute; top: 120px; right: 120px;" @onclick="OpenPatientDialog">New Patient</button>
 </SfDialog>
 
 <style>
@@ -294,4 +294,51 @@
             border-color: #0056b3;
             transform: scale(1.05);
         }
+
+    
+    .e-custom.e-input-group, .e-custom.e-input-group.e-control-wrapper {
+        height: 40px;
+        border-radius: 10px !important; /* Köşeleri yuvarlamak için */
+        border: 1px solid #f72585 !important; /* Yumuşak bir çerçeve */
+        padding: 5px;
+        border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
+        box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
+    }
+
+    .e-input-group.e-corner {
+        border-radius: 10px !important;
+        border: 1px solid #f72585 !important;
+        width: 100% !important;
+        padding: 5px;
+        border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
+        box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
+    }
+
+    .custom-add-button {
+        background-color: #f72585 !important; /* Arka plan rengi */
+        border-color: #f72585 !important; /* Kenar rengi */
+        color: #ffffff !important; /* Yazı rengi */
+        border-radius: 6px; /* Köşeleri yuvarlama (opsiyonel) */
+        padding: 8px 16px; /* İç boşluk ayarı */
+    }
+
+        .custom-add-button:hover {
+            background-color: #d61e70 !important; /* Hover efekti için renk */
+            border-color: #d61e70 !important;
+        }
+
+    /* Kart Genel Stil */
+    .custom-card {
+        border: 3px solid #f72585 !important; /* Mavi kalın çerçeve */
+        border-radius: 12px !important; /* Yuvarlatılmış köşeler */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hafif gölge */
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); /* Gradient arkaplan */
+    }
+
+    /* Kart İçeriği */
+    .custom-card-body {
+        border-radius: 10px !important; /* İçeriğin köşeleri */
+        padding: 20px;
+    }
+
 </style>

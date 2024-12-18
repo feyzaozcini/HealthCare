@@ -372,7 +372,6 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         {
             AllPatientsSelected = false;
             SelectedPatients.Clear();
-
             await InvokeAsync(StateHasChanged);
         }
         protected virtual async Task OnSearchButtonClicked()
@@ -409,6 +408,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             SelectedPatientId = patient.Patient.Id; // Hastanın ID'sini sakla
                                                     // Pop-up'ı kapatma işlemi
             IsPatientSelectionPopupVisible = false;
+            PatientList = new List<PatientWithNavigationPropertiesDto>();
         }
         #endregion
 

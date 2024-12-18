@@ -6,6 +6,7 @@ using Pusula.Training.HealthCare.Core.Rules.Appointments;
 using Pusula.Training.HealthCare.Core.Rules.BlackLists;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.EmailServices;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
@@ -33,7 +34,8 @@ namespace Pusula.Training.HealthCare.Appointments
         IAppointmentTypeRepository appointmentTypeRepository,
         IAppointmentBusinessRules appointmentBusinessRules,
         IBlackListBusinessRules blackListBusinessRules,
-        IAppointmentRuleRepository appointmentRuleRepository
+        IAppointmentRuleRepository appointmentRuleRepository,
+        EmailService emailService
         ) : HealthCareAppService, IAppointmentsAppService
     {
 
@@ -127,6 +129,7 @@ namespace Pusula.Training.HealthCare.Appointments
             // AppointmentType üzerinden DoctorAppointmentTypes'a eriş
             var appointmentType = await appointmentTypeRepository.GetAsync(input.AppointmentTypeId);
 
+            //Doktorun aynı zamanlarda randevusu olup olmadığı kontrol edilir
             await appointmentBusinessRules.AppointmentDatesCannotOverlapForDoctor(input.DepartmentId,input.DoctorId,input.StartDate, input.EndDate);
             
             //Hastanın black listte olup olmadığı kontrol edilir
@@ -135,6 +138,8 @@ namespace Pusula.Training.HealthCare.Appointments
             // Doktorun bu appointment type ile ilişkisini kontrol et
             var doctorAppointmentType = appointmentType.DoctorAppointmentTypes
                 .FirstOrDefault(dat => dat.DoctorId == input.DoctorId);
+
+            //Doktorların randevu süreleri değişebilir onları otomatil set edilmesi için düzenlendi
             var startDate = input.StartDate;
             var endDate = startDate.AddMinutes(appointmentType.DurationInMinutes);
 
@@ -150,6 +155,18 @@ namespace Pusula.Training.HealthCare.Appointments
                 input.IsBlock
             );
 
+            /*var patient = await patientRepository.GetAsync(input.PatientId);
+            var department = await departmentRepository.GetAsync(input.DepartmentId);
+
+            string body = $@"
+           Merhaba {patient.FirstName} {patient.LastName},
+           Randevunuz başarıyla oluşturulmuştur. İşte detaylar:
+
+           - **Departman:** {department.Name}
+           - **Randevu Başlangıç:** {startDate.ToString("yyyy-MM-dd HH:mm")}
+           - **Randevu Bitiş:** {endDate.ToString("yyyy-MM-dd HH:mm")}";
+
+            await emailService.SendEmailAsync(patient.Email, "Randevu Onayı", body);*/
             return ObjectMapper.Map<Appointment, AppointmentDto>(appointment);
         }
        
@@ -203,28 +220,21 @@ namespace Pusula.Training.HealthCare.Appointments
             var patientAge = DateTime.Now.Year - patient.BirthDate.Year;
             var patientGender=patient.Gender.ToString();
 
-            
+            //seçilen departman ve doktor için tanımlanmış kuralların getirilmesi(Hepsi gezilmiyor sadece randevu için seçilenler)
             var departmentRules = await appointmentRuleRepository.GetRulesForDepartmentAsync(input.DepartmentId);
             var doctorRules = await appointmentRuleRepository.GetRulesForDoctorAsync(input.DoctorId);
             var allRules = departmentRules.Concat(doctorRules).ToList();
 
-            //Çocuk departmanına tanımlanmış 18 yaşından büyüklerin girememesi
-            foreach (var rule in allRules)
-            {
-                if ((rule.MinAge.HasValue && patientAge < rule.MinAge) ||
-            (rule.MaxAge.HasValue && patientAge > rule.MaxAge))
-                {
-                    await appointmentBusinessRules.AppointmentCannotCreate();
-                }
 
-                if (rule.Gender.HasValue && rule.Gender != Pusula.Training.HealthCare.AppointmentRules.Gender.Unspecified && rule.Gender != null)
-                {
-                    if (patientGender != rule.Gender.ToString())
-                    {
-                        await appointmentBusinessRules.AppointmentCannotCreate();
-                    }
-                }
+            foreach (var rule in allRules.Where(r =>
+              (r.MinAge.HasValue && patientAge < r.MinAge) ||
+              (r.MaxAge.HasValue && patientAge > r.MaxAge) ||
+              (r.Gender.HasValue && patientGender != r.Gender.ToString())))
+            {
+                await appointmentBusinessRules.AppointmentCannotCreate();
             }
+
         }
+
     }
 }
