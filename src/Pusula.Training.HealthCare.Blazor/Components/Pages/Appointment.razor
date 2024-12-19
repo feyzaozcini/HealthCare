@@ -18,6 +18,7 @@
 @using Pusula.Training.HealthCare.AppointmentTypes
 @using Pusula.Training.HealthCare.Blazor.Containers
 @using Volo.Abp
+@implements IDisposable
 @inherits HealthCareComponentBase
 @inject Microsoft.AspNetCore.Components.NavigationManager UriHelper
 @inject IAppointmentsAppService AppointmentsAppService
@@ -27,7 +28,7 @@
 @inject IAppointmentTypeAppService AppointmentTypesAppService
 @inject IAppointmentTypeRepository AppointmentTypeRepository
 @inject IDoctorWorkSchedulesAppService DoctorWorkSchedulesAppService
-
+@inject PatientsStateContainer PatientsStateContainer
 @inject IJSRuntime JSRuntime
 
 <div class="stepper-container" style="max-width: 1700px; margin: 0 auto; padding: 20px;">
@@ -61,7 +62,21 @@
                         <DropDownListEvents TValue="Guid" TItem="DoctorWithNavigationPropertiesDto" ValueChange="OnDoctorValueChange"></DropDownListEvents>
                     </SfDropDownList>
                 </div>
-
+                <div class="col-md-5 mb-3">
+                    <h5 style="color: #495057;">Hasta</h5>
+                    @if (PatientsStateContainer.SelectedPatient != null)
+                    {
+                        <div>
+                            <p><b>@L["PatientNo"]:</b> @PatientsStateContainer.SelectedPatient.Patient.FirstName</p>
+                            <p><b>@L["FullName"]:</b> @PatientsStateContainer.SelectedPatient.Patient.LastName @PatientsStateContainer.SelectedPatient.Patient.LastName</p>
+                            <p><b>@L["IdentityNumber"]:</b> @PatientsStateContainer.SelectedPatient.Patient.IdentityNumber</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>Henüz bir hasta seçilmedi.</p>
+                    }
+                </div>
                 <!-- Hasta Seçim Butonu -->
                 <div class="col-md-2 mb-3">
                     <button class="btn custom-add-button" @onclick="OpenPatientSelectionPopup">

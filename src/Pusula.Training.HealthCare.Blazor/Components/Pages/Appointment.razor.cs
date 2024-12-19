@@ -13,6 +13,7 @@ using System;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp;
 using System.Linq;
+using Pusula.Training.HealthCare.Blazor.Containers;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -92,10 +93,15 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 .Select(b => new LookupDto<Pusula.Training.HealthCare.Patients.Type> { Id = b, DisplayName = b.ToString() })
                 .ToList();
 
+            PatientsStateContainer.OnChange += StateHasChanged;
 
             await LoadInitialDataAsync();
 
             ToastObj ??= new SfToast();
+        }
+        public void Dispose()
+        {
+            PatientsStateContainer.OnChange -= StateHasChanged;
         }
 
         public Appointment()
@@ -406,7 +412,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private void SelectPatient(PatientWithNavigationPropertiesDto patient)
         {
             SelectedPatientId = patient.Patient.Id; // Hastanın ID'sini sakla
-                                                    // Pop-up'ı kapatma işlemi
+            PatientsStateContainer.SetSelectedPatient(patient);      // Pop-up'ı kapatma işlemi
             IsPatientSelectionPopupVisible = false;
             PatientList = new List<PatientWithNavigationPropertiesDto>();
         }
