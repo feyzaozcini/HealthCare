@@ -1,55 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 
-namespace Pusula.Training.HealthCare.TestProcesses;
-
-public class GetTestProcessesInput : PagedAndSortedResultRequestDto
+namespace Pusula.Training.HealthCare.TestProcesses
 {
-    public string? FilterText { get; set; }
-    public Guid? LabRequestId { get; set; }
-    public Guid? TestGroupItemId { get; set; }
-    public TestProcessStates? Status { get; set; }
-    public decimal? Result { get; set; }
-    public DateTime? ResultDate { get; set; }
-
-    //Doktor
-    public string? DoctorName { get; set; }
-    public string? DoctorSurname { get; set; }
-    public string? PatientName { get; set; } = null!;
-    public string? PatientSurname { get; set; } = null!;
-    public int? ProtocolNo { get; set; } = null!;
-
-    //Test
-    public string? TestGroupItemName { get; set; }
-
-    //LabRequest
-    public DateTime? LabRequestCreatedTime { get; set; }
-
-
-
-    public GetTestProcessesInput()
+    public class GetTestProcessesInput : PagedAndSortedResultRequestDto
     {
-        MaxResultCount = PagedAndSortedResultRequestDto.MaxMaxResultCount;
-        SkipCount = 0;
-    }
+        public string? FilterText { get; set; }
+        public Guid? LabRequestId { get; set; }
+        public Guid? TestGroupItemId { get; set; }
+        public TestProcessStates? Status { get; set; }
+        public decimal? Result { get; set; }
+        public DateTime? ResultDate { get; set; }
 
-    public GetTestProcessesInput(string? filterText, Guid? labRequestId, Guid? testGroupItemId, TestProcessStates? status, decimal? result, DateTime? resultDate, string? doctorName, string? doctorSurname, string patientName, string patientSurname, string? testGroupItemName, DateTime? labRequestCreatedTime)
-    {
-        FilterText = filterText;
-        LabRequestId = labRequestId;
-        TestGroupItemId = testGroupItemId;
-        Status = status;
-        Result = result;
-        ResultDate = resultDate;
-        DoctorName = doctorName;
-        DoctorSurname = doctorSurname;
-        PatientName = patientName;
-        PatientSurname = patientSurname;
-        TestGroupItemName = testGroupItemName;
-        LabRequestCreatedTime = labRequestCreatedTime;
+        // Doktor
+        public string? DoctorName { get; set; }
+        public string? DoctorSurname { get; set; }
+
+        // Hasta
+        public string? PatientName { get; set; }
+        public string? PatientSurname { get; set; }
+        public int? ProtocolNo { get; set; }
+
+        // Test
+        public string? TestGroupItemName { get; set; }
+
+        // LabRequest
+        public DateTime? LabRequestCreatedTime { get; set; }
+
+        public GetTestProcessesInput()
+        {
+            MaxResultCount = 100;
+        }
     }
 }

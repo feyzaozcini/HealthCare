@@ -307,27 +307,19 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<TestValueRange, TestValueRangesDeletedDto>().ReverseMap();
         CreateMap<TestValueRange, GetTestValueRangesInput>().ReverseMap();
 
-        CreateMap<TestProcess, TestProcessDto>()
-            .ForMember(dest => dest.LabRequestDate, opt => opt.MapFrom(x => x.LabRequest.CreationTime))
-            .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(x => x.LabRequest.Doctor.User.Name))
-            .ForMember(dest => dest.DoctorSurname, opt => opt.MapFrom(x => x.LabRequest.Doctor.User.Surname))
-            .ForMember(dest => dest.TestGroupItemName, opt => opt.MapFrom(x => x.TestGroupItem.Name))
-            .ForMember(dest => dest.TestGroupName, opt => opt.MapFrom(x => x.TestGroupItem.TestGroup.Name))
-            .ForMember(dest => dest.PatientName, opt => opt.MapFrom(x => x.LabRequest.Protocol.Patient.FirstName))
-            .ForMember(dest => dest.PatientSurname, opt => opt.MapFrom(x => x.LabRequest.Protocol.Patient.LastName))
-            .ForMember(dest => dest.TestMinValue, opt => opt.MapFrom(x => x.TestGroupItem.TestValueRange!.MinValue))
-            .ForMember(dest => dest.TestMaxValue, opt => opt.MapFrom(x => x.TestGroupItem.TestValueRange!.MaxValue))
-            .ForMember(dest => dest.TestUnit, opt => opt.MapFrom(x => x.TestGroupItem.TestValueRange!.Unit))
-            .ForMember(dest => dest.ProtocolNo, opt => opt.MapFrom(x => x.LabRequest.Protocol.No))
-            .ForMember(dest => dest.ProtocolCreatedDate, opt => opt.MapFrom(x => x.LabRequest.Protocol.StartTime))
-            .ReverseMap();
 
+        CreateMap<TestProcessWithNavigationProperties, TestProcessWithNavigationPropertiesDto>()
+            .ForMember(dest => dest.TestProcess, opt => opt.MapFrom(src => src.TestProcess))
+            .ForMember(dest => dest.LabRequest, opt => opt.MapFrom(src => src.LabRequest))
+            .ForMember(dest => dest.TestGroupItem, opt => opt.MapFrom(src => src.TestGroupItem))
+            .ForMember(dest => dest.TestValueRange, opt => opt.MapFrom(src => src.TestValueRange));
+        CreateMap<TestProcess, TestProcessDto>().ReverseMap();
         CreateMap<TestProcess, TestProcessesCreateDto>().ReverseMap();
         CreateMap<TestProcessDto, TestProcessesCreateDto>().ReverseMap();
         CreateMap<TestProcess, TestProcessesUpdateDto>().ReverseMap();
         CreateMap<TestProcess, TestProcessesDeletedDto>().ReverseMap();
         CreateMap<TestProcess, GetTestProcessesInput>().ReverseMap();
-        CreateMap<TestProcess, GetTestProcessWithNavigationPropertiesDto>().ReverseMap();
+        CreateMap<TestProcess, TestProcessDto>().ReverseMap();
 
         CreateMap<ProtocolType, ProtocolTypeDto>();
         CreateMap<ProtocolTypeDto, ProtocolTypeUpdateDto>();

@@ -7,15 +7,7 @@ using System.Threading.Tasks;
 
 namespace Pusula.Training.HealthCare.TestProcesses;
 
-public class TestProcessesUpdateDto
+public class TestProcessesUpdateDto : TestProcessesCreateDto
 {
     public Guid Id { get; set; }
-    [Required]
-    public Guid LabRequestId { get; set; }
-    [Required]
-    public Guid TestGroupItemId { get; set; }
-    [Required]
-    public TestProcessStates Status { get; set; }
-    public decimal? Result { get; set; }
-    public DateTime? ResultDate { get; set; }
 }

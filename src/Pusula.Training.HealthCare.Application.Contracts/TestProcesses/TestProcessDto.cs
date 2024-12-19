@@ -9,24 +9,8 @@ namespace Pusula.Training.HealthCare.TestProcesses;
 
 public class TestProcessDto : FullAuditedEntityDto<Guid>
 {
-    [Required]
     public Guid LabRequestId { get; set; }
-    public DateTime LabRequestDate { get; set; }
-    public string? DoctorName { get; set; }
-    public string? DoctorSurname { get; set; }
-    public int? ProtocolNo { get; set; }
-    public DateTime? ProtocolCreatedDate { get; set; }
-    public string PatientName { get; set; } = null!;
-    public string PatientSurname { get; set; } = null!;
-    [Required]
     public Guid TestGroupItemId { get; set; }
-    public string TestGroupItemName { get; set; } = null!;
-    public string TestGroupName { get; set; } = null!;
-
-    public decimal TestMinValue { get; set; }
-    public decimal TestMaxValue { get; set; }
-    public TestUnitTypes TestUnit { get; set; }
-    [Required]
     public TestProcessStates Status { get; set; }
     public decimal? Result { get; set; }
     public DateTime? ResultDate { get; set; }

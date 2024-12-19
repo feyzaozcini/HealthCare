@@ -58,7 +58,13 @@ public class TestProcessesAppService(
     public virtual async Task<TestProcessDto> GetAsync(Guid id) => ObjectMapper.Map<TestProcess, TestProcessDto>(await testProcessRepository.GetAsync(id));
 
     //LabRequestID'ye göre TestProcess Listeleme.
-    public virtual async Task<List<TestProcessDto>> GetByLabRequestIdAsync(Guid labRequestId) => ObjectMapper.Map<List<TestProcess>, List<TestProcessDto>>(await testProcessRepository.GetByLabRequestIdAsync(labRequestId));
+    public virtual async Task<List<TestProcessWithNavigationPropertiesDto>> GetByLabRequestIdAsync(Guid labRequestId)
+    {
+        var testProcessesWithNavigation = await testProcessRepository.GetByLabRequestIdAsync(labRequestId);
+
+        return ObjectMapper.Map<List<TestProcessWithNavigationProperties>, List<TestProcessWithNavigationPropertiesDto>>(testProcessesWithNavigation);
+    }
+
 
     public virtual async Task<DownloadTokenResultDto> GetDownloadTokenAsync()
     {
@@ -82,8 +88,8 @@ public class TestProcessesAppService(
     {
         var totalCount = await testProcessRepository.GetCountAsync(
             input.FilterText,
-            input.TestGroupItemId,
             input.LabRequestId,
+            input.TestGroupItemId,
             input.Status,
             input.Result,
             input.ResultDate,
@@ -96,16 +102,11 @@ public class TestProcessesAppService(
 
         var items = await testProcessRepository.GetListAsync(
             input.FilterText,
-            input.TestGroupItemId,
             input.LabRequestId,
+            input.TestGroupItemId,
             input.Status,
             input.Result,
             input.ResultDate,
-            input.DoctorName,
-            input.DoctorSurname,
-            input.PatientName,
-            input.PatientSurname,
-            input.ProtocolNo,
             input.Sorting,
             input.MaxResultCount,
             input.SkipCount
@@ -118,12 +119,12 @@ public class TestProcessesAppService(
         };
     }
 
-    public async Task<PagedResultDto<TestProcessDto>> GetListWithNavigationPropertiesAsync(GetTestProcessesInput input)
+    public async Task<PagedResultDto<TestProcessWithNavigationPropertiesDto>> GetListWithNavigationPropertiesAsync(GetTestProcessesInput input)
     {
         var totalCount = await testProcessRepository.GetCountAsync(
             input.FilterText,
-            input.TestGroupItemId,
             input.LabRequestId,
+            input.TestGroupItemId,
             input.Status,
             input.Result,
             input.ResultDate,
@@ -131,13 +132,10 @@ public class TestProcessesAppService(
             input.DoctorSurname,
             input.PatientName,
             input.PatientSurname,
-            input.ProtocolNo
-            );
+            input.ProtocolNo);
 
         var items = await testProcessRepository.GetListWithNavigationPropertiesAsync(
             input.FilterText,
-            input.TestGroupItemId,
-            input.LabRequestId,
             input.Status,
             input.Result,
             input.ResultDate,
@@ -148,15 +146,15 @@ public class TestProcessesAppService(
             input.ProtocolNo,
             input.Sorting,
             input.MaxResultCount,
-            input.SkipCount
-            );
+            input.SkipCount);
 
-        return new PagedResultDto<TestProcessDto>
+        return new PagedResultDto<TestProcessWithNavigationPropertiesDto>
         {
             TotalCount = totalCount,
-            Items = ObjectMapper.Map<List<TestProcess>, List<TestProcessDto>>(items)
+            Items = ObjectMapper.Map<List<TestProcessWithNavigationProperties>, List<TestProcessWithNavigationPropertiesDto>>(items)
         };
     }
+
 
     //Tetkik İstem Test Sayısı Raporlama
     public async Task<List<TestCountDto>> GetTestCountsAsync()
@@ -166,7 +164,7 @@ public class TestProcessesAppService(
 
         var testCounts = testProcesses
             .Where(tp => tp.TestGroupItem != null) 
-            .GroupBy(tp => tp.TestGroupItem.Name)
+            .GroupBy(tp => tp.TestGroupItem!.Name)
             .Select(group => new TestCountDto
             {
                 TestName = group.Key,
@@ -196,10 +194,10 @@ public class TestProcessesAppService(
         return testCounts;
     }
 
-    public async Task<TestProcessDto> GetWithNavigationPropertiesAsync(Guid id)
+    public async Task<TestProcessWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id)
     {
         var testProcess = await testProcessRepository.GetWithNavigationPropertiesAsync(id);
-        return ObjectMapper.Map<TestProcess, TestProcessDto>(testProcess);
+        return ObjectMapper.Map<TestProcessWithNavigationProperties, TestProcessWithNavigationPropertiesDto>(testProcess);
     }
 
     [Authorize(HealthCarePermissions.TestProcesses.Edit)]

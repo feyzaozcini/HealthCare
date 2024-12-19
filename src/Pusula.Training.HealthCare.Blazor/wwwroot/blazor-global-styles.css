@@ -66,17 +66,17 @@
 
 /*Test Result Info*/
 .icon-alert::before {
-    content: '\e7b3'; 
+    content: '\e7b3';
     font-family: 'e-icons';
-    color: red; 
+    color: red;
     font-size: 18px;
     margin-right: 5px;
 }
 
 .icon-safe::before {
-    content: '\e7b2'; 
+    content: '\e7b2';
     font-family: 'e-icons';
-    color: green; 
+    color: green;
     font-size: 18px;
     margin-right: 5px;
 }
@@ -99,13 +99,13 @@
 
 /*Lab Toolbar*/
 .lab-toolbar .e-toolbar {
-    border-radius: 10px; 
-    border: 1px solid #ccc; 
-    overflow: hidden; 
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    overflow: hidden;
 }
 
     .lab-toolbar .e-toolbar .e-tbar-btn {
-        border-radius: 5px; 
+        border-radius: 5px;
     }
 
 
@@ -188,4 +188,11 @@
     font-size: 14px;
     width: 100%;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+}
+
+/*Lab Dialog*/
+.lab-dialog .e-dialog {
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    overflow: hidden;
 }

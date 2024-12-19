@@ -18,20 +18,20 @@ using Volo.Abp;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages;
 
-public partial class LabTestRequest
+public partial class LabTestRequest : IDisposable
 {
     private List<TestGroupItemDto> TestGroupItemsList { get; set; } = new List<TestGroupItemDto>();
     private List<TestGroupDto> TestGroupsList { get; set; } = new List<TestGroupDto>();
-    private List<TestProcessDto> TestProcessesList = new();
-    private List<TestProcessDto> ApprovedTestProcesses { get; set; } = new();
+    private List<TestProcessWithNavigationPropertiesDto> TestProcessesWithNavigationList = new();
+    private List<TestProcessWithNavigationPropertiesDto> ApprovedTestProcesses { get; set; } = new();
     private IReadOnlyList<LookupDto<Guid>> TestGroupNamesCollection { get; set; } = Array.Empty<LookupDto<Guid>>();
     private GetTestGroupItemsInput? TestGroupItemsFilter { get; set; }
     private GetTestGroupsInput? TestGroupsFilter { get; set; }
     private GetTestProcessesInput? TestProcessesFilter { get; set; }
 
-    private SfGrid<TestProcessDto>? TestProcessesGrid;
-    private SfGrid<TestProcessDto>? TestResultsGrid;
-    private List<TestProcessDto> CompletedTestProcesses { get; set; } = new();
+    private SfGrid<TestProcessWithNavigationPropertiesDto>? TestProcessesGrid;
+    private SfGrid<TestProcessWithNavigationPropertiesDto>? TestResultsGrid;
+    private List<TestProcessWithNavigationPropertiesDto> CompletedTestProcesses { get; set; } = new();
     private Guid? SelectedTestGroupId { get; set; } = null;
     private string? SelectedDescription { get; set; } = string.Empty;
     private Guid? SelectedTestProcessId { get; set; } = null;
@@ -52,24 +52,43 @@ public partial class LabTestRequest
 
     protected override async Task OnInitializedAsync()
     {
+        TestProcessState.Subscribe(StateChangedHandler);
+
+
         if (LabRequestService.SelectedLabRequest == null || LabRequestService.SelectedLabRequest.Id == Guid.Empty)
         {
             NavigationManager.NavigateTo("/lab-protocols");
             return;
         }
 
-        // LabRequest mevcutsa gerekli iþlemleri yap
         TestGroupsFilter = new GetTestGroupsInput();
         TestGroupItemsFilter = new GetTestGroupItemsInput();
         TestProcessesFilter = new GetTestProcessesInput();
-        await LoadTestProcessesAsync();
+
+        await LoadTestProcessesWithNavigationAsync();
+        await LoadApprovedTestProcessesAsync();
         await GetTestGroupItemsAsync();
         await GetTestGroupsAsync();
-        await LoadLookupsAsync();
-        await LoadApprovedTestProcessesAsync();
-        StateHasChanged();
 
         _isInitialized = true;
+    }
+
+    private void StateChangedHandler()
+    {
+        InvokeAsync(async () =>
+        {
+            if (TestProcessState.Refresh)
+            {
+                await LoadTestProcessesWithNavigationAsync();
+                await LoadApprovedTestProcessesAsync();
+                StateHasChanged();
+            }
+        });
+    }
+
+    public void Dispose()
+    {
+        TestProcessState.Unsubscribe(StateChangedHandler);
     }
 
     #region Click Events
@@ -101,32 +120,26 @@ public partial class LabTestRequest
                 ResultDate = null
             };
 
-            await TestProcessesAppService.CreateAsync(newTestProcess);
- 
-            var labRequest = await LabRequestsAppService.GetAsync(LabRequestService.SelectedLabRequest.Id);
-            if (labRequest.Status == RequestStatusEnum.Completed)
+            var createdProcess = await TestProcessesAppService.CreateAsync(newTestProcess);
+
+            var result = await TestProcessesAppService.GetWithNavigationPropertiesAsync(createdProcess.Id);
+
+            TestProcessState.AddOrUpdateTestProcess(result);
+
+            if (LabRequestService.SelectedLabRequest!.Status != RequestStatusEnum.InProgress)
             {
-                labRequest.Status = RequestStatusEnum.InProgress;
+                LabRequestService.SelectedLabRequest.Status = RequestStatusEnum.InProgress;
 
                 await LabRequestsAppService.UpdateAsync(new LabRequestUpdateDto
                 {
-                    Id = labRequest.Id,
-                    ProtocolId = labRequest.ProtocolId,
-                    DoctorId = labRequest.DoctorId,
-                    Date = labRequest.Date,
-                    Description = labRequest.Description,
-                    Status = labRequest.Status
+                    Id = LabRequestService.SelectedLabRequest.Id,
+                    ProtocolId = LabRequestService.SelectedLabRequest.ProtocolId,
+                    DoctorId = LabRequestService.SelectedLabRequest.DoctorId,
+                    Date = LabRequestService.SelectedLabRequest.Date,
+                    Description = LabRequestService.SelectedLabRequest.Description,
+                    Status = RequestStatusEnum.InProgress
                 });
             }
-
-            await LoadTestProcessesAsync();
-
-            if (TestProcessesGrid != null)
-            {
-                await TestProcessesGrid.Refresh();
-            }
-
-            await ShowToast(TestGroupItemConsts.TestSuccessfullyCreated, true);
         });
     }
 
@@ -137,28 +150,73 @@ public partial class LabTestRequest
             if (SelectedTestProcessId.HasValue)
             {
                 await TestProcessesAppService.DeleteAsync(SelectedTestProcessId.Value);
-                await LoadTestProcessesAsync();
-                StateHasChanged();
+
+                TestProcessesWithNavigationList.RemoveAll(tp => tp.TestProcess!.Id == SelectedTestProcessId.Value);
+                TestProcessState.SetTestProcesses(TestProcessesWithNavigationList);
+
+                await CloseTestProcessDeleteModal();
+                await ShowToast(TestGroupItemConsts.TestGroupItemDeletedMessage, true);
             }
-            await CloseTestProcessDeleteModal();
-            await ShowToast(TestGroupItemConsts.TestGroupItemDeletedMessage, true);
         });
     }
+
     #endregion
 
     #region Get Actions
 
     private async Task LoadApprovedTestProcessesAsync()
     {
-        var allTestProcesses = await TestProcessesAppService.GetByLabRequestIdAsync(LabRequestService.SelectedLabRequest!.Id);
+        if (LabRequestService.SelectedLabRequest == null)
+            return;
 
-        ApprovedTestProcesses = allTestProcesses.Where(tp => tp.Status == TestProcessStates.Approved).ToList();
+        ApprovedTestProcesses = TestProcessState.TestProcesses
+            .Where(tp => tp.TestProcess != null
+                         && tp.TestProcess.LabRequestId == LabRequestService.SelectedLabRequest!.Id
+                         && tp.TestProcess.Result.HasValue)
+            .ToList();
+
+        if (!ApprovedTestProcesses.Any())
+        {
+            var allProcesses = await TestProcessesAppService.GetByLabRequestIdAsync(LabRequestService.SelectedLabRequest!.Id);
+
+            ApprovedTestProcesses = allProcesses
+                .Where(tp => tp.TestProcess!.Result.HasValue)
+                .ToList();
+
+            TestProcessState.SetTestProcesses(allProcesses);
+        }
+
+        StateHasChanged();
     }
 
-    private async Task LoadTestProcessesAsync()
+    private List<TestProcessWithNavigationPropertiesDto> GetApprovedTestProcessesFromState()
+    {
+        return TestProcessState.TestProcesses
+            .Where(tp => tp.TestProcess != null
+                         && tp.TestProcess.LabRequestId == LabRequestService.SelectedLabRequest!.Id
+                         && tp.TestProcess.Result.HasValue)
+            .ToList();
+    }
+
+    private async Task<List<TestProcessWithNavigationPropertiesDto>> LoadApprovedTestProcessesFromServiceAsync()
+    {
+        var allProcesses = await TestProcessesAppService.GetByLabRequestIdAsync(LabRequestService.SelectedLabRequest!.Id);
+
+        var approvedProcesses = allProcesses
+            .Where(tp => tp.TestProcess!.Result.HasValue)
+            .ToList();
+
+        TestProcessState.SetTestProcesses(allProcesses);
+
+        return approvedProcesses;
+    }
+
+
+
+    private async Task LoadTestProcessesWithNavigationAsync()
     {
         var allTestProcesses = await TestProcessesAppService.GetByLabRequestIdAsync(LabRequestService.SelectedLabRequest!.Id);
-        TestProcessesList = allTestProcesses.Where(tp => tp.Status == TestProcessStates.Requested).ToList();
+        TestProcessesWithNavigationList = allTestProcesses.Where(tp => tp.TestProcess?.Status == TestProcessStates.Requested).ToList();
     }
 
     private async Task LoadLookupsAsync()
@@ -287,23 +345,4 @@ public partial class LabTestRequest
     }
 
     #endregion
-
-    public void RowBound(RowDataBoundEventArgs<TestProcessDto> args)
-    {
-        if (args.Data.Result.HasValue)
-        {
-            var result = args.Data.Result.Value;
-            var minValue = args.Data.TestMinValue;
-            var maxValue = args.Data.TestMaxValue;
-
-            if (result < minValue || result > maxValue)
-            {
-                args.Row.AddClass(new string[] { "bg-danger" });
-            }
-            else
-            {
-                args.Row.AddClass(new string[] { "bg-success" });
-            }
-        }
-    }
 }

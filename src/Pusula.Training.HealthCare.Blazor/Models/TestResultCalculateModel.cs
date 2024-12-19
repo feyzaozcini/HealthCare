@@ -10,7 +10,7 @@ public class TestResultCalculateModel
     public string Icon { get; set; }
     public string Text { get; set; }
 
-    public TestResultCalculateModel(TestProcessDto testProcess)
+    public TestResultCalculateModel(TestProcessWithNavigationPropertiesDto testProcess)
     {
         var resultStatus = TestResultCalculator.GetResultStatus(testProcess);
         TextStyle = resultStatus.TextStyle;

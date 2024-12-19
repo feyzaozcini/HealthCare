@@ -9,11 +9,11 @@ namespace Pusula.Training.HealthCare.Core.Helpers;
 
 public static class TestResultCalculator
 {
-    public static (string TextStyle, string TextClass, string Icon, string Text) GetResultStatus(TestProcessDto testProcess)
+    public static (string TextStyle, string TextClass, string Icon, string Text) GetResultStatus(TestProcessWithNavigationPropertiesDto testProcess)
     {
-        var result = testProcess.Result;
-        var minValue = testProcess.TestMinValue;
-        var maxValue = testProcess.TestMaxValue;
+        var result = testProcess.TestProcess?.Result;
+        var minValue = testProcess.TestValueRange!.MinValue;
+        var maxValue = testProcess.TestValueRange!.MinValue;
 
         string textStyle = "font-weight: normal;";
         string textClass = "";
