@@ -182,9 +182,8 @@
     "Menu:DiagnosisReport": "Diagnosis Report",
     "Menu:DoctorWorkSchedule": "Doctor Work Schedule",
     "Menu:Blacklist": "Blacklist",
-    "Menu:DoctorWorkSchedule": "Doctor Work Schedule",
     "Menu:Insurances": "Insurance",
-    "Menu:ProtocolTypes": "Protocol Type"
-
+    "Menu:ProtocolTypes": "Protocol Type",
+    "FullName": "Full Name"
   }
 }

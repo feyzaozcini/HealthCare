@@ -26,5 +26,11 @@ namespace Pusula.Training.HealthCare.Blazor.Containers
             SelectedPatient = patient;
             Refresh = true;
         }
+        // Yeni ClearSelectedPatient metodu
+        public void ClearSelectedPatient()
+        {
+            SelectedPatient = null;
+            Refresh = true;
+        }
     }
 }
