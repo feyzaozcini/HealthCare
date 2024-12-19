@@ -404,6 +404,11 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         {
             IsPatientSelectionPopupVisible = true;
         }
+        private void ClearPatientSelection()
+        {
+            PatientsStateContainer.ClearSelectedPatient(); // Seçilen hastayı temizle
+            StateHasChanged(); // Arayüzün güncellenmesi için çağrılır.
+        }
 
         private void ClosePatientSelectionPopup()
         {

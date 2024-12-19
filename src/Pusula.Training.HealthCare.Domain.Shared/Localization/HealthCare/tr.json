@@ -78,7 +78,8 @@
     "Menu:AppointmentRule": "Randevu Kuralları",
     "Menu:DoctorWorkSchedule": "Doktor Çalışma Zamanı Planlama",
     "Menu:Blacklist": "Kara Liste",
-    "Menu:DoctorWorkSchedule": "Doktor Çalışma Zamanı Planlama",
+    "FullName": "Ad Soyad",
+    "IdentityNumber": "Kimlik Numarası",
     "Menu:Insurances": "Sigorta",
     "Menu:ProtocolTypes": "Protokol Tipi"
   }

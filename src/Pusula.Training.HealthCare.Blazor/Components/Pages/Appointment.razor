@@ -31,14 +31,14 @@
 @inject PatientsStateContainer PatientsStateContainer
 @inject IJSRuntime JSRuntime
 
-<div class="stepper-container" style="max-width: 1700px; margin: 0 auto; padding: 20px;">
-    <div class="card custom-card">
-        <div class="custom-card-body">
+<div class="stepper-container" style="max-width: 1700px; max-height: 300px; margin: 0 auto; padding: 20px;">
+    <div class="card custom-card" style="max-height: 250px;">
+        <div class="custom-card-body" style="max-height: 250px;">
             <!-- Hasta . Departman ve Doktor Seçim Alanları -->
             <div class="row mb-4 align-items-center">
                 <!-- Departman Seçimi -->
                 <div class="col-md-5 mb-3">
-                    <h5 style="color: #495057;">Departman</h5>
+                    <h5 style="color: #f72585;">Departman</h5>
                     <SfDropDownList TValue="Guid"
                                     TItem="DepartmentDto"
                                     Placeholder="Departman seçiniz..."
@@ -51,7 +51,7 @@
 
                 <!-- Doktor Seçimi -->
                 <div class="col-md-5 mb-3">
-                    <h5 style="color: #495057;">Doktor</h5>
+                    <h5 style="color: #f72585;">Doktor</h5>
                     <SfDropDownList DataSource="@FilteredDoctors"
                                     Placeholder="Doktor seçiniz..."
                                     CssClass="e-custom"
@@ -62,13 +62,13 @@
                         <DropDownListEvents TValue="Guid" TItem="DoctorWithNavigationPropertiesDto" ValueChange="OnDoctorValueChange"></DropDownListEvents>
                     </SfDropDownList>
                 </div>
-                <div class="col-md-5 mb-3">
-                    <h5 style="color: #495057;">Hasta</h5>
+                <!-- Hasta Seçimi -->
+                <div class="col-md-5 mb-3"  style="max-height: 200px;">
+                    <h5 style="color: #f72585;">Hasta</h5>
                     @if (PatientsStateContainer.SelectedPatient != null)
                     {
                         <div>
-                            <p><b>@L["PatientNo"]:</b> @PatientsStateContainer.SelectedPatient.Patient.FirstName</p>
-                            <p><b>@L["FullName"]:</b> @PatientsStateContainer.SelectedPatient.Patient.LastName @PatientsStateContainer.SelectedPatient.Patient.LastName</p>
+                            <p><b>@L["FullName"]:</b> @PatientsStateContainer.SelectedPatient.Patient.FirstName @PatientsStateContainer.SelectedPatient.Patient.LastName</p>
                             <p><b>@L["IdentityNumber"]:</b> @PatientsStateContainer.SelectedPatient.Patient.IdentityNumber</p>
                         </div>
                     }
@@ -81,6 +81,9 @@
                 <div class="col-md-2 mb-3">
                     <button class="btn custom-add-button" @onclick="OpenPatientSelectionPopup">
                         Hasta Seç
+                    </button>
+                    <button class="btn custom-clear-button mt-3" @onclick="ClearPatientSelection">
+                        Seçimi Temizle
                     </button>
                 </div>
             </div>
@@ -260,87 +263,6 @@
 </SfDialog>
 
 <style>
-    .patient-card {
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        overflow: hidden;
-        background-color: #f8f9fa; /* Hafif bir arka plan rengi */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Hafif bir gölge efekti */
-        max-width: 1100px; /* Kart genişliği */
-        margin: auto; /* Ortala */
-    }
-
-        .patient-card .avatar {
-            width: 90px; /* Avatar boyutu */
-            height: 90px;
-            object-fit: cover;
-        }
-
-        .patient-card .card-body {
-            padding: 20px;
-        }
-
-        .patient-card h5 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-    .custom-dialog .e-dialog {
-        top: 100px !important; /* Pop-up'ın üstten uzaklığı */
-        transform: translate(-50%, 0) !important; /* Varsayılan merkezi hizalamayı düzelt */
-    }
-
-    .custom-dropdown .e-input {
-        border-radius: 8px;
-        border: 1px solid #ced4da;
-        padding: 10px;
-        font-size: 14px;
-    }
-
-    btn-primary {
-        background-color: #007bff;
-        border-color: #007bff;
-        border-radius: 25px;
-        transition: all 0.3s ease-in-out;
-    }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-            transform: scale(1.05);
-        }
-
-    
-    .e-custom.e-input-group, .e-custom.e-input-group.e-control-wrapper {
-        height: 40px;
-        border-radius: 10px !important; /* Köşeleri yuvarlamak için */
-        border: 1px solid #f72585 !important; /* Yumuşak bir çerçeve */
-        padding: 5px;
-        border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
-        box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
-    }
-
-    .e-input-group.e-corner {
-        border-radius: 10px !important;
-        border: 1px solid #f72585 !important;
-        width: 100% !important;
-        padding: 5px;
-        border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
-        box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
-    }
-
-    .custom-add-button {
-        background-color: #f72585 !important; /* Arka plan rengi */
-        border-color: #f72585 !important; /* Kenar rengi */
-        color: #ffffff !important; /* Yazı rengi */
-        border-radius: 6px; /* Köşeleri yuvarlama (opsiyonel) */
-        padding: 8px 16px; /* İç boşluk ayarı */
-    }
-
-        .custom-add-button:hover {
-            background-color: #d61e70 !important; /* Hover efekti için renk */
-            border-color: #d61e70 !important;
-        }
 
     /* Kart Genel Stil */
     .custom-card {

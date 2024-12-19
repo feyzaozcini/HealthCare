@@ -15,12 +15,13 @@
 
 <div class="row mb-2">
     <div class="col text-end">
-        <button class="btn btn-success" @onclick="OpenAddNewDialog">+ Add Appointment Rule</button>
+        <button class="btn custom-add-button" @onclick="OpenAddNewDialog">+ Add Appointment Rule</button>
     </div>
 </div>
 <div class="col-lg-12 control-section">
     <div class="content-wrapper">
         <SfGrid DataSource="@AppointmentRules" AllowPaging="true" Toolbar="@(new List<string>() { "Search" })" OnToolbarClick="OnToolbarClick">
+            <GridPageSettings PageSize="10"></GridPageSettings>
             <GridColumns>
                 <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
                 <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="150"></GridColumn>
@@ -82,6 +83,7 @@
             </div>
             <div class="mt-2">
                 <SfTextArea Placeholder="Description"
+                            CssClass="e-corner"
                             @bind-Value="@NewAppointmentRule.Description">
                 </SfTextArea>
             </div>
@@ -94,13 +96,3 @@
 </SfDialog>
 
 
-<style>
-    .e-custom.e-input-group, .e-custom.e-input-group.e-control-wrapper {
-        height: 40px;
-        border-radius: 10px !important; /* Köşeleri yuvarlamak için */
-        border: 1px solid #f72585 !important; /* Yumuşak bir çerçeve */
-        padding: 5px;
-        border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
-        box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
-    }
-</style>

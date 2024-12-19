@@ -107,3 +107,85 @@
     .lab-toolbar .e-toolbar .e-tbar-btn {
         border-radius: 5px; 
     }
+
+
+/*Appointment Modules*/
+
+.e-custom.e-input-group, .e-custom.e-input-group.e-control-wrapper {
+    height: 40px;
+    border-radius: 10px !important; /* Köþeleri yuvarlamak için */
+    border: 1px solid #f72585 !important; /* Yumuþak bir çerçeve */
+    padding: 5px;
+    border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
+    box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
+}
+
+.e-input-group.e-corner {
+    border-radius: 10px !important;
+    border: 1px solid #f72585 !important;
+    width: 100% !important;
+    padding: 5px;
+    border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
+    box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
+}
+
+.custom-add-button {
+    background-color: #f72585 !important; /* Arka plan rengi */
+    border-color: #f72585 !important; /* Kenar rengi */
+    color: #ffffff !important; /* Yazý rengi */
+    border-radius: 6px; /* Köþeleri yuvarlama (opsiyonel) */
+    padding: 8px 16px; /* Ýç boþluk ayarý */
+}
+
+    .custom-add-button:hover {
+        background-color: #d61e70 !important; /* Hover efekti için renk */
+        border-color: #d61e70 !important;
+    }
+
+.custom-clear-button {
+    background-color: #ff87f7 !important; /* Arka plan rengi */
+    border-color: #ff87f7 !important; /* Kenar rengi */
+    color: #ffffff !important; /* Yazý rengi */
+    border-radius: 6px; /* Köþeleri yuvarlama (opsiyonel) */
+    padding: 8px 16px; /* Ýç boþluk ayarý */
+}
+
+    .custom-clear-button:hover {
+        background-color: #d61e70 !important; /* Hover efekti için renk */
+        border-color: #d61e70 !important;
+    }
+.custom-delete-button {
+    background-color: #ff0040 !important; /* Arka plan rengi */
+    border-color: #ff0040 !important; /* Kenar rengi */
+    color: #ffffff !important; /* Yazý rengi */
+    border-radius: 6px; /* Köþeleri yuvarlama (opsiyonel) */
+    padding: 8px 16px; /* Ýç boþluk ayarý */
+}
+
+    .custom-delete-button:hover {
+        background-color: #d61e70 !important; /* Hover efekti için renk */
+        border-color: #d61e70 !important;
+    }
+
+.custom-doctor-button {
+    background-color: #ff87f7 !important; /* Arka plan rengi */
+    border-color: #ff87f7 !important; /* Kenar rengi */
+    color: #ffffff !important; /* Yazý rengi */
+    border-radius: 6px; /* Köþeleri yuvarlama (opsiyonel) */
+    padding: 8px 16px; /* Ýç boþluk ayarý */
+}
+
+
+    .custom-doctor-button:hover {
+        background-color: #d61e70 !important; /* Hover efekti için renk */
+        border-color: #d61e70 !important;
+    }
+.form-control {
+    border-radius: 10px;
+    border-color: #ff0040;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-size: 14px;
+    width: 100%;
+    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+}
