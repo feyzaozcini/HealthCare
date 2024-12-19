@@ -1,9 +1,12 @@
 ﻿@page "/test-results-report"
+@using Pusula.Training.HealthCare.Blazor.Containers
 @using Pusula.Training.HealthCare.Blazor.Models
 @using Pusula.Training.HealthCare.TestProcesses
-@using Syncfusion.Licensing
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
 
 @inject ITestProcessesAppService TestProcessesAppService
+@inject TestProcessStateContainer TestProcessState
 
 <div class="d-flex align-items-center justify-content-between mb-2">
     <div class="d-flex justify-content-center flex-grow-1">
@@ -23,14 +26,22 @@
     </SfButton>
 </div>
 
-<SfGrid @ref="TestProcessesGrid" ID="lab-grid" DataSource="@TestResultsList" AllowPaging="false" AllowSorting="true" Height="800px" RowHeight="40">
+<SfGrid @ref="TestProcessesGrid" ID="lab-grid" DataSource="@TestResultsList" AllowPaging="false" AllowSorting="true" Height="700px" RowHeight="40">
     <GridColumns>
-        <GridColumn Field=@nameof(TestProcessDto.ProtocolNo) Width="100%" HeaderText="Protokol No" TextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn Field="@nameof(TestProcessDto.Result)" Width="100%" HeaderText="Değer" TextAlign="TextAlign.Center">
-            <Template Context="context">
-                @if (context is TestProcessDto testProcess)
+        <GridColumn HeaderText="Protokol No" TextAlign="TextAlign.Center">
+            <Template Context="item">
+                @if (item is TestProcessWithNavigationPropertiesDto process)
                 {
-                    var gridItem = new TestResultCalculateModel(testProcess);
+                    <span>@process.LabRequest?.ProtocolNo</span>
+                }
+            </Template>
+        </GridColumn>
+
+        <GridColumn HeaderText="Değer" TextAlign="TextAlign.Center">
+            <Template Context="item">
+                @if (item is TestProcessWithNavigationPropertiesDto process)
+                {
+                    var gridItem = new TestResultCalculateModel(process!);
 
                     <span style="@gridItem.TextStyle">
                         <span>@gridItem.Icon</span> @gridItem.Text
@@ -38,45 +49,50 @@
                 }
             </Template>
         </GridColumn>
-        <GridColumn Field=@nameof(TestProcessDto.Result) Width="50%" HeaderText="Değer" TextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn Field=@nameof(TestProcessDto.TestUnit) Width="50%" HeaderText="" TextAlign="TextAlign.Center"></GridColumn>
-        <GridColumn HeaderText="Min-Max Değer" Width="100%" TextAlign="TextAlign.Center">
-            <Template Context="context">
-                @if (context is TestProcessDto testProcess)
+
+        <GridColumn HeaderText="Min-Max Değer" TextAlign="TextAlign.Center">
+            <Template Context="item">
+                @if (item is TestProcessWithNavigationPropertiesDto process)
                 {
-                    @($"{testProcess.TestMinValue} - {testProcess.TestMaxValue}")
+                    <span>@($"{process.TestValueRange?.MinValue} - {process.TestValueRange?.MaxValue}")</span>
                 }
             </Template>
         </GridColumn>
-        <GridColumn HeaderText="Hasta Ad-Soyad" Width="100%" TextAlign="TextAlign.Center">
-            <Template Context="context">
-                @if (context is TestProcessDto testProcess)
+
+        <GridColumn HeaderText="Hasta Ad-Soyad" TextAlign="TextAlign.Center">
+            <Template Context="item">
+                @if (item is TestProcessWithNavigationPropertiesDto process)
                 {
-                    @($"{testProcess.PatientName} {testProcess.PatientSurname}")
+                    <span>@($"{process.LabRequest?.PatientName} {process.LabRequest?.PatientSurname}")</span>
                 }
             </Template>
         </GridColumn>
-        <GridColumn HeaderText="Doktor Ad-Soyad" Width="100%" TextAlign="TextAlign.Center">
-            <Template Context="context">
-                @if (context is TestProcessDto testProcess)
+
+        <GridColumn HeaderText="Doktor Ad-Soyad" TextAlign="TextAlign.Center">
+            <Template Context="item">
+                @if (item is TestProcessWithNavigationPropertiesDto process)
                 {
-                    @($"{testProcess.DoctorName} {testProcess.DoctorSurname}")
-                }
-            </Template>
-        </GridColumn>      
-        <GridColumn HeaderText="Test Adı" Width="100%" TextAlign="TextAlign.Center">
-            <Template Context="context">
-                @if (context is TestProcessDto testProcess)
-                {
-                    @($"{testProcess.TestGroupName} - {testProcess.TestGroupItemName}")
+                    <span>@($"{process.LabRequest?.DoctorName} {process.LabRequest?.DoctorSurname}")</span>
                 }
             </Template>
         </GridColumn>
-        <GridColumn Field=@nameof(TestProcessDto.ResultDate) HeaderText="Sonuçlanma T." Width="100%" TextAlign="TextAlign.Center"></GridColumn>
+
+        <GridColumn HeaderText="Test Adı" TextAlign="TextAlign.Center">
+            <Template Context="item">
+                @if (item is TestProcessWithNavigationPropertiesDto process)
+                {
+                    <span>@($"{process.TestGroupItem?.TestGroupName} - {process.TestGroupItem?.Name}")</span>
+                }
+            </Template>
+        </GridColumn>
+
+        <GridColumn HeaderText="Sonuçlanma T." TextAlign="TextAlign.Center">
+            <Template Context="item">
+                @if (item is TestProcessWithNavigationPropertiesDto process)
+                {
+                    <span>@process.TestProcess?.ResultDate?.ToString("dd.MM.yyyy HH:mm")</span>
+                }
+            </Template>
+        </GridColumn>
     </GridColumns>
 </SfGrid>
-
-<style>
-
-
-</style>

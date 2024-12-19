@@ -15,7 +15,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
     public partial class LabProtocols
     {
         private List<LabRequestDto> LabRequestsList { get; set; } = new List<LabRequestDto>();
-        private GetLabRequestsInput? LabRequestsFilter { get; set; }
+        private GetLabRequestsInput LabRequestsFilter { get; set; } = new GetLabRequestsInput();
         private SfDialog? DescriptionDialog;
         private string SelectedDescription = string.Empty;
 
@@ -25,17 +25,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            LabRequestsFilter = new GetLabRequestsInput(
-                filterText: null,
-                protocolId: null,
-                doctorId: null,
-                doctorName: null,
-                date: null,
-                status: null,
-                description: null,
-                currentPage: CurrentPage,
-                pageSize: PageSize
-            );
+            LabRequestsFilter = new GetLabRequestsInput(); 
             await GetLabRequestsAsync();
         }
 
@@ -54,7 +44,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private void RowSelectHandler(RowSelectEventArgs<LabRequestDto> args)
         {
-            LabRequestService.SelectedLabRequest = args.Data;
+            LabRequestService.SetSelectedLabRequest(args.Data);
         }
 
         private void RedirectToTestRequest()

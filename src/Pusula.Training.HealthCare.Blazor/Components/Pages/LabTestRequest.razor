@@ -1,7 +1,8 @@
 ﻿@page "/lab-request"
 
 @using Microsoft.Extensions.Localization
-@using Pusula.Training.HealthCare.Blazor.Containers
+@using Pusula.Training.HealthCare.Blazor.Containers.Concretes
+@using Pusula.Training.HealthCare.Blazor.Models
 @using Pusula.Training.HealthCare.LabRequests
 @using Pusula.Training.HealthCare.TestGroupItems
 @using Pusula.Training.HealthCare.TestGroups
@@ -14,6 +15,7 @@
 @inject ILabRequestsAppService LabRequestsAppService
 @inject ITestProcessesAppService TestProcessesAppService
 @inject IStringLocalizer<LabTestRequest> Localizer
+@inject TestProcessStateContainer TestProcessState
 
 
 @if (!_isInitialized)
@@ -123,31 +125,46 @@ else
     </div>
 
     @*Requests List*@
-    <SfGrid @ref="TestProcessesGrid" ID="lab-grid" DataSource="@TestProcessesList" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="300px" PrintMode="PrintMode.AllPages">
+    <SfGrid @ref="TestProcessesGrid" ID="lab-grid" DataSource="@TestProcessesWithNavigationList" AllowPaging="false" Height="300px" AllowSorting="true" RowHeight="40" PrintMode="PrintMode.AllPages">
         <GridColumns>
-            <GridColumn Field="@nameof(TestProcessDto.CreationTime)" HeaderText="İstem Tarihi" TextAlign="TextAlign.Center"></GridColumn>
-            <GridColumn HeaderText="İsteyen Doktor" TextAlign="TextAlign.Center">
-                <Template Context="context">
-                    @if (context is TestProcessDto testProcess)
+            <GridColumn HeaderText="İstem Tarihi" TextAlign="TextAlign.Center">
+                <Template Context="item">
+                    @if (item is TestProcessWithNavigationPropertiesDto process)
                     {
-                        <span>@testProcess.DoctorName @testProcess.DoctorSurname</span>
+                        <span>@process.TestProcess?.CreationTime.ToString("dd.MM.yyyy HH:mm")</span>
                     }
                 </Template>
             </GridColumn>
-            <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)"
-                        HeaderText="İstenen Test"
-                        TextAlign="TextAlign.Center">
+            <GridColumn HeaderText="İsteyen Doktor" TextAlign="TextAlign.Center">
+                <Template Context="item">
+                    @if (item is TestProcessWithNavigationPropertiesDto process)
+                    {
+                        <span>@($"{process.LabRequest?.DoctorName} {process.LabRequest?.DoctorSurname}")</span>
+                    }
+                </Template>
             </GridColumn>
-            <GridColumn Field="@nameof(TestProcessDto.Status)"
-                        HeaderText="İşlem Durumu"
-                        TextAlign="TextAlign.Center">
+            <GridColumn HeaderText="Test Adı" TextAlign="TextAlign.Center">
+                <Template Context="item">
+                    @if (item is TestProcessWithNavigationPropertiesDto process)
+                    {
+                        <span>@process.TestGroupItem?.Name</span>
+                    }
+                </Template>
             </GridColumn>
-            <GridColumn HeaderText="" TextAlign="TextAlign.Right">
+            <GridColumn HeaderText="Durum" TextAlign="TextAlign.Center">
+                <Template Context="item">
+                    @if (item is TestProcessWithNavigationPropertiesDto process)
+                    {
+                        <span>@process.TestProcess?.Status</span>
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn HeaderText="İşlem" TextAlign="TextAlign.Right">
                 <Template>
-                    @if (context is TestProcessDto testProcess)
+                    @if (context is TestProcessWithNavigationPropertiesDto process)
                     {
                         <div class="d-flex justify-content-center">
-                            <SfButton CssClass="e-small e-link" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(testProcess.Id))"></SfButton>
+                            <SfButton CssClass="e-small e-link" IconCss="e-icons e-delete" OnClick="(() => OpenTestProcessDeleteModal(process.TestProcess!.Id))"></SfButton>
                         </div>
                     }
                 </Template>
@@ -180,8 +197,8 @@ else
         </DialogTemplates>
     </SfDialog>
 
-    @*Test Process History Modal*@
-    <SfDialog @ref="HistoryDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Visible="false">
+    @*Test History Modal*@
+    <SfDialog @ref="HistoryDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Visible="false" CssClass="lab-dialog">
         <DialogTemplates>
             <Content>
                 <div class="d-flex justify-content-end align-items-center w-100 mb-1">
@@ -191,31 +208,63 @@ else
                               OnClick="OnTestResultsPrintClick">
                     </SfButton>
                 </div>
-
-                <div class="mb-2">
-                    <SfGrid @ref="TestResultsGrid" DataSource="@ApprovedTestProcesses" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="400px" AllowResizing="false" GridLines="GridLine.Both">
-                        <GridEvents TValue="TestProcessDto" RowDataBound="RowBound"></GridEvents>
+                <div class="mb-3">
+                    <SfGrid @ref="TestResultsGrid" DataSource="@ApprovedTestProcesses" ID="lab-grid" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="400px" AllowResizing="false" GridLines="GridLine.Both">
                         <GridColumns>
-                            <GridColumn Field="@nameof(TestProcessDto.TestGroupItemName)" HeaderText="Test Adı" Width="50%"></GridColumn>
-                            <GridColumn Field="@nameof(TestProcessDto.ResultDate)" HeaderText="Tamamlanma T." Width="50%"></GridColumn>
-                            <GridColumn HeaderText="Min-Max Değer" Width="200" TextAlign="TextAlign.Center">
+                            <GridColumn HeaderText="Test Adı" Width="50%" TextAlign="TextAlign.Center">
                                 <Template Context="context">
-                                    @if (context is TestProcessDto testProcess)
+                                    @if (context is TestProcessWithNavigationPropertiesDto testProcess)
                                     {
-                                        @($"{testProcess.TestMinValue} - {testProcess.TestMaxValue}")
+                                        @testProcess.TestGroupItem!.Name
                                     }
                                 </Template>
                             </GridColumn>
-                            <GridColumn Field="@nameof(TestProcessDto.Result)" HeaderText="Sonuç" Width="25%"></GridColumn>
+
+                            <GridColumn HeaderText="Tamamlanma T." Width="35%" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is TestProcessWithNavigationPropertiesDto testProcess)
+                                    {
+                                        @testProcess.TestProcess!.ResultDate?.ToString("dd/MM/yyyy")
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn HeaderText="Min-Max Değer" Width="30%" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is TestProcessWithNavigationPropertiesDto testProcess)
+                                    {
+                                        @($"{testProcess.TestValueRange?.MinValue} - {testProcess.TestValueRange?.MaxValue}")
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn HeaderText="Sonuç" Width="25%" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is TestProcessWithNavigationPropertiesDto testProcess)
+                                    {
+                                        @testProcess.TestProcess!.Result
+                                    }
+                                </Template>
+                            </GridColumn>
+                            <GridColumn HeaderText="" Width="25%" TextAlign="TextAlign.Center">
+                                <Template Context="context">
+                                    @if (context is TestProcessWithNavigationPropertiesDto testProcess)
+                                    {
+                                        var gridItem = new TestResultCalculateModel(testProcess!);
+
+                                        <span style="@gridItem.TextStyle?">
+                                            <span>@gridItem.Icon</span> @gridItem.Text
+                                        </span>
+                                    }
+                                </Template>
+                            </GridColumn>
                         </GridColumns>
                     </SfGrid>
                 </div>
             </Content>
         </DialogTemplates>
     </SfDialog>
-    
+
     /*Patient Details Modal*/
-    <SfDialog @ref="PatientDetailsModal" Width="400px" IsModal="true" ShowCloseIcon="true" Visible="false">
+    <SfDialog @ref="PatientDetailsModal" CssClass="lab-dialog" Width="400px" IsModal="true" ShowCloseIcon="true" Visible="false">
         <Syncfusion.Blazor.Cards.SfCard>
             <Syncfusion.Blazor.Cards.CardHeader Title="Hasta Bilgileri">
             </Syncfusion.Blazor.Cards.CardHeader>

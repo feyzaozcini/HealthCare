@@ -35,7 +35,7 @@
 <div class="container-fluid d-flex flex-row">
     @*Sol Panel*@
     <div class="col-2">
-        <SfGrid DataSource="@TestGroupsList" ID="lab-grid" Width="100%" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="800px">
+        <SfGrid DataSource="@TestGroupsList" ID="lab-grid" Width="100%" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="750px">
             <GridColumns>
                 <!-- Grup Adı Sütunu -->
                 <GridColumn Field="@nameof(TestGroupDto.Name)" HeaderText="Test Grupları" Width="70">
@@ -64,7 +64,7 @@
     @*Sağ Panel*@
     <div class="col-10">
         @*Data Grid*@
-        <SfGrid DataSource="@TestGroupItemsList" ID="lab-grid" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="800px">
+        <SfGrid DataSource="@TestGroupItemsList" ID="lab-grid" AllowPaging="false" AllowSorting="true" RowHeight="40" Height="750px">
             <GridColumns>
                 <GridColumn Field=@nameof(TestGroupItemDto.Code) HeaderText="Test Kodu" Width="25"></GridColumn>
                 <GridColumn HeaderText="Test Grubu" Width="25">
@@ -114,7 +114,7 @@
 </div>
 
 @*Create Test Group Items Form*@
-<SfDialog @ref="CreateTestGroupItemsDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Test Ekle" Visible="false">
+<SfDialog @ref="CreateTestGroupItemsDialog" CssClass="lab-dialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Test Ekle" Visible="false">
     <DialogTemplates>
         <Content>
             <EditForm Model="@CreateTestGroupItemsDto" OnValidSubmit="AddTestGroupItem" class="needs-validation" novalidate>
@@ -175,7 +175,7 @@
 </SfDialog>
 
 @*Create Test Groups Form*@
-<SfDialog @ref="CreateTestGroupsDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Test Grubu Ekle" Visible="false">
+<SfDialog @ref="CreateTestGroupsDialog" CssClass="lab-dialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Test Grubu Ekle" Visible="false">
     <DialogTemplates>
         <Content>
             <EditForm Model="@CreateTestGroupsDto" OnValidSubmit="AddTestGroup" class="needs-validation" novalidate>
@@ -199,7 +199,7 @@
 </SfDialog>
 
 @*Delete Test Group Items Modal*@
-<SfDialog @ref="DeleteTestGroupItemsDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Silme İşlemi" Visible="false">
+<SfDialog @ref="DeleteTestGroupItemsDialog" CssClass="lab-dialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Silme İşlemi" Visible="false">
     <DialogTemplates>
         <Content>
             <p>Silmek istediğinize emin misiniz?</p>
@@ -212,7 +212,7 @@
 </SfDialog>
 
 @*Delete Test Groups Modal*@
-<SfDialog @ref="DeleteTestGroupsDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Test Silme" Visible="false">
+<SfDialog @ref="DeleteTestGroupsDialog" CssClass="lab-dialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Test Silme" Visible="false">
     <DialogTemplates>
         <Content>
             <p>Silmek istediğinize emin misiniz?</p>
@@ -225,7 +225,7 @@
 </SfDialog>
 
 @*Update Test Group Items Form*@
-<SfDialog @ref="UpdateTestGroupItemsDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Test Güncelleme" Visible="false">
+<SfDialog @ref="UpdateTestGroupItemsDialog" CssClass="lab-dialog" IsModal="true" ShowCloseIcon="true" Width="600px" Header="Test Güncelleme" Visible="false">
     <DialogTemplates>
         <Content>
             <EditForm Model="@UpdateTestGroupItemsDto" OnValidSubmit="UpdateTestGroupItem" class="needs-validation" novalidate>
@@ -279,7 +279,7 @@
 </SfDialog>
 
 @*Update Test Groups Form*@
-<SfDialog @ref="UpdateTestGroupsDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Test Grubu Güncelleme" Visible="false">
+<SfDialog @ref="UpdateTestGroupsDialog" CssClass="lab-dialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Test Grubu Güncelleme" Visible="false">
     <DialogTemplates>
         <Content>
             <EditForm Model="@UpdateTestGroupsDto" OnValidSubmit="UpdateTestGroup" class="needs-validation" novalidate>
@@ -303,7 +303,7 @@
 </SfDialog>
 
 @*Description Detail Modal*@
-<SfDialog @ref="DescriptionDialog" IsModal="true" ShowCloseIcon="true" Width="400px" Header="Açıklama" Visible="false">
+<SfDialog @ref="DescriptionDialog" CssClass="lab-dialog" IsModal="true" ShowCloseIcon="true" Width="400px" Header="Açıklama" Visible="false">
     <DialogTemplates>
         <Content>
             <p>@SelectedDescription</p>

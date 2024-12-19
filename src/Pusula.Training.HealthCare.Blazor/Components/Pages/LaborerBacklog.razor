@@ -1,10 +1,12 @@
 ﻿@page "/laborer-backlog"
 @using Microsoft.Extensions.Localization
+@using Pusula.Training.HealthCare.Blazor.Containers
 @using Pusula.Training.HealthCare.LabRequests
 @using Pusula.Training.HealthCare.TestProcesses
 
 @inject ITestProcessesAppService TestProcessesAppService
 @inject ILabRequestsAppService LabRequestsAppService
+@inject TestProcessStateContainer TestProcessState
 
 <div class="flex-grow-1 d-flex justify-content-center mb-2">
     <SfTextBox Placeholder="Protokol Ara"
@@ -24,23 +26,23 @@
                 <HeaderTemplate>İş Listesi</HeaderTemplate>
 
                 <ContentTemplate>
-                    <SfGrid DataSource="@InProgressLabRequests" ID="lab-grid"  AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="800px" AllowResizing="false" GridLines="@GridLine.Both">
+                    <SfGrid DataSource="@InProgressLabRequests" ID="lab-grid" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="800px" GridLines="@GridLine.Both">
                         <GridColumns>
                             <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10" TextAlign="TextAlign.Center"></GridColumn>
                             <GridColumn Field=@nameof(LabRequestDto.CreationTime) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>
                             <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
                                 <Template Context="context">
-                                    @if (context is LabRequestDto labrequest)
+                                    @if (context is LabRequestDto labRequest)
                                     {
-                                        <span>@labrequest.PatientName @labrequest.PatientSurname</span>
+                                        <span>@labRequest.PatientName @labRequest.PatientSurname</span>
                                     }
                                 </Template>
                             </GridColumn>
                             <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
                                 <Template Context="context">
-                                    @if (context is LabRequestDto labrequest)
+                                    @if (context is LabRequestDto labRequest)
                                     {
-                                        <span>@labrequest.DoctorName @labrequest.DoctorSurname</span>
+                                        <span>@labRequest.DoctorName @labRequest.DoctorSurname</span>
                                     }
                                 </Template>
                             </GridColumn>
@@ -58,32 +60,34 @@
                     </SfGrid>
                 </ContentTemplate>
             </TabItem>
+
             @*Biten İşler Tab'ı*@
             <TabItem>
                 <HeaderTemplate>Biten İşler</HeaderTemplate>
 
                 <ContentTemplate>
-                    <SfGrid DataSource="@CompletedLabRequests" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="750px" AllowResizing="false" GridLines="@GridLine.Both">
+                    <SfGrid DataSource="@CompletedLabRequests" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="750px" GridLines="@GridLine.Both">
                         <GridColumns>
                             <GridColumn Field=@nameof(LabRequestDto.ProtocolNo) HeaderText="Protokol No" Width="10" TextAlign="TextAlign.Center"></GridColumn>
-                            <GridColumn Field=@nameof(LabRequestDto.ProtocolStartDate) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>
+                            <GridColumn Field=@nameof(LabRequestDto.CreationTime) HeaderText="Protokol Başlangıç Tarihi" Width="20" TextAlign="TextAlign.Center"></GridColumn>
                             <GridColumn HeaderText="Hasta Adı-Soyadı" Width="25" TextAlign="TextAlign.Center">
                                 <Template Context="context">
-                                    @if (context is LabRequestDto labrequest)
+                                    @if (context is LabRequestDto labRequest)
                                     {
-                                        <span>@labrequest.PatientName @labrequest.PatientSurname</span>
+                                        <span>@labRequest.PatientName @labRequest.PatientSurname</span>
                                     }
                                 </Template>
                             </GridColumn>
                             <GridColumn HeaderText="İsteyen Doktor" Width="25" TextAlign="TextAlign.Center">
                                 <Template Context="context">
-                                    @if (context is LabRequestDto labrequest)
+                                    @if (context is LabRequestDto labRequest)
                                     {
-                                        <span>@labrequest.DoctorName @labrequest.DoctorSurname</span>
+                                        <span>@labRequest.DoctorName @labRequest.DoctorSurname</span>
                                     }
                                 </Template>
                             </GridColumn>
                             <GridColumn Field=@nameof(LabRequestDto.Status) HeaderText="Protokol Durumu" Width="25" TextAlign="TextAlign.Center"></GridColumn>
+
                             <GridColumn Width="25" TextAlign="TextAlign.Center">
                                 <Template Context="context">
                                     @if (context is LabRequestDto labRequest)
@@ -99,20 +103,28 @@
         </TabItems>
     </SfTab>
 </div>
-
 @*Sonuç Gir Dialog*@
-<SfDialog @ref="ResultDialog" IsModal="true" ShowCloseIcon="true" Width="600px" Visible="false" Header="Test Sonuçları">
+<SfDialog @ref="ResultDialog" CssClass="lab-dialog" IsModal="true" ShowCloseIcon="true" Width="600px" Visible="false" Header="Test Sonuçları">
     <DialogTemplates>
         <Content>
-            <SfGrid DataSource="@TestProcessesList" AllowPaging="false" AllowSorting="true" RowHeight="40" Width="100%" Height="300px" AllowResizing="false" GridLines="@GridLine.Both">
+            <SfGrid DataSource="@SelectedTestProcessesList" AllowPaging="false" RowHeight="40" Width="100%" Height="300px">
                 <GridColumns>
-                    <GridColumn Field=@nameof(TestProcessDto.TestGroupName) HeaderText="Grup" Width="50%"></GridColumn>
-                    <GridColumn Field=@nameof(TestProcessDto.TestGroupItemName) HeaderText="Test" Width="50%"></GridColumn>
-                    <GridColumn Field=@nameof(TestProcessDto.Result) HeaderText="Sonuç" Width="50%">
+                    <GridColumn HeaderText="Test Grubu" Width="50%">
                         <Template Context="context">
-                            @if (context is TestProcessDto testProcess)
+                            @if (context is TestProcessWithNavigationPropertiesDto testProcess)
                             {
-                                <SfNumericTextBox TValue="decimal?" @bind-Value="testProcess.Result" Placeholder="Sonuç Girin" Min="0"></SfNumericTextBox>
+                                <span>@testProcess.TestGroupItem?.Name</span>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn HeaderText="Sonuç" Width="50%">
+                        <Template Context="context">
+                            @if (context is TestProcessWithNavigationPropertiesDto testProcess)
+                            {
+                                <SfNumericTextBox TValue="decimal?"
+                                                  @bind-Value="testProcess.TestProcess!.Result"
+                                                  Placeholder="Sonuç Girin" Min="0">
+                                </SfNumericTextBox>
                             }
                         </Template>
                     </GridColumn>

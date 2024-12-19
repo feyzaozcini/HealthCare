@@ -24,7 +24,7 @@ public class TestProcess : FullAuditedEntity<Guid>
     [CanBeNull]
     public DateTime? ResultDate { get; protected set; }
 
-    protected TestProcess()
+    public TestProcess()
     {
 
     }

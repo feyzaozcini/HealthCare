@@ -31,7 +31,7 @@ public class TestProcessController(ITestProcessesAppService testProcessesAppServ
 
     [HttpGet]
     [Route("by-lab-request/{labRequestId}")]
-    public Task<List<TestProcessDto>> GetByLabRequestIdAsync(Guid labRequestId) => testProcessesAppService.GetByLabRequestIdAsync(labRequestId);
+    public Task<List<TestProcessWithNavigationPropertiesDto>> GetByLabRequestIdAsync(Guid labRequestId) => testProcessesAppService.GetByLabRequestIdAsync(labRequestId);
 
     [HttpGet]
     [Route("download-token")]
@@ -42,7 +42,7 @@ public class TestProcessController(ITestProcessesAppService testProcessesAppServ
 
     [HttpGet]
     [Route("get-list-with-navigation-properties")]
-    public Task<PagedResultDto<TestProcessDto>> GetListWithNavigationPropertiesAsync(GetTestProcessesInput input) => testProcessesAppService.GetListWithNavigationPropertiesAsync(input);
+    public Task<PagedResultDto<TestProcessWithNavigationPropertiesDto>> GetListWithNavigationPropertiesAsync(GetTestProcessesInput input) => testProcessesAppService.GetListWithNavigationPropertiesAsync(input);
 
     [HttpGet]
     [Route("get-test-count")]
@@ -54,7 +54,7 @@ public class TestProcessController(ITestProcessesAppService testProcessesAppServ
 
     [HttpGet]
     [Route("get-with-navigation-properties")]
-    public Task<TestProcessDto> GetWithNavigationPropertiesAsync(Guid id) => testProcessesAppService.GetWithNavigationPropertiesAsync(id);
+    public Task<TestProcessWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id) => testProcessesAppService.GetWithNavigationPropertiesAsync(id);
 
     [HttpPut]
     public Task<TestProcessDto> UpdateAsync(TestProcessesUpdateDto input) => testProcessesAppService.UpdateAsync(input);

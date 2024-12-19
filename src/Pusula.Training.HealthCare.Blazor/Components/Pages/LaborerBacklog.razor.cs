@@ -1,104 +1,139 @@
 using Pusula.Training.HealthCare.LabRequests;
 using Pusula.Training.HealthCare.TestProcesses;
-using Syncfusion.Blazor.Grids;
 using Syncfusion.Blazor.Inputs;
 using Syncfusion.Blazor.Popups;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Volo.Abp.Application.Dtos;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
-    public partial class LaborerBacklog
+    public partial class LaborerBacklog : IDisposable
     {
-        private List<TestProcessDto> TestProcessesList { get; set; } = new();
+        private List<TestProcessWithNavigationPropertiesDto> TestProcessesWithNavigationList { get; set; } = new();
         private List<LabRequestDto> LabRequestsList { get; set; } = new();
-        private TestProcessesUpdateDto UpdateTestProcessDto = new();
+        private List<TestProcessWithNavigationPropertiesDto> SelectedTestProcessesList { get; set; } = new();
         private List<LabRequestDto> InProgressLabRequests { get; set; } = new();
         private List<LabRequestDto> CompletedLabRequests { get; set; } = new();
         private GetTestProcessesInput? TestProcessesFilter { get; set; }
         private GetLabRequestsInput? LabRequestsFilter { get; set; }
 
         private LabRequestDto? SelectedLabRequest;
-        private Guid? SelectedTestProcessId;
-
         private SfDialog? ResultDialog;
 
         protected override async Task OnInitializedAsync()
         {
+            TestProcessState.Subscribe(StateChangedHandler);
+
             TestProcessesFilter = new GetTestProcessesInput();
             LabRequestsFilter = new GetLabRequestsInput();
+
             await LoadLabRequestsAsync();
+        }
+
+        private void StateChangedHandler()
+        {
+            InvokeAsync(async () =>
+            {
+                if (TestProcessState.Refresh)
+                {
+                    await LoadLabRequestsAsync();
+                }
+            });
+        }
+
+        public void Dispose()
+        {
+            TestProcessState.Unsubscribe(StateChangedHandler);
         }
 
         #region GetActions
         private async Task LoadLabRequestsAsync()
         {
-            //Temize çekilecek. Sadece test süreci baþlamýþ protokolleri listeler.
-            var allLabRequests = await LabRequestsAppService.GetListWithNavigationPropertiesAsync(LabRequestsFilter!);
-            var testProcesses = await TestProcessesAppService.GetListAsync(TestProcessesFilter!);
-            var labRequestIdsWithTestProcesses = testProcesses.Items.Select(tp => tp.LabRequestId).Distinct().ToList();
+            var allLabRequests = await FetchTestProcessesByLabRequestIdAsync();
 
-            InProgressLabRequests = allLabRequests.Items
-                .Where(lr => lr.Status == RequestStatusEnum.InProgress && labRequestIdsWithTestProcesses.Contains(lr.Id))
-                .ToList();
+            InProgressLabRequests = GetInProgressLabRequests(allLabRequests);
+            CompletedLabRequests = GetCompletedLabRequests(allLabRequests);
 
-            CompletedLabRequests = allLabRequests.Items
-                .Where(lr => lr.Status == RequestStatusEnum.Completed && labRequestIdsWithTestProcesses.Contains(lr.Id))
-                .ToList();
+            await InvokeAsync(StateHasChanged);
         }
+
 
         #endregion
 
         #region Save Methods
+
         private async Task SaveResult()
         {
-            await UpdateTestProcessesAsync();
-            await UpdateLabRequestStatusAsync();
-            await LoadLabRequestsAsync();
+            var updateTasks = SelectedTestProcessesList
+                .Where(tp => tp.TestProcess != null && tp.TestProcess.Result.HasValue)
+                .Select(async testProcess =>
+                {
+                    var updateDto = await CreateUpdateDto(testProcess);
+                    var updatedProcess = await TestProcessesAppService.UpdateAsync(updateDto);
+
+                    var result = await TestProcessesAppService.GetWithNavigationPropertiesAsync(updatedProcess.Id);
+                    TestProcessState.AddOrUpdateTestProcess(result);
+                });
+
+            await Task.WhenAll(updateTasks);
+
+            if (SelectedLabRequest != null)
+            {
+                await UpdateLabRequestStatusAsync(SelectedLabRequest.Id);
+            }
+
+            TestProcessState.NotifyStateChanged();
+
             await CloseResultDialog();
         }
 
+
         private async Task UpdateTestProcessesAsync()
         {
-            var updateTasks = TestProcessesList.Select(async testProcess =>
-            {
-                    var existingTestProcess = await TestProcessesAppService.GetAsync(testProcess.Id);
-                    if (testProcess.Result.HasValue &&
-                        (!existingTestProcess.Result.HasValue || existingTestProcess.Result != testProcess.Result))
-                    {
-                        await TestProcessesAppService.UpdateAsync(new TestProcessesUpdateDto
-                        {
-                            Id = testProcess.Id,
-                            LabRequestId = testProcess.LabRequestId,
-                            TestGroupItemId = testProcess.TestGroupItemId,
-                            Status = TestProcessStates.Approved,
-                            Result = testProcess.Result,
-                            ResultDate = DateTime.Now
-                        });
-                    }
-            });
+            var updateTasks = TestProcessesWithNavigationList
+                .Where(tp => tp.TestProcess != null && tp.TestProcess.Result.HasValue)
+                .Select(async testProcess =>
+                {
+                    var updateDto = await CreateUpdateDto(testProcess);
+                    var updatedProcess = await TestProcessesAppService.UpdateAsync(updateDto);
+
+                    testProcess.TestProcess.Result = updatedProcess.Result;
+                    testProcess.TestProcess.Status = updatedProcess.Status;
+                });
+
+            TestProcessState.SetTestProcesses(TestProcessesWithNavigationList);
             await Task.WhenAll(updateTasks);
+
+            await InvokeAsync(StateHasChanged);
         }
 
-        private async Task UpdateLabRequestStatusAsync()
+
+        private async Task UpdateLabRequestStatusAsync(Guid labRequestId)
         {
-            bool allResultsEntered = TestProcessesList.All(tp => tp.Result.HasValue);
-            if (allResultsEntered && SelectedLabRequest != null && SelectedLabRequest.Status != RequestStatusEnum.Completed)
+            bool allResultsEntered = TestProcessState.TestProcesses
+                .Where(tp => tp.TestProcess!.LabRequestId == labRequestId)
+                .All(tp => tp.TestProcess!.Result.HasValue);
+
+            var relatedLabRequest = TestProcessState.TestProcesses
+                .FirstOrDefault(tp => tp.TestProcess!.LabRequestId == labRequestId)?.LabRequest;
+
+            if (relatedLabRequest != null)
             {
-                SelectedLabRequest.Status = RequestStatusEnum.Completed;
+                relatedLabRequest.Status = allResultsEntered ? RequestStatusEnum.Completed : RequestStatusEnum.InProgress;
 
                 await LabRequestsAppService.UpdateAsync(new LabRequestUpdateDto
                 {
-                    Id = SelectedLabRequest.Id,
-                    ProtocolId = SelectedLabRequest.ProtocolId,
-                    DoctorId = SelectedLabRequest.DoctorId,
-                    Date = SelectedLabRequest.Date,
-                    Description = SelectedLabRequest.Description,
-                    Status = SelectedLabRequest.Status
+                    Id = relatedLabRequest.Id,
+                    ProtocolId = relatedLabRequest.ProtocolId,
+                    DoctorId = relatedLabRequest.DoctorId,
+                    Date = relatedLabRequest.Date,
+                    Description = relatedLabRequest.Description,
+                    Status = relatedLabRequest.Status
                 });
+
+                TestProcessState.NotifyStateChanged();
             }
         }
 
@@ -109,15 +144,25 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private async Task OpenResultUpdateModal(LabRequestDto labRequest)
         {
             SelectedLabRequest = labRequest;
-            TestProcessesList = await TestProcessesAppService.GetByLabRequestIdAsync(labRequest.Id);
+            SelectedTestProcessesList = await GetTestProcessesByLabRequestIdAsync(labRequest.Id);
             await ResultDialog!.ShowAsync();
         }
 
+        private async Task<List<TestProcessWithNavigationPropertiesDto>> GetTestProcessesByLabRequestIdAsync(Guid labRequestId)
+        {
+            return await TestProcessesAppService.GetByLabRequestIdAsync(labRequestId);
+        }
+
+
         private async Task CloseResultDialog()
         {
-            TestProcessesList = new();
+            SelectedTestProcessesList.Clear();
             SelectedLabRequest = null;
-            await ResultDialog!.HideAsync();
+
+            if (ResultDialog != null)
+            {
+                await ResultDialog.HideAsync();
+            }
         }
 
         #endregion
@@ -129,6 +174,51 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             await LoadLabRequestsAsync();
         }
 
+
+        #endregion
+
+        #region Helpers
+
+        private Task<TestProcessesUpdateDto> CreateUpdateDto(TestProcessWithNavigationPropertiesDto testProcess)
+        {
+            var updateDto = new TestProcessesUpdateDto
+            {
+                Id = testProcess.TestProcess!.Id,
+                LabRequestId = testProcess.TestProcess.LabRequestId,
+                TestGroupItemId = testProcess.TestProcess.TestGroupItemId,
+                Status = TestProcessStates.Approved,
+                Result = testProcess.TestProcess.Result,
+                ResultDate = DateTime.Now
+            };
+
+            return Task.FromResult(updateDto);
+        }
+
+        //Belirli bir lab isteði için iliþkili test süreçlerini API'den çekmek.
+        private async Task<List<LabRequestDto>> FetchTestProcessesByLabRequestIdAsync()
+        {
+            var allLabRequests = await LabRequestsAppService.GetListWithNavigationPropertiesAsync(LabRequestsFilter!);
+            return allLabRequests.Items.ToList();
+        }
+
+        //Tamamlanmamýþ Lab tetkik istemlerini filtrelemek.
+        private List<LabRequestDto> GetInProgressLabRequests(List<LabRequestDto> allLabRequests)
+        {
+            return allLabRequests
+                .Where(lr => TestProcessState.TestProcesses
+                    .Any(tp => tp.TestProcess!.LabRequestId == lr.Id && !tp.TestProcess!.Result.HasValue))
+                .ToList();
+        }
+
+        //Tamamlanmýþ Lab tetkik istemlerini filtrelemek.
+        private List<LabRequestDto> GetCompletedLabRequests(List<LabRequestDto> allLabRequests)
+        {
+            return allLabRequests
+                .Where(lr => TestProcessState.TestProcesses
+                    .Where(tp => tp.TestProcess!.LabRequestId == lr.Id)
+                    .All(tp => tp.TestProcess!.Result.HasValue))
+                .ToList();
+        }
         #endregion
     }
 }
