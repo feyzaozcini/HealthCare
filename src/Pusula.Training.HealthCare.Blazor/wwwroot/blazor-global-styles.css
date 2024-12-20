@@ -196,3 +196,27 @@
     border: 1px solid #ccc;
     overflow: hidden;
 }
+
+.custom-grid {
+    border: 2px solid darkmagenta;
+    border-radius: 10px !important;
+    overflow: hidden;
+    background-color: #fff0e6;
+}
+
+#custom-grid .e-gridheader {
+    border-radius: 10px 10px 0 0 !important;
+    overflow: hidden;
+}
+
+#custom-grid .e-gridfooter {
+    border-radius: 0 0 10px 10px !important;
+    overflow: hidden;
+}
+
+#custom-grid .e-toolbar {
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+    overflow: hidden;
+}
+

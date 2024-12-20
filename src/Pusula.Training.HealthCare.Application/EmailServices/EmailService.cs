@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
+using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Patients;
+using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
 
 namespace Pusula.Training.HealthCare.EmailServices
 {
@@ -42,6 +45,18 @@ namespace Pusula.Training.HealthCare.EmailServices
                 await client.SendAsync(message);
                 await client.DisconnectAsync(true);
             }
+        }
+
+        // Randevu Body Şablonu
+        public string CreateAppointmentConfirmationBody(string patientName, string departmentName, DateTime startDate, DateTime endDate)
+        {
+            return $@"
+          Merhaba {patientName} ,
+          Randevunuz başarıyla oluşturulmuştur. İşte detaylar:
+
+        - **Departman:  {departmentName}
+        - **Randevu Başlangıç:  {startDate.ToString("yyyy-MM-dd HH:mm")}
+        - **Randevu Bitiş:  {endDate.ToString("yyyy-MM-dd HH:mm")}"; ;
         }
     }
 }

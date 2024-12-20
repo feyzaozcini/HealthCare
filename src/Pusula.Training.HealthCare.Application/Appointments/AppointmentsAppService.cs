@@ -155,18 +155,19 @@ namespace Pusula.Training.HealthCare.Appointments
                 input.IsBlock
             );
 
-            /*var patient = await patientRepository.GetAsync(input.PatientId);
+            //Oluşturulan randevu bilgileri mail atılır
+            var patient = await patientRepository.GetAsync(input.PatientId);
             var department = await departmentRepository.GetAsync(input.DepartmentId);
 
-            string body = $@"
-           Merhaba {patient.FirstName} {patient.LastName},
-           Randevunuz başarıyla oluşturulmuştur. İşte detaylar:
-
-           - **Departman:** {department.Name}
-           - **Randevu Başlangıç:** {startDate.ToString("yyyy-MM-dd HH:mm")}
-           - **Randevu Bitiş:** {endDate.ToString("yyyy-MM-dd HH:mm")}";
-
-            await emailService.SendEmailAsync(patient.Email, "Randevu Onayı", body);*/
+            var emailBody = emailService.CreateAppointmentConfirmationBody(
+            $"{patient.FirstName} {patient.LastName}",
+            department.Name,
+            startDate,
+            endDate
+            );
+            //Oluşturulan randevu bilgileri mail atılır
+            await emailService.SendEmailAsync(patient.Email, "Randevu Onayı", emailBody);
+            
             return ObjectMapper.Map<Appointment, AppointmentDto>(appointment);
         }
        

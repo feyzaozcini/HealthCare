@@ -162,7 +162,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 Subject = a.AppointmentType.Name,
                 StartTime = a.Appointment.StartDate,
                 EndTime = a.Appointment.EndDate,
-                IsBlock = a.Appointment.IsBlock,
+                IsBlock = a.Appointment.IsBlock
             }).ToList();
 
         }
@@ -207,7 +207,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             if (schedule != null && schedule.Any())
             {
                 // Eğer doktorun özel bir programı varsa, alınan değerleri ata
-                var doctorSchedule = schedule.First(); // İlk programı seç (eğer birden fazlaysa bunu genişletebilirsiniz)
+                var doctorSchedule = schedule.First(); // İlk programı seç
                 _workingDays = doctorSchedule.WorkingDays;
                 startHour = doctorSchedule.StartHour;
                 endHour = doctorSchedule.EndHour;

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
+using Syncfusion.Blazor.Notifications;
+using Volo.Abp;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -25,6 +27,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private BlackListItem? SelectedBlackList;
         private BlackListStatus SelectedBlackListStatus;
         private IReadOnlyList<LookupDto<BlackListStatus>> BlackListStatusCoolection { get; set; } = new List<LookupDto<BlackListStatus>>();
+        private SfToast? ToastObj;
 
         protected override async Task OnInitializedAsync()
         {
@@ -35,6 +38,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                     .Cast<BlackListStatus>()
                     .Select(b => new LookupDto<BlackListStatus> { Id = b, DisplayName = b.ToString() })
                     .ToList();
+            ToastObj ??= new SfToast();
         }
         private async Task LoadDoctors()
         {
@@ -80,9 +84,16 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private async Task SaveBlackList()
         {
-            await BlackListAppService.CreateAsync(NewBlackList);
-            IsAddModalOpen = false;
-            await LoadBlackListAsync();
+            await HandleError(async () =>
+            {
+                await BlackListAppService.CreateAsync(NewBlackList);
+                IsAddModalOpen = false;
+                await LoadBlackListAsync();
+
+                // Başarılı mesaj
+                await ShowToast("Kara Listeye başarıyla eklendi!", true);
+            });
+            
         }
 
         private void OpenEditDialog(BlackListItem blackList)
@@ -140,5 +151,34 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             public string Note { get; set; }
 
         }
+
+        #region Handle Error
+        public async Task HandleError(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (UserFriendlyException ex) // Özel hata
+            {
+                await ShowToast(ex.Message, false);
+            }
+            catch (Exception) // Genel hata
+            {
+                await ShowToast("Bir hata oluştu. Lütfen tekrar deneyin.", false);
+            }
+        }
+
+        private async Task ShowToast(string message, bool isSuccess = true)
+        {
+            await ToastObj!.ShowAsync(new ToastModel
+            {
+                Content = message,
+                CssClass = isSuccess ? "e-toast-success" : "e-toast-danger",
+                Timeout = 3000,
+                ShowCloseButton = true
+            });
+        }
+        #endregion
     }
 }

@@ -47,4 +47,6 @@ public static class HealthCareDomainErrorCodes
     public const string DoctorWorkScheduleConflict = "Doktorun çalışma programı zaten mevcut.";
 
     public const string PatientWasBlockedByDoctor = "Hasta doktor tarafından engellenmiştir.";
+
+    public const string DublicateBlackListItem = "Hasta zaten doktor tarafından engellenmiştir.";
 }

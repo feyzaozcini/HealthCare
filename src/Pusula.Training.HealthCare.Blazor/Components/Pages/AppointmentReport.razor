@@ -13,11 +13,11 @@
     <div class="date-filters" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
         <SfDatePicker TValue="DateTime?" Placeholder="Başlangıç Tarihi" @bind-Value="StartDate"></SfDatePicker>
         <SfDatePicker TValue="DateTime?" Placeholder="Bitiş Tarihi" @bind-Value="EndDate"></SfDatePicker>
-        <SfButton CssClass="e-primary" OnClick="LoadFilteredData">Filtrele</SfButton>
+        <SfButton CssClass="custom-add-button" OnClick="LoadFilteredData">Filtrele</SfButton>
     </div>
     <div class="content-wrapper">
         <div style="text-align: right; margin-bottom: 10px;">
-            <SfButton CssClass="e-primary" IsPrimary="true" OnClick="@ExportToExcel">Export to Excel</SfButton>
+            <SfButton CssClass="custom-add-button" IsPrimary="true" OnClick="@ExportToExcel">Export to Excel</SfButton>
         </div>
         <SfPivotView TValue="AppointmentPivotData" @ref="Pivot" Height="800" Width="100%" AllowExcelExport="true" ShowFieldList="true" EnableValueSorting=true ExpandAll="false">
             <PivotViewDataSourceSettings DataSource="@PivotData" EnableSorting="true">
