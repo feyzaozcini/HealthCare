@@ -14,6 +14,7 @@
 @inject IBlackListsAppService BlackListAppService
 @inject IPatientsAppService PatientsAppService
 
+<SfToast @ref="ToastObj" />
 <div class="row mb-2">
     <div class="col text-end">
         <button class="btn custom-add-button" @onclick="OpenAddModal">+ Add Black List Item</button>
@@ -21,7 +22,7 @@
 </div>
 <div class="col-lg-12 control-section">
     <div class="content-wrapper">
-        <SfGrid DataSource="@BlackListItems" AllowPaging="true">
+        <SfGrid DataSource="@BlackListItems" AllowPaging="true" ID="custom-grid" Toolbar="@(new List<string>() { "Search" })">
             <GridPageSettings PageSize="10"></GridPageSettings>
             <GridColumns>
                 <GridColumn TextAlign="TextAlign.Center" Field="DoctorFullName" HeaderText="Doctor" Width="100" />
@@ -39,8 +40,11 @@
 </div>
 
 <SfDialog IsModal="true" Width="600px" Visible="@IsAddModalOpen" Header="Add Black List Item" OnClose="() => IsAddModalOpen = false">
+
     <DialogTemplates>
         <Content>
+            <EditForm Model="@NewBlackList" OnValidSubmit="SaveBlackList" class="needs-validation" novalidate>
+                <DataAnnotationsValidator />
             <div class="mt-2">
                 <label>Select Doctor:</label>
                 <SfDropDownList TValue="Guid" 
@@ -51,6 +55,7 @@
                     CssClass="e-custom">
                     <DropDownListFieldSettings Text="Name" Value="Id" />
                 </SfDropDownList>
+                    <ValidationMessage For="@(() => NewBlackList.DoctorId)" />
             </div>
             <div class="mt-2">
                 <label>Select Patient:</label>
@@ -77,14 +82,19 @@
                             CssClass="e-corner"
                             @bind-Value="@NewBlackList.Note">
                 </SfTextArea>
+                    <ValidationMessage For="@(() => NewBlackList.Note)" />
             </div>
+                <div class="row mt-2 mb-2">
+                    <div class="col-12 text-end">
+                        <SfButton CssClass="btn custom-add-button" Content="Kaydet" Type="Submit"></SfButton>
+                        <button type="button" class="btn custom-delete-button" @onclick="() => IsAddModalOpen = false">Cancel</button>
+                    </div>
+                </div>
+            </EditForm>
         </Content>
-        <FooterTemplate>
-            <button type="submit" class="btn btn-primary" @onclick="SaveBlackList">Save</button>
-            <button type="button" class="btn btn-secondary" @onclick="() => IsAddModalOpen = false">Cancel</button>
-        </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
+
 
 <SfDialog @bind-Visible="@IsEditModalOpen" Width="400px" Header="Edit Blacklist Status">
     <DialogTemplates>
@@ -98,10 +108,9 @@
             </div>
         </Content>
         <FooterTemplate>
-            <button class="btn btn-success" @onclick="UpdateBlackListStatus">Save</button>
-            <button class="btn btn-secondary" @onclick="CloseDialog">Cancel</button>
+            <button class="btn custom-add-button" @onclick="UpdateBlackListStatus">Save</button>
+            <button class="btn custom-delete-button" @onclick="CloseDialog">Cancel</button>
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
-
 

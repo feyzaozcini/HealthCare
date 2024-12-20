@@ -11,5 +11,8 @@ namespace Pusula.Training.HealthCare.Core.Rules.BlackLists
     {
         //Hasta ve doktorun engel durumunu kontrol eder
         Task ValidateBlackList(Guid patientId, Guid doctorId);
+
+        //Doktor ve hasta bir kez engellenmişse tekrar engellenemez
+        Task DublicateBlackList(Guid patientId, Guid doctorId);
     }
 }

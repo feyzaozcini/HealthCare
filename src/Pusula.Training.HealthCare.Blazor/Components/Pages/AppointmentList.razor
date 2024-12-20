@@ -74,7 +74,7 @@
     <!-- Appointment List Datagrid -->
     <div class="row">
         <div class="col-lg-12">
-            <SfGrid DataSource="@Appointments" AllowPaging="true" AllowSorting="true" Height="600">
+            <SfGrid DataSource="@Appointments" AllowPaging="true" AllowSorting="true" Height="600" ID="custom-grid">
                 <GridPageSettings PageSize="12"></GridPageSettings>
                 <GridColumns>
                     <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
@@ -98,7 +98,7 @@
                             @{
                                 var appointment = context as AppointmentListItem;
                             }
-                            <button class="btn btn-sm btn-primary"
+                            <button class="btn btn-sm custom-add-button"
                                     @onclick="() => OpenEditDialog(appointment)">
                                 <i class="fas fa-edit"></i>
                             </button>
@@ -144,6 +144,7 @@
 
 
 <style>
+ 
     .custom-card {
         border-radius: 10px;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);

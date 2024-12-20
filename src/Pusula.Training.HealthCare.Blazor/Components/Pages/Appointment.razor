@@ -155,7 +155,7 @@
             </div>
         </EditorTemplate>
         <EditorFooterTemplate>
-            <button id="saveButton" class="e-control e-btn e-primary" data-ripple="true" @onclick="CreateAndCloseModal">Save</button>
+            <button id="saveButton" class="btn custom-add-button" data-ripple="true" @onclick="CreateAndCloseModal">Save</button>
         </EditorFooterTemplate>
     </ScheduleTemplates>
     <ScheduleTimeScale Enable="@GridLine" Interval="@IntervalValue" SlotCount="@SlotValue"></ScheduleTimeScale>
@@ -204,8 +204,8 @@
             </SfDropDownList>
         </div>
         <div style="margin-top: 15px;">
-            <button type="submit" class="e-btn e-success">Kaydet</button>
-            <button type="button" class="e-btn e-danger" @onclick="ClosePatientDialog">İptal</button>
+            <button type="submit" class="e-btn custom-add-button">Kaydet</button>
+            <button type="button" class="e-btn custom-delete-button" @onclick="ClosePatientDialog">İptal</button>
         </div>
     </EditForm>
 </SfDialog>
@@ -239,7 +239,7 @@
             </Form>
 
             <!-- Hasta Listesi -->
-            <SfGrid DataSource="@PatientList" AllowPaging="true" AllowSelection="true">
+            <SfGrid DataSource="@PatientList" AllowPaging="true" AllowSelection="true" ID="custom-grid">
                 <GridPageSettings PageSize="5"></GridPageSettings>
                 <GridColumns>
                     <GridColumn Field="Patient.No" HeaderText="@L["PatientNo"]" Width="150"></GridColumn>
@@ -277,5 +277,4 @@
         border-radius: 10px !important; /* İçeriğin köşeleri */
         padding: 20px;
     }
-
 </style>

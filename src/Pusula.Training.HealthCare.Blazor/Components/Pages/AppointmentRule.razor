@@ -20,7 +20,7 @@
 </div>
 <div class="col-lg-12 control-section">
     <div class="content-wrapper">
-        <SfGrid DataSource="@AppointmentRules" AllowPaging="true" Toolbar="@(new List<string>() { "Search" })" OnToolbarClick="OnToolbarClick">
+        <SfGrid DataSource="@AppointmentRules" AllowPaging="true" Toolbar="@(new List<string>() { "Search" })" OnToolbarClick="OnToolbarClick" ID="custom-grid">
             <GridPageSettings PageSize="10"></GridPageSettings>
             <GridColumns>
                 <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
@@ -89,10 +89,8 @@
             </div>
         </Content>
         <FooterTemplate>
-            <button class="btn btn-primary" @onclick="CreateAppointmentRule">Save</button>
-            <button class="btn btn-secondary" @onclick="() => IsAddNewDialogOpen = false">Cancel</button>
+            <button class="btn custom-add-button" @onclick="CreateAppointmentRule">Save</button>
+            <button class="btn custom-delete-button" @onclick="() => IsAddNewDialogOpen = false">Cancel</button>
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
-
-

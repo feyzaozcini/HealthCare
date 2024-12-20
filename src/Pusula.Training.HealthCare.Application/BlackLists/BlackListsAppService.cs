@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Core;
+using Pusula.Training.HealthCare.Core.Rules.BlackLists;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Shared;
@@ -19,7 +20,8 @@ namespace Pusula.Training.HealthCare.BlackLists
         BlackListManager blackListManager,
         IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache,
         IDoctorRepository doctorRepository,
-        IPatientRepository patientRepository) : HealthCareAppService, IBlackListsAppService
+        IPatientRepository patientRepository,
+        IBlackListBusinessRules blackListBusinessRules) : HealthCareAppService, IBlackListsAppService
     {
         public virtual async Task<PagedResultDto<BlackListWithNavigationPropertiesDto>> GetListAsync(GetBlackListInput input)
         {
@@ -45,7 +47,7 @@ namespace Pusula.Training.HealthCare.BlackLists
 
         public virtual async Task<BlackListDto> CreateAsync(BlackListCreateDto input)
         {
-
+            await blackListBusinessRules.DublicateBlackList(input.PatientId, input.DoctorId);
             var blackList = await blackListManager.CreateAsync(
                 input.PatientId,
                 input.DoctorId,

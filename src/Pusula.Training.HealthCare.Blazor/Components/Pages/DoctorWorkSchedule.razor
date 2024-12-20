@@ -14,12 +14,12 @@
 <SfToast @ref="ToastObj" />
 <div class="row mb-2">
     <div class="col text-end">
-        <button class="btn btn-success" @onclick="OpenAddModal">+ Add Work Schedule</button>
+        <button class="btn custom-add-button" @onclick="OpenAddModal">+ Add Work Schedule</button>
     </div>
 </div>
 <div class="col-lg-12 control-section">
     <div class="content-wrapper">
-        <SfGrid DataSource="@DoctorWorkSchedulers" AllowPaging="true">
+        <SfGrid DataSource="@DoctorWorkSchedulers" AllowPaging="true" ID="custom-grid" Toolbar="@(new List<string>() { "Search" })">
             <GridPageSettings PageSize="12"></GridPageSettings>
             <GridColumns>
                 <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="200" />
@@ -38,8 +38,8 @@
                 <GridColumn Field="EndHour" HeaderText="End Hour" Width="100" />
                 <GridColumn HeaderText="Actions" Width="150" TextAlign="TextAlign.Center">
                     <Template>
-                        <button class="btn btn-warning me-2" @onclick="(() => OpenEditModal((context as DoctorWorkSchedulerListItem)))">Edit</button>
-                        <button class="btn btn-danger" @onclick="(() => DeleteDoctorWorkSchedule((context as DoctorWorkSchedulerListItem).Id))">Delete</button>
+                        <button class="btn custom-add-button" @onclick="(() => OpenEditModal((context as DoctorWorkSchedulerListItem)))">Edit</button>
+                        <button class="btn custom-delete-button" @onclick="(() => DeleteDoctorWorkSchedule((context as DoctorWorkSchedulerListItem).Id))">Delete</button>
                     </Template>
                 </GridColumn>
             </GridColumns>
@@ -53,13 +53,13 @@
         <Content>
             <div class="mt-2">
                 <label>Select Doctor:</label>
-                <SfDropDownList TValue="Guid" TItem="DoctorListItems" DataSource="@Doctors" @bind-Value="NewDoctorWorkSchedule.DoctorId" Placeholder="Select Doctor">
+                <SfDropDownList TValue="Guid" TItem="DoctorListItems" CssClass="e-custom" DataSource="@Doctors" @bind-Value="NewDoctorWorkSchedule.DoctorId" Placeholder="Select Doctor">
                     <DropDownListFieldSettings Text="Name" Value="Id" />
                 </SfDropDownList>
             </div>
             <div class="mt-2">
                 <label>Working Days:</label>
-                <SfMultiSelect TValue="int[]" TItem="object" DataSource="@WeekDays" @bind-Value="NewDoctorWorkSchedule.WorkingDays">
+                <SfMultiSelect TValue="int[]" TItem="object" Mode="VisualMode.Box" DataSource="@WeekDays" @bind-Value="NewDoctorWorkSchedule.WorkingDays">
                     <MultiSelectFieldSettings Text="Text" Value="Value" />
                 </SfMultiSelect>
             </div>
@@ -73,8 +73,8 @@
             </div>
         </Content>
         <FooterTemplate>
-            <button class="btn btn-primary" @onclick="SaveAppointmentType">Save</button>
-            <button class="btn btn-secondary" @onclick="() => IsAddModalOpen = false">Cancel</button>
+            <button class="btn custom-add-button" @onclick="SaveAppointmentType">Save</button>
+            <button class="btn custom-delete-button" @onclick="() => IsAddModalOpen = false">Cancel</button>
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
@@ -85,7 +85,7 @@
         <Content>
             <div class="mt-2">
                 <label>Select Doctor:</label>
-                <SfDropDownList TValue="Guid" TItem="DoctorListItems" DataSource="@Doctors" @bind-Value="EditDoctorWorkSchedule.DoctorId" Placeholder="Select Doctor">
+                <SfDropDownList TValue="Guid" TItem="DoctorListItems" CssClass="e-custom" DataSource="@Doctors" @bind-Value="EditDoctorWorkSchedule.DoctorId" Placeholder="Select Doctor">
                     <DropDownListFieldSettings Text="Name" Value="Id" />
                 </SfDropDownList>
             </div>
@@ -105,8 +105,8 @@
             </div>
         </Content>
         <FooterTemplate>
-            <button class="btn btn-primary" @onclick="UpdateDoctorWorkSchedule">Save</button>
-            <button class="btn btn-secondary" @onclick="() => IsEditModalOpen = false">Cancel</button>
+            <button class="btn custom-add-button" @onclick="UpdateDoctorWorkSchedule">Save</button>
+            <button class="btn custom-delete-button" @onclick="() => IsEditModalOpen = false">Cancel</button>
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
