@@ -29,7 +29,7 @@ namespace Pusula.Training.HealthCare.EmailServices
         public async Task SendEmailAsync(string to, string subject, string body)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("HealthCare Appointment System", _smtpUser));
+            message.From.Add(new MailboxAddress("HealthCare System", _smtpUser));
             message.To.Add(new MailboxAddress(to, to));
             message.Subject = subject;
 
@@ -58,5 +58,16 @@ namespace Pusula.Training.HealthCare.EmailServices
         - **Randevu Başlangıç:  {startDate.ToString("yyyy-MM-dd HH:mm")}
         - **Randevu Bitiş:  {endDate.ToString("yyyy-MM-dd HH:mm")}"; ;
         }
+
+        public string CreateTestResultsNotificationBody(string patientName)
+        {
+            return $@"
+            Merhaba {patientName},
+            Test sonuçlarınız hazırdır. Detaylar için doktorunuzdan randevu alınız.
+
+            Saygılarımızla,
+            halleDEViz Ekibi";
+        }
+
     }
 }
