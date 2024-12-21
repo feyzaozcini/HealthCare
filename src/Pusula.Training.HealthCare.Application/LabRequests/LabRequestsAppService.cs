@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Core;
+using Pusula.Training.HealthCare.EmailServices;
+using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -17,6 +19,7 @@ namespace Pusula.Training.HealthCare.LabRequests;
 public class LabRequestsAppService(
     ILabRequestRepository labRequestRepository,
     LabRequestManager labRequestManager,
+    EmailService emailService,
     IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache
     ) : HealthCareAppService, ILabRequestsAppService
 {
@@ -151,6 +154,19 @@ public class LabRequestsAppService(
     {
         var labRequest = await labRequestRepository.GetWithNavigationPropertiesAsync(id);
         return ObjectMapper.Map<LabRequest, LabRequestDto>(labRequest);
+    }
+
+    public async Task NotifyTestResultsAsync(LabRequestDto labRequestDto)
+    {
+        var emailBody = emailService.CreateTestResultsNotificationBody(
+            $"{labRequestDto.PatientName} {labRequestDto.PatientSurname}"
+        );
+
+        await emailService.SendEmailAsync(
+            to: labRequestDto.PatientMail,
+            subject: "Test Sonuçlarınız Hazır!",
+            body: emailBody
+        );
     }
 
     [Authorize(HealthCarePermissions.LabRequests.Edit)]

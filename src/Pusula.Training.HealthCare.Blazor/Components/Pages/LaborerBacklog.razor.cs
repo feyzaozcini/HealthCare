@@ -133,10 +133,14 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                     Status = relatedLabRequest.Status
                 });
 
+                if (relatedLabRequest.Status == RequestStatusEnum.Completed)
+                {
+                    await LabRequestsAppService.NotifyTestResultsAsync(SelectedLabRequest!);
+                }
+
                 TestProcessState.NotifyStateChanged();
             }
         }
-
 
         #endregion
 

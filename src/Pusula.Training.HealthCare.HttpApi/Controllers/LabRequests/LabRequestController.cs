@@ -46,6 +46,10 @@ public class LabRequestController(ILabRequestsAppService labRequestsAppService)
     [Route("get-with-navigation")]
     public Task<LabRequestDto> GetWithNavigationPropertiesAsync(Guid id) => labRequestsAppService.GetWithNavigationPropertiesAsync(id);
 
+    [HttpGet]
+    [Route("get-notify-test-results")]
+    public Task NotifyTestResultsAsync(LabRequestDto labRequest) => labRequestsAppService.NotifyTestResultsAsync(labRequest);
+
     [HttpPut]
     public Task<LabRequestDto> UpdateAsync(LabRequestUpdateDto input) => labRequestsAppService.UpdateAsync(input);
 }

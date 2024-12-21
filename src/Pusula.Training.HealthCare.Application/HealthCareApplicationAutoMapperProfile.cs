@@ -115,6 +115,7 @@ public class HealthCareApplicationAutoMapperProfile : Profile
             .ForMember(dest => dest.DoctorSurname, opt => opt.MapFrom(x => x.Doctor.User.Surname))
             .ForMember(dest => dest.PatientName, opt => opt.MapFrom(x => x.Protocol.Patient.FirstName))
             .ForMember(dest => dest.PatientSurname, opt => opt.MapFrom(x => x.Protocol.Patient.LastName))
+            .ForMember(dest => dest.PatientMail, opt => opt.MapFrom(x => x.Protocol.Patient.Email))
             .ForMember(dest => dest.PatientNo, opt => opt.MapFrom(x => x.Protocol.Patient.No))
             .ForMember(dest => dest.PatientBirthDate, opt => opt.MapFrom(x => x.Protocol.Patient.BirthDate))
             .ForMember(dest => dest.InsuranceName, opt => opt.MapFrom(x => x.Protocol.Insurance.Name))

@@ -23,6 +23,7 @@ public class LabRequestDto : FullAuditedEntity<Guid>
     public string PatientName { get; set; }
     public string PatientSurname { get; set; }
     public int PatientNo { get; set; }
+    public string PatientMail { get; set; }
     public DateTime PatientBirthDate { get; set; }
 
     //Doctor

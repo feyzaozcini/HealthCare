@@ -15,4 +15,6 @@ public interface ILabRequestsAppService : IApplicationService
     Task<LabRequestDto> CreateAsync(LabRequestCreateDto input);
     Task<LabRequestDto> UpdateAsync(LabRequestUpdateDto input);
     Task<Shared.DownloadTokenResultDto> GetDownloadTokenAsync();
+    Task NotifyTestResultsAsync(LabRequestDto labRequest);
+
 }
