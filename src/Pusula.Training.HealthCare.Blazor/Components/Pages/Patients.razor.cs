@@ -2,6 +2,7 @@ using Blazorise;
 using Blazorise.DataGrid;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Pusula.Training.HealthCare.Addresses;
 using Pusula.Training.HealthCare.Blazor.Containers;
 using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
@@ -84,14 +85,7 @@ public partial class Patients
     private IReadOnlyList<LookupDto<Type>> TypesCollection { get; set; } = new List<LookupDto<Type>>();
     private IReadOnlyList<LookupDto<BloodType>> BloodTypesCollection { get; set; } = new List<LookupDto<BloodType>>();
     private List<PatientWithNavigationPropertiesDto> SelectedPatients { get; set; } = [];
-    private List<CountryDto> SecondaryCountryList { get; set; } = new List<CountryDto>();
-    private List<CityDto> SecondaryCityList { get; set; } = new List<CityDto>();
-    private List<DistrictDto> SecondaryDistrictList { get; set; } = new List<DistrictDto>();
-    private List<VillageDto> SecondaryVillageList { get; set; } = new List<VillageDto>();
-    private List<CountryDto> PrimaryCountryList { get; set; } = new List<CountryDto>();
-    private List<CityDto> PrimaryCityList { get; set; } = new List<CityDto>();
-    private List<DistrictDto> PrimaryDistrictList { get; set; } = new List<DistrictDto>();
-    private List<VillageDto> PrimaryVillageList { get; set; } = new List<VillageDto>();
+    private List<CountryDto> CountryList { get; set; } = new List<CountryDto>();
     private GetCountriesInput? CountriesFilter { get; set; }
     private bool AllPatientsSelected { get; set; }
     private IReadOnlyList<GetCountryLookupDto<Guid>> CountriesCodeCollection { get; set; } = [];
@@ -127,8 +121,13 @@ public partial class Patients
     #region General Staff
     protected override async Task OnInitializedAsync()
     {
+        NewPatient = new PatientCreateDto
+        {
+            Addresses = new List<AddressCreateDto>()
+        };
 
         CountriesFilter = new GetCountriesInput();
+
 
         var insurances = await InsurancesAppService.GetListAsync(new GetInsurancesInput
         {
@@ -138,6 +137,7 @@ public partial class Patients
             MaxResultCount = 100,
             SkipCount = 0
         });
+
 
         InsuranceList = insurances.Items.Select(x => new LookupDto<Guid>
         {
@@ -155,11 +155,13 @@ public partial class Patients
             SkipCount = 0
         });
 
+
         ProtocolTypeList = protocolTypes.Items.Select(x => new LookupDto<Guid>
         {
             Id = x.Id,
             DisplayName = x.Name // Kullanýcýya görünecek sigorta adý
         }).ToList();
+
 
         var protocolNotes = await NotesAppService.GetListAsync(new GetNotesInput
         {
@@ -170,21 +172,20 @@ public partial class Patients
             SkipCount = 0
         });
 
+
         ProtocolNoteList = protocolNotes.Items.Select(x => new LookupDto<Guid>
         {
             Id = x.Id,
             DisplayName = x.Text // Kullanýcýya görünecek sigorta adý
         }).ToList();
 
+
         await LoadInitialDataAsync();
-        
-        await GetSecondaryCountriesAsync();
-        await GetPrimaryCountriesAsync();
+        await GetCountriesAsync();
         await SetPermissionsAsync();
         await GetCountryCodeCollectionLookupAsync();
         await GetCompanyCollectionLookupAsync();
         
-
 
         ProtocolStatusCollection = Enum.GetValues(typeof(ProtocolStatus))
         .Cast<ProtocolStatus>()
@@ -205,6 +206,7 @@ public partial class Patients
        })
        .ToList();
 
+
         TypesCollection = Enum.GetValues(typeof(Type))
        .Cast<Type>()
        .Select(t => new LookupDto<Type>
@@ -214,6 +216,7 @@ public partial class Patients
        })
        .ToList();
 
+
         BloodTypesCollection = Enum.GetValues(typeof(BloodType))
        .Cast<BloodType>()
        .Select(b => new LookupDto<BloodType>
@@ -222,16 +225,9 @@ public partial class Patients
            DisplayName = b.ToString().Replace('_', ' ')
        })
        .ToList();
-    }
 
-    private void NavigateToAppointments()
-    {
-        if (SelectedPatients.Count == 1)
-        {
-            //StateService.SelectedPatient = SelectedPatients.First().Patient;
-            //NavigationManager.NavigateTo();
-        }
     }
+    
 
     private void NavigateToPatientDetails(PatientWithNavigationPropertiesDto selectedPatient)
     {
@@ -305,6 +301,7 @@ public partial class Patients
         await Task.CompletedTask;
     }
 
+
     private async Task AddNewProtocol()
     {
 
@@ -312,6 +309,7 @@ public partial class Patients
         await CloseProtocolCreateModal();
 
     }
+
  
     private async Task OpenProtocolCreateModal(PatientWithNavigationPropertiesDto input)
     {
@@ -329,35 +327,49 @@ public partial class Patients
     {
         await CreateProtocolsDialog!.HideAsync();
     }
-
-    //private async Task GetProtocolsAsync()
-    //{
-    //    var input = new GetProtocolsInput
-    //    {
-    //        FilterText = ProtocolsFilter?.FilterText,
-    //        StartTime = ProtocolsFilter?.StartTime,
-    //        EndTime = ProtocolsFilter?.EndTime,
-    //        ProtocolStatus = ProtocolsFilter?.ProtocolStatus,
-    //        ProtocolTypeId = ProtocolsFilter?.ProtocolTypeId,
-    //        ProtocolNoteId = ProtocolsFilter?.ProtocolNoteId,
-    //        NoteText = ProtocolsFilter?.NoteText,
-    //        ProtocolInsuranceId = ProtocolsFilter?.ProtocolInsuranceId,
-    //        DepartmentId = ProtocolsFilter?.DepartmentId,
-    //        DoctorId = ProtocolsFilter?.DoctorId,
-    //        MaxResultCount = ProtocolsFilter!.MaxResultCount,
-    //        SkipCount = (CurrentPage - 1) * PageSize,
-    //        PatientId = SelectedPatientId ?? Guid.Empty
-    //    };
-
-    //    var result = await ProtocolsAppService.GetListAsync(input);
-    //    ProtocolList = result.Items.ToList();
-    //    TotalCount = (int)result.TotalCount;
-    //}
-
     #endregion
 
     #region Address
-    private async Task GetPrimaryCountriesAsync()
+
+    private void RemoveAddress(AddressCreateDto address)
+    {
+        NewPatient.Addresses.Remove(address);
+    }
+
+
+    private void OnPrimaryChanged(AddressCreateDto selectedAddress, ChangeEventArgs e)
+    {
+        bool isChecked = (bool)e.Value;
+
+        if (isChecked)
+        {
+            foreach (var address in NewPatient.Addresses)
+            {
+                if (address != selectedAddress)
+                {
+                    address.IsPrimary = false;
+                }
+            }
+        }
+
+        selectedAddress.IsPrimary = isChecked;
+    }
+
+    private void AddNewAddress()
+    {
+        NewPatient.Addresses.Add(new AddressCreateDto
+        {
+            CountryId = Guid.Empty,
+            CityId = Guid.Empty,
+            DistrictId = Guid.Empty,
+            VillageId = Guid.Empty,
+            AddressDescription = string.Empty,
+            IsPrimary = NewPatient.Addresses.Count == 0
+        });
+    }
+
+
+    private async Task GetCountriesAsync()
     {
 
         var input = new GetCountriesInput
@@ -370,42 +382,26 @@ public partial class Patients
         };
 
         var result = await countriesAppService.GetListAsync(input);
-        PrimaryCountryList = result.Items.ToList();
+        CountryList = result.Items.ToList();
         StateHasChanged();
 
     }
 
-    private async Task GetSecondaryCountriesAsync()
-    {
-
-        var input = new GetCountriesInput
-        {
-            FilterText = CountriesFilter!.FilterText,
-            Name = CountriesFilter.Name,
-            Code = CountriesFilter.Code,
-            MaxResultCount = 200,
-            SkipCount = (CurrentPage - 1) * PageSize
-        };
-
-        var result = await countriesAppService.GetListAsync(input);
-        SecondaryCountryList = result.Items.ToList();
-        StateHasChanged();
-
-    }
-    private async Task OnPrimaryCountryChanged(ChangeEventArgs e)
+    
+    private async Task OnCountryChanged(AddressCreateDto address, ChangeEventArgs e)
     {
         // Seçilen ülke ID'sini al
         if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
         {
-            NewPatient.PrimaryCountryId = selectedCountryId;
+            address.CountryId = selectedCountryId;
 
             // Eðer "Select" öðesi (Guid.Empty) seçildiyse, veriyi sýfýrlýyoruz
             if (selectedCountryId == Guid.Empty)
             {
                 // Veriyi sýfýrlýyoruz çünkü "Select" seçildi
-                PrimaryCityList = new List<CityDto>();
-                PrimaryDistrictList = new List<DistrictDto>();
-                PrimaryVillageList = new List<VillageDto>();
+                address.CityList.Clear();       // Baðýmsýz listeyi sýfýrla
+                address.DistrictList.Clear();
+                address.VillageList.Clear();
 
             }
             else
@@ -413,35 +409,35 @@ public partial class Patients
                 var cities = await cityRepository.GetListAsync(c => c.CountryId == selectedCountryId);
 
                 // City'leri ilgili property'ye atýyoruz
-                PrimaryCityList = cities.OrderBy(c => c.Name).Select(c => new CityDto { Id = c.Id, Name = c.Name }).ToList();
+                address.CityList = cities.OrderBy(c => c.Name).Select(c => new CityDto { Id = c.Id, Name = c.Name }).ToList();
 
-                PrimaryDistrictList = new List<DistrictDto>();
-                PrimaryVillageList = new List<VillageDto>();
+                address.DistrictList.Clear();
+                address.VillageList.Clear();
             }
 
             StateHasChanged();
         }
     }
 
-    private async Task OnPrimaryCityChanged(ChangeEventArgs e)
+    private async Task OnCityChanged(AddressCreateDto address, ChangeEventArgs e)
     {
         if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCityId))
         {
-            NewPatient.PrimaryCityId = selectedCityId;
+            address.CityId = selectedCityId;
 
             if (selectedCityId == Guid.Empty)
             {
-                PrimaryDistrictList = new List<DistrictDto>();
-                PrimaryVillageList = new List<VillageDto>();
+                address.DistrictList.Clear();
+                address.VillageList.Clear();
 
             }
             else
             {
                 var districts = await districtRepository.GetListAsync(d => d.CityId == selectedCityId);
 
-                PrimaryDistrictList = districts.OrderBy(d => d.Name).Select(d => new DistrictDto { Id = d.Id, Name = d.Name }).ToList();
+                address.DistrictList = districts.OrderBy(d => d.Name).Select(d => new DistrictDto { Id = d.Id, Name = d.Name }).ToList();
 
-                PrimaryVillageList = new List<VillageDto>();
+                address.VillageList.Clear();
 
             }
 
@@ -449,15 +445,15 @@ public partial class Patients
         }
     }
 
-    private async Task OnPrimaryDistrictChanged(ChangeEventArgs e)
+    private async Task OnDistrictChanged(AddressCreateDto address, ChangeEventArgs e)
     {
         if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedDistrictId))
         {
-            NewPatient.PrimaryDistrictId = selectedDistrictId;
+            address.DistrictId = selectedDistrictId;
 
             if (selectedDistrictId == Guid.Empty)
             {
-                PrimaryVillageList = new List<VillageDto>();
+                address.VillageList.Clear();
                 StateHasChanged();
 
             }
@@ -465,7 +461,7 @@ public partial class Patients
             {
                 var villages = await villageRepository.GetListAsync(v => v.DistrictId == selectedDistrictId);
 
-                PrimaryVillageList = villages.OrderBy(v => v.Name).Select(v => new VillageDto { Id = v.Id, Name = v.Name }).ToList();
+                address.VillageList = villages.OrderBy(v => v.Name).Select(v => new VillageDto { Id = v.Id, Name = v.Name }).ToList();
                 StateHasChanged();
 
             }
@@ -473,91 +469,10 @@ public partial class Patients
         }
     }
 
-    private async Task OnSecondaryCountryChanged(ChangeEventArgs e)
-    {
-        // Seçilen ülke ID'sini al
-        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCountryId))
-        {
-            NewPatient.SecondaryCountryId = selectedCountryId;
-
-            // Eðer "Select" öðesi (Guid.Empty) seçildiyse, veriyi sýfýrlýyoruz
-            if (selectedCountryId == Guid.Empty)
-            {
-                // Veriyi sýfýrlýyoruz çünkü "Select" seçildi
-                SecondaryCityList = new List<CityDto>();
-                SecondaryDistrictList = new List<DistrictDto>();
-                SecondaryVillageList = new List<VillageDto>();
-
-            }
-            else
-            {
-                var cities = await cityRepository.GetListAsync(c => c.CountryId == selectedCountryId);
-
-                // City'leri ilgili property'ye atýyoruz
-                SecondaryCityList = cities.OrderBy(c => c.Name).Select(c => new CityDto { Id = c.Id, Name = c.Name }).ToList();
-
-                SecondaryDistrictList = new List<DistrictDto>();
-                SecondaryVillageList = new List<VillageDto>();
-            }
-
-            StateHasChanged();
-        }
-    }
-
-    private async Task OnSecondaryCityChanged(ChangeEventArgs e)
-    {
-        // Seçilen ülke ID'sini al
-        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedCityId))
-        {
-            NewPatient.SecondaryCityId = selectedCityId;
-
-            if (selectedCityId == Guid.Empty)
-            {
-                SecondaryDistrictList = new List<DistrictDto>();
-                SecondaryVillageList = new List<VillageDto>();
-
-            }
-            else
-            {
-                var districts = await districtRepository.GetListAsync(d => d.CityId == selectedCityId);
-
-                SecondaryDistrictList = districts.OrderBy(d => d.Name).Select(d => new DistrictDto { Id = d.Id, Name = d.Name }).ToList();
-
-                SecondaryVillageList = new List<VillageDto>();
-
-            }
-
-            StateHasChanged();
-        }
-    }
-
-    private async Task OnSecondaryDistrictChanged(ChangeEventArgs e)
-    {
-        if (e.Value != null && Guid.TryParse(e.Value.ToString(), out Guid selectedDistrictId))
-        {
-            NewPatient.SecondaryDistrictId = selectedDistrictId;
-
-            if (selectedDistrictId == Guid.Empty)
-            {
-                SecondaryVillageList = new List<VillageDto>();
-                StateHasChanged();
-
-            }
-            else
-            {
-                var villages = await villageRepository.GetListAsync(v => v.DistrictId == selectedDistrictId);
-
-                SecondaryVillageList = villages.OrderBy(v => v.Name).Select(v => new VillageDto { Id = v.Id, Name = v.Name }).ToList();
-                StateHasChanged();
-
-            }
-        }
-    }
     #endregion
 
     #region Patient
 
-    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -568,11 +483,13 @@ public partial class Patients
         }
     }
 
+
     protected virtual ValueTask SetBreadcrumbItemsAsync()
     {
         BreadcrumbItems.Add(new Volo.Abp.BlazoriseUI.BreadcrumbItem(L["Patients"]));
         return ValueTask.CompletedTask;
     }
+
 
     protected virtual ValueTask SetToolbarItemsAsync()
     {
@@ -581,14 +498,13 @@ public partial class Patients
         return ValueTask.CompletedTask;
     }
 
+
     private async Task SetPermissionsAsync()
     {
         CanCreatePatient = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.Patients.Create);
         CanEditPatient = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.Patients.Edit);
         CanDeletePatient = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.Patients.Delete);
     }
-
-
     
     private async Task GetPatientsAsync()
     {
@@ -626,6 +542,7 @@ public partial class Patients
         await GetPatientsAsync();
         await InvokeAsync(StateHasChanged);
     }
+
     private async Task OnSearchTextChanged(ChangeEventArgs args)
     {
         if(string.IsNullOrEmpty(args?.Value?.ToString()))
@@ -639,20 +556,7 @@ public partial class Patients
         Filter.FilterText = args.Value.ToString();
         await GetPatientsAsync();
     }
-
-
-    /*private async Task DownloadAsExcelAsync()
-    {
-        var token = (await PatientsAppService.GetDownloadTokenAsync()).Token;
-        var remoteService = await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("HealthCare") ?? await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
-        var culture = CultureInfo.CurrentUICulture.Name ?? CultureInfo.CurrentCulture.Name;
-        if (!culture.IsNullOrEmpty())
-        {
-            culture = "&culture=" + culture;
-        }
-        await RemoteServiceConfigurationProvider.GetConfigurationOrDefaultOrNullAsync("Default");
-        NavigationManager.NavigateTo($"{remoteService?.BaseUrl.EnsureEndsWith('/') ?? string.Empty}api/app/Patients/as-excel-file?DownloadToken={token}&FilterText={HttpUtility.UrlEncode(Filter.FilterText)}{culture}&Name={HttpUtility.UrlEncode(Filter.FirstName)}", forceLoad: true);
-    }*/
+   
 
     private async Task OnDataGridReadAsync(DataGridReadDataEventArgs<PatientWithNavigationPropertiesDto> e)
     {
@@ -665,30 +569,20 @@ public partial class Patients
         await InvokeAsync(StateHasChanged);
     }
 
+
     private async Task OpenCreatePatientModalAsync()
     {
         NewPatient = new PatientCreateDto
         {
             BirthDate = DateTime.Now,
-
-            //PassportNumber = "",
-
-            //PrimaryCountryId = CountriesCodeCollection.Select(x => x.Id).FirstOrDefault(),
-
-            //CompanyId = CompaniesCollection.Select(x => x.Id).FirstOrDefault()
         };
-
-        //var selectedCountry = CountriesCodeCollection.FirstOrDefault(c => c.Id == NewPatient.PrimaryCountryId);
-        //if (selectedCountry != null)
-        //{
-        //    SelectedCountryCode = selectedCountry.Code;
-        //}
 
         SelectedCreateTab = "Patient-create-tab";
 
         await NewPatientValidations.ClearAll();
         await CreatePatientModal.Show();
     }
+
 
     private async Task CloseCreatePatientModalAsync()
     {
@@ -701,6 +595,7 @@ public partial class Patients
 
         await CreatePatientModal.Hide();
     }
+
 
     private async Task OpenEditPatientModalAsync(PatientWithNavigationPropertiesDto input)
     {
@@ -762,12 +657,14 @@ public partial class Patients
         }
     }
 
+
     protected virtual Task OnVillageChanged(ChangeEventArgs e)
     {
         Guid? villageId = (Guid?)e.Value;
         Filter.PrimaryVillageId = villageId;
         return Task.CompletedTask;
     }
+
 
     protected virtual void OnFirstNameChanged(string? firstName)
     {
@@ -778,6 +675,7 @@ public partial class Patients
     {
         Filter.LastName = lastName;
     }
+
 
     protected virtual void OnNoChanged(string no)
     {
@@ -791,39 +689,49 @@ public partial class Patients
         }
     }
 
+
     protected virtual void OnBirthDateMinChanged(DateTime? birthDateMin)
     {
         Filter.BirthDateMin = birthDateMin.HasValue ? birthDateMin.Value.Date : birthDateMin;
     }
+
 
     protected virtual void OnBirthDateMaxChanged(DateTime? birthDateMax)
     {
         Filter.BirthDateMax = birthDateMax.HasValue ? birthDateMax.Value.Date.AddDays(1).AddSeconds(-1) : birthDateMax;
     }
 
+
     protected virtual void OnIdentityNumberChanged(string? identityNumber)
     {
         Filter.IdentityNumber = identityNumber;
     }
 
+
     protected virtual void OnPassportNumberChanged(string? passportNumber)
     {
         Filter.PassportNumber = passportNumber;
     }
+
+
     protected virtual void OnEmailChanged(string? email)
     {
         Filter.Email = email;
     }
+
+
     protected virtual void OnMobilePhoneNumberChanged(string? mobilePhoneNumber)
     {
         Filter.MobilePhoneNumber = mobilePhoneNumber;
     }
+
 
     protected virtual void OnCompanyNameChanged(Guid? companyId)
     {
             Filter.CompanyId = companyId;
  
     }
+
 
     // Butona týklandýðýnda arama yapacak metot
     protected virtual async Task OnSearchButtonClicked()
@@ -840,12 +748,14 @@ public partial class Patients
         await GetPatientsAsync();
     }
 
+
     private Task SelectAllItems()
     {
         AllPatientsSelected = true;
 
         return Task.CompletedTask;
     }
+
 
     private async Task ClearSelection()
     {
@@ -854,6 +764,7 @@ public partial class Patients
 
         await InvokeAsync(StateHasChanged);
     }
+
 
     private Task SelectedPatientRowsChanged()
     {
@@ -865,15 +776,18 @@ public partial class Patients
         return Task.CompletedTask;
     }
 
+
     private async Task GetCountryCodeCollectionLookupAsync(string? newValue = null)
     {
         CountriesCodeCollection = (IReadOnlyList<GetCountryLookupDto<Guid>>)(await PatientsAppService.GetCountryLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
     }
 
+
     private async Task GetCompanyCollectionLookupAsync(string? newValue = null)
     {
         CompaniesCollection = (await PatientsAppService.GetCompanyLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
     }
+
 
     private async Task DeleteSelectedPatientsAsync()
     {
@@ -899,6 +813,7 @@ public partial class Patients
         await GetPatientsAsync();
     }
 
+
     private void NextStep()
     {
         if (currentStep < 2)
@@ -907,6 +822,7 @@ public partial class Patients
         }
     }
 
+
     private void PreviousStep()
     {
         if (currentStep > 1)
@@ -914,8 +830,5 @@ public partial class Patients
             currentStep--; // Bir önceki adýma dön
         }
     }
-
-
     #endregion
-
 }

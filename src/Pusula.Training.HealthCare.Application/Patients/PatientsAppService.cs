@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
+using Pusula.Training.HealthCare.Addresses;
 using Pusula.Training.HealthCare.Core.Rules.Patients;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.PatientCompanies;
@@ -27,6 +28,7 @@ namespace Pusula.Training.HealthCare.Patients
         IDistributedCache<PatientDownloadTokenCacheItem, string> downloadTokenCache,
         IDistributedEventBus distributedEventBus,
         ICountryRepository countryRepository,
+        IAddressRepository addressRepository,
         IPatientCompanyRepository patientCompanyRepository,
         PatientBusinessRules patientBusinessRules
         ) : HealthCareAppService, IPatientsAppService
@@ -109,8 +111,27 @@ namespace Pusula.Training.HealthCare.Patients
 
             var patient = await patientManager.CreateAsync(input.CompanyId, input.FirstName, input.LastName, input.BirthDate, input.IdentityNumber, input.PassportNumber,
                 input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.MotherName, input.FatherName, input.BloodType, input.Type,
-                input.PrimaryCountryId,input.PrimaryCityId,input.PrimaryDistrictId,input.PrimaryVillageId,input.PrimaryAddressDescription!,input.SecondaryCountryId,
-                input.SecondaryCityId,input.SecondaryDistrictId,input.SecondaryVillageId,input.SecondaryAddressDescription!);
+                input.PrimaryCountryId, input.PrimaryCityId, input.PrimaryDistrictId, input.PrimaryVillageId, input.PrimaryAddressDescription!, input.SecondaryCountryId,
+                input.SecondaryCityId, input.SecondaryDistrictId, input.SecondaryVillageId, input.SecondaryAddressDescription!);
+
+            if (input.Addresses != null && input.Addresses.Any())
+            {
+                foreach (var addressDto in input.Addresses)
+                {
+                    var address = new Address(
+                        Guid.NewGuid(), // ID otomatik oluþturulacak
+                        patient.Id, // Patient ile iliþkilendir
+                        addressDto.CountryId,
+                        addressDto.CityId,
+                        addressDto.DistrictId,
+                        addressDto.VillageId,
+                        addressDto.AddressDescription,
+                        addressDto.IsPrimary
+                    );
+
+                    await addressRepository.InsertAsync(address);
+                }
+            }
 
             return ObjectMapper.Map<Patient, PatientDto>(patient);
         }

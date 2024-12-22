@@ -184,6 +184,10 @@
     "Menu:Blacklist": "Blacklist",
     "Menu:Insurances": "Insurance",
     "Menu:ProtocolTypes": "Protocol Type",
+    "Permission:Addresses": "Addresses",
+    "Addresses": "Addresses",
+    "Address": "Address",
+    "Menu:ProtocolTypes": "Protocol Type",
     "FullName": "Full Name"
   }
 }

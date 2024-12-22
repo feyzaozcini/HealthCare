@@ -1,4 +1,6 @@
+using Pusula.Training.HealthCare.Addresses;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Pusula.Training.HealthCare.Patients;
@@ -62,4 +64,6 @@ public class PatientCreateDto
     public Guid? SecondaryDistrictId { get; set; }
     public Guid? SecondaryVillageId { get; set; }
     public string? SecondaryAddressDescription { get; set; }
+    public List<AddressCreateDto> Addresses { get; set; } = new List<AddressCreateDto>();
+
 }
