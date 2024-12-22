@@ -42,6 +42,7 @@ using Pusula.Training.HealthCare.DoctorWorkSchedules;
 using Pusula.Training.HealthCare.BlackLists;
 using Pusula.Training.HealthCare.SystemChecks;
 using Pusula.Training.HealthCare.FollowUpPlans;
+using Pusula.Training.HealthCare.Addresses;
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
 
@@ -104,6 +105,7 @@ public class HealthCareEntityFrameworkCoreModule : AbpModule
             options.AddRepository<PainDetail, EfCorePainDetailRepository>();
             options.AddRepository<DoctorWorkSchedule, EfCoreDoctorWorkScheduleRepository>();
             options.AddRepository<BlackList, EfCoreBlackListRepository>();
+            options.AddRepository<Address, EfCoreAddressRepository>();
             options.AddRepository<SystemCheck, EfCoreSystemCheckRepository>();
             options.AddRepository<FollowUpPlan, EfCoreFollowUpPlanRepository>();
 

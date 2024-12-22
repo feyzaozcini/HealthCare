@@ -1,6 +1,8 @@
 using JetBrains.Annotations;
+using Pusula.Training.HealthCare.Addresses;
 using Pusula.Training.HealthCare.Protocols;
 using System;
+using System.Collections.Generic;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -59,6 +61,7 @@ namespace Pusula.Training.HealthCare.Patients
         public virtual Guid? SecondaryVillageId { get; private set; }
         public virtual string? SecondaryAddressDescription { get; private set; }
 
+        public virtual ICollection<Address> Addresses { get; private set; } = new List<Address>();
 
 
         protected Patient()
@@ -68,8 +71,6 @@ namespace Pusula.Training.HealthCare.Patients
             BirthDate = DateTime.Now;
             Email = string.Empty;
             MobilePhoneNumber = string.Empty;
-
-            //Gender = Gender.Unspecified;
         }
 
         public Patient(Guid id, Guid? companyId,string firstName, string lastName, DateTime birthDate, string identityNumber, string? passportNumber,
