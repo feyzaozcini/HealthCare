@@ -7,6 +7,9 @@ using System;
 using Volo.Abp.Application.Dtos;
 using Pusula.Training.HealthCare.ProtocolTypes;
 using System.Linq;
+using Syncfusion.Blazor.Notifications;
+using Volo.Abp;
+using Pusula.Training.HealthCare.Insurances;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -23,6 +26,9 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private SfDialog? CreateProtocolTypesDialog;
         private SfDialog? UpdateProtocolTypesDialog;
         private SfDialog? DeleteProtocolTypesDialog;
+
+        private SfToast? ToastObj;
+
 
         private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
         private int CurrentPage { get; set; } = 1;
@@ -75,18 +81,26 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private async Task AddProtocolType()
         {
-            await ProtocolTypesAppService.CreateAsync(CreateProtocolTypesDto);
-            await LoadProtocolTypesAsync();
-            await CloseProtocolTypeCreateModal();
-            await GetProtocolTypesAsync();
+            await HandleError(async () =>
+            {
+                await ProtocolTypesAppService.CreateAsync(CreateProtocolTypesDto);
+                await LoadProtocolTypesAsync();
+                await CloseProtocolTypeCreateModal();
+                await GetProtocolTypesAsync();
+                await ShowToast(ProtocolTypeConsts.ProtocolTypeSuccessfullyCreated, true);
+            });
         }
 
 
         private async Task UpdateProtocolType()
         {
-            await ProtocolTypesAppService.UpdateAsync(UpdateProtocolTypesDto);
-            await CloseProtocolTypeUpdateModal();
-            await GetProtocolTypesAsync();
+            await HandleError(async () =>
+            {
+                await ProtocolTypesAppService.UpdateAsync(UpdateProtocolTypesDto);
+                await CloseProtocolTypeUpdateModal();
+                await GetProtocolTypesAsync();
+                await ShowToast(ProtocolTypeConsts.ProtocolTypeSuccessfullyUpdated, true);
+            });
         }
 
 
@@ -124,12 +138,16 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private async Task ConfirmProtocolTypeDelete()
         {
-            if (SelectedProtocolTypeId.HasValue)
+            await HandleError(async () =>
             {
-                await ProtocolTypesAppService.DeleteAsync(SelectedProtocolTypeId.Value);
-                await GetProtocolTypesAsync();
-            }
-            await CloseProtocolTypeDeleteModal();
+                if (SelectedProtocolTypeId.HasValue)
+                {
+                    await ProtocolTypesAppService.DeleteAsync(SelectedProtocolTypeId.Value);
+                    await GetProtocolTypesAsync();
+                }
+                await CloseProtocolTypeDeleteModal();
+                await ShowToast(ProtocolTypeConsts.ProtocolTypeSuccessfullyDeleted, true);
+            });
         }
 
 
@@ -151,5 +169,35 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             SelectedProtocolTypeId = null;
             await DeleteProtocolTypesDialog!.HideAsync();
         }
+
+        #region Toast  
+        public async Task HandleError(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (UserFriendlyException ex)
+            {
+                await ShowToast(ex.Message, false);
+            }
+            catch (Exception)
+            {
+                await ShowToast("Bir hata oluştu. Lütfen tekrar deneyin.", false);
+            }
+        }
+
+        private async Task ShowToast(string message, bool isSuccess = true)
+        {
+            await ToastObj!.ShowAsync(new ToastModel
+            {
+                Content = message,
+                CssClass = isSuccess ? "e-toast-success" : "e-toast-danger",
+                Timeout = 3000,
+                ShowCloseButton = true
+            });
+        }
+
+        #endregion
     }
 }

@@ -18,5 +18,10 @@ namespace Pusula.Training.HealthCare.Patients
         public const int PhoneNumberMinLength = 10;  
         public const int PhoneNumberMaxLength = 15;
         public const int PatientCompanyMaxLength = 60;
+
+        public const string PatientSuccessfullyCreated = "Hasta baþarýyla oluþturuldu.";
+        public const string PatientSuccessfullyDeleted = "Hasta baþarýyla silindi.";
+        public const string PatientSuccessfullyUpdated = "Hasta baþarýyla güncellendi.";
+
     }
 }
