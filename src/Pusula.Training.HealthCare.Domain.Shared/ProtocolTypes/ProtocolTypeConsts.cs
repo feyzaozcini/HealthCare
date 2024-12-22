@@ -16,5 +16,9 @@ namespace Pusula.Training.HealthCare.ProtocolTypes
         }
 
         public const int NameMaxLength = 128;
+
+        public const string ProtocolTypeSuccessfullyCreated = "Protokol Tipi başarıyla oluşturuldu.";
+        public const string ProtocolTypeSuccessfullyUpdated = "Protokol Tipi başarıyla güncellendi.";
+        public const string ProtocolTypeSuccessfullyDeleted = "Protokol Tipi başarıyla silindi.";
     }
 }

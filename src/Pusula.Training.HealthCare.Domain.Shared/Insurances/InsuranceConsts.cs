@@ -16,5 +16,9 @@ namespace Pusula.Training.HealthCare.Insurances
         }
 
         public const int NameMaxLength = 128;
+
+        public const string InsuranceSuccessfullyCreated = "Sigorta başarıyla oluşturuldu.";
+        public const string InsuranceSuccessfullyUpdated = "Sigorta başarıyla güncellendi.";
+        public const string InsuranceSuccessfullyDeleted = "Sigorta başarıyla silindi.";
     }
 }

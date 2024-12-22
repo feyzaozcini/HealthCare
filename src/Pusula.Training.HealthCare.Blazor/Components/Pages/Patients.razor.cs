@@ -52,7 +52,7 @@ public partial class Patients
     private List<LookupDto<Guid>> InsuranceList { get; set; } = new();
     private List<LookupDto<Guid>> ProtocolTypeList { get; set; } = new();
     private List<LookupDto<Guid>> ProtocolNoteList { get; set; } = new();
-   
+
     private DepartmentDto SelectedDepartment;
 
     private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
@@ -102,6 +102,7 @@ public partial class Patients
     private Guid? SelectedPatientId { get; set; } = null;
 
     private DoctorWithNavigationPropertiesDto SelectedDoctor;
+    private SfToast? ToastObj;
 
 
     public Patients()
@@ -185,7 +186,7 @@ public partial class Patients
         await SetPermissionsAsync();
         await GetCountryCodeCollectionLookupAsync();
         await GetCompanyCollectionLookupAsync();
-        
+
 
         ProtocolStatusCollection = Enum.GetValues(typeof(ProtocolStatus))
         .Cast<ProtocolStatus>()
@@ -227,7 +228,7 @@ public partial class Patients
        .ToList();
 
     }
-    
+
 
     private void NavigateToPatientDetails(PatientWithNavigationPropertiesDto selectedPatient)
     {
@@ -290,7 +291,7 @@ public partial class Patients
                         FullName = $"{dd.Title.Name} {dd.User.Name} {dd.User.Surname}"
                     })
                     .ToList();
-                
+
             }
             StateHasChanged();
         }
@@ -304,13 +305,15 @@ public partial class Patients
 
     private async Task AddNewProtocol()
     {
-
-        await ProtocolsAppService.CreateAsync(ProtocolCreateDto);
-        await CloseProtocolCreateModal();
-
+        await HandleError(async () =>
+        {
+            await ProtocolsAppService.CreateAsync(ProtocolCreateDto);
+            await CloseProtocolCreateModal();
+            await ShowToast(ProtocolConsts.ProtocolSuccessfullyCreated, true);
+        });
     }
 
- 
+
     private async Task OpenProtocolCreateModal(PatientWithNavigationPropertiesDto input)
     {
         if (input == null) return;
@@ -378,7 +381,7 @@ public partial class Patients
             Name = CountriesFilter.Name,
             Code = CountriesFilter.Code,
             MaxResultCount = 200,
-            SkipCount = (CurrentPage-1)*PageSize
+            SkipCount = (CurrentPage - 1) * PageSize
         };
 
         var result = await countriesAppService.GetListAsync(input);
@@ -387,7 +390,7 @@ public partial class Patients
 
     }
 
-    
+
     private async Task OnCountryChanged(AddressCreateDto address, ChangeEventArgs e)
     {
         // Seçilen ülke ID'sini al
@@ -493,7 +496,7 @@ public partial class Patients
 
     protected virtual ValueTask SetToolbarItemsAsync()
     {
-        
+
         Toolbar.AddButton(L["NewPatient"], OpenCreatePatientModalAsync, IconName.Add, requiredPolicyName: HealthCarePermissions.Patients.Create);
         return ValueTask.CompletedTask;
     }
@@ -505,7 +508,7 @@ public partial class Patients
         CanEditPatient = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.Patients.Edit);
         CanDeletePatient = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.Patients.Delete);
     }
-    
+
     private async Task GetPatientsAsync()
     {
         if (Filter == null || (string.IsNullOrEmpty(Filter.FilterText) &&
@@ -520,7 +523,7 @@ public partial class Patients
         Filter.SkipCount = (CurrentPage - 1) * PageSize;
         Filter.Sorting = CurrentSorting;
 
-      
+
         if (Filter == null)
         {
             PatientList = [];
@@ -545,9 +548,9 @@ public partial class Patients
 
     private async Task OnSearchTextChanged(ChangeEventArgs args)
     {
-        if(string.IsNullOrEmpty(args?.Value?.ToString()))
+        if (string.IsNullOrEmpty(args?.Value?.ToString()))
         {
-           
+
             PatientList = new List<PatientWithNavigationPropertiesDto>();
             TotalCount = 0;
             return;
@@ -556,7 +559,7 @@ public partial class Patients
         Filter.FilterText = args.Value.ToString();
         await GetPatientsAsync();
     }
-   
+
 
     private async Task OnDataGridReadAsync(DataGridReadDataEventArgs<PatientWithNavigationPropertiesDto> e)
     {
@@ -612,26 +615,34 @@ public partial class Patients
 
     private async Task DeletePatientAsync(PatientWithNavigationPropertiesDto input)
     {
-        await PatientsAppService.DeleteAsync(input.Patient.Id);
-        await GetPatientsAsync();
+        await HandleError(async () =>
+        {
+            await PatientsAppService.DeleteAsync(input.Patient.Id);
+            await GetPatientsAsync();
+            await ShowToast(PatientConsts.PatientSuccessfullyDeleted, true);
+        });
     }
 
     private async Task CreatePatientAsync()
     {
-        try
+        await HandleError(async () =>
         {
-            if (await NewPatientValidations.ValidateAll() == false)
+            try
             {
-                return;
+                if (await NewPatientValidations.ValidateAll() == false)
+                {
+                    return;
+                }
+                await PatientsAppService.CreateAsync(NewPatient);
+                await GetPatientsAsync();
+                await CloseCreatePatientModalAsync();
             }
-            await PatientsAppService.CreateAsync(NewPatient);
-            await GetPatientsAsync();
-            await CloseCreatePatientModalAsync();
-        }
-        catch (Exception ex)
-        {
+            catch (Exception ex)
+            {
 
-        }
+            }
+            await ShowToast(PatientConsts.PatientSuccessfullyCreated, true);
+        });
     }
 
     private async Task CloseEditPatientModalAsync()
@@ -641,20 +652,25 @@ public partial class Patients
 
     private async Task UpdatePatientAsync()
     {
-        try
+        await HandleError(async () =>
         {
-            if (await EditingPatientValidations.ValidateAll() == false)
+            try
             {
-                return;
+                if (await EditingPatientValidations.ValidateAll() == false)
+                {
+                    return;
+                }
+                await PatientsAppService.UpdateAsync(EditingPatientId, EditingPatient);
+                await GetPatientsAsync();
+                await CloseEditPatientModalAsync();
+                await ShowToast(PatientConsts.PatientSuccessfullyUpdated, true);
             }
-            await PatientsAppService.UpdateAsync(EditingPatientId, EditingPatient);
-            await GetPatientsAsync();
-            await CloseEditPatientModalAsync();
-        }
-        catch (Exception ex)
-        {
+            catch (Exception ex)
+            {
 
-        }
+            }
+
+        });
     }
 
 
@@ -728,8 +744,8 @@ public partial class Patients
 
     protected virtual void OnCompanyNameChanged(Guid? companyId)
     {
-            Filter.CompanyId = companyId;
- 
+        Filter.CompanyId = companyId;
+
     }
 
 
@@ -830,5 +846,36 @@ public partial class Patients
             currentStep--; // Bir önceki adýma dön
         }
     }
+    #endregion
+
+    #region Toast
+
+    public async Task HandleError(Func<Task> action)
+    {
+        try
+        {
+            await action();
+        }
+        catch (UserFriendlyException ex)
+        {
+            await ShowToast(ex.Message, false);
+        }
+        catch (Exception)
+        {
+            await ShowToast("Bir hata oluþtu. Lütfen tekrar deneyin.", false);
+        }
+    }
+
+    private async Task ShowToast(string message, bool isSuccess = true)
+    {
+        await ToastObj!.ShowAsync(new ToastModel
+        {
+            Content = message,
+            CssClass = isSuccess ? "e-toast-success" : "e-toast-danger",
+            Timeout = 5000,
+            ShowCloseButton = true
+        });
+    }
+
     #endregion
 }

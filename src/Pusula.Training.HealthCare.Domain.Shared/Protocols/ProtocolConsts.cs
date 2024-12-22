@@ -8,5 +8,10 @@ namespace Pusula.Training.HealthCare.Protocols
         {
             return string.Format(DefaultSorting, withEntityName ? "Protocol." : string.Empty);
         }
+
+        public const string ProtocolSuccessfullyCreated = "Protocol baþarýyla oluþturuldu.";
+        public const string ProtocolSuccessfullyUpdated = "Protocol baþarýyla güncellendi.";
+        public const string ProtocolSuccessfullyDeleted = "Protocol baþarýyla silindi.";
+
     }
 }
