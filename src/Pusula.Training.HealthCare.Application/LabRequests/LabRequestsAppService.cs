@@ -162,7 +162,7 @@ public class LabRequestsAppService(
             $"{labRequestDto.PatientName} {labRequestDto.PatientSurname}"
         );
 
-        await emailService.SendEmailAsync(
+        await emailService.SendAsync(
             to: labRequestDto.PatientMail,
             subject: "Test Sonuçlarınız Hazır!",
             body: emailBody

@@ -4,6 +4,6 @@ docker stack deploy -c elasticsearch.yml elasticsearch
 docker stack deploy -c kibana.yml kibana
 docker stack deploy -c redis.yml redis
 docker stack deploy -c rabbitmq.yml rabbitmq
-docker stack deploy -c dbmigrate.yml migrate
-docker stack deploy -c pusula_healthcare.yml pusula
+docker stack deploy --with-registry-auth -c dbmigrate.yml migrate
+docker stack deploy --with-registry-auth -c pusula_healthcare.yml pusula
 

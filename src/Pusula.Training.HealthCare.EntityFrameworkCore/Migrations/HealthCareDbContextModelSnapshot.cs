@@ -30,6 +30,66 @@ namespace Pusula.Training.HealthCare.Migrations
             modelBuilder.HasSequence<int>("ProtocolNoSequence")
                 .StartsAt(20000L);
 
+            modelBuilder.Entity("Pusula.Training.HealthCare.Addresses.Address", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("AddressDescription")
+                        .HasColumnType("text")
+                        .HasColumnName("AddressDescription");
+
+                    b.Property<Guid>("CityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CountryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid>("DistrictId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsPrimary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("PatientId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("VillageId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("CountryId");
+
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("PatientId");
+
+                    b.HasIndex("VillageId");
+
+                    b.ToTable("AppAddresses", (string)null);
+                });
+
             modelBuilder.Entity("Pusula.Training.HealthCare.Anamneses.Anamnesis", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1301,38 +1361,6 @@ namespace Pusula.Training.HealthCare.Migrations
                         .HasColumnType("text")
                         .HasColumnName("PassportNumber");
 
-                    b.Property<string>("PrimaryAddressDescription")
-                        .HasColumnType("text")
-                        .HasColumnName("PrimaryAddressDescription");
-
-                    b.Property<Guid?>("PrimaryCityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("PrimaryCountryId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("PrimaryDistrictId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("PrimaryVillageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("SecondaryAddressDescription")
-                        .HasColumnType("text")
-                        .HasColumnName("SecondaryAddressDescription");
-
-                    b.Property<Guid?>("SecondaryCityId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("SecondaryCountryId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("SecondaryDistrictId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("SecondaryVillageId")
-                        .HasColumnType("uuid");
-
                     b.Property<int?>("Type")
                         .HasColumnType("integer")
                         .HasColumnName("Type");
@@ -1340,22 +1368,6 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
-
-                    b.HasIndex("PrimaryCityId");
-
-                    b.HasIndex("PrimaryCountryId");
-
-                    b.HasIndex("PrimaryDistrictId");
-
-                    b.HasIndex("PrimaryVillageId");
-
-                    b.HasIndex("SecondaryCityId");
-
-                    b.HasIndex("SecondaryCountryId");
-
-                    b.HasIndex("SecondaryDistrictId");
-
-                    b.HasIndex("SecondaryVillageId");
 
                     b.ToTable("AppPatients", (string)null);
                 });
@@ -3762,6 +3774,45 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.ToTable("AbpTenantConnectionStrings", (string)null);
                 });
 
+            modelBuilder.Entity("Pusula.Training.HealthCare.Addresses.Address", b =>
+                {
+                    b.HasOne("Pusula.Training.HealthCare.Cities.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Pusula.Training.HealthCare.Countries.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Pusula.Training.HealthCare.Districts.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Pusula.Training.HealthCare.Patients.Patient", "Patient")
+                        .WithMany("Addresses")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pusula.Training.HealthCare.Villages.Village", "Village")
+                        .WithMany()
+                        .HasForeignKey("VillageId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("City");
+
+                    b.Navigation("Country");
+
+                    b.Navigation("District");
+
+                    b.Navigation("Patient");
+
+                    b.Navigation("Village");
+                });
+
             modelBuilder.Entity("Pusula.Training.HealthCare.Anamneses.Anamnesis", b =>
                 {
                     b.HasOne("Pusula.Training.HealthCare.Protocols.Protocol", null)
@@ -3995,46 +4046,6 @@ namespace Pusula.Training.HealthCare.Migrations
                     b.HasOne("Pusula.Training.HealthCare.PatientCompanies.PatientCompany", null)
                         .WithMany()
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Pusula.Training.HealthCare.Cities.City", null)
-                        .WithMany()
-                        .HasForeignKey("PrimaryCityId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Pusula.Training.HealthCare.Countries.Country", null)
-                        .WithMany()
-                        .HasForeignKey("PrimaryCountryId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Pusula.Training.HealthCare.Districts.District", null)
-                        .WithMany()
-                        .HasForeignKey("PrimaryDistrictId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Pusula.Training.HealthCare.Villages.Village", null)
-                        .WithMany()
-                        .HasForeignKey("PrimaryVillageId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Pusula.Training.HealthCare.Cities.City", null)
-                        .WithMany()
-                        .HasForeignKey("SecondaryCityId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Pusula.Training.HealthCare.Countries.Country", null)
-                        .WithMany()
-                        .HasForeignKey("SecondaryCountryId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Pusula.Training.HealthCare.Districts.District", null)
-                        .WithMany()
-                        .HasForeignKey("SecondaryDistrictId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Pusula.Training.HealthCare.Villages.Village", null)
-                        .WithMany()
-                        .HasForeignKey("SecondaryVillageId")
                         .OnDelete(DeleteBehavior.NoAction);
                 });
 
@@ -4321,6 +4332,11 @@ namespace Pusula.Training.HealthCare.Migrations
             modelBuilder.Entity("Pusula.Training.HealthCare.Doctors.Doctor", b =>
                 {
                     b.Navigation("DoctorDepartments");
+                });
+
+            modelBuilder.Entity("Pusula.Training.HealthCare.Patients.Patient", b =>
+                {
+                    b.Navigation("Addresses");
                 });
 
             modelBuilder.Entity("Pusula.Training.HealthCare.TestGroupItems.TestGroupItem", b =>

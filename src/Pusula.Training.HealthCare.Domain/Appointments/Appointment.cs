@@ -1,4 +1,8 @@
 ﻿using JetBrains.Annotations;
+using Pusula.Training.HealthCare.AppointmentTypes;
+using Pusula.Training.HealthCare.Departments;
+using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.Patients;
 using System;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;

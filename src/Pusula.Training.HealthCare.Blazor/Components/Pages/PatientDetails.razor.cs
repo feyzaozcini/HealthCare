@@ -6,12 +6,15 @@ using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Protocols;
 using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Shared;
+using Pusula.Training.HealthCare.TestGroupItems;
 using Syncfusion.Blazor.Inputs;
+using Syncfusion.Blazor.Notifications;
 using Syncfusion.Blazor.Popups;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
@@ -20,6 +23,8 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
     {
         private List<ProtocolDto> ProtocolsList { get; set; } = new List<ProtocolDto>();
         private GetProtocolsInput? ProtocolsFilter { get; set; }
+
+        private SfToast? ToastObj;
 
         private SfDialog? NoteDialog;
         private SfDialog? CreateProtocolsDialog;
@@ -253,15 +258,19 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private async Task AddNewProtocol()
         {
-
-            await ProtocolsAppService.CreateAsync(ProtocolCreateDto);
-            await CloseProtocolCreateModal();
-            await GetProtocolsAsync();
+            await HandleError(async () =>
+            {
+                await ProtocolsAppService.CreateAsync(ProtocolCreateDto);
+                await CloseProtocolCreateModal();
+                await GetProtocolsAsync();
+                await ShowToast(ProtocolConsts.ProtocolSuccessfullyCreated, true);
+            });
         }
 
 
         private async Task OpenProtocolCreateModal(PatientWithNavigationPropertiesDto input)
         {
+
             if (input?.Patient == null) return;
 
             ProtocolCreateDto = new ProtocolCreateDto
@@ -270,6 +279,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
             };
             await CreateProtocolsDialog!.ShowAsync();
+
         }
 
 
@@ -284,10 +294,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private async Task UpdateProtocol()
         {
-
-            await ProtocolsAppService.UpdateAsync(ProtocolUpdateDto.Id, ProtocolUpdateDto);
-            await CloseProtocolUpdateModal();
-            await GetProtocolsAsync();
+            await HandleError(async () =>
+            {
+                await ProtocolsAppService.UpdateAsync(ProtocolUpdateDto.Id, ProtocolUpdateDto);
+                await CloseProtocolUpdateModal();
+                await GetProtocolsAsync();
+                await ShowToast(ProtocolConsts.ProtocolSuccessfullyUpdated, true);
+            });
         }
 
 
@@ -360,12 +373,16 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private async Task ConfirmProtocolDelete()
         {
-            if (SelectedProtocolId.HasValue)
+            await HandleError(async () =>
             {
-                await ProtocolsAppService.DeleteAsync(SelectedProtocolId.Value);
-                await GetProtocolsAsync();
-            }
-            await CloseProtocolDeleteModal();
+                if (SelectedProtocolId.HasValue)
+                {
+                    await ProtocolsAppService.DeleteAsync(SelectedProtocolId.Value);
+                    await GetProtocolsAsync();
+                }
+                await CloseProtocolDeleteModal();
+                await ShowToast(ProtocolConsts.ProtocolSuccessfullyDeleted, true);
+            });
         }
 
 
@@ -382,6 +399,36 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             await DeleteProtocolsDialog!.ShowAsync();
         }
 
-        #endregion 
+        #endregion
+
+        #region Toast
+        public async Task HandleError(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (UserFriendlyException ex)
+            {
+                await ShowToast(ex.Message, false);
+            }
+            catch (Exception)
+            {
+                await ShowToast("Bir hata oluştu. Lütfen tekrar deneyin.", false);
+            }
+        }
+
+        private async Task ShowToast(string message, bool isSuccess = true)
+        {
+            await ToastObj!.ShowAsync(new ToastModel
+            {
+                Content = message,
+                CssClass = isSuccess ? "e-toast-success" : "e-toast-danger",
+                Timeout = 3000,
+                ShowCloseButton = true
+            });
+        }
+
+        #endregion
     }
 }

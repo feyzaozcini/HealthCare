@@ -12,7 +12,7 @@
 @inject IDepartmentsAppService DepartmentsAppService
 @inject IDoctorsAppService DoctorsAppService
 @inject IAppointmentRulesAppService AppointmentRulesAppService
-
+<SfToast @ref="ToastObj" />
 <div class="row mb-2">
     <div class="col text-end">
         <button class="btn custom-add-button" @onclick="OpenAddNewDialog">+ Add Appointment Rule</button>
@@ -29,6 +29,11 @@
                 <GridColumn Field="MinAge" HeaderText="MinAge" Width="50"></GridColumn>
                 <GridColumn Field="MaxAge" HeaderText="MaxAge" Width="50"></GridColumn>
                 <GridColumn Field="Description" HeaderText="Description" Width="200"></GridColumn>
+                <GridColumn HeaderText="Actions" Width="100" TextAlign="TextAlign.Center">
+                    <Template>
+                        <button class="btn custom-delete-button" @onclick="(() => DeleteAppointmentRule((context as AppointmentListItem).Id))">Delete</button>
+                    </Template>
+                </GridColumn>
             </GridColumns>
         </SfGrid>
     </div>
@@ -94,3 +99,5 @@
         </FooterTemplate>
     </DialogTemplates>
 </SfDialog>
+
+

@@ -42,6 +42,7 @@ using Pusula.Training.HealthCare.DoctorWorkSchedules;
 using Pusula.Training.HealthCare.BlackLists;
 using Pusula.Training.HealthCare.SystemChecks;
 using Pusula.Training.HealthCare.FollowUpPlans;
+using Pusula.Training.HealthCare.Addresses;
 
 
 namespace Pusula.Training.HealthCare;
@@ -58,28 +59,33 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Patient, PatientExcelDto>();
         CreateMap<PatientDto, PatientUpdateDto>();
         CreateMap<Patient, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"));
-        CreateMap<PatientWithNavigationProperties, PatientWithNavigationPropertiesDto>();
+        CreateMap<PatientWithNavigationProperties, PatientWithNavigationPropertiesDto>()
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+
         CreateMap<Patient, PatientWithNavigationPropertiesDto>();
         CreateMap<Patient, PatientDeletedDto>();
 
 
         CreateMap<Protocol, ProtocolDto>()
-        .ForMember(dest => dest.ProtocolTypeName, opt => opt.MapFrom(x => x.ProtocolType.Name))
-        .ForMember(dest => dest.ProtocolInsuranceName, opt => opt.MapFrom(x => x.Insurance.Name))
-        .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(x => x.Department.Name))
-        .ForMember(dest => dest.No, opt => opt.MapFrom(x => x.No))
-        .ForMember(dest => dest.PatientFirstName, opt => opt.MapFrom(x => x.Patient.FirstName))
-        .ForMember(dest => dest.PatientLastName, opt => opt.MapFrom(x => x.Patient.LastName))
-        .ForMember(dest => dest.PatientNo, opt => opt.MapFrom(x => x.Patient.No))
-        .ForMember(dest => dest.PatientBirthDate, opt => opt.MapFrom(x => x.Patient.BirthDate))
-        .ForMember(dest => dest.PatientGender, opt => opt.MapFrom(x => x.Patient.Gender))
-        .ForMember(dest => dest.DoctorTitleName, opt => opt.MapFrom(x => x.Doctor.Title.Name))
-        .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(x => x.Doctor.User.Name))
-        .ForMember(dest => dest.DoctorSurname, opt => opt.MapFrom(x => x.Doctor.User.Surname));
-
+            .ForMember(dest => dest.ProtocolTypeName, opt => opt.MapFrom(x => x.ProtocolType.Name))
+            .ForMember(dest => dest.ProtocolInsuranceName, opt => opt.MapFrom(x => x.Insurance.Name))
+            .ForMember(dest => dest.DepartmentName, opt => opt.MapFrom(x => x.Department.Name))
+            .ForMember(dest => dest.No, opt => opt.MapFrom(x => x.No))
+            .ForMember(dest => dest.PatientFirstName, opt => opt.MapFrom(x => x.Patient.FirstName))
+            .ForMember(dest => dest.PatientLastName, opt => opt.MapFrom(x => x.Patient.LastName))
+            .ForMember(dest => dest.PatientNo, opt => opt.MapFrom(x => x.Patient.No))
+            .ForMember(dest => dest.PatientBirthDate, opt => opt.MapFrom(x => x.Patient.BirthDate))
+            .ForMember(dest => dest.PatientGender, opt => opt.MapFrom(x => x.Patient.Gender))
+            .ForMember(dest => dest.DoctorTitleName, opt => opt.MapFrom(x => x.Doctor.Title.Name))
+            .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(x => x.Doctor.User.Name))
+            .ForMember(dest => dest.DoctorSurname, opt => opt.MapFrom(x => x.Doctor.User.Surname));
         CreateMap<ProtocolDto, ProtocolUpdateDto>();
         CreateMap<ProtocolWithNavigationProperties, ProtocolWithNavigationPropertiesDto>();
 
+        CreateMap<Address, AddressDto>();
+        CreateMap<Address, AddressCreateDto>();
+        CreateMap<AddressDto, AddressUpdateDto>();
+        CreateMap<AddressWithNavigationProperties, AddressWithNavigationPropertiesDto>();
 
         CreateMap<Department, DepartmentDto>();
         CreateMap<Department, DepartmentExcelDto>();

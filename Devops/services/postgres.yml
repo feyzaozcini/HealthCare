@@ -17,6 +17,9 @@ services:
       - healthcare_network
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
 
 volumes:
   pthpostgresdata:

@@ -51,6 +51,7 @@ using Pusula.Training.HealthCare.DoctorWorkSchedules;
 using Pusula.Training.HealthCare.BlackLists;
 using Pusula.Training.HealthCare.SystemChecks;
 using Pusula.Training.HealthCare.FollowUpPlans;
+using Pusula.Training.HealthCare.Addresses;
 
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
@@ -104,6 +105,8 @@ public class HealthCareDbContext :
 
     public DbSet<DoctorWorkSchedule> DoctorWorkSchedules { get; set; } = null!;
     public DbSet<BlackList> BlackLists { get; set; } = null!;
+    public DbSet<Address> Addresses { get; set; } = null!;
+
     #region Entities from the modules
 
     /* Notice: We only implemented IIdentityDbContext and ITenantManagementDbContext
@@ -182,19 +185,23 @@ public class HealthCareDbContext :
                 b.Property(x => x.FatherName).HasColumnName(nameof(Patient.FatherName));
                 b.Property(x => x.BloodType).HasColumnName(nameof(Patient.BloodType));
                 b.Property(x => x.Type).HasColumnName(nameof(Patient.Type)).IsRequired(false);
-                b.Property(x => x.PrimaryAddressDescription).HasColumnName(nameof(Patient.PrimaryAddressDescription));
-                b.Property(x => x.SecondaryAddressDescription).HasColumnName(nameof(Patient.SecondaryAddressDescription));
                 b.HasOne<PatientCompany>().WithMany().IsRequired(false).HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Country>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryCountryId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<City>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryCityId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<District>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryDistrictId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Village>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryVillageId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Country>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryCountryId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<City>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryCityId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<District>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryDistrictId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Village>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryVillageId).OnDelete(DeleteBehavior.NoAction);
-
+                b.HasMany(p => p.Addresses).WithOne(a => a.Patient).HasForeignKey(a => a.PatientId).IsRequired().OnDelete(DeleteBehavior.Cascade);
             });
+
+            builder.Entity<Address>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "Addresses", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.HasOne(a => a.Country).WithMany().IsRequired(false).HasForeignKey(a => a.CountryId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(a => a.City).WithMany().IsRequired(false).HasForeignKey(a => a.CityId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(a => a.District).WithMany().IsRequired(false).HasForeignKey(a => a.DistrictId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(a => a.Village).WithMany().IsRequired(false).HasForeignKey(a => a.VillageId).OnDelete(DeleteBehavior.NoAction);
+                b.Property(x => x.AddressDescription).IsRequired(false).HasColumnName(nameof(Address.AddressDescription));
+                b.Property(a => a.IsPrimary).HasDefaultValue(false);
+                b.HasOne(a => a.Patient).WithMany(p => p.Addresses).HasForeignKey(a => a.PatientId).IsRequired().OnDelete(DeleteBehavior.Cascade);
+            });
+
 
             builder.Entity<Protocol>(b =>
             {

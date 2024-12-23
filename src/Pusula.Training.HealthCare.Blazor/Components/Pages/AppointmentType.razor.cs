@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System;
 using Volo.Abp;
 using System.Linq;
+using Volo.Abp.Application.Dtos;
+using Pusula.Training.HealthCare.Appointments;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -21,6 +23,9 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private AppointmentTypeUpdateDto EditAppointmentType = new();
         private bool IsEditModalOpen = false;
         private SfToast? ToastObj;
+        private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
+        private int CurrentPage { get; set; } = 1;
+        private string CurrentSorting { get; set; } = string.Empty;
         private static readonly MultiSelectFieldSettings DoctorDropDownFields = new()
 
         {
@@ -29,7 +34,14 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         };
         protected override async Task OnInitializedAsync()
         {
-            var result = await AppointmentTypeAppService.GetListAsync(new GetAppointmentTypesInput());
+            var input = new GetAppointmentTypesInput
+            {
+                MaxResultCount = 1000,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
+            
+            var result = await AppointmentTypeAppService.GetListAsync(input);
             AppointmentTypeList = result.Items.ToList();
             ToastObj ??= new SfToast();
         }

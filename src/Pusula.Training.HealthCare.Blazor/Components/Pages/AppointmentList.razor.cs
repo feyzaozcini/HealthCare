@@ -1,5 +1,6 @@
 ﻿using Pusula.Training.HealthCare.Appointments;
 using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Shared;
 using Syncfusion.Blazor.DropDowns;
 using System.Collections.Generic;
@@ -13,6 +14,8 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
     public partial class AppointmentList
     {
         public List<AppointmentListItem> Appointments { get; set; } = new();
+        private List<AppointmentListItem> PastAppointments => Appointments.Where(a => a.StartDate < DateTime.Now).ToList();
+        private List<AppointmentListItem> UpcomingAppointments => Appointments.Where(a => a.StartDate >= DateTime.Now).ToList();
         public int TotalPatients { get; set; }
         public int TotalAppointments { get; set; }
         public int TodaysAppointments { get; set; }
@@ -23,7 +26,11 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
         private DoctorWithNavigationPropertiesDto SelectedDoctor;
         private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
-
+        private List<DepartmentDto> AllDepartments = new();
+        private DepartmentDto SelectedDepartment;
+        private List<DepartmentDto> FilteredDepartments = new();
+        private SfDropDownList<Guid, DepartmentDto> departmentDropDown;
+        private SfDropDownList<Guid, DoctorWithNavigationPropertiesDto> doctorDropDown;
         private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
         private int CurrentPage { get; set; } = 1;
         private string CurrentSorting { get; set; } = string.Empty;
@@ -65,6 +72,11 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             TotalAppointments = Appointments.Count;
             TodaysAppointments = Appointments.Count(a => a.StartDate.Date == DateTime.Today);
 
+            await LoadDoctorAsync();
+            await LoadDepartmentAsync();
+        }
+        private async Task LoadDoctorAsync()
+        {
             var doctorResult = await DoctorAppService.GetListAsync(new GetDoctorsInput());
             if (doctorResult?.Items != null)
             {
@@ -80,12 +92,28 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 .ToList();
             }
         }
+        private async Task LoadDepartmentAsync()
+        {
+
+            var departmentResult = await DepartmentAppService.GetListAsync(new GetDepartmentsInput());
+            if (departmentResult?.Items != null)
+            {
+                AllDepartments = departmentResult.Items.ToList();
+                FilteredDepartments = AllDepartments
+                .Select(d => new DepartmentDto
+                {
+                    Id = d.Id,
+                    Name = d.Name
+                }).ToList();
+            }
+        }
         private async Task LoadAppointmentsAsync()
         {
             var input = new GetAppointmentsInput
             {
                 DoctorId = SelectedDoctor?.Doctor?.Id, //Doctorun randevularını getirme filtresi
-                MaxResultCount = PageSize,
+                DepartmentId = SelectedDepartment?.Id, //Departmana ait randevuları getirme filtresi
+                MaxResultCount = 1000,
                 SkipCount = (CurrentPage - 1) * PageSize,
                 Sorting = CurrentSorting
             };
@@ -125,11 +153,43 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 await SelectDoctorAsync(selectedDoctor);
             }
         }
+
         private async Task SelectDoctorAsync(DoctorWithNavigationPropertiesDto doctor)
         {
             SelectedDoctor = doctor;
             await LoadAppointmentsAsync();  //Seçilen doktroun randevularını getirmek için çağırıldı
             await Task.CompletedTask;
+        }
+        private async Task OnDepartmentValueChange(ChangeEventArgs<Guid, DepartmentDto> args)
+        {
+            
+            Guid selectedDepartmentId = args.Value;
+
+           
+            DepartmentDto selectedDepartment = FilteredDepartments.FirstOrDefault(d => d.Id == selectedDepartmentId);
+
+            if (selectedDepartment != null)
+            {
+                await SelectDepartmentAsync(selectedDepartment);
+            }
+        }
+        private async Task SelectDepartmentAsync(DepartmentDto department)
+        {
+            SelectedDepartment = department;
+            await LoadAppointmentsAsync();  //Seçilen departmana ait randevularını getirmek için çağırıldı
+            await Task.CompletedTask;
+        }
+        private async Task ClearFilters()
+        {
+            SelectedDepartment = null;
+            SelectedDoctor = null;
+            await departmentDropDown.ClearAsync();
+            await doctorDropDown.ClearAsync();
+            await LoadDoctorAsync();
+            await LoadDepartmentAsync();
+            await LoadAppointmentsAsync();
+            await LoadInitialDataAsync();
+            StateHasChanged();
         }
         private string GetStatusClass(string status)
         {
@@ -198,6 +258,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             await LoadAppointmentsAsync(); // Randevular yeniden yüklenecek
             IsEditDialogOpen = false;
         }
+       
         public class AppointmentListItem
         {
             public Guid Id { get; set; }

@@ -1,4 +1,5 @@
-﻿using Pusula.Training.HealthCare.Cities;
+﻿using Pusula.Training.HealthCare.Addresses;
+using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.PatientCompanies;
@@ -15,15 +16,12 @@ namespace Pusula.Training.HealthCare.Patients
     public class PatientWithNavigationPropertiesDto
     {
         public PatientDto? Patient { get; set; }
-        public CountryDto? PrimaryCountry { get; set; } 
-        public CityDto? PrimaryCity { get; set; } 
-        public DistrictDto? PrimaryDistrict { get; set; } 
-        public VillageDto? PrimaryVillage { get; set; } 
-        public CountryDto? SecondaryCountry { get; set; } 
-        public CityDto? SecondaryCity { get; set; } 
-        public DistrictDto? SecondaryDistrict { get; set; } 
-        public VillageDto? SecondaryVillage { get; set; }
+        public CountryDto? Country { get; set; } 
+        public CityDto? City { get; set; } 
+        public DistrictDto? District { get; set; } 
+        public VillageDto? Village { get; set; } 
         public PatientCompanyDto? PatientCompany { get; set; } 
-        //public ProtocolDto? Protocol { get; set; }
+        public AddressDto? Address { get; set; }
+        public List<AddressDto>? Addresses { get; set; }
     }
 }

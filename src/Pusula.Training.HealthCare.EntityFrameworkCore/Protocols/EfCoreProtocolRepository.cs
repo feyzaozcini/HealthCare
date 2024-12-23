@@ -38,10 +38,8 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
         int? no = null,
         CancellationToken cancellationToken = default)
     {
-        //var query = await GetQueryForNavigationPropertiesAsync();
 
         var query = await GetQueryableAsync();
-
 
         query = ApplyFilter(query, filterText, startTime, endTime, protocolStatus, protocolTypeId, protocolNoteId, protocolInsuranceId, patientId, departmentId, doctorId, no);
 
@@ -63,7 +61,6 @@ public class EfCoreProtocolRepository(IDbContextProvider<HealthCareDbContext> db
        int? no = null,
        CancellationToken cancellationToken = default)
     {
-        //var query = await GetQueryForNavigationPropertiesAsync();
 
         var query = ApplyFilter(await GetDbSetAsync(), filterText, startTime, endTime, protocolStatus, protocolTypeId, protocolNoteId, protocolInsuranceId, patientId, departmentId, doctorId,no);
 

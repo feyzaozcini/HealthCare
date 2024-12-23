@@ -6,7 +6,6 @@ using Pusula.Training.HealthCare.Core.Rules.Appointments;
 using Pusula.Training.HealthCare.Core.Rules.BlackLists;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Doctors;
-using Pusula.Training.HealthCare.EmailServices;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
@@ -19,6 +18,7 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
+using Volo.Abp.EventBus.Distributed;
 
 namespace Pusula.Training.HealthCare.Appointments
 {
@@ -35,7 +35,8 @@ namespace Pusula.Training.HealthCare.Appointments
         IAppointmentBusinessRules appointmentBusinessRules,
         IBlackListBusinessRules blackListBusinessRules,
         IAppointmentRuleRepository appointmentRuleRepository,
-        EmailService emailService
+        IDistributedEventBus distributedEventBus,
+        IDistributedCache<PagedResultDto<LookupDto<Guid>>, string> departmentDistributedCache //department için cache
         ) : HealthCareAppService, IAppointmentsAppService
     {
 
@@ -93,17 +94,42 @@ namespace Pusula.Training.HealthCare.Appointments
 
         public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetDepartmentLookupAsync(LookupRequestDto input)
         {
+            // Cache key oluşturduk
+            var cacheKey = $"DepartmentLookup-{input.Filter}-{input.SkipCount}-{input.MaxResultCount}";
+
+            // Cache'de veri olup olmadığı kontrol edildi
+            var cachedData = await departmentDistributedCache.GetAsync(cacheKey);
+            if (cachedData != null)
+            {
+                return cachedData;
+            }
+            //get generic lookups
+            //get base async
+
+            // Cache'de yoksa aynı işlemler devam edildi
             var query = (await departmentRepository.GetQueryableAsync())
                            .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
                                x => x.Name != null && x.Name.Contains(input.Filter!));
 
             var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Department>();
             var totalCount = query.Count();
-            return new PagedResultDto<LookupDto<Guid>>
+
+            var result = new PagedResultDto<LookupDto<Guid>>
             {
                 TotalCount = totalCount,
                 Items = ObjectMapper.Map<List<Department>, List<LookupDto<Guid>>>(lookupData)
             };
+
+            // getirdiğimiz  verileri cache'e yazdık
+            await departmentDistributedCache.SetAsync(
+                cacheKey,
+                result,
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Cache süresi
+                });
+
+            return result;
         }
 
         public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetAppointmentTypeLookupAsync(LookupRequestDto input)
@@ -159,14 +185,14 @@ namespace Pusula.Training.HealthCare.Appointments
             var patient = await patientRepository.GetAsync(input.PatientId);
             var department = await departmentRepository.GetAsync(input.DepartmentId);
 
-            var emailBody = emailService.CreateAppointmentConfirmationBody(
-            $"{patient.FirstName} {patient.LastName}",
-            department.Name,
-            startDate,
-            endDate
-            );
-            //Oluşturulan randevu bilgileri mail atılır
-            await emailService.SendEmailAsync(patient.Email, "Randevu Onayı", emailBody);
+            await distributedEventBus.PublishAsync(new AppointmentSendMailEto
+            {
+                Email = patient.Email,
+                PatientName = $"{patient.FirstName} {patient.LastName}",
+                DepartmentName = department.Name,
+                StartDate = startDate,
+                EndDate = endDate
+            });
             
             return ObjectMapper.Map<Appointment, AppointmentDto>(appointment);
         }
@@ -236,6 +262,5 @@ namespace Pusula.Training.HealthCare.Appointments
             }
 
         }
-
     }
 }

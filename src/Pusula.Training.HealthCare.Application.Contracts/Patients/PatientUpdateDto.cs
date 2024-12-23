@@ -53,16 +53,6 @@ public class PatientUpdateDto : IHasConcurrencyStamp
     public string? FatherName { get; set; } = null!;
     public BloodType? BloodType { get; set; }
     public Type? Type { get; set; }
-    public Guid CompanyId { get; set; }
-    public Guid? PrimaryCountryId { get; set; }
-    public Guid? PrimaryCityId { get; set; }
-    public Guid? PrimaryDistrictId { get; set; }
-    public Guid? PrimaryVillageId { get; set; }
-    public string? PrimaryAddressDescription { get; set; }
-    public Guid? SecondaryCountryId { get; set; }
-    public Guid? SecondaryCityId { get; set; }
-    public Guid? SecondaryDistrictId { get; set; }
-    public Guid? SecondaryVillageId { get; set; }
-    public string? SecondaryAddressDescription { get; set; }
+    public Guid? CompanyId { get; set; }
     public string ConcurrencyStamp { get; set; } = null!;
 }

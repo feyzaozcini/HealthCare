@@ -23,24 +23,14 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         string? motherName, 
         string? fatherName, 
         BloodType? bloodType, 
-        Type? type,
-        Guid? primaryCountryId,
-        Guid? primaryCityId,
-        Guid? primaryDistrictId,
-        Guid? primaryVillageId,
-        string? primaryAddressDescription,
-        Guid? secondaryCountryId,
-        Guid? secondaryCityId,
-        Guid? secondaryDistrictId,
-        Guid? secondaryVillageId,
-        string? secondaryAddressDescription
+        Type? type
+        
     )
     {
         var patient = new Patient(
          GuidGenerator.Create(),
          companyId,firstName, lastName, birthDate, identityNumber, passportNumber, email, mobilePhoneNumber, emergencyPhoneNumber,gender,
-         motherName,fatherName,bloodType,type,primaryCountryId, primaryCityId, primaryDistrictId,primaryVillageId,primaryAddressDescription,
-         secondaryCountryId,secondaryCityId,secondaryDistrictId,secondaryVillageId,secondaryAddressDescription
+         motherName,fatherName,bloodType,type
          );
 
         return await patientRepository.InsertAsync(patient);
@@ -62,16 +52,6 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         string? fatherName,
         BloodType? bloodType,
         Type? type,
-        Guid? primaryCountryId,
-        Guid? primaryCityId,
-        Guid? primaryDistrictId,
-        Guid? primaryVillageId,
-        string? primaryAddressDescription,
-        Guid? secondaryCountryId,
-        Guid? secondaryCityId,
-        Guid? secondaryDistrictId,
-        Guid? secondaryVillageId,
-        string? secondaryAddressDescription,
         [CanBeNull] string? concurrencyStamp = null
     )
     {
@@ -91,16 +71,6 @@ public class PatientManager(IPatientRepository patientRepository) : DomainServic
         patient.SetFatherName(fatherName);
         patient.SetBloodType(bloodType);
         patient.SetType(type);
-        patient.SetPrimaryCountryId(primaryCountryId);
-        patient.SetPrimaryCityId(primaryCityId);
-        patient.SetPrimaryDistrictId(primaryDistrictId);
-        patient.SetPrimaryVillageId(primaryVillageId);
-        patient.SetPrimaryAddressDescription(primaryAddressDescription);
-        patient.SetSecondaryCountryId(secondaryCountryId);
-        patient.SetSecondaryCityId(secondaryCityId);
-        patient.SetSecondaryDistrictId(secondaryDistrictId);
-        patient.SetSecondaryVillageId(secondaryVillageId);
-        patient.SetSecondaryAddressDescription(secondaryAddressDescription);
         patient.SetConcurrencyStampIfNotNull(concurrencyStamp);
 
         return await patientRepository.UpdateAsync(patient);

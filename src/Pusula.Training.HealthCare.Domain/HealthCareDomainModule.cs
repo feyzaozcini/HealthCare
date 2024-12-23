@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Pusula.Training.HealthCare.MultiTenancy;
+using Volo.Abp;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.Emailing;
@@ -32,6 +33,16 @@ namespace Pusula.Training.HealthCare;
 )]
 public class HealthCareDomainModule : AbpModule
 {
+    public override void OnApplicationInitialization(ApplicationInitializationContext context)
+    {
+        base.OnApplicationInitialization(context);
+        var settingManager = context.ServiceProvider.GetService<SettingManager>();
+        
+        settingManager.SetGlobalAsync(EmailSettingNames.Smtp.Password, "asxj ddfe ifet ntkw");
+
+        
+    }
+
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
         Configure<AbpLocalizationOptions>(options =>
@@ -61,8 +72,8 @@ public class HealthCareDomainModule : AbpModule
             options.IsEnabled = MultiTenancyConsts.IsEnabled;
         });
 
-#if DEBUG
+/*#if DEBUG
         context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());
-#endif
+#endif*/
     }
 }

@@ -148,6 +148,11 @@ public class HealthCarePermissionDefinitionProvider : PermissionDefinitionProvid
         painTypePermission.AddChild(HealthCarePermissions.PainTypes.Edit, L("Permission:Edit"));
         painTypePermission.AddChild(HealthCarePermissions.PainTypes.Delete, L("Permission:Delete"));
 
+        var address = myGroup.AddPermission(HealthCarePermissions.Addresses.Default, L("Permission:Addresses"));
+        address.AddChild(HealthCarePermissions.Addresses.Create, L("Permission:Create"));
+        address.AddChild(HealthCarePermissions.Addresses.Edit, L("Permission:Edit"));
+        address.AddChild(HealthCarePermissions.Addresses.Delete, L("Permission:Delete"));
+
     }
 
     private static LocalizableString L(string name)

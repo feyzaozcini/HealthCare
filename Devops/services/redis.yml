@@ -1,0 +1,244 @@
+version: '3.3'
+
+services:
+  redis-node-1:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+      - "16379:16379"
+    volumes:
+      - redis-data-node1:/data
+    networks:
+      - healthcare_network
+    environment:
+      - REDIS_PASSWORD=rdi8725a.
+    command:
+      - sh
+      - -c
+      - |
+        redis-server \
+          --requirepass "rdi8725a." \
+          --masterauth "rdi8725a." \
+          --port 6379 \
+          --cluster-enabled yes \
+          --cluster-config-file nodes.conf \
+          --cluster-node-timeout 5000 \
+          --appendonly yes \
+          --bind 0.0.0.0 \
+          --cluster-announce-ip redis-node-1 \
+          --cluster-announce-port 6379 \
+          --cluster-announce-bus-port 16379
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  redis-node-2:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6380:6380"
+      - "16380:16380"
+    volumes:
+      - redis-data-node2:/data
+    networks:
+      - healthcare_network
+    environment:
+      - REDIS_PASSWORD=rdi8725a.
+    command:
+      - sh
+      - -c
+      - |
+        redis-server \
+          --requirepass "rdi8725a." \
+          --masterauth "rdi8725a." \
+          --port 6380 \
+          --cluster-enabled yes \
+          --cluster-config-file nodes.conf \
+          --cluster-node-timeout 5000 \
+          --appendonly yes \
+          --bind 0.0.0.0 \
+          --cluster-announce-ip redis-node-2 \
+          --cluster-announce-port 6380 \
+          --cluster-announce-bus-port 16380
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  redis-node-3:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6381:6381"
+      - "16381:16381"
+    volumes:
+      - redis-data-node3:/data
+    networks:
+      - healthcare_network
+    environment:
+      - REDIS_PASSWORD=rdi8725a.
+    command:
+      - sh
+      - -c
+      - |
+        redis-server \
+          --requirepass "rdi8725a." \
+          --masterauth "rdi8725a." \
+          --port 6381 \
+          --cluster-enabled yes \
+          --cluster-config-file nodes.conf \
+          --cluster-node-timeout 5000 \
+          --appendonly yes \
+          --bind 0.0.0.0 \
+          --cluster-announce-ip redis-node-3 \
+          --cluster-announce-port 6381 \
+          --cluster-announce-bus-port 16381
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+
+  redis-node-4:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6382:6382"
+      - "16382:16382"
+    volumes:
+      - redis-data-node4:/data
+    networks:
+      - healthcare_network
+    environment:
+      - REDIS_PASSWORD=rdi8725a.
+    command:
+      - sh
+      - -c
+      - |
+        redis-server \
+          --requirepass "rdi8725a." \
+          --masterauth "rdi8725a." \
+          --port 6382 \
+          --cluster-enabled yes \
+          --cluster-config-file nodes.conf \
+          --cluster-node-timeout 5000 \
+          --appendonly yes \
+          --bind 0.0.0.0 \
+          --cluster-announce-ip redis-node-4 \
+          --cluster-announce-port 6382 \
+          --cluster-announce-bus-port 16382
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+
+  redis-node-5:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6383:6383"
+      - "16383:16383"
+    volumes:
+      - redis-data-node5:/data
+    networks:
+      - healthcare_network
+    environment:
+      - REDIS_PASSWORD=rdi8725a.
+    command:
+      - sh
+      - -c
+      - |
+        redis-server \
+          --requirepass "rdi8725a." \
+          --masterauth "rdi8725a." \
+          --port 6383 \
+          --cluster-enabled yes \
+          --cluster-config-file nodes.conf \
+          --cluster-node-timeout 5000 \
+          --appendonly yes \
+          --bind 0.0.0.0 \
+          --cluster-announce-ip redis-node-5 \
+          --cluster-announce-port 6383 \
+          --cluster-announce-bus-port 16383
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+
+  redis-node-6:
+    image: redis:latest
+    restart: always
+    ports:
+      - "6384:6384"
+      - "16384:16384"
+    volumes:
+      - redis-data-node6:/data
+    networks:
+      - healthcare_network
+    environment:
+      - REDIS_PASSWORD=rdi8725a.
+    command:
+      - sh
+      - -c
+      - |
+        redis-server \
+          --requirepass "rdi8725a." \
+          --masterauth "rdi8725a." \
+          --port 6384 \
+          --cluster-enabled yes \
+          --cluster-config-file nodes.conf \
+          --cluster-node-timeout 5000 \
+          --appendonly yes \
+          --bind 0.0.0.0 \
+          --cluster-announce-ip redis-node-6 \
+          --cluster-announce-port 6384 \
+          --cluster-announce-bus-port 16384
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+
+  redis-cluster-init:
+    image: redis:latest
+    depends_on:
+      - redis-node-1
+      - redis-node-2
+      - redis-node-3
+      - redis-node-4
+      - redis-node-5
+      - redis-node-6
+    networks:
+      - healthcare_network
+    command:
+      - sh
+      - -c
+      - |
+        sleep 20 && \
+        echo "yes" | redis-cli --cluster create \
+        redis-node-1:6379 \
+        redis-node-2:6380 \
+        redis-node-3:6381 \
+        redis-node-4:6382 \
+        redis-node-5:6383 \
+        redis-node-6:6384 \
+        --cluster-replicas 1 -a rdi8725a.
+    deploy:
+      restart_policy:
+        condition: none
+      placement:
+        constraints:
+          - node.role == manager
+
+volumes:
+  redis-data-node1:
+  redis-data-node2:
+  redis-data-node3:
+  redis-data-node4:
+  redis-data-node5:
+  redis-data-node6:
+
+networks:
+  healthcare_network:
+    external: true
+

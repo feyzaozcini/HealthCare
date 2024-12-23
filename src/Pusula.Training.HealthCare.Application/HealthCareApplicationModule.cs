@@ -85,6 +85,9 @@ public class HealthCareApplicationModule : AbpModule
 
         context.Services.AddSingleton<IDistributedLockProvider>(_ => new RedisDistributedSynchronizationProvider(redis.GetDatabase()));
        
+        
+        context.Services.AddTransient<UserProfileManager>();
+
         context.Services.AddSingleton(new EmailService(
                    "smtp.gmail.com", // Gmail için SMTP sunucusu
                    587,                   // TLS portu
