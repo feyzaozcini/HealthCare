@@ -69,7 +69,8 @@
                     {
                         <div>
                             <p><b>@L["FullName"]:</b> @PatientsStateContainer.SelectedPatient.Patient.FirstName @PatientsStateContainer.SelectedPatient.Patient.LastName</p>
-                            <p><b>@L["IdentityNumber"]:</b> @PatientsStateContainer.SelectedPatient.Patient.IdentityNumber</p>
+                            <p><b>@L["IdentityNumber"]:</b> @PatientsStateContainer.SelectedPatient.Patient.IdentityNumber  <b>@L["  Gender "]: </b> @PatientsStateContainer.SelectedPatient.Patient.Gender  </p>
+                            <p><b>@L["Age "]:</b> @CalculateAge(PatientsStateContainer.SelectedPatient.Patient.BirthDate) </p>
                         </div>
                     }
                     else
@@ -162,9 +163,9 @@
     <ScheduleEventSettings TValue="FlatAppointmentDto" DataSource="@AppointmentList" EnableTooltip="true">
     </ScheduleEventSettings>
     <ScheduleViews>
-        <ScheduleView Option="View.Day" Readonly="@(CurrentDate < DateTime.Now.AddDays(-7))"></ScheduleView>
-        <ScheduleView Option="View.Week" Readonly="@(CurrentDate < DateTime.Now.AddDays(-7))"></ScheduleView>
-        <ScheduleView Option="View.WorkWeek" Readonly="@(CurrentDate < DateTime.Now.AddDays(-7))"></ScheduleView>
+        <ScheduleView Option="View.Day" Readonly="@(CurrentDate < DateTime.Now.AddMinutes(-60).Date)"></ScheduleView>
+        <ScheduleView Option="View.Week" Readonly="@(CurrentDate < DateTime.Now.AddMinutes(-60).Date)"></ScheduleView>
+        <ScheduleView Option="View.WorkWeek" Readonly="@(CurrentDate < DateTime.Now.AddMinutes(-60).Date)"></ScheduleView>
     </ScheduleViews>
 </SfSchedule>
 

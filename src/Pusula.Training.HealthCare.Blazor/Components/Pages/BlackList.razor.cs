@@ -8,6 +8,8 @@ using System;
 using System.Linq;
 using Syncfusion.Blazor.Notifications;
 using Volo.Abp;
+using Volo.Abp.Application.Dtos;
+using Pusula.Training.HealthCare.AppointmentRules;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -23,7 +25,9 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         public List<DoctorListItems> Doctors { get; set; } = new();
         public List<PatientListItems> Patients { get; set; } = new();
         public List<BlackListItem> BlackListItems { get; set; } = new();
-
+        private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
+        private int CurrentPage { get; set; } = 1;
+        private string CurrentSorting { get; set; } = string.Empty;
         private BlackListItem? SelectedBlackList;
         private BlackListStatus SelectedBlackListStatus;
         private IReadOnlyList<LookupDto<BlackListStatus>> BlackListStatusCoolection { get; set; } = new List<LookupDto<BlackListStatus>>();
@@ -64,7 +68,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private async Task LoadBlackListAsync()
         {
-            var blackLists = await BlackListAppService.GetListAsync(new GetBlackListInput());
+            var input = new GetBlackListInput
+            {
+                MaxResultCount = 1000,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
+            var blackLists = await BlackListAppService.GetListAsync(input);
             BlackListItems = blackLists.Items.Select(a => new BlackListItem
             {
                 Id = a.BlackList.Id,

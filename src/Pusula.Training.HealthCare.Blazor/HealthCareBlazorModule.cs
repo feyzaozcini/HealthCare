@@ -133,7 +133,7 @@ public class HealthCareBlazorModule : AbpModule
         context.Services.AddScoped<PatientStateContainer>();
         context.Services.AddScoped<DoctorStateContainer>();
         context.Services.AddScoped<DepartmentStateContainer>();
-        context.Services.AddSingleton<PatientsStateContainer>();
+        context.Services.AddTransient<PatientsStateContainer>();
 
         ConfigureAuthentication(context);
         ConfigureUrls(configuration);

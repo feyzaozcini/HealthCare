@@ -4,330 +4,271 @@
 @using Pusula.Training.HealthCare.Patients
 @using Pusula.Training.HealthCare.Departments
 @using Pusula.Training.HealthCare.Doctors
-@using Pusula.Training.HealthCare.Blazor.Containers
+@using Pusula.Training.HealthCare.Appointments
+@using Pusula.Training.HealthCare.AppointmentTypes
+@using Pusula.Training.HealthCare.Shared
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Charts
+
 @inject Microsoft.AspNetCore.Components.NavigationManager UriHelper
 @inject NavigationManager NavigationManager
-@inject PatientStateContainer StateService
-@inject DoctorStateContainer DoctorStateService
-@inject DepartmentStateContainer DepartmentStateService
+@inject AppointmentsAppService AppointmentsAppService
 @inherits HealthCareComponentBase
-@inject IDoctorsAppService DoctorsAppService
-@inject IDepartmentsAppService DepartmentsAppService
+@inject IAppointmentTypeAppService AppointmentTypeAppService
 
-<div class="stepper-container" style="max-width: 1500px; margin: 0 auto; padding: 40px;">
-    <div class="card">
-        <div class="card-body">
-            <h3 class="card-title text-center">Doktor ve Departman Seçimi</h3>
-
-            <!-- Seçilen Veriler -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card selected-card">
-                        <h5>Seçilenler</h5>
-                        <p><strong>Doktor:</strong> @($"{SelectedDoctor?.Title.Name} {SelectedDoctor?.User.Name} {SelectedDoctor?.User.Surname}")</p>
-                        <p><strong>Departman:</strong> @SelectedDepartment?.Name</p>
-                        <button class="btn btn-outline-danger btn-sm" @onclick="ClearSelections" style="width: 100%;">Seçimi Temizle</button>
-                    </div>
-                </div>
+<div class="control-section">
+    <div class="filter-section">
+    <div>
+        <h3>Filtreleme Seçenekleri</h3>
+        <div class="filter-box">
+                <div class="filter-item">
+            <label>Başlangıç Tarihi:</label>
+                    <SfDatePicker @bind-Value="@(Filter.StartDate)" CssClass="e-custom"> </SfDatePicker>
             </div>
-
-            <!-- Doktor ve Departman Seçim Alanları -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <h4>Hekim</h4>
-                    <input type="text" class="form-control" @bind="DoctorSearchText" @oninput="FilterDoctors" placeholder="Doktor ara..." />
-                    <ul class="list-group">
-                        @foreach (var doctor in FilteredDoctors)
-                        {
-                            <li class="list-group-item @GetSelectedClass(doctor)" @onclick="() => SelectDoctor(doctor)">
-                                @($"{doctor.Title?.Name} {doctor.User?.Name} {doctor.User?.Surname}")
-                            </li>
-                        }
-                    </ul>
+                <div class="filter-item">
+                    <label>Bitiş Tarihi:</label>
+                    <SfDatePicker @bind-Value="@(Filter.EndDate)" CssClass="e-custom"> </SfDatePicker>
                 </div>
-                <div class="col-md-6">
-                    <h4>Departman</h4>
-                    <input type="text" class="form-control" @bind="DepartmentSearchText" @oninput="FilterDepartments" placeholder="Departman ara..." />
-                    <ul class="list-group">
-                        @foreach (var department in FilteredDepartments)
-                        {
-                            <li class="list-group-item @GetSelectedClass(department)" @onclick="() => SelectDepartment(department)">
-                                @department.Name
-                            </li>
-                        }
-                    </ul>
+                <div class="filter-item">
+                    <label>Randevu Türleri:</label>
+                    <SfDropDownList DataSource="@FilteredAppointmentTypes"
+                                            Placeholder="Select Appointment Type"
+                                            @bind-Value="@Filter.AppointmentTypeId"
+                                            CssClass="e-custom">
+                                <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                            </SfDropDownList>
                 </div>
-            </div>
-
-            <div class="d-flex justify-content-between mt-4">
-                <button class="btn btn-primary" @onclick="ProceedToAppointments" disabled="@(SelectedDoctor == null || SelectedDepartment == null)">İleri</button>
-            </div>
+                <div class="filter-item">
+                    <button class="btn custom-add-button" @onclick="LoadAppointmentsAsync">Filtrele</button>
+                </div>
+                <div class="filter-item">
+                    <button class="btn custom-delete-button" @onclick="ClearFilters">Temizle</button>
+                </div>
         </div>
+        </div>
+    </div>
+    <div class="chart-container">
+    <div class="chart-section">
+         <!-- Randevu Durumlarına Göre Grafik -->
+        <SfAccumulationChart Title="Randevu Durumlarına Göre Dağılım">
+            <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
+            <AccumulationChartLegendSettings Visible="true"></AccumulationChartLegendSettings>
+            <AccumulationChartSeriesCollection>
+                <AccumulationChartSeries DataSource="@ChartData" XName="Name" YName="Count" InnerRadius="40%">
+                    <AccumulationDataLabelSettings Visible="true" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
+                </AccumulationChartSeries>
+            </AccumulationChartSeriesCollection>
+        </SfAccumulationChart>
+    </div>
+    <!-- Departmanlara Göre Grafik -->
+    <div class="chart-section">
+        <SfAccumulationChart Title="Departmanlara Göre Dağılım">
+            <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
+            <AccumulationChartLegendSettings Visible="true"></AccumulationChartLegendSettings>
+            <AccumulationChartSeriesCollection>
+                <AccumulationChartSeries DataSource="@DepartmentChartData" XName="Name" YName="Count" InnerRadius="40%">
+                    <AccumulationDataLabelSettings Visible="true" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
+                </AccumulationChartSeries>
+            </AccumulationChartSeriesCollection>
+        </SfAccumulationChart>
+    </div>
+     <!-- Cinsiyetlere Göre Grafik -->
+    <div class="chart-section">
+        <SfAccumulationChart Title="Cinsiyete Göre Dağılım">
+            <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
+            <AccumulationChartLegendSettings Visible="true"></AccumulationChartLegendSettings>
+            <AccumulationChartSeriesCollection>
+                <AccumulationChartSeries DataSource="@GenderChartData" XName="Name" YName="Count" InnerRadius="40%">
+                    <AccumulationDataLabelSettings Visible="true" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
+                </AccumulationChartSeries>
+            </AccumulationChartSeriesCollection>
+        </SfAccumulationChart>
+    </div>
     </div>
 </div>
 
 @code {
-    private string DoctorSearchText = string.Empty;
-    private string DepartmentSearchText = string.Empty;
-
-    private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
-    private List<DepartmentDto> AllDepartments = new();
-
-    private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
+    private List<ChartDataDto> ChartData = new List<ChartDataDto>();
+    private List<ChartDataDto> DepartmentChartData = new List<ChartDataDto>();
+    private List<ChartDataDto> GenderChartData = new List<ChartDataDto>();
+    private List<AppointmentStatus> AppointmentStatuses = new List<AppointmentStatus>();
+    private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
+    private int CurrentPage { get; set; } = 1;
+    private string CurrentSorting { get; set; } = string.Empty;
+    private IReadOnlyList<LookupDto<Guid>> AppointmentTypesCollection { get; set; } = new List<LookupDto<Guid>>();
+    private IReadOnlyList<LookupDto<Gender>> GendersCollection { get; set; } = new List<LookupDto<Gender>>();
+    private GetAppointmentsInput Filter { get; set; }
+    private List<Pusula.Training.HealthCare.AppointmentTypes.AppointmentTypeDto> FilteredAppointmentTypes { get; set; } = new();
+    
     private List<DepartmentDto> FilteredDepartments = new();
-
-    private DoctorWithNavigationPropertiesDto SelectedDoctor;
-    private DepartmentDto SelectedDepartment;
-
+    private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
+    
+    public Dashboard()
+    {
+        Filter = new GetAppointmentsInput
+            {
+                MaxResultCount = 100,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
+        
+    }
     protected override async Task OnInitializedAsync()
     {
-        await LoadInitialDataAsync();
-    }
-
-    private async Task LoadInitialDataAsync()
-    {
-        var doctorResult = await DoctorsAppService.GetListAsync(new GetDoctorsInput());
-        if (doctorResult?.Items != null)
+        GendersCollection = Enum.GetValues(typeof(Gender))
+                .Cast<Gender>()
+                .Select(b => new LookupDto<Gender> { Id = b, DisplayName = b.ToString() })
+                .ToList();
+        var input = new GetAppointmentTypesInput
+            {
+                MaxResultCount = 100,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
+        var result = await AppointmentTypeAppService.GetListAsync(input);
+        if (result?.Items != null)
         {
-            AllDoctors = doctorResult.Items.ToList();
-            FilteredDoctors = AllDoctors;
+            FilteredAppointmentTypes = result.Items.ToList();
         }
-
-        var departmentResult = await DepartmentsAppService.GetListAsync(new GetDepartmentsInput());
-        if (departmentResult?.Items != null)
-        {
-            AllDepartments = departmentResult.Items.ToList();
-            FilteredDepartments = AllDepartments;
-        }
+        await LoadAppointmentsAsync();
+        await GetAppointmentTypeCollectionLookupAsync();
     }
-
-    private void FilterDoctors()
+    private async Task LoadAppointmentsAsync()
     {
-        FilteredDoctors = AllDoctors
-        .Where(d => string.IsNullOrEmpty(DoctorSearchText) ||
-                    d.User.Name.Contains(DoctorSearchText, StringComparison.OrdinalIgnoreCase))
-        .ToList();
-        StateHasChanged();
-    }
+        var input = new GetAppointmentsInput
+            {
+                StartDate = Filter?.StartDate,
+                EndDate = Filter?.EndDate,
+                Note = null,
+                AppointmentStatus = null,
+                IsBlock = null,
+                PatientId = null,
+                AppointmentTypeId = Filter?.AppointmentTypeId,
+                DoctorId = null, 
+                DepartmentId = null,
+                MaxResultCount = 100,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
 
-    private void FilterDepartments()
-    {
-        FilteredDepartments = FilteredDepartments
-            .Where(d => string.IsNullOrEmpty(DepartmentSearchText) ||
-                        d.Name.Contains(DepartmentSearchText, StringComparison.OrdinalIgnoreCase))
+        var result = await AppointmentsAppService.GetListAsync(input);
+        ChartData = result.Items
+            .GroupBy(a => a.Appointment.AppointmentStatus)
+            .Select(group => new ChartDataDto
+                {
+                    Name = group.Key.ToString(),
+                    Count = group.Count()
+                })
             .ToList();
+
+        DepartmentChartData = result.Items
+            .GroupBy(a => a.Department.Name)
+            .Select(group => new ChartDataDto
+                {
+                    Name = group.Key,
+                    Count = group.Count()
+                })
+            .ToList();
+
+        GenderChartData = result.Items
+            .GroupBy(a => a.Patient.Gender.ToString())
+            .Select(group => new ChartDataDto
+                {
+                    Name = group.Key,
+                    Count = group.Count()
+                })
+            .ToList();
+
     }
-
-    private async Task SelectDoctor(DoctorWithNavigationPropertiesDto doctor)
+    private async Task ClearFilters()
     {
-        SelectedDoctor = doctor;
+        // Başlangıç ve Bitiş Tarihi sıfırlanır
+        Filter.StartDate = null;
+        Filter.EndDate = null;
 
-        if (doctor != null)
-        {
-            var doctorWithDepartments = await DoctorsAppService.GetWithDepartmentsAsync(doctor.Doctor.Id);
-            if (doctorWithDepartments?.Departments != null)
+        // Randevu türü sıfırlanır
+        Filter.AppointmentTypeId = null;
+         Filter = new GetAppointmentsInput
             {
-                FilteredDepartments = doctorWithDepartments.Departments
-                    .Select(dd => new DepartmentDto { Id = dd.Id, Name = dd.Name })
-                    .ToList();
-            }
-        }
-        else
-        {
-            FilteredDepartments.Clear();
-        }
+                MaxResultCount = 100,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
+        
+        // İstenirse, filtreleme işlemini tekrar yapabilirsiniz
+        await LoadAppointmentsAsync();
     }
 
-    private async Task SelectDepartment(DepartmentDto department)
+    private async Task GetAppointmentTypeCollectionLookupAsync(string? newValue = null)
     {
-        SelectedDepartment = department;
-
-        /*if (department != null)
-        {
-            var departmentWithDoctors = await DepartmentsAppService.GetDoctorsByDepartmentIdAsync(department.Id);
-            if (departmentWithDoctors?.Doctors != null)
-            {
-                FilteredDoctors = departmentWithDoctors.Doctors
-                    .Select(dd => new DoctorWithNavigationPropertiesDto
-                        {
-                            Doctor = dd.Doctor,
-                            Title = dd.Title,
-                            User = dd.User,
-                        })
-                    .ToList();
-            }
-        }
-        else
-        {
-            FilteredDoctors.Clear();
-        }*/
+        AppointmentTypesCollection = (await AppointmentsAppService.GetAppointmentTypeLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
     }
-
-    private void ClearSelections()
+    
+    public class ChartDataDto
     {
-        SelectedDoctor = null;
-        SelectedDepartment = null;
-        DoctorSearchText = string.Empty;
-        DepartmentSearchText = string.Empty;
-        FilteredDoctors = AllDoctors;
-        FilteredDepartments = AllDepartments;
-    }
-
-    private string GetSelectedClass(object item)
-    {
-        if (item is DoctorWithNavigationPropertiesDto doctor && SelectedDoctor == doctor)
-            return "selected-item";
-        if (item is DepartmentDto department && SelectedDepartment == department)
-            return "selected-item";
-        return string.Empty;
-    }
-
-    private void ProceedToAppointments()
-    {
-        //Seçilen Departman ve Doctor bilgileri Randevu Özet Kartına Aktarılır
-        DoctorStateService.SelectedDoctor = SelectedDoctor;
-        DepartmentStateService.SelectedDepartment = SelectedDepartment;
-        NavigationManager.NavigateTo("/appointment");
+        public string Name { get; set; }
+        public int Count { get; set; }
     }
 }
 
-
-
-
 <style>
-    .stepper-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 40px;
-    }
-
-    .card {
-        padding: 30px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-    }
-
-    .card-body {
-        padding: 20px;
-    }
-
-    .selected-card {
-        padding: 15px;
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-    }
-
-    .card-title {
-        font-size: 24px;
-        font-weight: bold;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    h4 {
-        font-size: 22px;
-        font-weight: bold;
-        margin-bottom: 15px;
-    }
-
-    input[type="text"] {
-        font-size: 16px;
-        padding: 10px;
-        width: 100%;
-        margin-bottom: 15px;
-        border-radius: 4px;
-        border: 1px solid #ddd;
-    }
-
-    ul.list-group {
-        max-height: 350px;
-        overflow-y: auto;
-        padding-left: 0;
-        margin-bottom: 15px;
-    }
-
-    .list-group-item {
-        font-size: 18px;
-        cursor: pointer;
-        padding: 12px 15px;
-        border: 1px solid #f0f0f0;
-        margin-bottom: 5px;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-    }
-
-        .list-group-item:hover {
-            background-color: #f0f0f0;
-        }
-
-    .selected-item {
-        background-color: #cce5ff;
-        color: #0056b3;
-        font-weight: bold;
-    }
-
-    button {
-        font-size: 16px;
-        padding: 8px 16px;
-        border-radius: 5px;
-        width: 100%;
-    }
-
-        button:disabled {
-            background-color: #ddd;
-            cursor: not-allowed;
-        }
-
-    .btn-primary {
-        background-color: #007bff;
-        color: white;
-        border: none;
-    }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-    .d-flex {
+    .chart-container {
         display: flex;
-        justify-content: space-between;
+        flex-wrap: wrap; /* Ekran daraldığında taşmasını engellemek için wrap kullanıyoruz */
+        justify-content: space-around; /* Grafikleri yatayda eşit aralıklarla hizalar */
+        gap: 20px;
+        margin: 20px 0;
+        background-color: #fff; /* Ortak beyaz arka plan */
+        padding: 20px; /* Kapsayıcıya iç boşluk ekliyoruz */
+        border-radius: 10px; /* Kapsayıcıya yuvarlatılmış köşeler */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Hafif gölge */
     }
 
-    .mt-4 {
-        margin-top: 40px;
-    }
-
-    .mb-4 {
-        margin-bottom: 20px;
-    }
-
-    @@media (max-width: 768px) {
-        .row {
-            flex-direction: column;
-        }
-
-        .col-md-6 {
-            width: 100%;
-        }
-    }
-
-    .patient-card {
-        border: 1px solid #ddd;
+    .chart-section {
+        padding: 20px;
+        border: 1px solid #ccc;
         border-radius: 10px;
-        overflow: hidden;
-        background-color: #f8f9fa; /* Hafif bir arka plan rengi */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Hafif bir gölge efekti */
-        max-width: 1100px; /* Kart genişliği */
-        margin: auto; /* Ortala */
+        background-color: #fff;
+        width: 100%;
+        max-width: 650px; /* Grafiklerin en fazla 500px genişliğinde olmasını sağlar */
     }
 
-    ul.list-group {
-        max-height: 350px;
-        height: 350px; /* Sabit yükseklik */
-        overflow-y: auto;
+    .chart-container > .chart-section:nth-child(3) {
+        flex-basis: 100%; /* Cinsiyet grafiğini diğerlerinden alt kısma yerleştirir */
+        text-align: center; /* Ortalanmasını sağlar */
+    }
+
+    .filter-section {
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #fff;
+    }
+
+    .filter-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .filter-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 200px;
+    }
+
+        .filter-item label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+    .chart-section {
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #fff;
     }
 </style>
 

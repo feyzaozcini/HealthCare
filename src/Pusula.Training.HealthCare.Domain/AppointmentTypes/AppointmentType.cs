@@ -61,10 +61,5 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
 
             DoctorAppointmentTypes.Add(new DoctorAppoinmentType(doctorId, Id));
         }
-
-        private bool IsInDoctor(Guid doctorId)
-        {
-            return DoctorAppointmentTypes.Any(x => x.DoctorId == doctorId);
-        }
     }
 }

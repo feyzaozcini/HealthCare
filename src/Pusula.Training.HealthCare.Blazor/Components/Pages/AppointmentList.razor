@@ -2,10 +2,13 @@
 @using Pusula.Training.HealthCare.Shared
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Cards
+@using Syncfusion.Blazor.Navigations
 @using Pusula.Training.HealthCare.Appointments
 @using Pusula.Training.HealthCare.Doctors
+@using Pusula.Training.HealthCare.Departments
 @inject IAppointmentsAppService AppointmentAppService
 @inject IDoctorsAppService DoctorAppService
+@inject IDepartmentsAppService DepartmentAppService
 
 <div class="container">
     <!-- Syncfusion Kartlar -->
@@ -55,60 +58,132 @@
             </SfCard>
         </div>
     </div>
-
+    </div>
     <!-- Doktor Arama Kısmı -->
     <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <h4>Doktor</h4>
-            <SfDropDownList DataSource="@FilteredDoctors"
+        <SfDropDownList @ref="doctorDropDown"
+                            DataSource="@FilteredDoctors"
                             Placeholder="Doktor seçiniz..."
                             AllowFiltering="true"
                             TItem="DoctorWithNavigationPropertiesDto"
-                            TValue="Guid">
+                            TValue="Guid"
+                            CssClass="e-custom"
+        Width="120">
                 <DropDownListFieldSettings Value="Doctor.Id" Text="FullName"></DropDownListFieldSettings>
                 <DropDownListEvents TValue="Guid" TItem="DoctorWithNavigationPropertiesDto" ValueChange="OnDoctorValueChange"></DropDownListEvents>
             </SfDropDownList>
         </div>
+    <div class="col-md-4">
+        <h4>Departman</h4>
+        <SfDropDownList @ref="departmentDropDown"
+                        DataSource="@FilteredDepartments"
+                        Placeholder="Departman seçiniz..."
+                        AllowFiltering="true"
+                        TItem="DepartmentDto"
+                        TValue="Guid"
+                        CssClass="e-custom"
+        Width="120">
+            <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+            <DropDownListEvents TValue="Guid" TItem="DepartmentDto" ValueChange="OnDepartmentValueChange"></DropDownListEvents>
+        </SfDropDownList>
+    </div>
+    <div class="col-md-4 d-flex align-items-end">
+        <button class="btn custom-add-button" @onclick="ClearFilters">Temizle</button>
+    </div>
     </div>
 
     <!-- Appointment List Datagrid -->
+
     <div class="row">
         <div class="col-lg-12">
-            <SfGrid DataSource="@Appointments" AllowPaging="true" AllowSorting="true" Height="600" ID="custom-grid">
-                <GridPageSettings PageSize="12"></GridPageSettings>
-                <GridColumns>
-                    <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
-                    <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="200"></GridColumn>
-                    <GridColumn Field="PatientFullName" HeaderText="Patient" Width="200"></GridColumn>
-                    <GridColumn Field="StartDate" HeaderText="Start Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
-                    <GridColumn Field="EndDate" HeaderText="End Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
-                    <GridColumn Field="Status" HeaderText="Status" Width="120">
-                        <Template>
-                            @{
-                                var appointment = context as AppointmentListItem;
-                            }
-                            <span class="@GetStatusClass(appointment.Status)">
-                                @appointment.Status
-                            </span>
-                        </Template>
-                    </GridColumn>
-                    <GridColumn Field="AppointmentTypeName" HeaderText="Appointment Type" Width="150"></GridColumn>
-                    <GridColumn HeaderText="Actions" Width="100">
-                        <Template>
-                            @{
-                                var appointment = context as AppointmentListItem;
-                            }
-                            <button class="btn btn-sm custom-add-button"
-                                    @onclick="() => OpenEditDialog(appointment)">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </Template>
-                    </GridColumn>
-                </GridColumns>
-            </SfGrid>
+        <SfTab CssClass="e-tab">
+                <TabItems>
+                    <!-- Gelecek Randevular -->
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Randevular"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <SfGrid DataSource="@UpcomingAppointments" AllowPaging="true" AllowSorting="true" Height="600">
+                            <GridPageSettings PageSize="12"></GridPageSettings>
+                            <GridColumns>
+                                <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
+                                <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="200"></GridColumn>
+                                <GridColumn Field="PatientFullName" HeaderText="Patient" Width="200"></GridColumn>
+                                <GridColumn Field="StartDate" HeaderText="Start Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field="EndDate" HeaderText="End Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field="Status" HeaderText="Status" Width="120">
+                                    <Template>
+                                        @{
+                                            var appointment = context as AppointmentListItem;
+                                        }
+                                        <span class="@GetStatusClass(appointment.Status)">
+                                            @appointment.Status
+                                        </span>
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn HeaderText="Actions" Width="100">
+                                    <Template>
+                                        @{
+                                            var appointment = context as AppointmentListItem;
+                                        }
+                                        <button class="btn btn-sm custom-add-button"
+                                                @onclick="() => OpenEditDialog(appointment)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn Field="AppointmentTypeName" HeaderText="Appointment Type" Width="150"></GridColumn>
+                            </GridColumns>
+                        </SfGrid>
+                    </ContentTemplate>
+                </TabItem>
+                <!-- Geçmiş Randevular -->
+                <TabItem>
+                    <ChildContent>
+                        <TabHeader Text="Geçmiş Randevular"></TabHeader>
+                    </ChildContent>
+                    <ContentTemplate>
+                        <SfGrid DataSource="@PastAppointments" AllowPaging="true" AllowSorting="true" Height="600">
+                            <GridPageSettings PageSize="12"></GridPageSettings>
+                            <GridColumns>
+                                <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
+                                <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="200"></GridColumn>
+                                <GridColumn Field="PatientFullName" HeaderText="Patient" Width="200"></GridColumn>
+                                <GridColumn Field="StartDate" HeaderText="Start Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field="EndDate" HeaderText="End Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
+                                <GridColumn Field="Status" HeaderText="Status" Width="120">
+                                    <Template>
+                                        @{
+                                            var appointment = context as AppointmentListItem;
+                                        }
+                                        <span class="@GetStatusClass(appointment.Status)">
+                                            @appointment.Status
+                                        </span>
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn Field="AppointmentTypeName" HeaderText="Appointment Type" Width="150"></GridColumn>
+                                <GridColumn HeaderText="Actions" Width="100">
+                                    <Template>
+                                        @{
+                                            var appointment = context as AppointmentListItem;
+                                          }
+                                        <button class="btn btn-sm custom-add-button"
+                                        @onclick="() => OpenEditDialog(appointment)">
+                                       <i class="fas fa-edit"></i>
+                                       </button>
+                                    </Template> 
+                                </GridColumn>
+                            </GridColumns>
+                        </SfGrid>
+                    </ContentTemplate>
+                </TabItem>
+                </TabItems>
+            </SfTab>
         </div>
     </div>
-</div>
 
 <!-- Doktorun randevu statuslerini güncelleyebilmesi için Edit Dialog -->
 <SfDialog @bind-Visible="@IsEditDialogOpen" Width="400px" Header="Edit Appointment Status">
@@ -144,7 +219,33 @@
 
 
 <style>
- 
+    .e-appointment.e-input-group, .e-custom.e-input-group.e-control-wrapper {
+        height: 40px;
+        width: 100% !important;
+        border-radius: 10px !important; /* Köşeleri yuvarlamak için */
+        border: 1px solid #f72585 !important; /* Yumuşak bir çerçeve */
+        padding: 5px;
+        border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
+        box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
+    }
+    .e-input-group.e-corner {
+    border-radius: 10px !important;
+    border: 1px solid #f72585 !important;
+    width: 100% !important;
+    padding: 5px;
+    border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
+    box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
+}
+    .e-tab .e-tab-header .e-toolbar-item.e-active {
+        background: white;
+        border: 2px solid #f72585;
+        font-size: 14px;
+    }
+
+        .e-tab .e-tab-header .e-toolbar-item.e-active .e-tab-text,
+        .e-tab .e-tab-header .e-toolbar-item.e-active .e-tab-icon {
+            color: #f72585 !important;
+        }
     .custom-card {
         border-radius: 10px;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);

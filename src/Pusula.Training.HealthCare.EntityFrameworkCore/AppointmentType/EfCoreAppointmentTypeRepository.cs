@@ -12,7 +12,7 @@ using Volo.Abp.EntityFrameworkCore;
 
 namespace Pusula.Training.HealthCare.AppointmentTypes
 {
-    internal class EfCoreAppointmentTypeRepository(IDbContextProvider<HealthCareDbContext> dbContextProvider)
+    public class EfCoreAppointmentTypeRepository(IDbContextProvider<HealthCareDbContext> dbContextProvider)
     : EfCoreRepository<HealthCareDbContext, AppointmentType, Guid>(dbContextProvider), IAppointmentTypeRepository
     {
         public async Task<List<AppointmentType>> GetAppointmentTypesForDoctorAsync(Guid doctorId)
