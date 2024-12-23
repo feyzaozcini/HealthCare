@@ -8,7 +8,7 @@ namespace Pusula.Training.HealthCare.Appointments
 {
     public interface IAppointmentsAppService : IApplicationService
     {
-        
+
 
         Task<PagedResultDto<AppointmentWithNavigationPropertiesDto>> GetListAsync(GetAppointmentsInput input);
 
@@ -31,5 +31,6 @@ namespace Pusula.Training.HealthCare.Appointments
         Task<AppointmentDto> UpdateAsync(AppointmentUpdateDto input);
 
         Task<Shared.DownloadTokenResultDto> GetDownloadTokenAsync();
+
     }
 }

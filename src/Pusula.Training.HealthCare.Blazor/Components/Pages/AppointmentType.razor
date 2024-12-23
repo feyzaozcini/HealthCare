@@ -20,6 +20,7 @@
 <div class="col-lg-12 control-section">
     <div class="content-wrapper">
         <SfGrid DataSource="@AppointmentTypeList" AllowPaging="true" Toolbar="@(new List<string>() { "Search" })" OnToolbarClick="OnToolbarClick" ID="custom-grid">
+            <GridPageSettings PageSize="10"></GridPageSettings>
             <GridColumns>
                 <GridColumn Field="Name" HeaderText="Appointment Type" Width="150" />
                 <GridColumn Field="DurationInMinutes" HeaderText="Duration (min)" TextAlign="TextAlign.Center" Width="140" />

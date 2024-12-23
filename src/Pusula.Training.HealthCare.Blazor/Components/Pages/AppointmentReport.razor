@@ -1,43 +1,200 @@
 ﻿@page "/appointmentReport"
 @using Syncfusion.Blazor.PivotView
 @using Pusula.Training.HealthCare.Appointments
+@using Pusula.Training.HealthCare.AppointmentTypes
 @using Pusula.Training.HealthCare.Patients
 @using Pusula.Training.HealthCare.Departments
 @using Pusula.Training.HealthCare.Doctors
-
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Charts
 @inject IAppointmentsAppService AppointmentsAppService
 @inject IDepartmentsAppService DepartmentsAppService
 @inject IDoctorsAppService DoctorsAppService
 @inject IPatientsAppService PatientsAppService
-<div class="control-section">
-    <div class="date-filters" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-        <SfDatePicker TValue="DateTime?" Placeholder="Başlangıç Tarihi" @bind-Value="StartDate"></SfDatePicker>
-        <SfDatePicker TValue="DateTime?" Placeholder="Bitiş Tarihi" @bind-Value="EndDate"></SfDatePicker>
-        <SfButton CssClass="custom-add-button" OnClick="LoadFilteredData">Filtrele</SfButton>
-    </div>
-    <div class="content-wrapper">
-        <div style="text-align: right; margin-bottom: 10px;">
-            <SfButton CssClass="custom-add-button" IsPrimary="true" OnClick="@ExportToExcel">Export to Excel</SfButton>
-        </div>
-        <SfPivotView TValue="AppointmentPivotData" @ref="Pivot" Height="800" Width="100%" AllowExcelExport="true" ShowFieldList="true" EnableValueSorting=true ExpandAll="false">
-            <PivotViewDataSourceSettings DataSource="@PivotData" EnableSorting="true">
-                <PivotViewColumns>
-                    <PivotViewColumn Name="AppointmentStatus" Caption="Randevu Durumu"></PivotViewColumn>
-                </PivotViewColumns>
-                <PivotViewRows>
-                    <PivotViewRow Name="DepartmentName" Caption="Departman"></PivotViewRow>
-                    <PivotViewRow Name="DoctorName" Caption="Doktor"></PivotViewRow>
-                </PivotViewRows>
-                <PivotViewValues>
-                    <PivotViewValue Name="AppointmentCount" Caption="Randevu Sayısı" ></PivotViewValue>
-                </PivotViewValues>
-            </PivotViewDataSourceSettings>
-            <PivotViewPageSettings ColumnPageSize="100" RowPageSize="100"></PivotViewPageSettings> <!-- Sayfa başına daha fazla veri -->
-            <PivotViewGridSettings ColumnWidth="120"></PivotViewGridSettings>
-        </SfPivotView>
-    </div>
-</div>
+@inject IAppointmentTypeAppService AppointmentTypesAppService
+
+
+<SfTab CssClass="e-tab">
+    <TabItems>
+        <!-- Grafikler -->
+        <TabItem>
+            <ChildContent>
+                <TabHeader Text="Grafikli Veriler"></TabHeader>
+            </ChildContent>
+            <ContentTemplate>
+                <div class="control-section">
+                    <div class="filter-section">
+                        <div>
+                            <h3>Filtreleme Seçenekleri</h3>
+                            <div class="filter-box">
+                                <div class="filter-item">
+                                    <label>Başlangıç Tarihi:</label>
+                                    <SfDatePicker @bind-Value="@(Filter.StartDate)" CssClass="e-custom"> </SfDatePicker>
+                                </div>
+                                <div class="filter-item">
+                                    <label>Bitiş Tarihi:</label>
+                                    <SfDatePicker @bind-Value="@(Filter.EndDate)" CssClass="e-custom"> </SfDatePicker>
+                                </div>
+                                <div class="filter-item">
+                                    <label>Randevu Türleri:</label>
+                                    <SfDropDownList DataSource="@FilteredAppointmentTypes"
+                                                    Placeholder="Select Appointment Type"
+                                                    @bind-Value="@Filter.AppointmentTypeId"
+                                                    CssClass="e-custom">
+                                        <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                    </SfDropDownList>
+                                </div>
+                                <div class="filter-item">
+                                    <button class="btn custom-add-button" @onclick="LoadAppointmentsAsync">Filtrele</button>
+                                </div>
+                                <div class="filter-item">
+                                    <button class="btn custom-delete-button" @onclick="ClearFilters">Temizle</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-section">
+                            <!-- Randevu Durumlarına Göre Grafik -->
+                            <SfAccumulationChart Title="Randevu Durumlarına Göre Dağılım">
+                                <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
+                                <AccumulationChartLegendSettings Visible="true"></AccumulationChartLegendSettings>
+                                <AccumulationChartSeriesCollection>
+                                    <AccumulationChartSeries DataSource="@ChartData" XName="Name" YName="Count" InnerRadius="40%">
+                                        <AccumulationDataLabelSettings Visible="true" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
+                                    </AccumulationChartSeries>
+                                </AccumulationChartSeriesCollection>
+                            </SfAccumulationChart>
+                        </div>
+                        <!-- Departmanlara Göre Grafik -->
+                        <div class="chart-section">
+                            <SfAccumulationChart Title="Departmanlara Göre Dağılım">
+                                <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
+                                <AccumulationChartLegendSettings Visible="true"></AccumulationChartLegendSettings>
+                                <AccumulationChartSeriesCollection>
+                                    <AccumulationChartSeries DataSource="@DepartmentChartData" XName="Name" YName="Count" InnerRadius="40%">
+                                        <AccumulationDataLabelSettings Visible="true" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
+                                    </AccumulationChartSeries>
+                                </AccumulationChartSeriesCollection>
+                            </SfAccumulationChart>
+                        </div>
+                        <!-- Cinsiyetlere Göre Grafik -->
+                        <div class="chart-section">
+                            <SfAccumulationChart Title="Cinsiyete Göre Dağılım">
+                                <AccumulationChartTooltipSettings Enable="true"></AccumulationChartTooltipSettings>
+                                <AccumulationChartLegendSettings Visible="true"></AccumulationChartLegendSettings>
+                                <AccumulationChartSeriesCollection>
+                                    <AccumulationChartSeries DataSource="@GenderChartData" XName="Name" YName="Count" InnerRadius="40%">
+                                        <AccumulationDataLabelSettings Visible="true" Position="AccumulationLabelPosition.Outside"></AccumulationDataLabelSettings>
+                                    </AccumulationChartSeries>
+                                </AccumulationChartSeriesCollection>
+                            </SfAccumulationChart>
+                        </div>
+                    </div>
+                </div>
+            </ContentTemplate>
+        </TabItem>
+        <!-- Geçmiş Randevular -->
+        <TabItem>
+            <ChildContent>
+                <TabHeader Text="Tablolu verileri"></TabHeader>
+            </ChildContent>
+            <ContentTemplate>
+                <div class="control-section">
+                    <div class="date-filters" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+                        <SfDatePicker TValue="DateTime?" Placeholder="Başlangıç Tarihi" @bind-Value="StartDate"></SfDatePicker>
+                        <SfDatePicker TValue="DateTime?" Placeholder="Bitiş Tarihi" @bind-Value="EndDate"></SfDatePicker>
+                        <SfButton CssClass="custom-add-button" OnClick="LoadFilteredData">Filtrele</SfButton>
+                    </div>
+                    <div class="content-wrapper">
+                        <div style="text-align: right; margin-bottom: 10px;">
+                            <SfButton CssClass="custom-add-button" IsPrimary="true" OnClick="@ExportToExcel">Export to Excel</SfButton>
+                        </div>
+                        <SfPivotView TValue="AppointmentPivotData" @ref="Pivot" Height="800" Width="100%" AllowExcelExport="true" ShowFieldList="true" EnableValueSorting=true ExpandAll="false">
+                            <PivotViewDataSourceSettings DataSource="@PivotData" EnableSorting="true">
+                                <PivotViewColumns>
+                                    <PivotViewColumn Name="AppointmentStatus" Caption="Randevu Durumu"></PivotViewColumn>
+                                </PivotViewColumns>
+                                <PivotViewRows>
+                                    <PivotViewRow Name="DepartmentName" Caption="Departman"></PivotViewRow>
+                                    <PivotViewRow Name="DoctorName" Caption="Doktor"></PivotViewRow>
+                                </PivotViewRows>
+                                <PivotViewValues>
+                                    <PivotViewValue Name="AppointmentCount" Caption="Randevu Sayısı"></PivotViewValue>
+                                </PivotViewValues>
+                            </PivotViewDataSourceSettings>
+                            <PivotViewPageSettings ColumnPageSize="100" RowPageSize="100"></PivotViewPageSettings> <!-- Sayfa başına daha fazla veri -->
+                            <PivotViewGridSettings ColumnWidth="120"></PivotViewGridSettings>
+                        </SfPivotView>
+                    </div>
+                </div>
+            </ContentTemplate>
+        </TabItem>
+    </TabItems>
+</SfTab>
 <style>
+    .chart-container {
+        display: flex;
+        flex-wrap: wrap; 
+        justify-content: space-around; 
+        gap: 20px;
+        margin: 20px 0;
+        background-color: #fff; 
+        padding: 20px; 
+        border-radius: 10px; 
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
+    }
+
+    .chart-section {
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #fff;
+        width: 100%;
+        max-width: 650px;
+    }
+
+    .chart-container > .chart-section:nth-child(3) {
+        flex-basis: 100%; 
+        text-align: center; 
+    }
+
+    .filter-section {
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #fff;
+    }
+
+    .filter-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .filter-item {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 200px;
+    }
+
+        .filter-item label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+    .e-tab .e-tab-header .e-toolbar-item.e-active {
+        background: white;
+        border: 2px solid #f72585;
+        font-size: 14px;
+    }
+
+        .e-tab .e-tab-header .e-toolbar-item.e-active .e-tab-text,
+        .e-tab .e-tab-header .e-toolbar-item.e-active .e-tab-icon {
+            color: #f72585 !important;
+        }
     .e-pivotview {
         min-height: 200px;
     }
@@ -46,6 +203,4 @@
         height: 100%;
     }
 </style>
-@code {
-    
-}
+

@@ -1,12 +1,16 @@
 ﻿using Pusula.Training.HealthCare.AppointmentRules;
+using Pusula.Training.HealthCare.AppointmentTypes;
 using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Shared;
 using Syncfusion.Blazor.DropDowns;
+using Syncfusion.Blazor.Notifications;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Volo.Abp;
+using Volo.Abp.Application.Dtos;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -16,10 +20,10 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private IReadOnlyList<LookupDto<Guid>> DepartmentsCollection { get; set; } = new List<LookupDto<Guid>>();
         private IReadOnlyList<LookupDto<Guid>> DoctorsCollection { get; set; } = new List<LookupDto<Guid>>();
         private AppointmentRuleCreateDto NewAppointmentRule = new AppointmentRuleCreateDto();
-
+        private AppointmentRuleUpdateDto EditAppointmentRule = new AppointmentRuleUpdateDto();
         private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
         private List<DepartmentDto> AllDepartments = new();
-
+        private SfToast? ToastObj;
         private DoctorWithNavigationPropertiesDto SelectedDoctor;
         private DepartmentDto SelectedDepartment;
 
@@ -27,8 +31,10 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
 
         public List<AppointmentListItem> AppointmentRules { get; set; } = new();
-
-
+        private bool IsEditModalOpen = false;
+        private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
+        private int CurrentPage { get; set; } = 1;
+        private string CurrentSorting { get; set; } = string.Empty;
         private bool IsAddNewDialogOpen = false;
         protected override async Task OnInitializedAsync()
         {
@@ -36,7 +42,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             await GetDepartmentCollectionLookupAsync();
             await LoadInitialDataAsync();
             await LoadAppointmentRulesAsync();
-
+            ToastObj ??= new SfToast();
             GendersCollection = Enum.GetValues(typeof(Gender))
                 .Cast<Gender>()
                 .Select(b => new LookupDto<Gender> { Id = b, DisplayName = b.ToString() })
@@ -128,14 +134,21 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         }
         private async Task LoadAppointmentRulesAsync()
         {
-            var result = await AppointmentRulesAppService.GetListAsync(new GetAppointmentRulesInput());
+            var input = new GetAppointmentRulesInput
+            {
+                MaxResultCount = 1000,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
+            var result = await AppointmentRulesAppService.GetListAsync(input);
             AppointmentRules = result.Items.Select(a => new AppointmentListItem
             {
+                Id = a.AppointmentRule.Id,
                 DepartmentName = a.Department?.Name,
                 DoctorFullName = $"{a.Doctor?.TitleName} {a.Doctor?.Name} {a.Doctor?.SurName}",
                 MinAge = a.AppointmentRule?.MinAge,
                 MaxAge = a.AppointmentRule?.MaxAge,
-                PatientGender = ToDisplayString(a.AppointmentRule?.Gender),
+                PatientGender = a.AppointmentRule?.Gender,
                 Description = a.AppointmentRule?.Description
             }).ToList();
         }
@@ -152,20 +165,10 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         {
             IsAddNewDialogOpen = true;
         }
-        private string ToDisplayString(Gender? gender)
-        {
-            return gender switch
-            {
-                Gender.Male => "Erkek",
-                Gender.Female => "Kadın",
-                Gender.Unspecified => "Belirtilmemiş",
-                Gender.Other => "Diğer",
-                _ => " "
-            };
-        }
+       
         private async Task CreateAppointmentRule()
         {
-            try
+            await HandleError(async () =>
             {
                 NewAppointmentRule.DepartmentId = SelectedDepartment?.Id;
                 NewAppointmentRule.DoctorId = SelectedDoctor?.Doctor.Id;
@@ -173,12 +176,23 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
                 IsAddNewDialogOpen = false; // Dialog kapat
                 await LoadAppointmentRulesAsync(); // Listeyi güncelle
-            }
-            catch (Exception ex)
-            {
-
-            }
+                await ShowToast("Appoinment Rule başarıyla eklendi.", true);
+            });
+            
         }
+        private async Task DeleteAppointmentRule(Guid id)
+        {
+            await HandleError(async () =>
+            {
+                await AppointmentRulesAppService.DeleteAsync(id);
+                var result = await AppointmentRulesAppService.GetListAsync(new GetAppointmentRulesInput());
+                await LoadAppointmentRulesAsync(); // Listeyi güncelle
+                await ShowToast("Appoinment Rule başarıyla silindi.", true);
+            });
+        }
+
+
+
         public class AppointmentListItem
         {
             public Guid Id { get; set; }
@@ -189,8 +203,37 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             public int? Age { get; set; }
             public int? MinAge { get; set; }
             public int? MaxAge { get; set; }
-            public string? PatientGender { get; set; }
+            public Gender? PatientGender { get; set; }
             public string? Description { get; set; }
         }
+
+        #region HandleError
+        public async Task HandleError(Func<Task> action)
+        {
+            try
+            {
+                await action();
+            }
+            catch (UserFriendlyException ex)
+            {
+                await ShowToast(ex.Message, false);
+            }
+            catch (Exception)
+            {
+                await ShowToast("Bir hata oluştu. Lütfen tekrar deneyin.", false);
+            }
+        }
+
+        private async Task ShowToast(string message, bool isSuccess = true)
+        {
+            await ToastObj!.ShowAsync(new ToastModel
+            {
+                Content = message,
+                CssClass = isSuccess ? "e-toast-success" : "e-toast-danger",
+                Timeout = 3000,
+                ShowCloseButton = true
+            });
+        }
+        #endregion
     }
 }

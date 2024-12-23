@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System;
 using Volo.Abp;
 using System.Linq;
+using Volo.Abp.Application.Dtos;
+using Pusula.Training.HealthCare.AppointmentRules;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -16,6 +18,9 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private List<DoctorWorkScheduleWithNavigationPropertiesDto> DoctorWorkScheduleList = new();
         private DoctorWorkScheduleCreateDto NewDoctorWorkSchedule = new();
         private DoctorWorkScheduleUpdateDto EditDoctorWorkSchedule = new();
+        private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
+        private int CurrentPage { get; set; } = 1;
+        private string CurrentSorting { get; set; } = string.Empty;
         private bool IsAddModalOpen = false;
         private bool IsEditModalOpen = false;
         private SfToast? ToastObj;
@@ -48,7 +53,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         }
         private async Task LoadDoctorWorkSchedurlerAsync()
         {
-            var doctorWorkSchedules = await DoctorWorkScheduleAppService.GetListAsync(new GetDoctorWorkSchedulesInput());
+            var input = new GetDoctorWorkSchedulesInput
+            {
+                MaxResultCount = 1000,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
+            var doctorWorkSchedules = await DoctorWorkScheduleAppService.GetListAsync(input);
             DoctorWorkSchedulers = doctorWorkSchedules.Items.Select(a => new DoctorWorkSchedulerListItem
             {
                 Id = a.DoctorWorkSchedule.Id,

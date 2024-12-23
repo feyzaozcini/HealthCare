@@ -1,51 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using MailKit.Net.Smtp;
-using MailKit.Security;
-using MimeKit;
-using Pusula.Training.HealthCare.Departments;
-using Pusula.Training.HealthCare.Patients;
-using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
+using Pusula.Training.HealthCare.Core.EMail;
+using Volo.Abp.Emailing;
 
 namespace Pusula.Training.HealthCare.EmailServices
 {
-    public class EmailService
+    //Feyza Özçini ve Nil Birlik Pair Programming Yaparak Oluşturdu
+    public class EmailService(IEmailSender emailSender) : IEmailService
     {
-        private readonly string _smtpServer;
-        private readonly int _smtpPort;
-        private readonly string _smtpUser;
-        private readonly string _smtpPass;
+        public async Task SendAsync(string to, string subject, string body) =>
+            await SendAsync(default,to, subject, body); 
 
-        public EmailService(string smtpServer, int smtpPort, string smtpUser, string smtpPass)
-        {
-            _smtpServer = smtpServer;
-            _smtpPort = smtpPort;
-            _smtpUser = smtpUser;
-            _smtpPass = smtpPass;
-        }
+        public async Task SendAsync(string from, string to, string subject, string body) =>
+            await emailSender.SendAsync(from, to, subject, body);
 
-        public async Task SendEmailAsync(string to, string subject, string body)
-        {
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("HealthCare System", _smtpUser));
-            message.To.Add(new MailboxAddress(to, to));
-            message.Subject = subject;
+        public async Task QueueAsync(string to, string subject, string body) =>
+            await QueueAsync(default,to, subject, body);
 
-            message.Body = new TextPart("plain")
-            {
-                Text = body
-            };
+        public async Task QueueAsync(string from,string to, string subject, string body) =>
+            await emailSender.QueueAsync(from,to, subject, body);
 
-            using (var client = new SmtpClient())
-            {
-                await client.ConnectAsync(_smtpServer, _smtpPort, SecureSocketOptions.StartTls);
-                await client.AuthenticateAsync(_smtpUser, _smtpPass);
-                await client.SendAsync(message);
-                await client.DisconnectAsync(true);
-            }
-        }
 
         // Randevu Body Şablonu
         public string CreateAppointmentConfirmationBody(string patientName, string departmentName, DateTime startDate, DateTime endDate)
@@ -59,6 +33,7 @@ namespace Pusula.Training.HealthCare.EmailServices
         - **Randevu Bitiş:  {endDate.ToString("yyyy-MM-dd HH:mm")}"; ;
         }
 
+        //test sonuçları testresultemail service onun kendi servsinde o alan olur 
         public string CreateTestResultsNotificationBody(string patientName)
         {
             return $@"
@@ -69,5 +44,15 @@ namespace Pusula.Training.HealthCare.EmailServices
             halleDEViz Ekibi";
         }
 
+        public string CreateEmailBody(params object[] args)
+        {
+            return $@"
+          Merhaba {args[0]} ,
+          Randevunuz başarıyla oluşturulmuştur. İşte detaylar:
+
+        - **Departman:  {args[1]}
+        - **Randevu Başlangıç:  {args[2]}
+        - **Randevu Bitiş:  {args[3]}"; ;
+        }
     }
 }

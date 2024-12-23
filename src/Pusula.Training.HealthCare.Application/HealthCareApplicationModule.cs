@@ -88,12 +88,7 @@ public class HealthCareApplicationModule : AbpModule
         
         context.Services.AddTransient<UserProfileManager>();
 
-        context.Services.AddSingleton(new EmailService(
-                   "smtp.gmail.com", // Gmail için SMTP sunucusu
-                   587,                   // TLS portu
-                   "hhalledeviz@gmail.com", // Gmail kullanıcı adı
-                   "asxj ddfe ifet ntkw"  // Gmail uygulama şifresi
-               ));
+       
 
     }
 }

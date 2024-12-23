@@ -108,7 +108,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         {
             Filter = new GetPatientsInput
             {
-                MaxResultCount = PageSize,
+                MaxResultCount = 1000,
                 SkipCount = (CurrentPage - 1) * PageSize,
                 Sorting = CurrentSorting
             };
@@ -151,7 +151,10 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 PatientId = null,
                 AppointmentTypeId = null,
                 DoctorId = SelectedDoctor?.Doctor?.Id, //Doctorun randevularını getirme filtresi
-                DepartmentId = SelectedDepartment?.Id //Departmanın randevularını getirme filtresi
+                DepartmentId = SelectedDepartment?.Id, //Departmanın randevularını getirme filtresi
+                MaxResultCount = 1000,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
             };
 
             var result = await AppointmentsAppService.GetListAsync(input);
@@ -301,7 +304,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 var createdAppointment = await AppointmentsAppService.CreateAsync(NewAppointment);
 
                 // Başarılı mesaj
-                await ShowToast("Randevu başarıyla oluşturuldu!", true);
+                await ShowToast("Randevu başarıyla oluşturuldu! Detaylar Mailinize İletilmiştir.", true);
             });
         }
         #endregion
@@ -421,6 +424,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             IsPatientSelectionPopupVisible = false;
             PatientList = new List<PatientWithNavigationPropertiesDto>();
         }
+        private int CalculateAge(DateTime birthDate)
+        {
+            var today = DateTime.Now;
+            var age = today.Year - birthDate.Year;
+            if (birthDate.Date > today.AddYears(-age)) age--;
+            return age;
+        }
         #endregion
 
         #region Lookups
@@ -486,7 +496,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             {
                 Content = message,
                 CssClass = isSuccess ? "e-toast-success" : "e-toast-danger",
-                Timeout = 3000,
+                Timeout = 4000,
                 ShowCloseButton = true
             });
         }
