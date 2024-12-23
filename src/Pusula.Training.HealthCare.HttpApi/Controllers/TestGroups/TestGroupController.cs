@@ -40,4 +40,5 @@ public class TestGroupController(ITestGroupsAppService testGroupsAppService)
 
     [HttpPut]
     public Task<TestGroupDto> UpdateAsync(TestGroupsUpdateDto input) => testGroupsAppService.UpdateAsync(input);
+
 }

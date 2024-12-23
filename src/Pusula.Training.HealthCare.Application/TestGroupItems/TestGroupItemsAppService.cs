@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Core;
+using Pusula.Training.HealthCare.Core.Helpers.Concretes;
 using Pusula.Training.HealthCare.Core.Rules.TestGroupItems;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
@@ -19,7 +20,8 @@ public class TestGroupItemsAppService(
     ITestGroupItemRepository testGroupItemRepository,
     ITestGroupItemBusinessRules testGroupItemBusinessRules,
     TestGroupItemManager testGroupItemManager,
-    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache)
+    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache,
+    IDistributedCache distributedCache)
     : HealthCareAppService, ITestGroupItemsAppService
 {
     [Authorize(HealthCarePermissions.TestGroupItems.Create)]
@@ -81,7 +83,14 @@ public class TestGroupItemsAppService(
 
     public virtual async Task<PagedResultDto<TestGroupItemDto>> GetListAsync(GetTestGroupItemsInput input)
     {
-        var totalCount = await testGroupItemRepository.GetCountAsync(
+        var cacheHelper = new CacheHelper<TestGroupItemDto, GetTestGroupItemsInput>(
+        distributedCache,
+        Logger
+    );
+        return await cacheHelper.GetOrAddAsync(
+            async () =>
+            {
+                var totalCount = await testGroupItemRepository.GetCountAsync(
             input.FilterText, 
             input.TestGroupId,
             input.Name,
@@ -102,12 +111,16 @@ public class TestGroupItemsAppService(
             input.MaxResultCount, 
             input.SkipCount
             );
-
-        return new PagedResultDto<TestGroupItemDto>
-        {
-            TotalCount = totalCount,
-            Items = ObjectMapper.Map<List<TestGroupItem>, List<TestGroupItemDto>>(items)
-        };
+                return new PagedResultDto<TestGroupItemDto>
+                {
+                    TotalCount = totalCount,
+                    Items = ObjectMapper.Map<List<TestGroupItem>, List<TestGroupItemDto>>(items)
+                };
+            },
+            input,
+            "TestGroupItems:GetList",
+            TimeSpan.FromMinutes(60)
+        );
     }
 
     public virtual async Task<TestGroupItemDto> GetWithNavigationPropertiesAsync(Guid id)

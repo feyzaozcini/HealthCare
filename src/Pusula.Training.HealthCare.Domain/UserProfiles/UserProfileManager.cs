@@ -3,12 +3,13 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.DependencyInjection;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Identity;
 
 namespace Pusula.Training.HealthCare.UserProfiles;
 
-public class UserProfileManager : DomainService
+public class UserProfileManager : DomainService, ITransientDependency
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IIdentityRoleRepository _roleRepository;
