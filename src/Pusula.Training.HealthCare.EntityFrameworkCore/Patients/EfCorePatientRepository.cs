@@ -201,8 +201,7 @@ public class EfCorePatientRepository(IDbContextProvider<HealthCareDbContext> dbC
                 .WhereIf(companyId.HasValue, e => e.CompanyId == companyId);
 
 
-    //join address in (await GetDbContextAsync()).Set<Address>() on patient.Addresses equals address into adressses
-    //from address in adressses.DefaultIfEmpty()
+    
     //Company ve Country tablolarý ile join iþlemi yapýlýr. Entityler yok þu an önemli
     protected virtual async Task<IQueryable<PatientWithNavigationProperties>> GetQueryForNavigationPropertiesAsync()
     {
