@@ -1,0 +1,89 @@
+version: '3.3'
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - pthprometheus:/prometheus
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == worker
+
+  grafana:
+      image: grafana/grafana:latest
+      ports:
+        - "3000:3000"
+      volumes:
+        - pthgrafana:/var/lib/grafana
+      environment:
+        - GF_SMTP_ENABLED=true
+        - GF_SMTP_HOST=smtp.gmail.com:587
+        - GF_SMTP_USER=mehmet.dstci@gmail.com
+        - GF_SMTP_PASSWORD=jangbcofcvwwuzaw
+        - GF_SMTP_SKIP_VERIFY=false
+        - GF_SMTP_FROM_ADDRESS=mehmet.dstci@gmail.com
+      deploy:
+        replicas: 1
+        restart_policy:
+          condition: on-failure
+        placement:
+          constraints:
+            - node.role == worker
+
+  node_exporter_node1:
+    image: prom/node-exporter:latest
+    ports:
+      - 9100
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.hostname == team1-node1]
+
+  node_exporter_node2:
+    image: prom/node-exporter:latest
+    ports:
+      - 9100
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.hostname == team1-node2]
+
+configs:
+  prometheus_config:
+    file: ./prometheus_config.yml
+
+volumes:
+  pthgrafana:
+  pthprometheus:
+

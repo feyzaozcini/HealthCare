@@ -6,6 +6,7 @@ services:
     environment:
       - xpack.watcher.enabled=false
       - xpack.security.enabled=true
+      - xpack.security.authc.api_key.enabled=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - discovery.type=single-node
       - ELASTIC_USERNAME=elastic
@@ -18,7 +19,10 @@ services:
       - healthcare_network
     deploy:
       replicas: 1
-
+      placement:
+        constraints:
+          - node.role == worker  
+          
 volumes:
   pthesdata:
 
