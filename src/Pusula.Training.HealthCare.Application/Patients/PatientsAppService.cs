@@ -56,7 +56,7 @@ namespace Pusula.Training.HealthCare.Patients
         public virtual async Task<PatientWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id)
         {
             var patient = await patientRepository.GetWithNavigationPropertiesAsync(id);
-            await distributedEventBus.PublishAsync(new PatientCountryAndCompanyEto { Country = patient.PrimaryCountry.Name, Company = patient.PatientCompany.Name });
+            await distributedEventBus.PublishAsync(new PatientCountryAndCompanyEto { Country = patient.Country.Name, Company = patient.PatientCompany.Name });
             return ObjectMapper.Map<PatientWithNavigationProperties, PatientWithNavigationPropertiesDto>(patient);
         }
 

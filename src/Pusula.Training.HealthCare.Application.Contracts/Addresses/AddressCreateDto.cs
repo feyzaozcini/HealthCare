@@ -19,8 +19,6 @@ namespace Pusula.Training.HealthCare.Addresses
         public virtual Guid VillageId { get; set; }
         public virtual string AddressDescription { get; set; } = string.Empty;
         public virtual bool IsPrimary { get; set; }
-        
-
         public List<CityDto> CityList { get; set; } = new List<CityDto>();
         public List<DistrictDto> DistrictList { get; set; } = new List<DistrictDto>();
         public List<VillageDto> VillageList { get; set; } = new List<VillageDto>();

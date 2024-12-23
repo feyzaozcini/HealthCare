@@ -16,16 +16,11 @@ namespace Pusula.Training.HealthCare.Patients
     {
         public Patient? Patient { get; set; }
         public PatientCompany? PatientCompany { get; set; }
-        public Country? PrimaryCountry { get; set; }
-        public City? PrimaryCity { get; set; } 
-        public District? PrimaryDistrict { get; set; } 
-        public Village? PrimaryVillage { get; set; } 
-        public Country? SecondaryCountry { get; set; } 
-        public City? SecondaryCity { get; set; } 
-        public District? SecondaryDistrict { get; set; }
-        public Village? SecondaryVillage { get; set; } 
+        public Country? Country { get; set; }
+        public City? City { get; set; } 
+        public District? District { get; set; } 
+        public Village? Village { get; set; } 
         public Address? Address { get; set; }
-
         public List<Address>? Addresses { get; set; }
     }
 }
