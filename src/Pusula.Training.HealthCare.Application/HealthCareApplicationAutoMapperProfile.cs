@@ -59,7 +59,9 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<Patient, PatientExcelDto>();
         CreateMap<PatientDto, PatientUpdateDto>();
         CreateMap<Patient, LookupDto<Guid>>().ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"));
-        CreateMap<PatientWithNavigationProperties, PatientWithNavigationPropertiesDto>();
+        CreateMap<PatientWithNavigationProperties, PatientWithNavigationPropertiesDto>()
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+
         CreateMap<Patient, PatientWithNavigationPropertiesDto>();
         CreateMap<Patient, PatientDeletedDto>();
 

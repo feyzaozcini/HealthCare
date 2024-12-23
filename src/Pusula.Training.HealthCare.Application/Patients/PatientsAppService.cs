@@ -38,15 +38,11 @@ namespace Pusula.Training.HealthCare.Patients
         {
             var totalCount = await patientRepository.GetCountAsync(input.FilterText, input.FirstName, input.LastName,input.BirthDateMin,input.BirthDateMax,input.IdentityNumber,
                 input.PassportNumber,input.Email,input.MobilePhoneNumber,input.EmergencyPhoneNumber,input.Gender,input.No,input.MotherName,input.FatherName,input.BloodType,
-                input.Type,input.CompanyId, input.PrimaryCountryId,input.PrimaryCityId,input.PrimaryDistrictId,input.PrimaryVillageId,input.PrimaryAddressDescription,
-                input.SecondaryCountryId,input.SecondaryCityId,input.SecondaryDistrictId,input.SecondaryVillageId, input.SecondaryAddressDescription, input.Sorting,
-                input.MaxResultCount, input.SkipCount);
+                input.Type,input.CompanyId, input.Sorting, input.MaxResultCount, input.SkipCount);
 
             var items = await patientRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.FirstName, input.LastName, input.BirthDateMin, input.BirthDateMax, input.IdentityNumber,
                 input.PassportNumber, input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.No, input.MotherName, input.FatherName, input.BloodType,
-                input.Type, input.CompanyId,  input.PrimaryCountryId, input.PrimaryCityId, input.PrimaryDistrictId, input.PrimaryVillageId,input.PrimaryAddressDescription,
-                input.SecondaryCountryId, input.SecondaryCityId, input.SecondaryDistrictId, input.SecondaryVillageId, input.SecondaryAddressDescription, input.Sorting,
-                input.MaxResultCount, input.SkipCount);
+                input.Type, input.CompanyId, input.Sorting, input.MaxResultCount, input.SkipCount);
 
             return new PagedResultDto<PatientWithNavigationPropertiesDto>
             {
@@ -110,9 +106,8 @@ namespace Pusula.Training.HealthCare.Patients
             await patientBusinessRules.IdentityNumberCannotBeDuplicatedWhenInserted(input.IdentityNumber);
 
             var patient = await patientManager.CreateAsync(input.CompanyId, input.FirstName, input.LastName, input.BirthDate, input.IdentityNumber, input.PassportNumber,
-                input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.MotherName, input.FatherName, input.BloodType, input.Type,
-                input.PrimaryCountryId, input.PrimaryCityId, input.PrimaryDistrictId, input.PrimaryVillageId, input.PrimaryAddressDescription!, input.SecondaryCountryId,
-                input.SecondaryCityId, input.SecondaryDistrictId, input.SecondaryVillageId, input.SecondaryAddressDescription!);
+                input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.MotherName, input.FatherName, input.BloodType, input.Type
+                );
 
             if (input.Addresses != null && input.Addresses.Any())
             {
@@ -140,9 +135,8 @@ namespace Pusula.Training.HealthCare.Patients
         public virtual async Task<PatientDto> UpdateAsync(Guid id, PatientUpdateDto input) => ObjectMapper.Map<Patient, PatientDto>(
                 await patientManager.UpdateAsync(id,
                     input.CompanyId, input.FirstName, input.LastName, input.BirthDate, input.IdentityNumber, input.PassportNumber, input.Email, 
-                    input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.MotherName, input.FatherName, input.BloodType, input.Type,
-                    input.PrimaryCountryId, input.PrimaryCityId, input.PrimaryDistrictId, input.PrimaryVillageId, input.PrimaryAddressDescription, 
-                    input.SecondaryCountryId, input.SecondaryCityId, input.SecondaryDistrictId, input.SecondaryVillageId, input.SecondaryAddressDescription));
+                    input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.MotherName, input.FatherName, input.BloodType, input.Type
+                    ));
 
         [Authorize(HealthCarePermissions.Patients.Delete)]
         public virtual async Task<PatientDeletedDto> DeleteAsync(Guid id)
@@ -164,9 +158,7 @@ namespace Pusula.Training.HealthCare.Patients
         [Authorize(HealthCarePermissions.Patients.Delete)]
         public virtual async Task DeleteAllAsync(GetPatientsInput input) => await patientRepository.DeleteAllAsync(input.FilterText, input.FirstName, input.LastName,
             input.BirthDateMin, input.BirthDateMax, input.IdentityNumber, input.PassportNumber, input.Email, input.MobilePhoneNumber,input.EmergencyPhoneNumber,
-            input.Gender, input.No, input.MotherName,input.FatherName, input.BloodType, input.Type, input.CompanyId, input.PrimaryCountryId, input.PrimaryCityId,
-            input.PrimaryDistrictId, input.PrimaryVillageId, input.PrimaryAddressDescription,input.SecondaryCountryId, input.SecondaryCityId, input.SecondaryDistrictId,
-            input.SecondaryVillageId, input.SecondaryAddressDescription);
+            input.Gender, input.No, input.MotherName,input.FatherName, input.BloodType, input.Type, input.CompanyId);
 
         [Authorize(HealthCarePermissions.Patients.Delete)]
         public virtual async Task DeleteByIdsAsync(List<Guid> patientIds) => await patientRepository.DeleteManyAsync(patientIds);
