@@ -15,14 +15,14 @@ public class TestGroupItemDto : AuditedEntityDto<Guid>
 
     public string TestGroupName { get; set; } = null!;
     [Required]
-    public string Name { get; private set; } = null!;
+    public string Name { get; set; } = null!;
 
     [Required]
-    public string Code { get; private set; } = null!;
+    public string Code { get; set; } = null!;
 
     [Required]
-    public string TestType { get; private set; } = null!; 
-    public string? Description { get; private set; }
+    public string TestType { get; set; } = null!; 
+    public string? Description { get; set; }
     [Required]
     public int TurnaroundTime { get; set; }
 }
