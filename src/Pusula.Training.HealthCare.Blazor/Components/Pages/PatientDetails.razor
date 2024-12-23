@@ -123,60 +123,54 @@
 
                                 <!-- Address Information -->
                                 <CardContent>
-                                    <h4 class="fw-bold text-center mt-3">Address</h4>
-                                    <h5 class="fw-bold text-center mt-3">Primary Address</h5>
-                                    <table style="line-height: 2.75em;">
-                                        <tr>
-                                            <td><b>Country:</b></td>
-                                            <td>@PatientStateService.SelectedPatientNavigation.PrimaryCountry?.Name</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>City:</b></td>
-                                            <td>@PatientStateService.SelectedPatientNavigation.PrimaryCity?.Name</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>District:</b></td>
-                                            <td>@PatientStateService.SelectedPatientNavigation.PrimaryDistrict?.Name</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>Village:</b></td>
-                                            <td>@PatientStateService.SelectedPatientNavigation.PrimaryVillage?.Name</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>Address:</b></td>
-                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.PrimaryAddressDescription</td>
-                                        </tr>
-                                    </table>
-
-                                    <h5 class="fw-bold text-center mt-3">Secondary Address</h5>
-                                    <table style="line-height: 2.75em;">
-                                        <tr>
-                                            <td><b>Country:</b></td>
-                                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryCountry?.Name</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>City:</b></td>
-                                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryCity?.Name</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>District:</b></td>
-                                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryDistrict?.Name</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>Village:</b></td>
-                                            <td>@PatientStateService.SelectedPatientNavigation.SecondaryVillage?.Name</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>Address:</b></td>
-                                            <td>@PatientStateService.SelectedPatientNavigation.Patient?.SecondaryAddressDescription</td>
-                                        </tr>
-                                    </table>
+                                    <h4 class="fw-bold text-center mt-3">Addresses</h4>
+                                    @if (PatientStateService?.SelectedPatientNavigation?.Addresses != null && PatientStateService.SelectedPatientNavigation.Addresses.Any())
+                                    {
+                                        foreach (var address in PatientStateService.SelectedPatientNavigation.Addresses.OrderByDescending(a => a.IsPrimary))
+                                        {
+                                            <h5 class="fw-bold text-center mt-3">
+                                                
+                                                @if (address.IsPrimary)
+                                                {
+                                                    
+                                                    <span style="color: green;">(Primary)</span>
+                                                }
+                                            </h5>
+                                            <h5 class="fw-bold text-center mt-3">Address</h5>
+                                            <table style="line-height: 2.75em;">
+                                                <tr>
+                                                    <td><b>Country:</b></td>
+                                                    <td>@address.CountryName</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>City:</b></td>
+                                                    <td>@address.CityName</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>District:</b></td>
+                                                    <td>@address.DistrictName</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Village:</b></td>
+                                                    <td>@address.VillageName</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Address:</b></td>
+                                                    <td>@address.AddressDescription</td>
+                                                </tr>
+                                            </table>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <h5 class="fw-bold text-center mt-3 text-danger">No Addresses Found</h5>
+                                    }
 
                                     <div class="right-align">
-                                        <SfButton CssClass="e-button e-btn e-outline e-primary" @onclick="@(()=> ShowTable = !ShowTable)">For Less Info</SfButton>
+                                        <SfButton CssClass="e-button e-btn e-outline e-primary" @onclick="@(() => ShowTable = !ShowTable)">For Less Info</SfButton>
                                     </div>
-
                                 </CardContent>
+
 
                             }
 

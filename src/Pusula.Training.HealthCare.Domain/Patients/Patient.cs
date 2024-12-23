@@ -18,49 +18,21 @@ namespace Pusula.Training.HealthCare.Patients
 
         [NotNull]
         public virtual DateTime BirthDate { get; private set; }
-
-        //Türk Hastalarý için TC Kimlik No
-        public virtual string IdentityNumber { get; private set; }
-
-        //Yabancý Hastalar için Pasaport No
-        public virtual string? PassportNumber { get; private set; }
-
-        
+        public virtual string IdentityNumber { get; private set; } //Türk Hastalarý için TC Kimlik No
+        public virtual string? PassportNumber { get; private set; }  //Yabancý Hastalar için Pasaport No
         public virtual string? Email { get; private set; }
 
         [NotNull]
         public virtual string MobilePhoneNumber { get; private set; }
-
         public virtual string? EmergencyPhoneNumber { get; private set; }   //Home Phone Number Emergency Oldu
-
         public virtual Gender Gender { get; private set; }
-
         public virtual int No { get; set; }
-
         public virtual string? MotherName { get; private set; }
-
         public virtual string? FatherName { get; private set; }
-
         public virtual BloodType? BloodType { get; private set; }
-
         //Hasta Türleri
         public virtual Type? Type { get; private set; }
-
         public virtual Guid? CompanyId { get; private set; }
-
-        public virtual Guid? PrimaryCountryId { get; private set; }
-        public virtual Guid? PrimaryCityId { get; private set; }
-        public virtual Guid? PrimaryDistrictId { get; private set; }
-        public virtual Guid? PrimaryVillageId { get; private set; }
-        public virtual string? PrimaryAddressDescription { get; private set; }
-
-
-        public virtual Guid? SecondaryCountryId { get; private set; }
-        public virtual Guid? SecondaryCityId { get; private set; }
-        public virtual Guid? SecondaryDistrictId { get; private set; }
-        public virtual Guid? SecondaryVillageId { get; private set; }
-        public virtual string? SecondaryAddressDescription { get; private set; }
-
         public virtual ICollection<Address> Addresses { get; private set; } = new List<Address>();
 
 
@@ -75,8 +47,7 @@ namespace Pusula.Training.HealthCare.Patients
 
         public Patient(Guid id, Guid? companyId,string firstName, string lastName, DateTime birthDate, string identityNumber, string? passportNumber,
             string? email, string mobilePhoneNumber, string? emergencyPhoneNumber, Gender gender, string? motherName, string? fatherName, BloodType? bloodType,
-            Type? type, Guid? primaryCountryId, Guid? primaryCityId, Guid? primaryDistrictId, Guid? primaryVillageId, string? primaryAddressDescription,
-            Guid? secondaryCountryId, Guid? secondaryCityId, Guid? secondaryDistrictId, Guid? secondaryVillageId, string? secondaryAddressDescription)
+            Type? type)
         {
             Id = id;
             SetCompanyId(companyId);
@@ -93,16 +64,6 @@ namespace Pusula.Training.HealthCare.Patients
             SetFatherName(fatherName);
             SetBloodType(bloodType);
             SetType(type);
-            SetPrimaryCountryId(primaryCountryId);
-            SetPrimaryCityId(primaryCityId);
-            SetPrimaryDistrictId(primaryDistrictId);
-            SetPrimaryVillageId(primaryVillageId);
-            SetPrimaryAddressDescription(primaryAddressDescription);
-            SetSecondaryCountryId(secondaryCountryId);
-            SetSecondaryCityId(secondaryCityId);
-            SetSecondaryDistrictId(secondaryDistrictId);
-            SetSecondaryVillageId(secondaryVillageId);
-            SetSecondaryAddressDescription(secondaryAddressDescription);
         }
 
         public void SetCompanyId(Guid? companyId) => CompanyId = companyId;
@@ -131,7 +92,6 @@ namespace Pusula.Training.HealthCare.Patients
 
         public void SetPassportNumber(string? passportNumber) => PassportNumber = passportNumber;
 
-
         public void SetEmail(string? email)
         {
             Check.Length(email, nameof(email), PatientConsts.EmailAddressMaxLength, 0);
@@ -151,15 +111,5 @@ namespace Pusula.Training.HealthCare.Patients
         public void SetFatherName(string? fatherName) => FatherName = fatherName;
         public void SetBloodType(BloodType? bloodType) => BloodType = bloodType;
         public void SetType(Type? type) => Type = type;
-        public void SetPrimaryCountryId(Guid? primaryCountryId) => PrimaryCountryId = primaryCountryId;
-        public void SetPrimaryCityId(Guid? primaryCityId) => PrimaryCityId = primaryCityId;
-        public void SetPrimaryDistrictId(Guid? primaryDistrictId) => PrimaryDistrictId = primaryDistrictId;
-        public void SetPrimaryVillageId(Guid? primaryVillageId) => PrimaryVillageId = primaryVillageId;
-        public void SetPrimaryAddressDescription(string? primaryAddressDescription) => PrimaryAddressDescription = primaryAddressDescription;
-        public void SetSecondaryCountryId(Guid? secondaryCountryId) => SecondaryCountryId = secondaryCountryId;
-        public void SetSecondaryCityId(Guid? secondaryCityId) => SecondaryCityId = secondaryCityId;
-        public void SetSecondaryDistrictId(Guid? secondaryDistrictId) => SecondaryDistrictId = secondaryDistrictId;
-        public void SetSecondaryVillageId(Guid? secondaryVillageId) => SecondaryVillageId = secondaryVillageId;
-        public void SetSecondaryAddressDescription(string? secondaryAddressDescription) => SecondaryAddressDescription = secondaryAddressDescription;
     }
 }

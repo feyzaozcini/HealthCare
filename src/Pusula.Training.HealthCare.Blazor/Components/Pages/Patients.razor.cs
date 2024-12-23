@@ -672,15 +672,7 @@ public partial class Patients
 
         });
     }
-
-
-    protected virtual Task OnVillageChanged(ChangeEventArgs e)
-    {
-        Guid? villageId = (Guid?)e.Value;
-        Filter.PrimaryVillageId = villageId;
-        return Task.CompletedTask;
-    }
-
+    
 
     protected virtual void OnFirstNameChanged(string? firstName)
     {

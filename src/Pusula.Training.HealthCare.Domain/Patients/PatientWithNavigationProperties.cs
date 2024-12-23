@@ -1,4 +1,5 @@
-﻿using Pusula.Training.HealthCare.Cities;
+﻿using Pusula.Training.HealthCare.Addresses;
+using Pusula.Training.HealthCare.Cities;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Districts;
 using Pusula.Training.HealthCare.PatientCompanies;
@@ -23,5 +24,8 @@ namespace Pusula.Training.HealthCare.Patients
         public City? SecondaryCity { get; set; } 
         public District? SecondaryDistrict { get; set; }
         public Village? SecondaryVillage { get; set; } 
+        public Address? Address { get; set; }
+
+        public List<Address>? Addresses { get; set; }
     }
 }

@@ -185,17 +185,7 @@ public class HealthCareDbContext :
                 b.Property(x => x.FatherName).HasColumnName(nameof(Patient.FatherName));
                 b.Property(x => x.BloodType).HasColumnName(nameof(Patient.BloodType));
                 b.Property(x => x.Type).HasColumnName(nameof(Patient.Type)).IsRequired(false);
-                b.Property(x => x.PrimaryAddressDescription).HasColumnName(nameof(Patient.PrimaryAddressDescription));
-                b.Property(x => x.SecondaryAddressDescription).HasColumnName(nameof(Patient.SecondaryAddressDescription));
                 b.HasOne<PatientCompany>().WithMany().IsRequired(false).HasForeignKey(x => x.CompanyId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Country>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryCountryId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<City>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryCityId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<District>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryDistrictId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Village>().WithMany().IsRequired(false).HasForeignKey(x => x.PrimaryVillageId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Country>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryCountryId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<City>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryCityId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<District>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryDistrictId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Village>().WithMany().IsRequired(false).HasForeignKey(x => x.SecondaryVillageId).OnDelete(DeleteBehavior.NoAction);
                 b.HasMany(p => p.Addresses).WithOne(a => a.Patient).HasForeignKey(a => a.PatientId).IsRequired().OnDelete(DeleteBehavior.Cascade);
             });
 
