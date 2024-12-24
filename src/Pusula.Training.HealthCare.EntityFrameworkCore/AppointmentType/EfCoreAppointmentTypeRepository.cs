@@ -15,6 +15,7 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
     public class EfCoreAppointmentTypeRepository(IDbContextProvider<HealthCareDbContext> dbContextProvider)
     : EfCoreRepository<HealthCareDbContext, AppointmentType, Guid>(dbContextProvider), IAppointmentTypeRepository
     {
+        //Doktorlara ait randevu tiplerini getirir
         public async Task<List<AppointmentType>> GetAppointmentTypesForDoctorAsync(Guid doctorId)
         {
             var dbContext = await GetDbContextAsync();
@@ -28,6 +29,7 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
 
             return appointmentTypes;
         }
+        //Appointment Type Id'ye göre doktorları getirir
         public async Task<List<DoctorWithNavigationProperties>> GetDoctorsByAppointmentTypeIdAsync(Guid appointmentTypeId)
         {
             var dbContext = await GetDbContextAsync();
@@ -66,7 +68,7 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
             return appointmentTypes; // AppointmentType listesini döndür
         }
 
-        //doktorları önce silmek için
+        //Appointment Type Id'ye ait doktorları önce silmek için
         public async Task RemoveAllDoctorsByAppointmentTypeIdAsync(Guid appointmentTypeId)
         {
             var dbContext = await GetDbContextAsync();

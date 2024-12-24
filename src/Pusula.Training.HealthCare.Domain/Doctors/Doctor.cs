@@ -86,7 +86,7 @@ namespace Pusula.Training.HealthCare.Doctors
         }
 
 
-        //Many To Many Deparmtment ekleme metodu 
+        //Many To Many Department ekleme metodu 
         public void AddDepartment(Guid departmentId)
         {
             if (DoctorDepartments.Any(dd => dd.DepartmentId == departmentId))
@@ -95,11 +95,6 @@ namespace Pusula.Training.HealthCare.Doctors
             }
 
             DoctorDepartments.Add(new DoctorDepartment(Id, departmentId));
-        }
-
-        private bool IsInDoctor(Guid departmentId)
-        {
-            return DoctorDepartments.Any(dd => dd.DepartmentId == departmentId);
         }
     }
 }

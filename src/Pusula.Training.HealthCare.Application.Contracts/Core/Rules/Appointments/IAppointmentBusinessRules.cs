@@ -7,5 +7,6 @@ namespace Pusula.Training.HealthCare.Core.Rules.Appointments
     {
         Task AppointmentDatesCannotOverlapForDoctor(Guid doktorId,DateTime startDate, DateTime endDate);
         Task AppointmentCannotCreate();
+        Task AppointmentCannotCreatePastTime(DateTime startDate);
     }
 }
