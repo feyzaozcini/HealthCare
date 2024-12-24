@@ -129,7 +129,7 @@ public class TestGroupsAppService(
             },
             input,
             "TestGroups:Lookup",
-            TimeSpan.FromMinutes(30)
+            TimeSpan.FromMinutes(60)
         );
     }
 
