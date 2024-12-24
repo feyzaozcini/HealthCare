@@ -1,14 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
-using Pusula.Training.HealthCare.Exceptions;
-using Pusula.Training.HealthCare.TestValueRanges;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -106,6 +103,8 @@ public class EfCoreTestProcessRepository(IDbContextProvider<HealthCareDbContext>
         var dbSet = await GetDbSetAsync();
 
         return dbSet
+            .AsNoTracking() //Change Tracker devre dışı
+            .AsSplitQuery() //Include'ları birden fazla sorguya böler
             .Include(tp => tp.LabRequest)
             .ThenInclude(tp => tp.Protocol.Patient)
             .Include(tp => tp.LabRequest.Doctor)

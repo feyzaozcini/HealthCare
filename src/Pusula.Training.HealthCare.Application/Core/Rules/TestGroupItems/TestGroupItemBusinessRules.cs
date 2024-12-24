@@ -11,7 +11,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace Pusula.Training.HealthCare.Core.Rules.TestGroupItems;
 
-public class TestGroupItemBusinessRules(ITestGroupItemRepository testGroupItemRepository, ILabRequestRepository labRequestRepository) : ITestGroupItemBusinessRules
+public class TestGroupItemBusinessRules(ITestGroupItemRepository testGroupItemRepository) : ITestGroupItemBusinessRules
 {
     //Aynı test kodu eklenemez.
     public async Task TestGroupItemCodeDuplicatedAsync(string code)

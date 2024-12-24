@@ -35,7 +35,7 @@
             <Template Context="context">
                 @if (context is LabRequestDto labrequest)
                 {
-                    <span>@labrequest.PatientName @labrequest.PatientSurname</span>
+                    <span>@labrequest.Patient.FirstName @labrequest.Patient.LastName</span>
                 }
             </Template>
         </GridColumn>

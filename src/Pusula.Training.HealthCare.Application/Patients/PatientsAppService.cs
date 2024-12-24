@@ -109,17 +109,17 @@ namespace Pusula.Training.HealthCare.Patients
             await patientBusinessRules.IdentityNumberCannotBeDuplicatedWhenInserted(input.IdentityNumber);
 
             //Mernis Doðrulama
-            var isIdentityValid = await mernisValidationService.ValidateIdentityAsync(
-                input.IdentityNumber,
-                input.FirstName,
-                input.LastName,
-                input.BirthDate.Year 
-            );
-
-            if (!isIdentityValid)
+            var identityValidationDto = new IdentityValidationDto
             {
-                throw new BusinessException("Kimlik doðrulama baþarýsýz. Lütfen bilgilerinizi kontrol edin.");
-            }
+                NationalId = input.IdentityNumber,
+                FirstName = input.FirstName,
+                LastName = input.LastName,
+                BirthYear = input.BirthDate.Year
+            };
+
+            await patientBusinessRules.ValidateMernisAsync(identityValidationDto);
+
+
             var patient = await patientManager.CreateAsync(input.CompanyId, input.FirstName, input.LastName, input.BirthDate, input.IdentityNumber, input.PassportNumber,
                 input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.MotherName, input.FatherName, input.BloodType, input.Type
                 );

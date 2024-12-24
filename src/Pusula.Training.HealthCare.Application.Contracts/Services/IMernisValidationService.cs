@@ -5,6 +5,6 @@ namespace Pusula.Training.HealthCare.Services;
 
 public interface IMernisValidationService : ITransientDependency
 {
-    Task<bool> ValidateIdentityAsync(string nationalId, string firstName, string lastName, int birthYear);
+    Task<bool> ValidateIdentityAsync(IdentityValidationDto dto);
 
 }

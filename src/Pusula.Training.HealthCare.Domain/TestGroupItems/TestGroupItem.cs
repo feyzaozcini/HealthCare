@@ -11,7 +11,7 @@ namespace Pusula.Training.HealthCare.TestGroupItems;
 
 public class TestGroupItem : AuditedEntity<Guid>
 {
-    public Guid TestGroupId { get; private set; } // Set yalnızca sınıf içinde erişilebilir.
+    public Guid TestGroupId { get; private set; } 
     public TestGroup TestGroup { get; private set; } 
 
     [NotNull]
@@ -21,12 +21,12 @@ public class TestGroupItem : AuditedEntity<Guid>
     public string Code { get; private set; } = null!;
 
     [NotNull]
-    public string TestType { get; private set; } = null!; // Test tipi, arayüzde kullanılacak. Senaryosu gerekirse tasarlanacak.
+    public string TestType { get; private set; } = null!;
     public string? Description { get; private set; }
     [NotNull]
-    public int TurnaroundTime { get; set; } // Tetkikin tahmini tamamlanma süresi. Saat cinsinden tanımlanacak. Arayüzde gün ve saat dönüşümü yapılacak.
+    public int TurnaroundTime { get; private set; } 
 
-    public TestValueRange? TestValueRange { get; set; } 
+    public TestValueRange? TestValueRange { get; set; } //Değişecek.
 
 
     protected TestGroupItem()

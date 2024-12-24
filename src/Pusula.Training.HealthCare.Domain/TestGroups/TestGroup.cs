@@ -10,10 +10,11 @@ namespace Pusula.Training.HealthCare.TestGroups;
 public class TestGroup : AuditedEntity<Guid>
 {
     [NotNull]
-    public string Name { get; private set; } = null!; // Set yalnızca sınıf içinde erişilebilir.
+    public string Name { get; private set; }
 
     protected TestGroup()
     {
+        Name = string.Empty;
     }
 
     public TestGroup(Guid id, string name)

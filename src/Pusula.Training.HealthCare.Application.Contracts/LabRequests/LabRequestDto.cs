@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Pusula.Training.HealthCare.Patients;
+using Pusula.Training.HealthCare.TestProcesses;
+using System;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -10,21 +12,18 @@ public class LabRequestDto : FullAuditedEntity<Guid>
     //Protocol
     [Required]
     public Guid ProtocolId { get; set; }
-    public string ProtocolType { get; set; }
+    public string? ProtocolType { get; set; }
     public DateTime? ProtocolStartDate { get; set; }
     public string? ProtocolEndDate { get; set; }
     public int ProtocolNo { get; set; }
 
     //Insurance
-    public string InsuranceName { get; set; }
+    public string? InsuranceName { get; set; }
 
     //Patient
+    public PatientDto Patient { get; set; }
+    public TestProcessesCreateDto TestProcess { get; set; }
 
-    public string PatientName { get; set; }
-    public string PatientSurname { get; set; }
-    public int PatientNo { get; set; }
-    public string PatientMail { get; set; }
-    public DateTime PatientBirthDate { get; set; }
 
     //Doctor
     [Required]

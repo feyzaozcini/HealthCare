@@ -10,21 +10,21 @@ namespace Pusula.Training.HealthCare.TestProcesses;
 public class TestProcess : FullAuditedEntity<Guid>
 {
     [NotNull]
-    public Guid LabRequestId { get; protected set; }
-    public LabRequest LabRequest { get; set; }
+    public Guid LabRequestId { get; private set; }
+    public LabRequest LabRequest { get; private set; }
 
     [NotNull]
-    public Guid TestGroupItemId { get; protected set; }
-    public TestGroupItem TestGroupItem { get; set; }
+    public Guid TestGroupItemId { get; private set; }
+    public TestGroupItem TestGroupItem { get; private set; }
 
     [NotNull]
-    public TestProcessStates Status { get; protected set; }
+    public TestProcessStates Status { get; private set; }
     [CanBeNull]
-    public decimal? Result { get; protected set; }
+    public decimal? Result { get; private set; }
     [CanBeNull]
-    public DateTime? ResultDate { get; protected set; }
+    public DateTime? ResultDate { get; private set; }
 
-    public TestProcess()
+    protected TestProcess()
     {
 
     }

@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using Pusula.Training.HealthCare.Doctors;
-using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Protocols;
 using System;
 using Volo.Abp;
@@ -20,7 +19,7 @@ public class LabRequest : FullAuditedEntity<Guid>
     public DateTime Date { get; private set; }
     [NotNull]
     public RequestStatusEnum Status { get; private set; }
-    public string? Description { get; set; }
+    public string? Description { get; private set; }
 
     protected LabRequest()
     {

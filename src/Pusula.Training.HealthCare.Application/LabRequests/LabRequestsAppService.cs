@@ -22,7 +22,7 @@ namespace Pusula.Training.HealthCare.LabRequests;
 public class LabRequestsAppService(
     ILabRequestRepository labRequestRepository,
     LabRequestManager labRequestManager,
-    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache,
+    IDistributedCache<LabRequestDownloadTokenCacheItem, string> downloadTokenCache,
     IDistributedEventBus distributedEventBus
     ) : HealthCareAppService, ILabRequestsAppService
 {
@@ -63,7 +63,7 @@ public class LabRequestsAppService(
 
         await downloadTokenCache.SetAsync(
             token,
-            new DownloadTokenCacheItem { Token = token },
+            new LabRequestDownloadTokenCacheItem { Token = token },
             new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)
@@ -163,8 +163,8 @@ public class LabRequestsAppService(
     {
         await distributedEventBus.PublishAsync(new TestProcessSendMailEto
         {
-            Email = labRequestDto.PatientMail,
-            PatientName = $"{labRequestDto.PatientName} {labRequestDto.PatientSurname}"
+            Email = labRequestDto.Patient.Email!,
+            PatientName = $"{labRequestDto.Patient.FirstName} {labRequestDto.Patient.LastName}"
         });
     }
 

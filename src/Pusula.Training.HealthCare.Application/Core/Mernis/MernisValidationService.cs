@@ -1,36 +1,37 @@
-﻿using ServiceReference;
+﻿using Pusula.Training.HealthCare.Exceptions;
+using ServiceReference;
 using System;
 using System.Threading.Tasks;
+using Volo.Abp;
 
 namespace Pusula.Training.HealthCare.Services;
 
 public class MernisValidationService : IMernisValidationService
 {
-    public async Task<bool> ValidateIdentityAsync(string nationalId, string firstName, string lastName, int birthYear)
+    public async Task<bool> ValidateIdentityAsync(IdentityValidationDto dto)
     {
         try
         {
-            // Mernis SOAP istemcisini oluştur
             using var client = new KPSPublicSoapClient(KPSPublicSoapClient.EndpointConfiguration.KPSPublicSoap);
 
-            // Doğrulama isteği
             var result = await client.TCKimlikNoDogrulaAsync(new TCKimlikNoDogrulaRequest
             {
                 Body = new TCKimlikNoDogrulaRequestBody
                 {
-                    TCKimlikNo = long.Parse(nationalId),
-                    Ad = firstName.ToUpper(),
-                    Soyad = lastName.ToUpper(),
-                    DogumYili = birthYear
+                    TCKimlikNo = long.Parse(dto.NationalId),
+                    Ad = dto.FirstName.ToUpper(),
+                    Soyad = dto.LastName.ToUpper(),
+                    DogumYili = dto.BirthYear
                 }
             });
 
             return result.Body.TCKimlikNoDogrulaResult;
         }
-        catch (Exception ex)
+        catch (UserFriendlyException ex)
         {
-            // Hata yönetimi
-            Console.WriteLine($"Mernis doğrulama sırasında hata oluştu: {ex.Message}");
+            HealthCareException.ThrowIf(
+                HealthCareDomainErrorCodes.MernisVerificationError
+            );
             return false;
         }
     }

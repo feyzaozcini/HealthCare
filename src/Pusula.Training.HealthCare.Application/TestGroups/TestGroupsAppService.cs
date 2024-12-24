@@ -27,9 +27,8 @@ public class TestGroupsAppService(
     ITestGroupRepository testGroupRepository,
     TestGroupManager testGroupManager,
     ITestGroupBusinessRules testGroupBusinessRules,
-    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache,
-    IDistributedCache distributedCache,
-    ILogger<TestGroupsAppService> logger)    
+    IDistributedCache<TestGroupDownloadTokenCacheItem, string> downloadTokenCache,
+    IDistributedCache distributedCache)    
     : HealthCareAppService, ITestGroupsAppService
 {
     [Authorize(HealthCarePermissions.TestGroups.Create)]
@@ -69,7 +68,7 @@ public class TestGroupsAppService(
 
         await downloadTokenCache.SetAsync(
             token,
-            new DownloadTokenCacheItem { Token = token },
+            new TestGroupDownloadTokenCacheItem { Token = token },
             new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)

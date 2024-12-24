@@ -8,5 +8,4 @@ public enum RequestStatusEnum
     InProgress = 1,  
     [Display(Name = "Tamamlandı")]
     Completed = 2,   
-    //Cancelled = 3    // İptal Edildi
 }

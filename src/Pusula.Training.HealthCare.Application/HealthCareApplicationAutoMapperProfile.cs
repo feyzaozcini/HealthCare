@@ -29,13 +29,10 @@ using Pusula.Training.HealthCare.Appointments;
 using System.Linq;
 using Pusula.Training.HealthCare.TestValueRanges;
 using Pusula.Training.HealthCare.TestProcesses;
-
-using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
 using Pusula.Training.HealthCare.ProtocolTypes;
 using Pusula.Training.HealthCare.Notes;
 using Pusula.Training.HealthCare.Insurances;
 using Pusula.Training.HealthCare.AppointmentRules;
-using System.Collections.Generic;
 using Pusula.Training.HealthCare.PainTypes;
 using Pusula.Training.HealthCare.PainDetails;
 using Pusula.Training.HealthCare.DoctorWorkSchedules;
@@ -122,11 +119,11 @@ public class HealthCareApplicationAutoMapperProfile : Profile
             .ForMember(dest => dest.ProtocolNo, opt => opt.MapFrom(x => x.Protocol.No))
             .ForMember(dest => dest.DoctorName, opt => opt.MapFrom(x => x.Doctor.User.Name))
             .ForMember(dest => dest.DoctorSurname, opt => opt.MapFrom(x => x.Doctor.User.Surname))
-            .ForMember(dest => dest.PatientName, opt => opt.MapFrom(x => x.Protocol.Patient.FirstName))
-            .ForMember(dest => dest.PatientSurname, opt => opt.MapFrom(x => x.Protocol.Patient.LastName))
-            .ForMember(dest => dest.PatientMail, opt => opt.MapFrom(x => x.Protocol.Patient.Email))
-            .ForMember(dest => dest.PatientNo, opt => opt.MapFrom(x => x.Protocol.Patient.No))
-            .ForMember(dest => dest.PatientBirthDate, opt => opt.MapFrom(x => x.Protocol.Patient.BirthDate))
+            .ForMember(dest => dest.Patient, opt => opt.MapFrom(x => x.Protocol.Patient))
+            //.ForMember(dest => dest.PatientSurname, opt => opt.MapFrom(x => x.Protocol.Patient.LastName))
+            //.ForMember(dest => dest.PatientMail, opt => opt.MapFrom(x => x.Protocol.Patient.Email))
+            //.ForMember(dest => dest.PatientNo, opt => opt.MapFrom(x => x.Protocol.Patient.No))
+            //.ForMember(dest => dest.PatientBirthDate, opt => opt.MapFrom(x => x.Protocol.Patient.BirthDate))
             .ForMember(dest => dest.InsuranceName, opt => opt.MapFrom(x => x.Protocol.Insurance.Name))
             .ReverseMap();
 

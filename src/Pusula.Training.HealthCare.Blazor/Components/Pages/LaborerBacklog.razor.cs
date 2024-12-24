@@ -99,7 +99,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                     var updateDto = await CreateUpdateDto(testProcess);
                     var updatedProcess = await TestProcessesAppService.UpdateAsync(updateDto);
 
-                    testProcess.TestProcess.Result = updatedProcess.Result;
+                    testProcess.TestProcess!.Result = updatedProcess.Result;
                     testProcess.TestProcess.Status = updatedProcess.Status;
                 });
 

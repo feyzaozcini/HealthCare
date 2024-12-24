@@ -15,7 +15,7 @@ public static class HealthCareDomainErrorCodes
     public const string CityNotFound = "Böyle bir şehir adı bulunmamaktadır";
     public const string DistrictNotFound = "Böyle bir ilçe adı bulunmamaktadır";
     public const string VillageNotFound = "Böyle bir köy adı bulunmamaktadır";
-  
+
     //LAB
     public const string TestGroupNameAlreadyExists = "Bu isimde bir test grubu zaten mevcut.";
     public const string TestGroupCannotBeDeleted = "Bu test grubuna bağlı testler bulunduğundan silinemez.";
@@ -38,5 +38,9 @@ public static class HealthCareDomainErrorCodes
     public const string DoctorWorkScheduleConflict = "Doktorun çalışma programı zaten mevcut.";
     public const string PatientWasBlockedByDoctor = "Hasta doktor tarafından engellenmiştir.";
     public const string DublicateBlackListItem = "Hasta zaten doktor tarafından engellenmiştir.";
+    public const string MernisVerificationError = "Mernis doğrulaması sırasında beklenmeyen bir hata oluştu.";
+    public const string MernisVerificationFailed = "Mernis doğrulaması başarısız. Lütfen bilgileri kontrol ediniz.";
+
+
     public const string PastTimeAppointmentCannotCreate = "Geçmiş tarihli randevu oluşturulamaz.";
 }
