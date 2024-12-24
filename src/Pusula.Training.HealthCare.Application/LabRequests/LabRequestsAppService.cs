@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Core;
+using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.EmailServices;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
+using Pusula.Training.HealthCare.TestProcesses;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
+using Volo.Abp.EventBus.Distributed;
 
 namespace Pusula.Training.HealthCare.LabRequests;
 
@@ -19,8 +22,8 @@ namespace Pusula.Training.HealthCare.LabRequests;
 public class LabRequestsAppService(
     ILabRequestRepository labRequestRepository,
     LabRequestManager labRequestManager,
-    EmailService emailService,
-    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache
+    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache,
+    IDistributedEventBus distributedEventBus
     ) : HealthCareAppService, ILabRequestsAppService
 {
     [Authorize(HealthCarePermissions.LabRequests.Create)]
@@ -158,15 +161,11 @@ public class LabRequestsAppService(
 
     public async Task NotifyTestResultsAsync(LabRequestDto labRequestDto)
     {
-        var emailBody = emailService.CreateTestResultsNotificationBody(
-            $"{labRequestDto.PatientName} {labRequestDto.PatientSurname}"
-        );
-
-        await emailService.SendAsync(
-            to: labRequestDto.PatientMail,
-            subject: "Test Sonuçlarınız Hazır!",
-            body: emailBody
-        );
+        await distributedEventBus.PublishAsync(new TestProcessSendMailEto
+        {
+            Email = labRequestDto.PatientMail,
+            PatientName = $"{labRequestDto.PatientName} {labRequestDto.PatientSurname}"
+        });
     }
 
     [Authorize(HealthCarePermissions.LabRequests.Edit)]
