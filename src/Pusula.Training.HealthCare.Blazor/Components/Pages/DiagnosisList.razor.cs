@@ -214,6 +214,12 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             // Form modelini sýfýrla
             DiagnosisCreateDto = new DiagnosisCreateDto();
 
+            // Eðer bir taný grubu seçildiyse, onu varsayýlan olarak atýyoruz
+            if (SelectedGroupId.HasValue)
+            {
+                DiagnosisCreateDto.GroupId = SelectedGroupId.Value;
+            }
+
             // Modalý görünür yap
             IsAddDiagnosisModalVisible = true;
         }

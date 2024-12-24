@@ -1,0 +1,28 @@
+﻿@page "/diagnosis-report"
+@using Pusula.Training.HealthCare.ExaminationDiagnoses
+@inject IExaminationDiagnosisAppService ExaminationDiagnosisAppService
+
+
+
+<h3>DiagnosisReport</h3>
+
+
+<SfAccumulationChart Title="Tanı Dağılım İstatistikleri">
+    <AccumulationChartSeriesCollection>
+        <AccumulationChartSeries DataSource="@DiagnosisCounts"
+                                 XName="DiagnosisName"
+                                 YName="Count"
+                                 Name="Tanılar">
+        </AccumulationChartSeries>
+    </AccumulationChartSeriesCollection>
+    <AccumulationChartLegendSettings Visible="true"></AccumulationChartLegendSettings>
+</SfAccumulationChart>
+
+<SfGrid DataSource="@DiagnosisCounts" AllowPaging="false">
+    <GridColumns>
+        <GridColumn HeaderText="Tanı Adı" Field="DiagnosisName"></GridColumn>
+        <GridColumn HeaderText="Kullanım Sayısı" Field="Count" TextAlign="TextAlign.Center"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+

@@ -1,4 +1,6 @@
-﻿@page "/doctor-details/{doctorId:guid}"
+﻿@* @page "/doctor-details/{doctorId:guid}" *@
+@page "/doctor-details"
+
 @using Pusula.Training.HealthCare.Permissions
 @using Pusula.Training.HealthCare.Shared
 @using Pusula.Training.HealthCare.Protocols
@@ -10,9 +12,10 @@
 @using Syncfusion.Blazor.Calendars
 @using Pusula.Training.HealthCare.Blazor.Containers
 @using Microsoft.Extensions.Localization
-@inject DoctorStateContainer DoctorStateService
+@inject DoctorsStateContainer DoctorsStateService
 @inject IProtocolsAppService ProtocolsAppService
 @inject NavigationManager NavigationManager
+
 
 
 <h3>DoctorDetails</h3>
@@ -28,18 +31,22 @@
         <!-- Search Bar -->
         <div class="col-md-4">
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="Arama Yap" />
-                <button class="btn btn-outline-secondary" type="button">
-                    <i class="bi bi-search"></i>
-                </button>
+                <SfTextBox Placeholder="Protokol Ara"
+                           FloatLabelType="FloatLabelType.Never"
+                           @bind-Value="ProtocolsFilter.FilterText"
+                          
+                           Input="OnInputChange">
+                </SfTextBox>
             </div>
         </div>
 
         <!-- Date Picker -->
         <div class="col-md-3">
-            <SfDatePicker TValue="DateTime" Placeholder="Tarih Seçin" @bind-Value="selectedDate" CssClass="form-control" />
+            <SfDateRangePicker TValue="DateTime?"
+                               Placeholder="Tarih Aralığı Seçin">
+                <DateRangePickerEvents TValue="DateTime?" ValueChange="@OnDateRangeChange"></DateRangePickerEvents>
+            </SfDateRangePicker>
         </div>
-
        @*  <!-- Buttons -->
         <div class="col-md-5 text-end">
             <button class="btn btn-primary me-2">İş Listesi</button>

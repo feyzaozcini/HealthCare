@@ -56,8 +56,10 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private void NavigateToDoctorProtocols(DoctorWithNavigationPropertiesDto doctor)
         {
-            var doctorId = doctor.Doctor.Id;
-            NavigationManager.NavigateTo($"/doctor-details/{doctorId}");
+            DoctorsStateContainer.SetSelectedDoctor(doctor);
+            NavigationManager.NavigateTo("/doctor-details");
+            //var doctorId = doctor.Doctor.Id;
+            //NavigationManager.NavigateTo($"/doctor-details/{doctorId}");
         }
 
         private async Task OnSearchAsync(InputEventArgs args)

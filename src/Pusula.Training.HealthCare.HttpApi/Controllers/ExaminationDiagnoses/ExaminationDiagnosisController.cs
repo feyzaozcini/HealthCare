@@ -1,6 +1,5 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using Pusula.Training.HealthCare.Anamneses;
 using Pusula.Training.HealthCare.ExaminationDiagnoses;
 using Pusula.Training.HealthCare.Shared;
 using System;
@@ -38,6 +37,10 @@ namespace Pusula.Training.HealthCare.Controllers.ExaminationDiagnoses
         [HttpGet]
         [Route("{id}")]
         public Task<ExaminationDiagnosisDto> GetAsync(Guid id) => examinationDiagnosisAppService.GetAsync(id);
+
+        [HttpGet]
+        [Route("diagnosis-count")]
+        public Task<PagedResultDto<DiagnosisCountDto>> GetDiagnosisCountsAsync(GetExaminationDiagnosisInput input) => examinationDiagnosisAppService.GetDiagnosisCountsAsync(input);
 
         [HttpGet]
         [Route("diagnosis-lookup")]

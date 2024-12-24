@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Pusula.Training.HealthCare.Anamneses;
 using Pusula.Training.HealthCare.Diagnoses;
-using Pusula.Training.HealthCare.PainTypes;
-using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Protocols;
 using Pusula.Training.HealthCare.Shared;
@@ -47,6 +44,36 @@ namespace Pusula.Training.HealthCare.ExaminationDiagnoses
 
         public async Task<ExaminationDiagnosisDto> GetAsync(Guid id)=> ObjectMapper.Map<ExaminationDiagnosis, ExaminationDiagnosisDto>(
                 await examinationDiagnosisRepository.GetAsync(id));
+
+        public async Task<PagedResultDto<DiagnosisCountDto>> GetDiagnosisCountsAsync(GetExaminationDiagnosisInput input)
+        {
+           
+            var totalCount = await examinationDiagnosisRepository.GetCountAsync(
+                input.FilterText,
+                input.InitialDate,
+                input.Note,
+                input.ProtocolId,
+                input.DiagnosisId,
+                input.Sorting,
+                input.MaxResultCount,
+                input.SkipCount,
+                default);
+
+           
+            var counts = await examinationDiagnosisRepository.GetDiagnosisCountsAsync(
+                input.SkipCount,
+                input.MaxResultCount,
+                default);
+
+          
+            var items = counts.Select(c => new DiagnosisCountDto
+            {
+                DiagnosisName = c.DiagnosisName,
+                Count = c.Count
+            }).ToList();
+
+            return new PagedResultDto<DiagnosisCountDto>(totalCount, items);
+        }
 
         public async Task<PagedResultDto<LookupDto<Guid>>> GetDiagnosisLookupAsync(LookupRequestDto input)
         {

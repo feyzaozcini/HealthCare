@@ -43,6 +43,9 @@ using Pusula.Training.HealthCare.BlackLists;
 using Pusula.Training.HealthCare.SystemChecks;
 using Pusula.Training.HealthCare.FollowUpPlans;
 using Pusula.Training.HealthCare.Addresses;
+using Pusula.Training.HealthCare.FamilyHistories;
+using Pusula.Training.HealthCare.ControlNotes;
+using Pusula.Training.HealthCare.PatientHistories;
 
 
 namespace Pusula.Training.HealthCare;
@@ -366,8 +369,18 @@ public class HealthCareApplicationAutoMapperProfile : Profile
         CreateMap<BlackListDto, BlackListWithNavigationPropertiesDto>();
 
         CreateMap<SystemCheck, SystemCheckDto>().ReverseMap();
-
         CreateMap<FollowUpPlan, FollowUpPlanDto>().ReverseMap();
+        CreateMap<FamilyHistory, FamilyHistoryDto>().ReverseMap();
+
+        CreateMap<ControlNote, GetControlsInput>().ReverseMap();
+        CreateMap<ControlNote, ControlNoteDto>()
+            .ForMember(dest => dest.CreatorName, opt => opt.MapFrom(x => x.User.Name))
+            .ForMember(dest => dest.CreatorSurname, opt => opt.MapFrom(x => x.User.Surname))
+            .ForMember(dest => dest.CreatorTitle, opt => opt.MapFrom(x =>x.CreatorId == x.Protocol.Doctor.UserId? x.Protocol.Doctor.Title.Name: null));
+
+        CreateMap<PatientHistory, PatientHistoryDto>().ReverseMap();
+
+
 
 
     }

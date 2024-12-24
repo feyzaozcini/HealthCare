@@ -188,6 +188,17 @@
     "Addresses": "Addresses",
     "Address": "Address",
     "Menu:ProtocolTypes": "Protocol Type",
-    "FullName": "Full Name"
+    "FullName": "Full Name",
+    "Menu:ProtocolTypes": "Protocol Type",
+    "Enum:FollowUpType.NoFollowUp": "No follow-up",
+    "Enum:FollowUpType.AmbulatoryTreatment": "Ambulatory follow-up",
+    "Enum:FollowUpType.InpatientTreatment": "Inpatient follow-up ",
+    "Enum:FollowUpType.AmbulatorySurgery": "Ambulatory surgical intervention",
+    "Enum:FollowUpType.InpatientSurgery": "Inpatient surgical intervention",
+    "Enum:FollowUpType.Rehabilitation": "Rehabilitation",
+    "Enum:FollowUpType.Consultation": "Consultation",
+    "Enum:FollowUpType.PalliativeTreatment": "Palliative treatment",
+    "Enum:FollowUpType.DailyTreatment": "Daily treatment"
+
   }
 }
