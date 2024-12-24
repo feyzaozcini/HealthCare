@@ -11,7 +11,7 @@ namespace Pusula.Training.HealthCare.Anamneses
     {
         
         public string Complaint { get; set; } = null!;
-        public DateTime StartDate { get; set; }
+        public DateTime StartDate { get; set; } = DateTime.Now;
 
         public string Story { get; set; } = null!;
 

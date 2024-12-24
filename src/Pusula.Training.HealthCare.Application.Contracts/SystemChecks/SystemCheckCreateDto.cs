@@ -12,28 +12,28 @@ namespace Pusula.Training.HealthCare.SystemChecks
         [Required]
         public Guid ProtocolId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Genel sistem sorgusu alanı boş bırakılamaz.")]
         public bool? GeneralSystemCheck { get; set; }
 
-        [Required]
+       
         public bool? GenitoUrinary { get; set; }
 
-        [Required]
+       
         public bool? Skin { get; set; }
 
-        [Required]
+       
         public bool? Respiratory { get; set; }
 
-        [Required]
+       
         public bool? Nervous { get; set; }
 
-        [Required]
+       
         public bool? MusculoSkeletal { get; set; }
 
-        [Required]
+        
         public bool? Circulatory { get; set; }
 
-        [Required]
+       
         public bool? GastroIntestinal { get; set; }
         public string? Description { get; set; } = null!;
     }

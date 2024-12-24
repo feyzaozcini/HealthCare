@@ -1,9 +1,14 @@
+using Blazorise;
 using Microsoft.AspNetCore.Components;
+using Microsoft.IdentityModel.Tokens;
 using Pusula.Training.HealthCare.Anamneses;
+using Pusula.Training.HealthCare.ControlNotes;
 using Pusula.Training.HealthCare.ExaminationDiagnoses;
 using Pusula.Training.HealthCare.FallRisks;
+using Pusula.Training.HealthCare.FamilyHistories;
 using Pusula.Training.HealthCare.FollowUpPlans;
 using Pusula.Training.HealthCare.PainDetails;
+using Pusula.Training.HealthCare.PatientHistories;
 using Pusula.Training.HealthCare.Patients;
 using Pusula.Training.HealthCare.PhysicalExaminations;
 using Pusula.Training.HealthCare.Protocols;
@@ -12,8 +17,10 @@ using Pusula.Training.HealthCare.Shared;
 using Pusula.Training.HealthCare.SystemChecks;
 using Pusula.Training.HealthCare.TestGroups;
 using Syncfusion.Blazor.Notifications;
+using Syncfusion.Blazor.Popups;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -34,7 +41,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private ProtocolDto protocolDto { get; set; } = new();
 
-        #region Toast and Error handling
+        #region Toast , Dialog and Error handling
 
         private SfToast? ToastObj;
 
@@ -48,28 +55,72 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 ShowCloseButton = true
             });
         }
+
+        private bool IsErrorModalOpen { get; set; }
+        private List<string> ValidationMessages { get; set; } = new List<string>();
+        private async Task ShowErrorModal(string errors)
+        {
+            ValidationMessages = errors.Split("<br>").ToList();
+            IsErrorModalOpen = true;
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private void CloseErrorModal()
+        {
+            IsErrorModalOpen = false;
+        }
+        private async Task ShowValidationErrors(IList<ValidationResult> validationErrors)
+        {
+            // Tüm hata mesajlarýný birleþtirip kullanýcýya gösteriyoruz
+            var errors = string.Join("<br>", validationErrors.Select(v => v.ErrorMessage));
+            await ShowErrorModal(errors);
+        }
         public async Task HandleError(Func<Task> action)
         {
             try
             {
                 await action();
             }
+            catch (Volo.Abp.Validation.AbpValidationException ex) // AbpValidationException'ý yakalýyoruz
+            {
+               
+                await ShowValidationErrors(ex.ValidationErrors);
+                // Sistem sorgusu modali validasyon hatasi geldiginde kapanmamali
+              
+            }
             catch (UserFriendlyException ex)
             {
-              
-                await ShowToast(ex.Message, false);
+                await ShowErrorModal(ex.Message);
+                
             }
             catch (Exception)
             {
-
-               await ShowToast("Bir hata oluþtu. Lütfen tekrar deneyin.", false);
+                await ShowToast("Bir hata oluþtu. Lütfen tekrar deneyin.", false);
             }
         }
+        //public async Task HandleError(Func<Task> action)
+        //{
+        //    try
+        //    {
+        //        await action();
+        //    }
+        //    catch (UserFriendlyException ex)
+        //    {
+
+        //        await ShowToast(ex.Message, false);
+        //    }
+        //    catch (Exception)
+        //    {
+
+        //       await ShowToast("Bir hata oluþtu. Lütfen tekrar deneyin.", false);
+        //    }
+        //}
         #endregion
         protected override async Task OnInitializedAsync()
         {
             // Hasta bilgilerini çek
             Patient = await PatientsAppService.GetAsync(PatientId);
+            await LoadAnamnesisAsync();
             await LoadFallRiskAsync();
             await LoadPhysicalExaminationAsync();
             await LoadPainTypesAsync();
@@ -79,7 +130,17 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             await GetProtocolAsync();
             await LoadSystemCheckAsync();
             await LoadFollowUpPlanAsync();
+            await LoadFamilyHistoryAsync();
+            await LoadControlNotesAsync();
+            await LoadPsychologicalStateAsync();
+            await LoadPatientHistoryAsync();
+
             ToastObj ??= new SfToast();
+
+            EducationLevelsCollection = Enum.GetValues(typeof(EducationLevel))
+                .Cast<EducationLevel>()
+                .Select(b => new LookupDto<EducationLevel> { Id = b, DisplayName = b.ToString() })
+                .ToList();
         }
 
         private async Task GetProtocolAsync()
@@ -97,17 +158,100 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         }
 
         #region ANAMNESIS
-        private bool isCollapsed = false; // Baþlangýçta açýk
+
         private AnamnesisCreateDto anamnesisCreateDto = new();
+        private AnamnesisDto anamnesisDto = new();
+        private bool isExistingAnamnesis;
 
-        private int durationValue = 0; // Girilen süre (ör. 2)
-        private string selectedUnit = "Gün"; // Varsayýlan birim (ör. Gün)
-        private DateTime selectedDate = DateTime.Now; // Varsayýlan tarih (bugün)
 
-        private void ToggleCollapse()
+        private int durationValue = 0; 
+        private string selectedUnit = "Gün"; // Varsayýlan birim
+        
+
+        private async Task SaveAnamnesisAsync()
         {
-            isCollapsed = !isCollapsed; // Açýk/Kapalý durumunu deðiþtir
+            try
+            {
+                if (isExistingAnamnesis)
+                {
+                    await UpdateAnamnesisAsync();
+
+                }
+                else
+                {
+                    await CreateAnamnesisAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Hata yönetimi
+                Console.WriteLine($"Kaydetme iþlemi sýrasýnda hata oluþtu: {ex.Message}");
+            }
         }
+
+        #region Create
+        private async Task CreateAnamnesisAsync()
+        {
+            await HandleError(async () =>
+            {
+                var createDto = new AnamnesisCreateDto
+                {
+                    Complaint = anamnesisDto.Complaint,
+                    StartDate=anamnesisDto.StartDate,
+                    Story = anamnesisDto.Story,
+                    ProtocolId = ProtocolId
+                };
+
+                await AnamnesisAppService.CreateAsync(createDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+
+        #region UPDATE
+        private async Task UpdateAnamnesisAsync()
+        {
+            await HandleError(async () =>
+            {
+                var updateDto = new AnamnesisUpdateDto
+                {
+                    Id = anamnesisDto.Id,
+                    Complaint = anamnesisDto.Complaint,
+                    StartDate = anamnesisDto.StartDate,
+                    Story = anamnesisDto.Story,
+                    ProtocolId = ProtocolId
+                };
+
+                await AnamnesisAppService.UpdateAsync(updateDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+        private async Task LoadAnamnesisAsync()
+        {
+            try
+            {
+                var result = await AnamnesisAppService.GetWithProtocolIdAsync(ProtocolId);
+
+                if (result != null)
+                {
+                    anamnesisDto = result;
+                    isExistingAnamnesis = true;
+
+                }
+                else
+                {
+                    isExistingAnamnesis = false;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Hata oluþtu: {ex.Message}");
+
+            }
+        }
+
         private void UpdateUnit(string unit)
         {
             selectedUnit = unit;
@@ -117,7 +261,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private void UpdateDate()
         {
             var now = DateTime.Now;
-            selectedDate = selectedUnit switch
+            anamnesisDto.StartDate = selectedUnit switch
             {
                 "Saat" => now.AddHours(-durationValue),
                 "Gün" => now.AddDays(-durationValue),
@@ -127,12 +271,6 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 _ => now
             };
         }
-        private async Task SubmitAnamnesisAsync()
-        {
-            
-            await AnamnesisAppService.CreateAsync(anamnesisCreateDto);
-            // Baþarý durumunda gerekli iþlemleri yap
-        }
         private string GetButtonClass(string unit)
         {
             return unit == selectedUnit ? "e-primary" : "e-outline";
@@ -140,26 +278,108 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         #endregion
 
-        #region psychologicalState
+        #region PsychologicalState
         private MentalState selectedMentalState;
-        private string description = string.Empty;
+        //private string description = string.Empty;
 
+        private PshychologicalStateDto pshychologicalStateDto = new();
+        private bool isExistingPsychologicalState;
+
+        private async Task SavePsychologicalStateAsync()
+        {
+            try
+            {
+                if (isExistingPsychologicalState)
+                {
+                    await UpdatePsychologicalStateAsync();
+
+                }
+                else
+                {
+                    await CreatePsychologicalStateAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Hata yönetimi
+                Console.WriteLine($"Kaydetme iþlemi sýrasýnda hata oluþtu: {ex.Message}");
+            }
+        }
+
+        #region Create
+        private async Task CreatePsychologicalStateAsync()
+        {
+            await HandleError(async () =>
+            {
+                var createDto = new PshychologicalStateCreateDto
+                {
+                    Description = pshychologicalStateDto.Description,
+                    MentalState = pshychologicalStateDto.MentalState,
+                    ProtocolId = ProtocolId
+                };
+
+                await PsychologicalStateAppService.CreateAsync(createDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+
+        #region UPDATE
+        private async Task UpdatePsychologicalStateAsync()
+        {
+            await HandleError(async () =>
+            {
+                var updateDto = new PshychologicalStateUpdateDto
+                {
+                    Id = pshychologicalStateDto.Id,
+                    Description = pshychologicalStateDto.Description,
+                    MentalState = pshychologicalStateDto.MentalState,
+                    ProtocolId = ProtocolId
+                };
+
+                await PsychologicalStateAppService.UpdateAsync(updateDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+
+        private async Task LoadPsychologicalStateAsync()
+        {
+            try
+            {
+                var result = await PsychologicalStateAppService.GetWithProtocolIdAsync(ProtocolId);
+
+                if (result != null)
+                {
+                    pshychologicalStateDto = result;
+                    isExistingPsychologicalState = true;
+
+                }
+                else
+                {
+                    isExistingPsychologicalState = false;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Hata oluþtu: {ex.Message}");
+
+            }
+        }
         private void SetMentalState(MentalState state)
         {
-            selectedMentalState = state;
+            pshychologicalStateDto.MentalState = state;
         }
 
         private string GetButtonClass(MentalState state)
         {
-            return state == selectedMentalState ? "e-primary" : "e-outline";
+            return state == pshychologicalStateDto.MentalState ? "e-primary" : "e-outline";
         }
         #endregion
 
         #region FALLRISK
-        //yarina not 3 method yaz create update ve load dursun sanirim save icinde kayit varsa updatei cagir yoksa create cagir uzatmadan
-        //son olarakta eger yok isaretlenirsa kayit silinecek 
-        //ince detay kayit olmasada default kayit geliyo oraya artik son sprintte bakarim herhal
-        //private FallRiskCreateDto fallRiskCreateDto = new FallRiskCreateDto();
+       
         private FallRiskCreateDto fallRiskCreateDto = new FallRiskCreateDto();
         private FallRiskDto fallRiskDto = new FallRiskDto();
         private bool isFallRisk;
@@ -174,7 +394,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             {
                 if (isExistingRecord)
                 {
-                    // Güncelleme DTO'su hazýrla
+                    
                     var updateDto = new FallRiskUpdateDto
                     {
                         Id = fallRiskDto.Id,
@@ -190,7 +410,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                         GeneralHealthState = fallRiskDto.GeneralHealthState
                     };
 
-                    // Backend'e güncelleme isteði gönder
+                   
                     await FallRiskAppService.UpdateAsync(updateDto);
                 }
                 else
@@ -208,13 +428,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         {
             try
             {
-                // API isteði (ProtocolId ile)
+               
                 var protocolId = ProtocolId; 
                 var result = await FallRiskAppService.GetWithProtocolIdAsync(protocolId);
 
                 if (result != null)
                 {
-                    // Kayýt bulundu, DTO'yu doldur
+                    
                     fallRiskDto = new FallRiskDto
                     {
                         Id = result.Id,
@@ -233,13 +453,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                     score = fallRiskDto.Score;
                     fallRiskDescription = fallRiskDto.Description;
 
-                    isExistingRecord = true; // Kayýt bulundu
+                    isExistingRecord = true; 
                 }
                 else
                 {
                   
                     fallRiskDto = new FallRiskDto();
-                    isFallRisk = false; // Düþme riski yok
+                    isFallRisk = false; 
                     score = 0;
                     fallRiskDescription = string.Empty;
                     isExistingRecord = false;
@@ -979,7 +1199,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                     await CreateSystemCheckAsync();
                 }
 
-                isSystemModalOpen= false;
+              
             }
             catch (Exception ex)
             {
@@ -1013,7 +1233,10 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 isSystemModalOpen = false;
                 await ShowToast("Ýþlem Baþarýlý", true);
             });
+
         }
+
+
         #endregion
 
         #region Update
@@ -1162,5 +1385,358 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             return followUpType == selectedFollowUpType ? "e-primary" : "e-outline";
         }
         #endregion
+
+        #region SOYGECMIS
+        public FamilyHistoryDto familyHistoryDto = new FamilyHistoryDto();
+        private bool isExistingFamilyHistory;
+
+        #region UPDATE
+        private async Task UpdateFamilyHistoryAsync()
+        {
+            await HandleError(async () =>
+            {
+                var updateDto = new FamilyHistoryUpdateDto
+                {
+                    Id = familyHistoryDto.Id,
+                    PatientId = PatientId,
+                    Mother = familyHistoryDto.Mother,
+                    Father = familyHistoryDto.Father,
+                    Sister = familyHistoryDto.Sister,
+                    Brother = familyHistoryDto.Brother,
+                    Other = familyHistoryDto.Other,
+                    IsParentsRelative = familyHistoryDto.IsParentsRelative,
+                };
+
+                await FamilyHistoriesAppService.UpdateAsync(updateDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+
+        #region Create
+        private async Task CreateFamilyHistoryAsync()
+        {
+            await HandleError(async () =>
+            {
+                var createDto = new FamilyHistoryCreateDto
+                {
+                    PatientId = PatientId,
+                    Mother = familyHistoryDto.Mother,
+                    Father = familyHistoryDto.Father,
+                    Sister = familyHistoryDto.Sister,
+                    Brother = familyHistoryDto.Brother,
+                    Other = familyHistoryDto.Other,
+                    IsParentsRelative = familyHistoryDto.IsParentsRelative,
+                };
+
+                await FamilyHistoriesAppService.CreateAsync(createDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+        private async Task SaveFamilyHistory()
+        {
+            try
+            {
+                if (isExistingFamilyHistory)
+                {
+                    await UpdateFamilyHistoryAsync();
+
+                }
+                else
+                {
+                    await CreateFamilyHistoryAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Hata yönetimi
+                Console.WriteLine($"Kaydetme iþlemi sýrasýnda hata oluþtu: {ex.Message}");
+            }
+        }
+        private async Task LoadFamilyHistoryAsync()
+        {
+            try
+            {
+                var result = await FamilyHistoriesAppService.GetByPatientIdAsync(PatientId);
+
+                if (result != null)
+                {
+                    familyHistoryDto = result;
+                    isExistingFamilyHistory = true;
+                   
+                }
+                else
+                {
+
+                    familyHistoryDto = new FamilyHistoryDto();
+                    isExistingFamilyHistory = false;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Hata oluþtu: {ex.Message}");
+
+            }
+        }
+
+
+        #endregion
+
+        #region Kontrol Notlari
+        public ControlNoteDto controlNoteDto = new ControlNoteDto();
+        public ControlNoteCreateDto controlNoteCreateDto = new ControlNoteCreateDto();
+        private List<ControlNoteDto> controlNotes { get; set; } = new();
+
+        private SfDialog? NoteDialog; // Modal referansý
+        private string SelectedNote = string.Empty; // Seçilen notun içeriði
+        private bool isGridVisible = true; // Grid'in görünürlük durumu
+        private SfDialog? DeleteControlNoteDialog; // Silme modali referansý
+        private Guid SelectedControlNoteId; // Silinecek notun ID'si
+
+        // Modal açýlýrken çalýþacak
+        private async Task OpenControlNoteDeleteModal(Guid id)
+        {
+            SelectedControlNoteId = id;
+            await DeleteControlNoteDialog!.ShowAsync(); // Modalý göster
+        }
+
+        // Silme iþlemini onayla
+        private async Task ConfirmControlNoteDelete()
+        {
+            await HandleError(async () =>
+            {
+                // Servis üzerinden silme iþlemi
+                await ControlNotesAppService.DeleteAsync(SelectedControlNoteId);
+                await ShowToast("Ýþlem Baþarýlý", true);
+                await LoadControlNotesAsync();
+            });
+          
+            await DeleteControlNoteDialog!.HideAsync();
+            
+        }
+
+        // Modalý kapat (Silme iþlemi iptal)
+        private async Task CloseControlNoteDeleteModal()
+        {
+            SelectedControlNoteId = Guid.Empty; // ID'yi sýfýrla
+            await DeleteControlNoteDialog!.HideAsync();
+        }
+        private async Task UpdateControlNote()
+        {
+            // Düzenleme iþlemi burada yapýlacak
+            Console.WriteLine($"Edit Note ID: ");
+        }
+
+        private async Task DeleteControlNote(Guid? id)
+        {
+            await HandleError(async () =>
+            {
+                var createDto = new ControlNoteCreateDto
+                {
+                    ProtocolId = ProtocolId,
+                    NoteDate = controlNoteCreateDto.NoteDate,
+                    Note = controlNoteCreateDto.Note
+                };
+
+                await ControlNotesAppService.CreateAsync(createDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+                await LoadControlNotesAsync();
+            });
+        }
+        private async Task OpenNoteModal(string? note)
+        {
+            SelectedNote = note ?? "Açýklama mevcut deðil.";
+            await NoteDialog!.ShowAsync(); // Modalý göster
+        }
+
+        private async Task CloseNoteModal()
+        {
+            SelectedNote = string.Empty; // Not içeriðini temizle
+            await NoteDialog!.HideAsync(); // Modalý gizle
+        }
+        private string GetToggleIcon()
+        {
+            return isGridVisible ? "e-icons e-arrow-up" : "e-icons e-arrow-down";
+        }
+        private void ToggleGrid()
+        {
+            isGridVisible = !isGridVisible; // Grid görünürlüðünü deðiþtir
+        }
+        private async Task LoadControlNotesAsync()
+        {
+            var input = new GetControlsInput
+            {
+                ProtocolId = ProtocolId, // URL'den gelen veya baþka bir yerden alýnan Protokol ID
+                FilterText = null,       // Filtre yok
+                NoteDate = null,         // Tarih filtresi yok
+                Note = null,             // Not filtresi yok
+                Sorting = "NoteDate DESC", // Tarihe göre azalan sýralama
+                MaxResultCount = 10,    // Maksimum sonuç boyutu
+                SkipCount = 0          // Ýlk sayfa
+            };
+
+            // API çaðrýsý
+            var result = await ControlNotesAppService.GetListAsync(input);
+
+            // Gelen veriyi listeye at
+            controlNotes = result.Items.ToList();
+
+            StateHasChanged(); // Sayfayý güncelle
+        }
+        private async Task CreateControlNoteAsync()
+        {
+            await HandleError(async () =>
+            {
+                var createDto = new ControlNoteCreateDto
+                {
+                    ProtocolId = ProtocolId,
+                    NoteDate = controlNoteCreateDto.NoteDate,
+                    Note = controlNoteCreateDto.Note
+                };
+
+                await ControlNotesAppService.CreateAsync(createDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+                await LoadControlNotesAsync();
+            });
+        }
+
+        #endregion
+
+        #region Patient History
+        private bool isExistingPatienthistory;
+        private EducationLevel? selectedEducationLevel;
+        private PatientHistoryDto patientHistoryDto = new PatientHistoryDto();
+        private List<LookupDto<EducationLevel>> EducationLevelsCollection;
+        private bool isDetailsModalOpen;
+
+       
+        private string GetMaritalStatusButtonClass(MaritalStatus status)
+        {
+            return patientHistoryDto.MaritalStatus == status
+                ? "e-primary border-none" // Seçili durum için
+                : "e-outline-primary border-none"; // Seçilmemiþ durum için
+        }
+        private void SetMaritalStatus(MaritalStatus status)
+        {
+            patientHistoryDto.MaritalStatus = status;
+        }
+
+        #region Create
+        private async Task CreatePatientHistoryAsync()
+        {
+            await HandleError(async () =>
+            {
+                var createDto = new PatientHistoryCreateDto
+                {
+                    PatientId = PatientId,
+                    Habit = patientHistoryDto.Habit,
+                    Disease = patientHistoryDto.Disease,
+                    Medicine = patientHistoryDto.Medicine,
+                    Operation = patientHistoryDto.Operation,
+                    Vaccination = patientHistoryDto.Vaccination,
+                    Allergy = patientHistoryDto.Allergy,
+                    SpecialCondition = patientHistoryDto.SpecialCondition,
+                    Device = patientHistoryDto.Device,
+                    Therapy = patientHistoryDto.Therapy,
+                    Job = patientHistoryDto.Job,
+                    EducationLevel = patientHistoryDto.EducationLevel,
+                    MaritalStatus = patientHistoryDto.MaritalStatus,
+
+                };
+
+                await PatientHistoriesAppService.CreateAsync(createDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+
+        #region UPDATE
+        private async Task UpdatePatientHistoryAsync()
+        {
+            await HandleError(async () =>
+            {
+                var updateDto = new PatientHistoryUpdateDto
+                {
+                    Id = patientHistoryDto.Id,
+                    PatientId = PatientId,
+                    Habit = patientHistoryDto.Habit,
+                    Disease = patientHistoryDto.Disease,
+                    Medicine = patientHistoryDto.Medicine,
+                    Operation = patientHistoryDto.Operation,
+                    Vaccination = patientHistoryDto.Vaccination,
+                    Allergy = patientHistoryDto.Allergy,
+                    SpecialCondition = patientHistoryDto.SpecialCondition,
+                    Device = patientHistoryDto.Device,
+                    Therapy = patientHistoryDto.Therapy,
+                    Job = patientHistoryDto.Job,
+                    EducationLevel = patientHistoryDto.EducationLevel,
+                    MaritalStatus = patientHistoryDto.MaritalStatus,
+                };
+
+                await PatientHistoriesAppService.UpdateAsync(updateDto);
+                await ShowToast("Ýþlem Baþarýlý", true);
+            });
+        }
+        #endregion
+
+        private async Task SavePatientHistoryAsync()
+        {
+            try
+            {
+                if (isExistingPatienthistory)
+                {
+                    await UpdatePatientHistoryAsync();
+
+                }
+                else
+                {
+                    await CreatePatientHistoryAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                
+                Console.WriteLine($"Kaydetme iþlemi sýrasýnda hata oluþtu: {ex.Message}");
+            }
+        }
+        private async Task LoadPatientHistoryAsync()
+        {
+            try
+            {
+                var result = await PatientHistoriesAppService.GetByPatientIdAsync(PatientId);
+
+                if (result != null)
+                {
+                    patientHistoryDto = result;
+                    isExistingPatienthistory = true;
+
+                }
+                else
+                {
+
+                    patientHistoryDto = new PatientHistoryDto();
+                    isExistingPatienthistory = false;
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Hata oluþtu: {ex.Message}");
+
+            }
+        }
+        private void OpenDetailsModal()
+        {
+            isDetailsModalOpen = true;
+        }
+        private void CloseDetailsModal()
+        {
+            isDetailsModalOpen = false;
+        }
+
+        #endregion
+
     }
 }

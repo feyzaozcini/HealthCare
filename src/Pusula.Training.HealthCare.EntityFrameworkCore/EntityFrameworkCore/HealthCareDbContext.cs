@@ -52,6 +52,9 @@ using Pusula.Training.HealthCare.BlackLists;
 using Pusula.Training.HealthCare.SystemChecks;
 using Pusula.Training.HealthCare.FollowUpPlans;
 using Pusula.Training.HealthCare.Addresses;
+using Pusula.Training.HealthCare.FamilyHistories;
+using Pusula.Training.HealthCare.ControlNotes;
+using Pusula.Training.HealthCare.PatientHistories;
 
 
 namespace Pusula.Training.HealthCare.EntityFrameworkCore;
@@ -98,14 +101,18 @@ public class HealthCareDbContext :
     public DbSet<AppointmentRule> AppointmentRules { get; set; }
     public DbSet<PainType> PainTypes { get; set; } = null!;
     public DbSet<PainDetail> PainDetails { get; set; } = null!;
-
     public DbSet<SystemCheck> SystemChecks { get; set; } = null!;
     public DbSet<FollowUpPlan> FollowUpPlans { get; set; } = null!;
-
-
     public DbSet<DoctorWorkSchedule> DoctorWorkSchedules { get; set; } = null!;
     public DbSet<BlackList> BlackLists { get; set; } = null!;
     public DbSet<Address> Addresses { get; set; } = null!;
+
+    public DbSet<FamilyHistory> FamilyHistories { get; set; } = null!;
+    public DbSet<ControlNote> ControlNotes { get; set; } = null!;
+    public DbSet<PatientHistory> PatientHistories { get; set; } = null!;
+
+
+
 
     #region Entities from the modules
 
@@ -592,8 +599,7 @@ public class HealthCareDbContext :
             {
                 b.ToTable(HealthCareConsts.DbTablePrefix + "PshychologicalStates", HealthCareConsts.DbSchema);
                 b.ConfigureByConvention();
-                b.Property(x => x.Description).HasColumnName(nameof(PshychologicalState.Description)).HasMaxLength(PshychologicalStateConsts.DescriptionMaxLength);
-                //b.Property(x => x.State).HasColumnName(nameof(PshychologicalState.State));
+                b.Property(x => x.Description).HasColumnName(nameof(PshychologicalState.Description)).IsRequired(false).HasMaxLength(PshychologicalStateConsts.DescriptionMaxLength);
                 b.Property(x => x.MentalState).HasColumnName(nameof(PshychologicalState.MentalState));
                 b.HasOne<Protocol>().WithOne().HasForeignKey<PshychologicalState>(x => x.ProtocolId).OnDelete(DeleteBehavior.NoAction);
             });
@@ -724,6 +730,54 @@ public class HealthCareDbContext :
                 b.Property(x => x.FollowUpType).HasColumnName(nameof(FollowUpPlan.FollowUpType)).IsRequired();
                 b.Property(x => x.IsSurgeryScheduled).HasColumnName(nameof(FollowUpPlan.IsSurgeryScheduled)).IsRequired();
                 b.HasOne(x => x.Protocol).WithOne().HasForeignKey<FollowUpPlan>(x => x.ProtocolId).IsRequired().OnDelete(DeleteBehavior.Cascade);
+
+            });
+
+            builder.Entity<FamilyHistory>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "FamilyHistories", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.PatientId).HasColumnName(nameof(FamilyHistory.PatientId)).IsRequired();
+                b.Property(x => x.Mother).HasColumnName(nameof(FamilyHistory.Mother)).IsRequired(false);
+                b.Property(x => x.Father).HasColumnName(nameof(FamilyHistory.Father)).IsRequired(false);
+                b.Property(x => x.Sister).HasColumnName(nameof(FamilyHistory.Sister)).IsRequired(false);
+                b.Property(x => x.Brother).HasColumnName(nameof(FamilyHistory.Brother)).IsRequired(false);
+                b.Property(x => x.Other).HasColumnName(nameof(FamilyHistory.Other)).IsRequired(false);
+                b.Property(x => x.IsParentsRelative).HasColumnName(nameof(FamilyHistory.IsParentsRelative)).IsRequired();
+                b.HasOne(x => x.Patient).WithOne().HasForeignKey<FamilyHistory>(x => x.PatientId).IsRequired().OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<ControlNote>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "ControlNotes", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.ProtocolId).HasColumnName(nameof(ControlNote.ProtocolId)).IsRequired();
+                b.Property(x => x.NoteDate).HasColumnName(nameof(ControlNote.NoteDate)).IsRequired();
+                b.Property(x => x.Note).HasColumnName(nameof(ControlNote.Note)).HasMaxLength(ControlNoteConsts.NoteMaxLength).IsRequired();
+                b.HasOne(x => x.Protocol).WithMany().IsRequired().HasForeignKey(x => x.ProtocolId).OnDelete(DeleteBehavior.Cascade);
+                b.HasOne(x => x.User).WithMany().IsRequired().HasForeignKey(x => x.CreatorId).OnDelete(DeleteBehavior.Cascade);
+            });
+
+            builder.Entity<PatientHistory>(b =>
+            {
+                b.ToTable(HealthCareConsts.DbTablePrefix + "PatientHistories", HealthCareConsts.DbSchema);
+                b.ConfigureByConvention();
+                b.Property(x => x.PatientId).HasColumnName(nameof(PatientHistory.PatientId)).IsRequired();
+                b.Property(x => x.Habit).HasColumnName(nameof(PatientHistory.Habit)).IsRequired(false);
+                b.Property(x => x.Disease).HasColumnName(nameof(PatientHistory.Disease)).IsRequired();
+                b.Property(x => x.Medicine).HasColumnName(nameof(PatientHistory.Medicine)).IsRequired(false);
+                b.Property(x => x.Operation).HasColumnName(nameof(PatientHistory.Operation)).IsRequired();
+                b.Property(x => x.Vaccination).HasColumnName(nameof(PatientHistory.Vaccination)).IsRequired(false);
+                b.Property(x => x.Allergy).HasColumnName(nameof(PatientHistory.Allergy)).IsRequired();
+                b.Property(x => x.SpecialCondition).HasColumnName(nameof(PatientHistory.SpecialCondition)).IsRequired(false);
+                b.Property(x => x.Device).HasColumnName(nameof(PatientHistory.Device)).IsRequired(false);
+                b.Property(x => x.Therapy).HasColumnName(nameof(PatientHistory.Therapy)).IsRequired(false);
+                b.Property(x => x.Job).HasColumnName(nameof(PatientHistory.Job)).IsRequired(false);
+                b.Property(x => x.EducationLevel).HasColumnName(nameof(PatientHistory.EducationLevel)).IsRequired();
+                b.Property(x => x.MaritalStatus).HasColumnName(nameof(PatientHistory.MaritalStatus)).IsRequired();
+
+
+                b.HasOne(x => x.Patient).WithOne().HasForeignKey<PatientHistory>(x => x.PatientId).IsRequired().OnDelete(DeleteBehavior.Cascade);
 
             });
         }

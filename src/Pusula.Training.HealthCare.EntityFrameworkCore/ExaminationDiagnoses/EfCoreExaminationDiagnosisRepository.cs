@@ -1,19 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.Diagnoses;
-using Pusula.Training.HealthCare.DiagnosisGroups;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
-using Pusula.Training.HealthCare.PatientCompanies;
-using Pusula.Training.HealthCare.Patients;
+
 using Pusula.Training.HealthCare.Protocols;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
@@ -111,6 +104,31 @@ namespace Pusula.Training.HealthCare.ExaminationDiagnoses
                   .WhereIf(initialDate.HasValue, e => e.ExaminationDiagnosis.InitialDate == initialDate)
                   .WhereIf(protocolId.HasValue, e => e.ExaminationDiagnosis.ProtocolId == protocolId)
                   .WhereIf(diagnosisId.HasValue, e => e.ExaminationDiagnosis.DiagnosisId == diagnosisId);
+
+
+        public async Task<List<(string DiagnosisName, int Count)>> GetDiagnosisCountsAsync(int skipCount,int maxResultCount,
+            CancellationToken cancellationToken = default)
+        {
+            var dbContext = await GetDbContextAsync();
+
+            var query = from ed in dbContext.Set<ExaminationDiagnosis>()
+                        join d in dbContext.Set<Diagnosis>() on ed.DiagnosisId equals d.Id
+                        where !ed.IsDeleted // Soft delete olanları dışla
+                        group ed by d.Name into g
+                        orderby g.Key // İsteğe bağlı sıralama
+                        select new
+                        {
+                            DiagnosisName = g.Key,
+                            Count = g.Count()
+                        };
+
+            var result = await query
+                .Skip(skipCount)
+                .Take(maxResultCount)
+                .ToListAsync(cancellationToken);
+
+            return result.Select(x => (x.DiagnosisName, x.Count)).ToList();
+        }
 
     }
 }

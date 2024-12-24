@@ -10,7 +10,9 @@
 @using Pusula.Training.HealthCare.Protocols
 @using Pusula.Training.HealthCare.SystemChecks
 @using Pusula.Training.HealthCare.FollowUpPlans
-
+@using Pusula.Training.HealthCare.FamilyHistories
+@using Pusula.Training.HealthCare.ControlNotes
+@using Pusula.Training.HealthCare.PatientHistories
 
 
 @using Volo.Abp.Localization
@@ -36,6 +38,11 @@
 @inject IProtocolsAppService ProtocolAppService
 @inject ISystemChecksAppService SystemCheckAppService
 @inject IFollowUpPlansAppService FollowUpPlanAppService
+@inject IFamilyHistoriesAppService FamilyHistoriesAppService
+@inject IControlNotesAppService ControlNotesAppService
+@inject IPshychologicalStatesAppService PsychologicalStateAppService
+@inject IPatientHistoriesAppService PatientHistoriesAppService
+
 
 
 
@@ -45,6 +52,43 @@
 <SfToast @ref="ToastObj" Width="300px">
     <ToastPosition X="Right" Y="Top"></ToastPosition>
 </SfToast>
+
+
+ <SfDialog 
+    @bind-Visible="IsErrorModalOpen" 
+    Width="400px" 
+    ShowCloseIcon="true">
+
+    <DialogTemplates>
+        <!-- Header -->
+        <Header>
+            <div class="e-icon-settings">Doğrulama Hatası</div>
+        </Header>
+
+        <!-- Content -->
+        <Content>
+            <div class="dialogContent">
+                <ul>
+                    @foreach (var error in ValidationMessages)
+                    {
+                                <li>@error</li>
+                    }
+                </ul>
+            </div>
+        </Content>
+
+        <!-- Footer -->
+        <FooterTemplate>
+            <SfButton OnClick="CloseErrorModal" CssClass="e-primary">Kapat</SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+
+    <!-- Pozisyon Ayarları -->
+    <DialogPositionData X="center" Y="top"></DialogPositionData>
+</SfDialog>
+
+
+
 
 
 <div class="patient-card-container">
@@ -79,19 +123,19 @@
 <!-- #endregion -->
 
 
-<div class="container-fluid">
-    <div class="row">
+<div class="container-fluid" style="height: 100vh;">
+    <div class="row h-100">
         <!-- Sol Kolon -->
-        <div class="col-md-6">
+        <div class="col-md-6" style="overflow-y: auto; height: 100%; border-right: 1px solid #ddd; padding: 10px;">
             <!-- ANAMNESIS START -->
             <div class="mb-3">
-                <SfCard CssClass="e-shadow">
+                <SfCard CssClass="e-shadow position-relative">
                     <Syncfusion.Blazor.Cards.CardHeader>
                         <strong>Yakınması</strong>
                     </Syncfusion.Blazor.Cards.CardHeader>
                     <CardContent>
                         <div class="mb-3">
-                            <SfTextBox @bind-Value="anamnesisCreateDto.Complaint" Placeholder="Şikayeti" CssClass="form-control" />
+                            <SfTextBox @bind-Value="anamnesisDto.Complaint" Placeholder="Şikayeti" CssClass="form-control required-field" />
                         </div>
                         <div class="mb-3">
                             <p class="form-label">Başlangıç Tarihi</p>
@@ -105,25 +149,219 @@
                                     <SfButton CssClass="@GetButtonClass("Yıl")" @onclick='() => UpdateUnit("Yıl")'>Yıl</SfButton>
                                 </div>
                                 <span class="me-2">Önce</span>
-                                <SfDatePicker TValue="DateTime" @bind-Value="selectedDate" Placeholder="Tarih Seç" />
+                                <SfDatePicker TValue="DateTime" @bind-Value="anamnesisDto.StartDate" Placeholder="Tarih Seç" Max="DateTime.Now" />
                             </div>
                         </div>
                         <div class="mb-3">
-                            <SfTextBox @bind-Value="anamnesisCreateDto.Story" Placeholder="Öykü" CssClass="form-control" />
+                            <SfTextBox @bind-Value="anamnesisDto.Story" Placeholder="Öykü" CssClass="form-control required-field" />
+                        </div>
+                        <!-- Kaydet Butonu -->
+                        <div class="text-end mt-3">
+                            <SfButton CssClass="e-primary e-small save-button"
+                                      IconCss="e-icons e-save"
+                                      @onclick="SaveAnamnesisAsync">
+                                Kaydet
+                            </SfButton>
                         </div>
                     </CardContent>
                 </SfCard>
             </div>
             <!-- ANAMNESIS END -->
-            <!-- Özgeçmiş Kartı START -->
+            <!-- FAMILY HISTORY START -->
             <div class="mb-3">
                 <SfCard CssClass="e-shadow">
                     <Syncfusion.Blazor.Cards.CardHeader>
-                        <strong style="text-align: left; display: block;">Özgeçmiş</strong>
+                        <strong>Soygeçmiş</strong>
                     </Syncfusion.Blazor.Cards.CardHeader>
                     <CardContent>
-                        <!-- İçerik ileride eklenecek -->
+                        <table class="table table-borderless" style="border-collapse: collapse; width: 100%;">
+                            <tbody>
+                                <!-- Anne Alanı -->
+                                <tr>
+                                    <td style="padding: 0; margin: 0; width: 15%;">
+                                        <SfTextBox Readonly="true"
+                                                   Value="Anne"
+                                                   style="width: 100%; height: 30px; font-weight: bold; text-align: center;" />
+                                    </td>
+                                    <td style="padding: 0; margin: 0; width: 85%;">
+                                        <SfTextBox Placeholder="Açıklama giriniz"
+                                                   @bind-Value="familyHistoryDto.Mother"
+                                                   style="width: 100%; height: 30px;" />
+                                    </td>
+                                </tr>
+                                <!-- Baba Alanı -->
+                                <tr>
+                                    <td style="padding: 0; margin: 0; width: 15%;">
+                                        <SfTextBox Readonly="true"
+                                                   Value="Baba"
+                                                   style="width: 100%; height: 30px; font-weight: bold; text-align: center;" />
+                                    </td>
+                                    <td style="padding: 0; margin: 0; width: 85%;">
+                                        <SfTextBox Placeholder="Açıklama giriniz"
+                                                   @bind-Value="familyHistoryDto.Father"
+                                                   style="width: 100%; height: 30px;" />
+                                    </td>
+                                </tr>
+                                <!-- Kiz kardes Alanı -->
+                                <tr>
+                                    <td style="padding: 0; margin: 0; width: 15%;">
+                                        <SfTextBox Readonly="true"
+                                                   Value="Kız Kardeş"
+                                                   style="width: 100%; height: 30px; font-weight: bold; text-align: center;" />
+                                    </td>
+                                    <td style="padding: 0; margin: 0; width: 85%;">
+                                        <SfTextBox Placeholder="Açıklama giriniz"
+                                                   @bind-Value="familyHistoryDto.Sister"
+                                                   style="width: 100%; height: 30px;" />
+                                    </td>
+                                </tr>
+                                <!-- Erkek kardes Alanı -->
+                                <tr>
+                                    <td style="padding: 0; margin: 0; width: 15%;">
+                                        <SfTextBox Readonly="true"
+                                                   Value="Erkek Kardeş"
+                                                   style="width: 100%; height: 30px; font-weight: bold; text-align: center;" />
+                                    </td>
+                                    <td style="padding: 0; margin: 0; width: 85%;">
+                                        <SfTextBox Placeholder="Açıklama giriniz"
+                                                   @bind-Value="familyHistoryDto.Brother"
+                                                   style="width: 100%; height: 30px;" />
+                                    </td>
+                                </tr>
+                                <!-- Diger  Alanı -->
+                                <tr>
+                                    <td style="padding: 0; margin: 0; width: 15%;">
+                                        <SfTextBox Readonly="true"
+                                                   Value="Diğer"
+                                                   style="width: 100%; height: 30px; font-weight: bold; text-align: center;" />
+                                    </td>
+                                    <td style="padding: 0; margin: 0; width: 85%;">
+                                        <SfTextBox Placeholder="Açıklama giriniz"
+                                                   @bind-Value="familyHistoryDto.Other"
+                                                   style="width: 100%; height: 30px;" />
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                        <!-- Checkbox ve Yazı -->
+                        <div style="margin-top: 10px; display: flex; align-items: center;">
+                            <SfCheckBox TChecked="bool" @bind-Checked="familyHistoryDto.IsParentsRelative" />
+                            <span style="margin-left: 5px;">Anne ve baba akraba mı?</span>
+                        </div>
+                        <!-- Kaydet Butonu -->
+                        <div style="margin-top: 20px; text-align: right;">
+                            <SfButton CssClass="e-primary" OnClick="SaveFamilyHistory">Kaydet</SfButton>
+                        </div>
                     </CardContent>
+                </SfCard>
+            </div>
+            <!-- FAMILY HISTORY END -->
+            <!-- Özgeçmiş Kartı START BARAN2 -->
+            <div class="mb-3">
+                <SfCard CssClass="e-shadow">
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        @* <div class="d-flex justify-content-between align-items-center" style="width: 100%;">
+                            <strong>Özgeçmiş</strong>
+                            <span @onclick="OpenDetailsModal" style="cursor: pointer; color: #007bff; font-size: 0.9rem; text-decoration: none;">
+                                Detaylar
+                            </span>
+                        </div> *@
+                        <div class="d-flex justify-content-between align-items-center position-relative" style="width: 100%;">
+                            <div class="position-relative required-label">
+                                <strong>Özgeçmiş</strong>
+                             </div>
+                             <span @onclick="OpenDetailsModal" style="cursor: pointer; color: #007bff; font-size: 0.9rem; text-decoration: none;">
+                                Detaylar
+                             </span>
+                        </div>
+                    </Syncfusion.Blazor.Cards.CardHeader>
+                    <Syncfusion.Blazor.Cards.CardContent>
+                        <table class="table">
+                            <tbody>
+                                <!-- Alışkanlık -->
+                                <tr>
+                                    <td class="label-cell"><strong>Alışkanlıklar:</strong></td>
+                                    <td>
+                                        <SfTextArea Placeholder="Alışkanlıklarınızı giriniz..." @bind-Value="patientHistoryDto.Habit" CssClass="e-outline" RowCount="2" Width="100" ResizeMode='Resize.None'></SfTextArea>
+                                    </td>
+                                </tr>
+                                <!-- Hastalık -->
+                                <tr>
+                                    <td class="label-cell"><strong>Hastalık:</strong></td>
+                                    <td>
+                                        <SfTextArea Placeholder="Hastalıklarınızı giriniz..." @bind-Value="patientHistoryDto.Disease" CssClass="e-outline required-field" RowCount="2" Width="100" ResizeMode='Resize.None'></SfTextArea>
+                                    </td>
+                                </tr>
+                                <!-- Alerji -->
+                                <tr>
+                                    <td class="label-cell"><strong>Alerji:</strong></td>
+                                    <td>
+                                        <SfTextArea Placeholder="Alerjilerinizi giriniz..." @bind-Value="patientHistoryDto.Allergy" CssClass="e-outline  required-field" RowCount="2" Width="100" ResizeMode='Resize.None'></SfTextArea>
+                                    </td>
+                                </tr>
+                                <!-- Ameliyat -->
+                                <tr>
+                                    <td class="label-cell"><strong>Ameliyat:</strong></td>
+                                    <td>
+                                        <SfTextArea Placeholder="Ameliyat geçmişinizi giriniz..." @bind-Value="patientHistoryDto.Operation  " CssClass="e-outline required-field" RowCount="2" Width="100" ResizeMode='Resize.None'></SfTextArea>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Çizgi ve Son Satır -->
+                        <hr />
+                        <div class="d-flex align-items-center">
+                            <!-- Meslek Textbox -->
+                            <SfTextBox Placeholder="Meslek" @bind-Value="patientHistoryDto.Job" CssClass="me-3"></SfTextBox>
+
+                            <!-- Eğitim Seviyesi Dropdown -->
+
+                            @*  <SfDropDownList Placeholder="Eğitim Seviyesi"
+                                            DataSource="@EducationLevelsCollection" Value="@selectedEducationLevel">
+                                <DropDownListFieldSettings Text="DisplayName" Value="Id" />
+                            </SfDropDownList> *@
+                            <SfDropDownList Placeholder="Eğitim Seviyesi"
+                                            DataSource="@EducationLevelsCollection"
+                                            @bind-Value="patientHistoryDto.EducationLevel">
+                                <DropDownListFieldSettings Text="DisplayName" Value="Id" />
+                            </SfDropDownList>
+
+                            <!-- Medeni Durum -->
+                            <span class="me-3"><strong>Medeni Durum:</strong></span>
+                            <div class="d-flex">
+                                <!-- Belirtilmemiş -->
+                                <SfButton CssClass="@GetMaritalStatusButtonClass(MaritalStatus.Unspecified)"
+                                          Content="Belirtilmemiş"
+                                          @onclick="() => SetMaritalStatus(MaritalStatus.Unspecified)"
+                                          Style="border-top-left-radius: 10px; border-bottom-left-radius: 10px;">
+                                </SfButton>
+
+                                <!-- Evli -->
+                                <SfButton CssClass="@GetMaritalStatusButtonClass(MaritalStatus.Married)"
+                                          Content="Evli"
+                                          @onclick="() => SetMaritalStatus(MaritalStatus.Married)">
+                                </SfButton>
+
+                                <!-- Bekar -->
+                                <SfButton CssClass="@GetMaritalStatusButtonClass(MaritalStatus.Single)"
+                                          Content="Bekar"
+                                          @onclick="() => SetMaritalStatus(MaritalStatus.Single)"
+                                          Style="border-top-right-radius: 10px; border-bottom-right-radius: 10px;">
+                                </SfButton>
+                            </div>
+                        </div>
+                    </Syncfusion.Blazor.Cards.CardContent>
+                    <!-- Kart Altına Kaydet Butonu -->
+                    <!-- Kaydet Butonu -->
+                    <div class="text-end mt-3">
+                        <SfButton CssClass="e-primary e-small save-button"
+                                  IconCss="e-icons e-save"
+                                  OnClick="SavePatientHistoryAsync">
+                            Kaydet
+                        </SfButton>
+                    </div>
                 </SfCard>
             </div>
             <!-- Özgeçmiş Kartı END -->
@@ -141,7 +379,7 @@
 
                     <CardContent>
                         <div class="mb-3">
-                            <SfTextArea @bind-Value="systemCheckDto.Description" Placeholder="Açıklama" CssClass="form-control" />
+                            <SfTextArea @bind-Value="systemCheckDto.Description" Placeholder="Açıklama" RowCount="2" Width="50"  />
                         </div>
                     </CardContent>
                 </SfCard>
@@ -154,18 +392,39 @@
                         <strong>Psikolojik Durum</strong>
                     </Syncfusion.Blazor.Cards.CardHeader>
                     <CardContent>
-                        <div class="d-flex align-items-center mb-3">
+              @*           <div class="d-flex align-items-center mb-3">
                             <div class="btn-group me-3" role="group">
                                 @foreach (var state in Enum.GetValues(typeof(MentalState)))
                                 {
-                                    @* buradayim *@
-                                    <SfButton CssClass="@GetButtonClass((MentalState)state)"
-                                              @onclick="() => SetMentalState((MentalState)state)">
+
+                                        <SfButton CssClass="@GetButtonClass((MentalState)state)"
+                                                  @onclick="() => SetMentalState((MentalState)state)">
                                         @Localizer[$"Enum:MentalState.{state}"]
-                                    </SfButton>
+                                        </SfButton>
                                 }
                             </div>
-                            <SfTextBox @bind-Value="description" Placeholder="Açıklama" CssClass="form-control" Style="width: 100px;" />
+                            <SfTextBox @bind-Value="pshychologicalStateDto.Description" Placeholder="Açıklama" CssClass="form-control" Style="width: 100px;" />
+                        </div> *@
+                        <div class="d-flex align-items-center mb-3 position-relative">
+                            <div class="btn-group me-3 required-label" role="group">
+                                 @foreach (var state in Enum.GetValues(typeof(MentalState)))
+                                 {
+                                    <SfButton CssClass="@GetButtonClass((MentalState)state)"
+                                        @onclick="() => SetMentalState((MentalState)state)">
+                                        @Localizer[$"Enum:MentalState.{state}"]
+                                    </SfButton>
+                                 }
+                            </div>
+                          <SfTextBox @bind-Value="pshychologicalStateDto.Description" Placeholder="Açıklama" CssClass="form-control" Style="width: 100px;" />
+                       </div>
+
+                        <!-- Kaydet Butonu -->
+                        <div class="text-end mt-3">
+                            <SfButton CssClass="e-primary e-small save-button"
+                                      IconCss="e-icons e-save"
+                                      @onclick="SavePsychologicalStateAsync">
+                                Kaydet
+                            </SfButton>
                         </div>
                     </CardContent>
                 </SfCard>
@@ -179,15 +438,18 @@
                             <strong style="margin-right: auto;">Düşme Riski</strong>
                             @if (isFallRisk)
                             {
-                                <div class="d-flex align-items-center me-3">
-                                    <SfTextBox @bind-Value="fallRiskDto.Description" Placeholder="Açıklama" CssClass="me-2" OnBlur="@UpdateDescriptionAndScoreAsync" />
+                                    <div class="d-flex align-items-center me-3">
+                                        <SfTextBox @bind-Value="fallRiskDto.Description" Placeholder="Açıklama" CssClass="me-2" OnBlur="@UpdateDescriptionAndScoreAsync" />
 
-                                    <strong class="me-2">Skor</strong>
-                                    <SfNumericTextBox TValue="int" @bind-Value="fallRiskDto.Score" Placeholder="Skor" ShowSpinButton="false" CssClass="me-2" OnBlur="@UpdateDescriptionAndScoreAsync" />
-                                </div>
+                                        <strong class="me-2">Skor</strong>
+                                        <SfNumericTextBox TValue="int" @bind-Value="fallRiskDto.Score" Placeholder="Skor" ShowSpinButton="false" CssClass="me-2" Max=10 OnBlur="@UpdateDescriptionAndScoreAsync" />
+                                    </div>
                             }
                             <div class="btn-group" role="group">
-                                <SfButton CssClass="@(isFallRisk ? "e-primary" : "e-outline")" @onclick="() => SetFallRisk(true)">Var</SfButton>
+                                <SfButton CssClass="@(isFallRisk ? "e-primary required-label" : "e-outline required-label")" 
+                                    @onclick="() => SetFallRisk(true)">
+                                    Var
+                                </SfButton>
                                 <SfButton CssClass="@(isFallRisk ? "e-outline" : "e-primary")" @onclick="() => SetFallRisk(false)">Yok</SfButton>
                             </div>
                         </div>
@@ -204,16 +466,16 @@
                             <strong style="margin-right: 10px;">Ağrı</strong>
                             @if (isPain)
                             {
-                                <!-- Bölge TextBox -->
-                                <SfTextBox @bind-Value="painDetailDto.Area" Placeholder="Bölge" CssClass="me-2" />
+                                    <!-- Bölge TextBox -->
+                                    <SfTextBox @bind-Value="painDetailDto.Area" Placeholder="Bölge" CssClass="me-2 required-field" />
 
-                                <strong style="margin-right: 10px;">Skor</strong>
+                                    <strong style="margin-right: 10px;">Skor</strong>
 
-                                <!-- Skor NumericTextBox -->
-                                <SfNumericTextBox @bind-Value="painDetailDto.Score" TValue="int" Placeholder="Skor" ShowSpinButton="false" CssClass="me-2" />
+                                    <!-- Skor NumericTextBox -->
+                                    <SfNumericTextBox @bind-Value="painDetailDto.Score" TValue="int" Placeholder="Skor" ShowSpinButton="false" CssClass="me-2" Max="10" />
 
-                                <!-- Açıklama TextBox -->
-                                <SfTextBox @bind-Value="painDetailDto.Description" Placeholder="Açıklama" CssClass="me-2" />
+                                    <!-- Açıklama TextBox -->
+                                    <SfTextBox @bind-Value="painDetailDto.Description" Placeholder="Açıklama" CssClass="me-2" />
                             }
 
                             <!-- "Var" ve "Yok" Butonları -->
@@ -226,70 +488,70 @@
                         <!-- İkinci Satır: Ağrı Türü Butonları -->
                         @if (isPain)
                         {
-                            <!-- Ağrı Niteliği Label ve Butonlar -->
-                            <div class="d-flex align-items-center flex-wrap mt-3">
-                                <label class="form-label me-2">Ağrı Niteliği</label>
-                                <div class="btn-group d-flex flex-wrap" role="group">
+                                <!-- Ağrı Niteliği Label ve Butonlar -->
+                                <div class="d-flex align-items-center flex-wrap mt-3">
+                                    <label class="form-label me-2">Ağrı Niteliği</label>
+                                    <div class="btn-group d-flex flex-wrap" role="group">
                                     @foreach (var painType in painTypes)
                                     {
-                                        <SfButton CssClass="@GetPainTypeButtonClass(painType.Id)" @onclick="() => SetPainType(painType.Id)">
+                                                <SfButton CssClass="@GetPainTypeButtonClass(painType.Id)" @onclick="() => SetPainType(painType.Id)">
                                             @* @bind-Value="painDetailDto.PainTypeId" *@
                                             @painType.DisplayName
-                                        </SfButton>
+                                                </SfButton>
                                     }
+                                    </div>
                                 </div>
-                            </div>
                         }
 
                         <!-- Üçüncü Satır: Diğer Bölge için TextBox -->
                         @if (isPain)
                         {
-                            <div class="mb-3">
-                                <SfTextBox @bind-Value="painDetailDto.OtherPain" Placeholder="Diğer" CssClass="form-control" />
-                            </div>
+                                <div class="mb-3">
+                                    <SfTextBox @bind-Value="painDetailDto.OtherPain" Placeholder="Diğer" CssClass="form-control" />
+                                </div>
                         }
 
                         <!-- Dördüncü Satır: Ağrı Ritmi, Ağrı Başlangıcı ve Süre Alanları -->
                         @if (isPain)
                         {
-                            <!-- Ağrı Ritmi -->
-                            <div class="d-flex align-items-center mt-3">
-                                <label class="form-label me-2">Ağrı Ritmi</label>
+                                <!-- Ağrı Ritmi -->
+                                <div class="d-flex align-items-center mt-3">
+                                    <label class="form-label me-2">Ağrı Ritmi</label>
 
-                                <div class="btn-group" role="group">
+                                    <div class="btn-group" role="group">
                                     @foreach (var rhythm in Enum.GetValues(typeof(PainRhythm)))
                                     {
-                                        <SfButton CssClass="@GetPainRhythmButtonClass((PainRhythm)rhythm)"
-                                                  @onclick="() => SetPainRhythm((PainRhythm)rhythm)">
+                                                <SfButton CssClass="@GetPainRhythmButtonClass((PainRhythm)rhythm)"
+                                                          @onclick="() => SetPainRhythm((PainRhythm)rhythm)">
                                             @Localizer[$"Enum:PainRhythm.{rhythm}"]
-                                        </SfButton>
+                                                </SfButton>
                                     }
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Ağrı Başlangıcı -->
-                            <div class="d-flex align-items-center mt-3">
-                                <label class="form-label me-2">Ağrı Başlangıcı</label>
+                                <!-- Ağrı Başlangıcı -->
+                                <div class="d-flex align-items-center mt-3">
+                                    <label class="form-label me-2">Ağrı Başlangıcı</label>
 
-                                <!-- Süre NumericTextBox -->
-                                <SfNumericTextBox TValue="int" @bind-Value="painDurationValue" Placeholder="Süre" ShowSpinButton="false" CssClass="me-2" @onchange="UpdatePainStartDate" />
+                                    <!-- Süre NumericTextBox -->
+                                    <SfNumericTextBox TValue="int" @bind-Value="painDurationValue" Placeholder="Süre" ShowSpinButton="false" CssClass="me-2" @onchange="UpdatePainStartDate" />
 
-                                <!-- Zaman Seçim Dropdown -->
-                                <SfDropDownList TValue="string" TItem="string" @bind-Value="painSelectedUnit" DataSource="@timeUnits" Placeholder="Seç" CssClass="me-2" />
+                                    <!-- Zaman Seçim Dropdown -->
+                                    <SfDropDownList TValue="string" TItem="string" @bind-Value="painSelectedUnit" DataSource="@timeUnits" Placeholder="Seç" CssClass="me-2" />
 
-                                <!-- Önce Yazısı -->
-                                <span class="ms-2">Önce</span>
-                            </div>
+                                    <!-- Önce Yazısı -->
+                                    <span class="ms-2">Önce</span>
+                                </div>
 
-                            <!-- DateTime Picker (güncellenmiş tarih) -->
-                            <div class="d-flex align-items-center mt-3">
-                                <SfDatePicker TValue="DateTime" @bind-Value="painStartDate" Placeholder="Tarih Seç" CssClass="me-2" />
-                            </div>
+                                <!-- DateTime Picker (güncellenmiş tarih) -->
+                                <div class="d-flex align-items-center mt-3">
+                                    <SfDatePicker TValue="DateTime" @bind-Value="painStartDate" Placeholder="Tarih Seç" CssClass="me-2" />
+                                </div>
 
-                            <!-- Kaydet Butonu -->
-                            <div class="d-flex justify-content-end mt-4">
-                                <SfButton CssClass="e-primary" @onclick="SavePainDetailAsync">Kaydet</SfButton>
-                            </div>
+                                <!-- Kaydet Butonu -->
+                                <div class="d-flex justify-content-end mt-4">
+                                    <SfButton CssClass="e-primary" @onclick="SavePainDetailAsync">Kaydet</SfButton>
+                                </div>
                         }
                     </CardContent>
                 </SfCard>
@@ -298,7 +560,7 @@
         </div>
 
         <!-- Sağ Kolon -->
-        <div class="col-md-6">
+        <div class="col-md-6" style="overflow-y: auto; height: 100%; padding: 10px;">
             <!-- FIZIKSEL MUAYENE START -->
             <div class="mb-3">
                 <SfCard CssClass="e-shadow physical-examination">
@@ -377,11 +639,11 @@
                         <SfButton CssClass="e-primary" @onclick="SavePhysicalExaminationAsync">
                             @if (isExistingPhysicalExamination)
                             {
-                                <span>Güncelle</span>
+                                    <span>Güncelle</span>
                             }
                             else
                             {
-                                <span>Kaydet</span>
+                                    <span>Kaydet</span>
                             }
                         </SfButton>
                     </CardContent>
@@ -460,31 +722,31 @@
 
                         @if (ExaminationDiagnoses.Any())
                         {
-                            <SfGrid DataSource="@ExaminationDiagnoses" AllowPaging="false" AllowSorting="true">
-                                <GridColumns>
-                                    <GridColumn Field="Diagnosis.Code" HeaderText="Kodu" Width="90"></GridColumn>
-                                    <GridColumn Field="Diagnosis.Name" HeaderText="Adı" Width="90"></GridColumn>
-                                    <GridColumn Field="ExaminationDiagnosis.InitialDate" HeaderText="İlk Tanı Tarihi" Width="100" Format="dd.MM.yyyy"></GridColumn>
-                                    <GridColumn Field="ExaminationDiagnosis.DiagnosisType" HeaderText="Tanı Tipi" Width="100"></GridColumn>
-                                    <GridColumn Field="ExaminationDiagnosis.Note" HeaderText="Açıklama" Width="100"></GridColumn>
+                                <SfGrid DataSource="@ExaminationDiagnoses" AllowPaging="false" AllowSorting="true">
+                                    <GridColumns>
+                                        <GridColumn Field="Diagnosis.Code" HeaderText="Kodu" Width="90"></GridColumn>
+                                        <GridColumn Field="Diagnosis.Name" HeaderText="Adı" Width="90"></GridColumn>
+                                        <GridColumn Field="ExaminationDiagnosis.InitialDate" HeaderText="İlk Tanı Tarihi" Width="100" Format="dd.MM.yyyy"></GridColumn>
+                                        <GridColumn Field="ExaminationDiagnosis.DiagnosisType" HeaderText="Tanı Tipi" Width="100"></GridColumn>
+                                        <GridColumn Field="ExaminationDiagnosis.Note" HeaderText="Açıklama" Width="100"></GridColumn>
 
-                                    <!-- Silme Butonu -->
-                                    <GridColumn HeaderText="İşlem" Width="100">
-                                        <Template>
+                                        <!-- Silme Butonu -->
+                                        <GridColumn HeaderText="İşlem" Width="100">
+                                            <Template>
                                             @{
                                                 var item = (ExaminationDiagnosisWithNavigationPropertiesDto)@context;
                                             }
-                                            <SfButton CssClass="btn-danger btn-sm" @onclick="(() => DeleteExaminationDiagnosis(item.ExaminationDiagnosis.Id))">
-                                                Sil
-                                            </SfButton>
-                                        </Template>
-                                    </GridColumn>
-                                </GridColumns>
-                            </SfGrid>
+                                                <SfButton CssClass="btn-danger btn-sm" @onclick="(() => DeleteExaminationDiagnosis(item.ExaminationDiagnosis.Id))">
+                                                    Sil
+                                                </SfButton>
+                                            </Template>
+                                        </GridColumn>
+                                    </GridColumns>
+                                </SfGrid>
                         }
                         else
                         {
-                            <p>Hiç kayıt bulunamadı.</p>
+                                <p>Hiç kayıt bulunamadı.</p>
                         }
 
                     </CardContent>
@@ -511,11 +773,11 @@
                         <div class="btn-group me-3" role="group" style="display: flex; flex-wrap: wrap; gap: 8px;">
                             @foreach (var type in Enum.GetValues(typeof(FollowUpType)))
                             {
-                                <SfButton CssClass="@GetButtonClass((FollowUpType)type)"
-                                          @onclick="() => SetFollowUpType((FollowUpType)type)"
-                                          Style="margin-bottom: 4px; border-radius: 10px;">
+                                    <SfButton CssClass="@GetButtonClass((FollowUpType)type)"
+                                              @onclick="() => SetFollowUpType((FollowUpType)type)"
+                                              Style="margin-bottom: 4px; border-radius: 10px;">
                                     @Localizer[$"Enum:FollowUpType.{type}"]
-                                </SfButton>
+                                    </SfButton>
                             }
                         </div>
 
@@ -531,7 +793,7 @@
                                               @onclick="() => SetSurgeryPlan(true)">
                                         Evet
                                     </SfButton>
-                                  
+
                                     <SfButton CssClass="@($"btn-right {GetSurgeryButtonClass(false)}")"
                                               @onclick="() => SetSurgeryPlan(false)">
                                         Hayır
@@ -546,13 +808,133 @@
                                 Kaydet
                             </SfButton>
                         </div>
+
                     </CardContent>
                 </SfCard>
             </div>
             <!-- İzlem Plan Kartı END -->
+            <!-- Kontrol Notları Kartı START -->
+            <div class="mb-3">
+                <SfCard CssClass="e-shadow">
+                    <!-- Header -->
+                    <Syncfusion.Blazor.Cards.CardHeader>
+                        <div style="display: flex; justify-content: flex-start; padding: 10px;">
+                            <strong>Kontrol Notları</strong>
+                        </div>
+                    </Syncfusion.Blazor.Cards.CardHeader>
 
+                    <CardContent>
+                        <!-- Tarih ve Not Alanı -->
+                        <div class="d-flex align-items-start gap-3">
+                            <!-- Tarih Seçici -->
+                            <div>
+                                <SfDatePicker TValue="DateTime"
+                                              Placeholder="Tarih seçiniz"
+                                              CssClass="controlnotes-datepicker"
+                                              @bind-Value="controlNoteCreateDto.NoteDate">
+                                </SfDatePicker>
+                            </div>
+
+                            <!-- Not Alanı -->
+                            <div style="flex-grow: 1;">
+                                <SfTextArea Placeholder="Kontrol notu"
+                                            CssClass="controlnotes-textbox"
+                                            @bind-Value="controlNoteCreateDto.Note">
+                                </SfTextArea>
+                            </div>
+                        </div>
+
+                        <!-- Butonlar -->
+                        <div class="d-flex align-items-center justify-content-between mt-3">
+                            <!-- Grid Aç/Kapat Butonu -->
+                            <SfButton CssClass="e-info"
+                                      IconCss="@GetToggleIcon()"
+                                      @onclick="ToggleGrid">
+                                @((isGridVisible ? "Notları Kapat" : "Notları Aç"))
+                            </SfButton>
+
+                            <!-- Yeni Ekle Butonu -->
+                            <SfButton CssClass="e-primary"
+                                      @onclick="CreateControlNoteAsync">
+                                Yeni Ekle
+                            </SfButton>
+                        </div>
+
+                        <!-- Grid Bölümü -->
+                        @if (isGridVisible)
+                        {
+                                <div class="mt-4">
+                                    <SfGrid DataSource="@controlNotes"
+                                            AllowSorting="true"
+                                            Height="250px">
+                                        <GridColumns>
+                                            <!-- Tarih Kolonu -->
+                                            <GridColumn Field="NoteDate"
+                                                        HeaderText="Tarih"
+                                                        Format="dd.MM.yyyy"
+                                                        Width="120">
+                                            </GridColumn>
+
+                                            <!-- Notlar için Buton -->
+                                            <GridColumn HeaderText="Notlar"
+                                                        Width="120"
+                                                        TextAlign="TextAlign.Center">
+                                                <Template Context="item">
+                                                @if (!string.IsNullOrEmpty((item as ControlNoteDto)?.Note))
+                                                {
+                                                            <SfButton CssClass="e-small e-link"
+                                                                      OnClick="(() => OpenNoteModal((item as ControlNoteDto)?.Note))">
+                                                                <i class="fa-regular fa-file"></i>
+                                                            </SfButton>
+                                                }
+                                                </Template>
+                                            </GridColumn>
+
+                                            <!-- Oluşturan Kolonu -->
+                                            <GridColumn HeaderText="Oluşturan"
+                                                        Width="250">
+                                                <Template>
+                                                @if (!string.IsNullOrEmpty(((ControlNoteDto)context).CreatorTitle) ||
+                                            !string.IsNullOrEmpty(((ControlNoteDto)context).CreatorName) ||
+                                            !string.IsNullOrEmpty(((ControlNoteDto)context).CreatorSurname))
+                                                {
+                                                            <span>
+                                                        @(((ControlNoteDto)context).CreatorTitle ?? "")
+                                                        @(((ControlNoteDto)context).CreatorName ?? "")
+                                                        @(((ControlNoteDto)context).CreatorSurname ?? "")
+                                                            </span>
+                                                }
+                                                else
+                                                {
+                                                            <span>Bilinmiyor</span>
+                                                }
+                                                </Template>
+                                            </GridColumn>
+
+                                            <!-- Aksiyonlar Kolonu -->
+                                            <GridColumn Width="30" TextAlign="TextAlign.Center">
+                                                <Template Context="context">
+                                                @if (context is ControlNoteDto controlNote)
+                                                {
+                                                            <div class="d-flex justify-content-center">
+                                                                <!-- Silme Butonu -->
+                                                                <SfButton CssClass="e-small e-link"
+                                                                          IconCss="e-icons e-delete"
+                                                                          OnClick="(() => OpenControlNoteDeleteModal(controlNote.Id))">
+                                                                </SfButton>
+                                                            </div>
+                                                }
+                                                </Template>
+                                            </GridColumn>
+                                        </GridColumns>
+                                    </SfGrid>
+                                </div>
+                        }
+                    </CardContent>
+                </SfCard>
+            </div>
+            <!-- Kontrol Notları Kartı END -->
         </div>
-
     </div>
 </div>
 
@@ -667,7 +1049,6 @@
             </div>
 
 
-
             <!-- Kaydet Butonu -->
             <div class="text-end">
                 <SfButton CssClass="e-primary" @onclick="SaveFallRiskAsync">Kaydet</SfButton>
@@ -677,7 +1058,6 @@
 
 </SfDialog>
 <!-----------Fallrisk  MODAL END ------------------->
-
 <!-- SYSTEM CHECK MODAL START -->
 <SfDialog @bind-Visible="isSystemModalOpen"
           ShowCloseIcon="true"
@@ -709,7 +1089,9 @@
                 <!-- Genel Sistem Sorgusu -->
                 <SfCard CssClass="mb-3">
                     <Syncfusion.Blazor.Cards.CardHeader>
-                        <strong>Genel Sistem Sorgusu</strong>
+                        <div class="position-relative required-label">
+                            <strong>Genel Sistem Sorgusu</strong>
+                        </div>
                     </Syncfusion.Blazor.Cards.CardHeader>
                     <CardContent>
                         <div class="btn-group" role="group">
@@ -903,11 +1285,182 @@
     </DialogTemplates>
 </SfDialog>
 <!-- SYSTEM CHECK MODAL END -->
+<!--KONTROL NOTE SHOW Modal START-->
+<SfDialog @ref="NoteDialog" IsModal="true" ShowCloseIcon="true" Width="400px" Header="Kontrol Notu" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <p>@SelectedNote</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="e-small e-secondary" Content="Kapat" OnClick="CloseNoteModal"></SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+<!--KONTROL NOTE SHOW Modal END-->
+
+<!--control note DELETE Modal START -->
+
+<SfDialog @ref="DeleteControlNoteDialog" IsModal="true" ShowCloseIcon="true" Width="300px" Header="Silme İşlemi" Visible="false">
+    <DialogTemplates>
+        <Content>
+            <p>Silmek istediğinizden emin misiniz?</p>
+        </Content>
+        <FooterTemplate>
+            <SfButton CssClass="e-small e-danger" OnClick="ConfirmControlNoteDelete">Evet</SfButton>
+            <SfButton CssClass="e-small e-primary" OnClick="CloseControlNoteDeleteModal">Hayır</SfButton>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+
+<!--control note DELETE Modal END -->
+<!--PATIENT HISTORY DETAILS  Modal START -->
+<!-- Detaylar Modal     BARAN1 -->
+<SfDialog @bind-Visible="isDetailsModalOpen"
+          ShowCloseIcon="true"
+          Width="100%"
+          Height="100%"
+          CssClass="e-fixed">
+    <DialogPositionData X="0" Y="0"></DialogPositionData>
+    <DialogTemplates>
+        <Header>
+            <strong>Detaylar</strong>
+        </Header>
+    </DialogTemplates>
+    <div>
+        <table class="table">
+            <tbody>
+                <!-- İlaç -->
+                <tr>
+                    <td class="label-cell"><strong>İlaç:</strong></td>
+                    <td>
+                        <SfTextArea Placeholder="Kullanılan ilaçları giriniz..." @bind-Value="patientHistoryDto.Medicine" CssClass="e-outline" RowCount="2" Width="100"></SfTextArea>
+                    </td>
+                </tr>
+                <!-- Aşı -->
+                <tr>
+                    <td class="label-cell"><strong>Aşı:</strong></td>
+                    <td>
+                        <SfTextArea Placeholder="Aşı geçmişinizi giriniz..."  @bind-Value="patientHistoryDto.Vaccination" CssClass="e-outline" RowCount="2" Width="100"></SfTextArea>
+                    </td>
+                </tr>
+                <!-- Özel Durum -->
+                <tr>
+                    <td class="label-cell"><strong>Özel Durum:</strong></td>
+                    <td>
+                        <SfTextArea Placeholder="Özel durumlarınızı giriniz..." @bind-Value="patientHistoryDto.SpecialCondition" CssClass="e-outline" RowCount="2" Width="100"></SfTextArea>
+                    </td>
+                </tr>
+                <!-- Cihaz -->
+                <tr>
+                    <td class="label-cell"><strong>Cihaz:</strong></td>
+                    <td>
+                        <SfTextArea Placeholder="Kullanılan cihazları giriniz..." @bind-Value="patientHistoryDto.Device" CssClass="e-outline" RowCount="2" Width="100"></SfTextArea>
+                    </td>
+                </tr>
+                <!-- Terapi -->
+                <tr>
+                    <td class="label-cell"><strong>Terapi:</strong></td>
+                    <td>
+                        <SfTextArea Placeholder="Terapi geçmişinizi giriniz..." @bind-Value="patientHistoryDto.Therapy" CssClass="e-outline" RowCount="2" Width="100"></SfTextArea>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <DialogTemplates>
+        <FooterTemplate>
+            <div class="d-flex justify-content-end">
+                <SfButton CssClass="e-primary" @onclick="CloseDetailsModal">Kapat</SfButton>
+            </div>
+        </FooterTemplate>
+    </DialogTemplates>
+</SfDialog>
+<!--PATIENT HISTORY DETAILS  Modal END -->
 
 
 <style>
 
-    
+    .required-label {
+    position: relative; /* Kırmızı noktanın konumlandırılması için referans */
+}
+
+.required-label::before {
+    content: ""; /* Boş içerik */
+    position: absolute;
+    top: -5px; /* Noktayı yazının üstüne taşır */
+    left: -10px; /* Noktayı yazının soluna taşır */
+    width: 8px; /* Noktanın genişliği */
+    height: 8px; /* Noktanın yüksekliği */
+    background-color: red; /* Kırmızı renk */
+    border-radius: 50%; /* Yuvarlak bir nokta */
+    z-index: 1; /* Görünürlük için üstte tut */
+}
+
+   .required-field {
+    position: relative;
+}
+
+.required-field::before {
+    content: ""; /* Boş içerik */
+    position: absolute;
+    top: -5px; /* Üstte biraz boşluk bırakır */
+    left: -5px; /* Solda biraz boşluk bırakır */
+    width: 8px; /* Noktanın genişliği */
+    height: 8px; /* Noktanın yüksekliği */
+    background-color: red; /* Kırmızı renk */
+    border-radius: 50%; /* Yuvarlak bir nokta */
+    z-index: 1; /* Görsel olarak üstte görünmesi için */
+}
+
+  /* Dialog Header - Kırmızı arka plan */
+.custom-dialog .e-dlg-header {
+    background-color: #ff4d4d; /* Kırmızı */
+    color: white; /* Yazı rengi */
+    font-weight: bold;
+}
+
+/* Dialog Footer */
+.custom-footer {
+    display: flex;
+    justify-content: flex-end; /* Sağ tarafa yerleştirir */
+    padding: 10px;
+}
+
+/* Kapat Butonu */
+.custom-close-button {
+    background-color: #ff4d4d; /* Kırmızı arka plan */
+    color: white; /* Yazı rengi */
+    border: none; /* Kenarlık yok */
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+    .label-cell {
+        width: 150px; /* Sabit genişlik */
+        text-align: left; /* Sol hizalama */
+        vertical-align: top; /* TextArea ile düzgün hizalama */
+        padding-right: 10px; /* Yazı ile TextArea arasına boşluk */
+    }
+    .border-start-rounded {
+        border-radius: 8px 0 0 8px;
+        margin-right: -1px; /* Yapıştırma için */
+    }
+
+    /* Sağdaki butonun sağ kenarında border-radius */
+    .border-end-rounded {
+        border-radius: 0 8px 8px 0;
+        margin-left: -1px; /* Yapıştırma için */
+    }
+
+    /* Ortadaki butonun köşelerini düz bırak */
+    .border-none {
+        border-radius: 0;
+        margin-left: -1px; /* Yapıştırma için */
+        margin-right: -1px;
+    }
+
     .followUp-textbox {
         height: 50px;
         padding: 10px;
@@ -994,43 +1547,3 @@
     }
 
 </style>
-
-
-@*
-     .custom-input {
-        height: 2.5rem; /* Yüksekliği optimize ettik */
-        width: 100%; /* Genişliği kolona göre belirledik */
-        text-align: center; /* Placeholder ve girişlerin merkezlenmesi için */
-    }
-
-
-.e-card {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 15px;
-        background-color: #f9f9f9;
-        margin-bottom: 20px;
-        width: 100%; /* Sayfanın genişliğine uyum sağlar */
-    }
-
-    .e-card-header {
-        display: flex;
-        align-items: center;
-    }
-
-    .e-card-header-image img {
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        margin-right: 15px;
-    }
-
-    .e-card-header-text h4 {
-        margin: 0;
-        font-size: 18px;
-    }
-
-    .e-card-content {
-        margin-top: 10px;
-    }
- *@

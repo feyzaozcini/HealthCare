@@ -81,6 +81,16 @@
     "FullName": "Ad Soyad",
     "IdentityNumber": "Kimlik Numarası",
     "Menu:Insurances": "Sigorta",
-    "Menu:ProtocolTypes": "Protokol Tipi"
+    "Menu:ProtocolTypes": "Protokol Tipi",
+    "Enum:FollowUpType.NoFollowUp": "Takip önerilmedi",
+    "Enum:FollowUpType.AmbulatoryTreatment": "Ayaktan takip",
+    "Enum:FollowUpType.InpatientTreatment": "Yatarak takip ve tedavi",
+    "Enum:FollowUpType.AmbulatorySurgery": "Ayaktan cerrahi girişim",
+    "Enum:FollowUpType.InpatientSurgery": "Yatarak cerrahi girişim",
+    "Enum:FollowUpType.Rehabilitation": "Rehabilitasyon",
+    "Enum:FollowUpType.Consultation": "Konsültasyon",
+    "Enum:FollowUpType.PalliativeTreatment": "Palyatif tedavi",
+    "Enum:FollowUpType.DailyTreatment": "Günübirlik tedavi"
+
   }
 }

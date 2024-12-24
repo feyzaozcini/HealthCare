@@ -1,6 +1,4 @@
-﻿using Pusula.Training.HealthCare.Anamneses;
-using Pusula.Training.HealthCare.Diagnoses;
-using Pusula.Training.HealthCare.Shared;
+﻿using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,5 +30,7 @@ namespace Pusula.Training.HealthCare.ExaminationDiagnoses
         Task<ExaminationDiagnosisDto> UpdateAsync(ExaminationDiagnosisUpdateDto input);
 
         Task<PagedResultDto<LookupDto<Guid>>> GetDiagnosisLookupAsync(LookupRequestDto input);
+
+        Task<PagedResultDto<DiagnosisCountDto>> GetDiagnosisCountsAsync(GetExaminationDiagnosisInput input);
     }
 }

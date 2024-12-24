@@ -17,7 +17,7 @@ namespace Pusula.Training.HealthCare.SystemChecks
 
         public Protocol Protocol { get; private set; }
 
-       
+        [NotNull]
         public bool? GeneralSystemCheck { get; private set; }
 
        
@@ -68,7 +68,7 @@ namespace Pusula.Training.HealthCare.SystemChecks
 
         public void SetGeneralSystemCheck(bool? generalSystemCheck)
         {
-            GeneralSystemCheck = generalSystemCheck;
+            GeneralSystemCheck = Check.NotNull(generalSystemCheck, nameof(generalSystemCheck)); ;
         }
 
         public void SetGenitoUrinary(bool? genitoUrinary)
