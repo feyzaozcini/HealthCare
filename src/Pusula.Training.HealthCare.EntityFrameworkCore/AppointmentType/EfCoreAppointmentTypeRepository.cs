@@ -83,9 +83,6 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
             await dbContext.SaveChangesAsync();
         }
 
-
-
-
         public virtual async Task DeleteAllAsync(
         string? filterText = null,
         string? name = null,

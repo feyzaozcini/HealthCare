@@ -16,15 +16,20 @@ namespace Pusula.Training.HealthCare.DoctorWorkSchedules
         [NotNull]
         public virtual Guid DoctorId { get; private set; }
 
-        //Schedule İçin Tanımlama Türleri Bu Şekilde Yapıldı
+        //Takvim Template Bu Türde Kabul Ediyor , Tanımlama Türleri Bu Şekilde Yapıldı
         public virtual int[] WorkingDays { get; private set; } = new int[7]; // Çalışma günleri (Pazar = 0, Pazartesi = 1, vb.)
-        public virtual string StartHour { get; private set; } //
+        [NotNull]
+        public virtual string StartHour { get; private set; }
+        [NotNull]
         public virtual string EndHour { get; private set; }
+
+        public virtual Doctor Doctor { get; private set; } = null!;
 
 
         protected DoctorWorkSchedule()
         {
-
+            StartHour = string.Empty;
+            EndHour = string.Empty;
         }
 
         public DoctorWorkSchedule(Guid id, Guid doctorId, int[] workingDays, string startHour, string endHour)

@@ -17,6 +17,7 @@ using Volo.Abp.Caching;
 namespace Pusula.Training.HealthCare.AppointmentRules
 {
     [RemoteService(IsEnabled = false)]
+    [Authorize(HealthCarePermissions.AppointmentRules.Default)]
     public class AppointmentRulesAppService(
         IAppointmentRuleRepository appointmentRuleRepository,
         AppointmentRuleManager appointmentRuleManager,
@@ -90,6 +91,7 @@ namespace Pusula.Training.HealthCare.AppointmentRules
                 Items = ObjectMapper.Map<List<Doctor>, List<LookupDto<Guid>>>(lookupData)
             };
         }
+        [Authorize(HealthCarePermissions.AppointmentRules.Create)]
         public virtual async Task<AppointmentRuleDto> CreateAsync(AppointmentRuleCreateDto input)
         {
             var appointmentRule = await appointmentRuleManager.CreateAsync(
@@ -104,6 +106,7 @@ namespace Pusula.Training.HealthCare.AppointmentRules
 
             return ObjectMapper.Map<AppointmentRule, AppointmentRuleDto>(appointmentRule);
         }
+        [Authorize(HealthCarePermissions.AppointmentRules.Edit)]
         public virtual async Task<AppointmentRuleDto> UpdateAsync(AppointmentRuleUpdateDto input)
         {
             return ObjectMapper.Map<AppointmentRule, AppointmentRuleDto>(
@@ -118,6 +121,7 @@ namespace Pusula.Training.HealthCare.AppointmentRules
                     input.Description
                 ));
         }
+        [Authorize(HealthCarePermissions.AppointmentRules.Delete)]
         public virtual async Task DeleteAsync(Guid id) => await appointmentRuleRepository.DeleteAsync(id);
 
         public virtual async  Task<DownloadTokenResultDto> GetDownloadTokenAsync()

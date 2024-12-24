@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.AppointmentRules;
 using Pusula.Training.HealthCare.AppointmentTypes;
+using Pusula.Training.HealthCare.Core.Helpers.Concretes;
 using Pusula.Training.HealthCare.Core.Rules.Appointments;
 using Pusula.Training.HealthCare.Core.Rules.BlackLists;
 using Pusula.Training.HealthCare.Departments;
@@ -36,6 +37,7 @@ namespace Pusula.Training.HealthCare.Appointments
         IBlackListBusinessRules blackListBusinessRules,
         IAppointmentRuleRepository appointmentRuleRepository,
         IDistributedEventBus distributedEventBus,
+        IDistributedCache distributedCache,
         IDistributedCache<PagedResultDto<LookupDto<Guid>>, string> departmentDistributedCache //department için cache
         ) : HealthCareAppService, IAppointmentsAppService
     {
@@ -92,44 +94,34 @@ namespace Pusula.Training.HealthCare.Appointments
             };
         }
 
+        //Departmanlar için cache işlemi yapıldı
         public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetDepartmentLookupAsync(LookupRequestDto input)
         {
-            // Cache key oluşturduk
-            var cacheKey = $"DepartmentLookup-{input.Filter}-{input.SkipCount}-{input.MaxResultCount}";
+            var cacheHelper = new CacheHelper<LookupDto<Guid>, LookupRequestDto>(
+            distributedCache,
+            Logger
+            );
 
-            // Cache'de veri olup olmadığı kontrol edildi
-            var cachedData = await departmentDistributedCache.GetAsync(cacheKey);
-            if (cachedData != null)
-            {
-                return cachedData;
-            }
-            //get generic lookups
-            //get base async
-
-            // Cache'de yoksa aynı işlemler devam edildi
-            var query = (await departmentRepository.GetQueryableAsync())
-                           .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
-                               x => x.Name != null && x.Name.Contains(input.Filter!));
-
-            var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Department>();
-            var totalCount = query.Count();
-
-            var result = new PagedResultDto<LookupDto<Guid>>
-            {
-                TotalCount = totalCount,
-                Items = ObjectMapper.Map<List<Department>, List<LookupDto<Guid>>>(lookupData)
-            };
-
-            // getirdiğimiz  verileri cache'e yazdık
-            await departmentDistributedCache.SetAsync(
-                cacheKey,
-                result,
-                new DistributedCacheEntryOptions
+            return await cacheHelper.GetOrAddLookupAsync<Guid>(
+                async () =>
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10) // Cache süresi
-                });
+                    var query = (await departmentRepository.GetQueryableAsync())
+                        .WhereIf(!string.IsNullOrWhiteSpace(input.Filter),
+                            x => x.Name != null && x.Name.Contains(input.Filter!));
 
-            return result;
+                    var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Department>();
+                    var totalCount = query.Count();
+
+                    return new PagedResultDto<LookupDto<Guid>>
+                    {
+                        TotalCount = totalCount,
+                        Items = ObjectMapper.Map<List<Department>, List<LookupDto<Guid>>>(lookupData)
+                    };
+                },
+                input,
+                "Departments:Lookup",
+                TimeSpan.FromMinutes(30)
+            );
         }
 
         public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetAppointmentTypeLookupAsync(LookupRequestDto input)
@@ -156,7 +148,7 @@ namespace Pusula.Training.HealthCare.Appointments
             var appointmentType = await appointmentTypeRepository.GetAsync(input.AppointmentTypeId);
 
             //Doktorun aynı zamanlarda randevusu olup olmadığı kontrol edilir
-            await appointmentBusinessRules.AppointmentDatesCannotOverlapForDoctor(input.DepartmentId,input.DoctorId,input.StartDate, input.EndDate);
+            await appointmentBusinessRules.AppointmentDatesCannotOverlapForDoctor(input.DoctorId,input.StartDate, input.EndDate);
             
             //Hastanın black listte olup olmadığı kontrol edilir
             await blackListBusinessRules.ValidateBlackList(input.PatientId, input.DoctorId);
@@ -165,7 +157,7 @@ namespace Pusula.Training.HealthCare.Appointments
             var doctorAppointmentType = appointmentType.DoctorAppointmentTypes
                 .FirstOrDefault(dat => dat.DoctorId == input.DoctorId);
 
-            //Doktorların randevu süreleri değişebilir onları otomatil set edilmesi için düzenlendi
+            //Doktorların randevu süreleri değişebilir onları otomatil set edilmesi için düzenlendi(default 15 dk)
             var startDate = input.StartDate;
             var endDate = startDate.AddMinutes(appointmentType.DurationInMinutes);
 

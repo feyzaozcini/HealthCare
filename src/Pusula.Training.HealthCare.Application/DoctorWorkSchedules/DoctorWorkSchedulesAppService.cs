@@ -1,24 +1,28 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Core;
 using Pusula.Training.HealthCare.Core.Rules.DoctorWorkSchedules;
 using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
-using static Pusula.Training.HealthCare.Permissions.HealthCarePermissions;
 
 namespace Pusula.Training.HealthCare.DoctorWorkSchedules
 {
+    [RemoteService(IsEnabled = false)]
+    [Authorize(HealthCarePermissions.DoctorWorkSchedules.Default)]
     public class DoctorWorkSchedulesAppService(
         IDoctorWorkScheduleRepository doctorWorkScheduleRepository,
         DoctorWorkScheduleManager doctorWorkScheduleManager,
         IDoctorRepository doctorRepository,
-        IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache,
+        IDistributedCache<DoctorWorkScheduleDownloadTokenCacheItem, string> downloadTokenCache,
         IDoctorWorkScheduleBusinessRules doctorWorkScheduleBusinessRules
         ) : HealthCareAppService, IDoctorWorkSchedulesAppService
     {
@@ -52,6 +56,7 @@ namespace Pusula.Training.HealthCare.DoctorWorkSchedules
         public virtual async Task<DoctorWorkScheduleDto> GetAsync(Guid id) => ObjectMapper.Map<DoctorWorkSchedule, DoctorWorkScheduleDto>(
                 await doctorWorkScheduleRepository.GetAsync(id));
 
+        [Authorize(HealthCarePermissions.DoctorWorkSchedules.Create)]
         public virtual async Task<DoctorWorkScheduleDto> CreateAsync(DoctorWorkScheduleCreateDto input)
         {
             await doctorWorkScheduleBusinessRules.DoctorWorkScheduleCannotCreate(input.DoctorId);
@@ -66,6 +71,7 @@ namespace Pusula.Training.HealthCare.DoctorWorkSchedules
             return ObjectMapper.Map<DoctorWorkSchedule, DoctorWorkScheduleDto>(doctorWorkSchedule);
         }
 
+        [Authorize(HealthCarePermissions.DoctorWorkSchedules.Edit)]
         public virtual async Task<DoctorWorkScheduleDto> UpdateAsync(DoctorWorkScheduleUpdateDto input)
         {
             return ObjectMapper.Map<DoctorWorkSchedule, DoctorWorkScheduleDto>(await doctorWorkScheduleManager.UpdateAsync(
@@ -77,6 +83,7 @@ namespace Pusula.Training.HealthCare.DoctorWorkSchedules
             ));
         }
 
+        [Authorize(HealthCarePermissions.DoctorWorkSchedules.Delete)]
         public virtual async Task DeleteAsync(Guid id) => await doctorWorkScheduleRepository.DeleteAsync(id);
 
         public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetDoctorLookupAsync(LookupRequestDto input)
@@ -100,7 +107,7 @@ namespace Pusula.Training.HealthCare.DoctorWorkSchedules
 
             await downloadTokenCache.SetAsync(
                 token,
-                new DownloadTokenCacheItem { Token = token },
+                new DoctorWorkScheduleDownloadTokenCacheItem { Token = token },
                 new DistributedCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)

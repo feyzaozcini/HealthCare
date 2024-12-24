@@ -11,11 +11,11 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
     {
         
         Task<List<AppointmentType>> GetAppointmentTypesByDoctorIdsAsync(List<Guid> doctorIds);
-
+        //randevu tipine göre doktorları getirir
         Task<List<DoctorWithNavigationProperties>> GetDoctorsByAppointmentTypeIdAsync(Guid appointmentTypeId);
-
+        //doktorun randevu tiplerini getirir
         Task<List<AppointmentType>> GetAppointmentTypesForDoctorAsync(Guid doctorId);
-
+        //many to many için
         Task RemoveAllDoctorsByAppointmentTypeIdAsync(Guid appointmentTypeId);
 
         Task DeleteAllAsync(

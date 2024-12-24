@@ -223,5 +223,20 @@ public static class HealthCarePermissions
         public const string Create = Default + ".Create";
         public const string Delete = Default + ".Delete";
     }
+    public static class BlackLists
+    {
+        public const string Default = GroupName + ".BlackLists";
+        public const string Edit = Default + ".Edit";
+        public const string Create = Default + ".Create";
+        public const string Delete = Default + ".Delete";
+    }
+
+    public static class DoctorWorkSchedules
+    {
+        public const string Default = GroupName + ".DoctorWorkSchedules";
+        public const string Edit = Default + ".Edit";
+        public const string Create = Default + ".Create";
+        public const string Delete = Default + ".Delete";
+    }
 
 }

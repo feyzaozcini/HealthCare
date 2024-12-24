@@ -44,6 +44,8 @@ public class CacheHelper<TDto, TInput>(IDistributedCache distributedCache, ILogg
         return result;
     }
 
+
+    //Lookupların cache işlemleri için ayrı bir metot yazıldı.
     public async Task<PagedResultDto<Shared.LookupDto<TKey>>> GetOrAddLookupAsync<TKey>(Func<Task<PagedResultDto<Shared.LookupDto<TKey>>>> fetchFromDb, TInput input, string cacheKeyBase, TimeSpan cacheDuration)
     {
         var cacheKey = input.GenerateCacheKey(cacheKeyBase);

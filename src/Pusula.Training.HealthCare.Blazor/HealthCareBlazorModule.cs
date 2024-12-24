@@ -17,7 +17,6 @@ using Pusula.Training.HealthCare.Blazor.Menus;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
 using Pusula.Training.HealthCare.Localization;
 using Pusula.Training.HealthCare.MultiTenancy;
-using OpenIddict.Validation.AspNetCore;
 using Volo.Abp;
 using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.Components.Web;
@@ -47,7 +46,6 @@ using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 using Syncfusion.Blazor;
-using Pusula.Training.HealthCare.Blazor.Containers;
 using Microsoft.Extensions.Logging;
 
 
@@ -132,7 +130,7 @@ public class HealthCareBlazorModule : AbpModule
 
         context.Services.AddScoped<PatientStateContainer>();
         context.Services.AddScoped<DoctorStateContainer>();
-        context.Services.AddScoped<DepartmentStateContainer>();
+        
         context.Services.AddTransient<PatientsStateContainer>();
         context.Services.AddSingleton<DoctorsStateContainer>();
 

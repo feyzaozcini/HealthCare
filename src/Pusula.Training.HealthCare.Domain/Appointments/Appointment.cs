@@ -31,6 +31,11 @@ namespace Pusula.Training.HealthCare.Appointments
 
         public virtual Guid AppointmentTypeId { get; private set; }
 
+        public virtual Patient Patient { get; private set; }
+        public virtual Doctor Doctor { get; private set; }
+        public virtual Department Department { get; private set; }
+        public virtual AppointmentType AppointmentType { get; private set; }
+
         protected Appointment()
         {
             StartDate = DateTime.Now;
@@ -50,7 +55,6 @@ namespace Pusula.Training.HealthCare.Appointments
             SetDepartmentId(departmentId);
             SetAppointmentType(appointmentTypeId);
         }
-
 
         public void SetStartDate(DateTime startDate)
         {
@@ -96,7 +100,5 @@ namespace Pusula.Training.HealthCare.Appointments
         {
             IsBlock = isBlock;
         }
-
-        
     }
 }

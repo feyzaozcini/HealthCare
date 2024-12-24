@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System;
 using Volo.Abp.Application.Dtos;
 using System.Linq;
+using Syncfusion.Blazor.PivotView;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {

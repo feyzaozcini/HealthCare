@@ -1,5 +1,4 @@
-﻿using Pusula.Training.HealthCare.AppointmentRules;
-using Pusula.Training.HealthCare.Shared;
+﻿using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;

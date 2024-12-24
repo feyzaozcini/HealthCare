@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Pusula.Training.HealthCare.BlackLists;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
+using Pusula.Training.HealthCare.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +17,7 @@ namespace Pusula.Training.HealthCare.DoctorWorkSchedules
     public class EfCoreDoctorWorkScheduleRepository(IDbContextProvider<HealthCareDbContext> dbContextProvider)
         : EfCoreRepository<HealthCareDbContext, DoctorWorkSchedule, Guid>(dbContextProvider), IDoctorWorkScheduleRepository
     {
-
+        //Doktorun çalışma planını getirmek için kullanılır
         public async Task<List<DoctorWorkSchedule>> GetWorkScheduleForDoctorAsync(Guid doctorId)
         {
             return await (await GetQueryableAsync())
@@ -88,15 +90,10 @@ namespace Pusula.Training.HealthCare.DoctorWorkSchedules
             Guid id, 
             CancellationToken cancellationToken = default)
         {
-            var dbContext = await GetDbContextAsync();
-
-            return (await GetDbSetAsync()).Where(b => b.Id == id)
-                .Select(doctorWorkSchedule => new DoctorWorkScheduleWithNavigationProperties
-                {
-                    DoctorWorkSchedule = doctorWorkSchedule,
-                    Doctor = dbContext.Set<Doctor>().FirstOrDefault(c => c.Id == doctorWorkSchedule.DoctorId)!,
-                })
-                .FirstOrDefault()!;
+            var query = await GetQueryForNavigationPropertiesAsync();
+            var doctorWorkSchedules = await query.FirstOrDefaultAsync(lr => lr.DoctorWorkSchedule.Id == id, cancellationToken);
+            HealthCareException.ThrowIf(doctorWorkSchedules == null);
+            return doctorWorkSchedules!;
         }
 
 
@@ -114,18 +111,23 @@ namespace Pusula.Training.HealthCare.DoctorWorkSchedules
 
 
 
-        protected virtual async Task<IQueryable<DoctorWorkScheduleWithNavigationProperties>> GetQueryForNavigationPropertiesAsync() =>
-            from doctorWorkSchedule in (await GetDbSetAsync())
-            join doctor in (await GetDbContextAsync()).Set<Doctor>()
-            .Include(d => d.User)
-            .Include(d => d.Title)
-            on doctorWorkSchedule.DoctorId equals doctor.Id into doctors
-            from doctor in doctors.DefaultIfEmpty()
-            select new DoctorWorkScheduleWithNavigationProperties
-            {
-                DoctorWorkSchedule = doctorWorkSchedule,
-                Doctor = doctor
-            };
+        protected virtual async Task<IQueryable<DoctorWorkScheduleWithNavigationProperties>> GetQueryForNavigationPropertiesAsync()
+        {
+            var dbContext = await GetDbContextAsync();
+            var doctorWorkSchedules = await GetDbSetAsync();
+            var query = doctorWorkSchedules
+                .Include(ar => ar.Doctor)
+                    .ThenInclude(d => d.User)
+                .Include(ar => ar.Doctor)
+                    .ThenInclude(d => d.Title)
+                .Select(ar => new DoctorWorkScheduleWithNavigationProperties
+                {
+                    DoctorWorkSchedule = ar,
+                    Doctor = ar.Doctor
+                });
+            return query;
+        }
+           
 
 
 
