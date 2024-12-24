@@ -4,8 +4,6 @@ using Pusula.Training.HealthCare.DoctorWorkSchedules;
 using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
@@ -19,7 +17,6 @@ namespace Pusula.Training.HealthCare.Controllers.DoctorWorkSchedules
 
     public class DoctorWorkScheduleController(IDoctorWorkSchedulesAppService doctorWorkSchedulesAppService) : HealthCareController, IDoctorWorkSchedulesAppService
     {
-
         [HttpGet]
         [Route("{id}")]
         public Task<DoctorWorkScheduleDto> GetAsync(Guid id) => doctorWorkSchedulesAppService.GetAsync(id);

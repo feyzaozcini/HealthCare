@@ -24,11 +24,7 @@ namespace Pusula.Training.HealthCare.Departments
         DepartmentManager departmentManager, IDistributedCache<DepartmentDownloadTokenCacheItem, string> downloadTokenCache) 
         : HealthCareAppService, IDepartmentsAppService
     {
-        /*public virtual async Task<DepartmentWithDoctorsDto> GetWithDoctorsAsync(Guid id)
-        {
-            var department = await departmentRepository.GetWithDoctorsAsync(id);
-            return ObjectMapper.Map<Department, DepartmentWithDoctorsDto>(department);
-        }*/
+        //Departmana ait doktorlarý getirir
         public virtual async Task<List<DoctorWithNavigationPropertiesDto>> GetDoctorsByDepartmentIdAsync(Guid departmentId)
         {
             var doctors = await departmentRepository.GetDoctorsByDepartmentIdAsync(departmentId);

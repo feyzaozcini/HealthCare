@@ -168,6 +168,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         }
         #endregion
 
+        #region Veri Modelleri
         public class DoctorListItems
         {
             public Guid Id { get; set; }
@@ -183,5 +184,6 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             public string StartHour { get; set; }
             public string EndHour { get; set; }
         }
+        #endregion
     }
 }

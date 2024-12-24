@@ -621,10 +621,10 @@ public class HealthCareDbContext :
                 b.Property(x => x.AppointmentStatus).HasColumnName(nameof(Appointment.AppointmentStatus)).IsRequired();
                 b.Property(x => x.IsBlock).HasColumnName(nameof(Appointment.IsBlock)).IsRequired();
                 b.Property(x => x.Note).HasColumnName(nameof(Appointment.Note)).HasMaxLength(AppointmentConst.NoteMaxLength);
-                b.HasOne<Doctor>().WithMany().HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Patient>().WithMany().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Department>().WithMany().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<AppointmentType>().WithMany().HasForeignKey(x => x.AppointmentTypeId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x=>x.Doctor).WithMany().HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x=>x.Patient).WithMany().HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x => x.Department).WithMany().HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x=>x.AppointmentType).WithMany().HasForeignKey(x => x.AppointmentTypeId).OnDelete(DeleteBehavior.NoAction);
             });
 
 
@@ -653,8 +653,8 @@ public class HealthCareDbContext :
                 b.Property(x => x.MinAge).HasColumnName(nameof(AppointmentRule.MinAge));
                 b.Property(x => x.MaxAge).HasColumnName(nameof(AppointmentRule.MaxAge));
                 b.Property(x => x.Description).HasColumnName(nameof(AppointmentRule.Description));
-                b.HasOne<Doctor>().WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Department>().WithMany().IsRequired(false).HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x => x.Doctor).WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x => x.Department).WithMany().IsRequired(false).HasForeignKey(x => x.DepartmentId).OnDelete(DeleteBehavior.NoAction);
             });
             builder.Entity<PainType>(b =>
             {
@@ -688,7 +688,7 @@ public class HealthCareDbContext :
                 b.Property(x => x.WorkingDays).HasColumnName(nameof(DoctorWorkSchedule.WorkingDays)).IsRequired();
                 b.Property(x => x.StartHour).HasColumnName(nameof(DoctorWorkSchedule.StartHour)).IsRequired();
                 b.Property(x => x.EndHour).HasColumnName(nameof(DoctorWorkSchedule.EndHour)).IsRequired();
-                b.HasOne<Doctor>().WithOne().HasForeignKey<DoctorWorkSchedule>(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x=>x.Doctor).WithOne().HasForeignKey<DoctorWorkSchedule>(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
             }
              );
 
@@ -698,8 +698,8 @@ public class HealthCareDbContext :
                 b.ConfigureByConvention();
                 b.Property(x => x.BlackListStatus).HasColumnName(nameof(BlackList.BlackListStatus)).IsRequired();
                 b.Property(x => x.Note).HasColumnName(nameof(BlackList.Note));
-                b.HasOne<Patient>().WithMany().IsRequired(false).HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Doctor>().WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x=>x.Patient).WithMany().IsRequired(false).HasForeignKey(x => x.PatientId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne(x=>x.Doctor).WithMany().IsRequired(false).HasForeignKey(x => x.DoctorId).OnDelete(DeleteBehavior.NoAction);
             });
             builder.Entity<SystemCheck>(b =>
             {

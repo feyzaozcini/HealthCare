@@ -1,10 +1,5 @@
 ﻿using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Patients;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pusula.Training.HealthCare.BlackLists
 {

@@ -25,7 +25,6 @@ namespace Pusula.Training.HealthCare.Controllers.AppointmentTypes
         [Route("{id}")]
         public Task<AppointmentTypeDeleteDto> DeleteAsync(Guid id) => appointmentTypeAppService.DeleteAsync(id);
 
-
         [HttpGet]
         [Route("{id}")]
         public Task<AppointmentTypeDto> GetAsync(Guid id) => appointmentTypeAppService.GetAsync(id);

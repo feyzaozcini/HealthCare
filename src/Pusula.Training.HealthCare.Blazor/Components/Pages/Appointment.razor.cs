@@ -326,10 +326,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         }
         private async Task CreatePatient()
         {
-
-            await PatientsAppService.CreateAsync(NewPatient);
-            await GetPatientCollectionLookupAsync();
-            ClosePatientDialog();
+            await HandleError(async () =>
+            {
+                await PatientsAppService.CreateAsync(NewPatient);
+                await GetPatientCollectionLookupAsync();
+                ClosePatientDialog();
+                await ShowToast("Hasta Create Başarılı", true);
+            });
             await Task.CompletedTask;
         }
         #endregion

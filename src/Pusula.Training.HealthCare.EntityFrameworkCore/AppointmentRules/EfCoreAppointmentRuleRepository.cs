@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Pusula.Training.HealthCare.Departments;
-using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
+using Pusula.Training.HealthCare.Exceptions;
+using Pusula.Training.HealthCare.LabRequests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -101,19 +101,13 @@ namespace Pusula.Training.HealthCare.AppointmentRules
         }
 
         public virtual async Task<AppointmentRuleWithNavigationProperties> GetWithNavigationPropertiesAsync(
-            Guid id, 
+            Guid id,
             CancellationToken cancellationToken = default)
         {
-            var dbContext = await GetDbContextAsync();
-
-            return (await GetDbSetAsync()).Where(b => b.Id == id)
-                .Select(appointmentRule => new AppointmentRuleWithNavigationProperties
-                {
-                    AppointmentRule = appointmentRule,
-                    Doctor = dbContext.Set<Doctor>().FirstOrDefault(c => c.Id == appointmentRule.DoctorId)!,
-                    Department = dbContext.Set<Department>().FirstOrDefault(c => c.Id == appointmentRule.DepartmentId)!,
-                })
-                .FirstOrDefault()!;
+            var query = await GetQueryForNavigationPropertiesAsync();
+            var appointmentRule = await query.FirstOrDefaultAsync(lr => lr.AppointmentRule.Id == id, cancellationToken);
+            HealthCareException.ThrowIf(appointmentRule == null);
+            return appointmentRule!;
         }
 
 
@@ -135,23 +129,24 @@ namespace Pusula.Training.HealthCare.AppointmentRules
 
 
 
-        protected virtual async Task<IQueryable<AppointmentRuleWithNavigationProperties>> GetQueryForNavigationPropertiesAsync() =>
-            from appointmentRule in (await GetDbSetAsync())
-            join doctor in (await GetDbContextAsync()).Set<Doctor>()
-            .Include(d => d.User)
-            .Include(d => d.Title)
-            on appointmentRule.DoctorId equals doctor.Id into doctors
-            from doctor in doctors.DefaultIfEmpty()
-            join department in (await GetDbContextAsync()).Set<Department>() on appointmentRule.DepartmentId equals department.Id into departments
-            from department in departments.DefaultIfEmpty()
-            select new AppointmentRuleWithNavigationProperties
-            {
-                AppointmentRule = appointmentRule,
-                Doctor = doctor,
-                Department = department
-            };
-            
-
+        protected virtual async Task<IQueryable<AppointmentRuleWithNavigationProperties>> GetQueryForNavigationPropertiesAsync()
+        {
+            var dbContext = await GetDbContextAsync();
+            var appointmentRules = await GetDbSetAsync();
+            var query = appointmentRules
+                .Include(ar => ar.Doctor)
+                    .ThenInclude(d => d.User)
+                .Include(ar => ar.Doctor)
+                    .ThenInclude(d => d.Title)
+                .Include(ar => ar.Department)
+                .Select(ar => new AppointmentRuleWithNavigationProperties
+                {
+                    AppointmentRule = ar,
+                    Doctor = ar.Doctor,
+                    Department = ar.Department
+                });
+            return query;
+        }
 
         protected virtual IQueryable<AppointmentRuleWithNavigationProperties> ApplyFilter(
             IQueryable<AppointmentRuleWithNavigationProperties> query,

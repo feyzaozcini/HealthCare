@@ -66,7 +66,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             await GetAppointmentTypeCollectionLookupAsync();
             await LoadDataAsync();
         }
-
+        #region Chart Verileri İçin
         private async Task LoadAppointmentsAsync()
         {
             var input = new GetAppointmentsInput
@@ -114,6 +114,29 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 .ToList();
 
         }
+        private async Task ClearFilters()
+        {
+
+            Filter.StartDate = null;
+            Filter.EndDate = null;
+            Filter.AppointmentTypeId = null;
+
+            Filter = new GetAppointmentsInput
+            {
+                MaxResultCount = 1000,
+                SkipCount = (CurrentPage - 1) * PageSize,
+                Sorting = CurrentSorting
+            };
+
+            await LoadAppointmentsAsync();
+        }
+        public async Task LoadFilteredData()
+        {
+            await LoadDataAsync();
+        }
+        #endregion
+
+        #region Tablolu Veriler İçin 
         private async Task LoadDataAsync()
         {
             var input = new GetAppointmentsInput
@@ -136,32 +159,6 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             }).ToList();
         }
 
-        private async Task ClearFilters()
-        {
-            
-            Filter.StartDate = null;
-            Filter.EndDate = null;
-            Filter.AppointmentTypeId = null;
-
-            Filter = new GetAppointmentsInput
-            {
-                MaxResultCount = 1000,
-                SkipCount = (CurrentPage - 1) * PageSize,
-                Sorting = CurrentSorting
-            };
-
-            await LoadAppointmentsAsync();
-        }
-
-        private async Task GetAppointmentTypeCollectionLookupAsync(string? newValue = null)
-        {
-            AppointmentTypesCollection = (await AppointmentsAppService.GetAppointmentTypeLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
-        }
-
-        public async Task LoadFilteredData()
-        {
-            await LoadDataAsync();
-        }
         public async Task ExportToExcel(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
         {
             if (Pivot != null)
@@ -169,8 +166,17 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 await Pivot.ExportToExcelAsync();
             }
         }
+        #endregion
 
-        // Pivot View için veri modeli
+
+
+        private async Task GetAppointmentTypeCollectionLookupAsync(string? newValue = null)
+        {
+            AppointmentTypesCollection = (await AppointmentsAppService.GetAppointmentTypeLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
+        }
+
+
+        #region Veriler için modeller
         public class AppointmentPivotData
         {
             public string DepartmentName { get; set; }
@@ -178,11 +184,11 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             public string AppointmentStatus { get; set; }
             public int AppointmentCount { get; set; }
         }
-        // Chart veri modeli
         public class ChartDataDto
         {
             public string Name { get; set; }
             public int Count { get; set; }
         }
+        #endregion
     }
 }

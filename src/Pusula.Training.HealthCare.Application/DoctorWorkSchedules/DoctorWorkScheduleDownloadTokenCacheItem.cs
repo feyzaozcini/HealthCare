@@ -5,10 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pusula.Training.HealthCare.AppointmentTypes
+namespace Pusula.Training.HealthCare.DoctorWorkSchedules
 {
-    public class AppointmentTypeDownloadTokenCacheItem : DownloadTokenCacheItem
+    public class DoctorWorkScheduleDownloadTokenCacheItem : DownloadTokenCacheItem
     {
-
     }
 }

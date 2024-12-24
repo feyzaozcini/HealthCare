@@ -19,11 +19,15 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private IReadOnlyList<LookupDto<Gender>> GendersCollection { get; set; } = new List<LookupDto<Gender>>();
         private IReadOnlyList<LookupDto<Guid>> DepartmentsCollection { get; set; } = new List<LookupDto<Guid>>();
         private IReadOnlyList<LookupDto<Guid>> DoctorsCollection { get; set; } = new List<LookupDto<Guid>>();
+
         private AppointmentRuleCreateDto NewAppointmentRule = new AppointmentRuleCreateDto();
         private AppointmentRuleUpdateDto EditAppointmentRule = new AppointmentRuleUpdateDto();
+        
+        private SfToast? ToastObj;
+
         private List<DoctorWithNavigationPropertiesDto> AllDoctors = new();
         private List<DepartmentDto> AllDepartments = new();
-        private SfToast? ToastObj;
+
         private DoctorWithNavigationPropertiesDto SelectedDoctor;
         private DepartmentDto SelectedDepartment;
 
@@ -31,11 +35,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private List<DoctorWithNavigationPropertiesDto> FilteredDoctors = new();
 
         public List<AppointmentListItem> AppointmentRules { get; set; } = new();
+
         private bool IsEditModalOpen = false;
         private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
         private int CurrentPage { get; set; } = 1;
         private string CurrentSorting { get; set; } = string.Empty;
         private bool IsAddNewDialogOpen = false;
+
         protected override async Task OnInitializedAsync()
         {
             await GetDoctorCollectionLookupAsync();
@@ -72,6 +78,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 .ToList();
             }
         }
+        #region Senkron Departman ve Doktor Seçimi Metotları
         private async Task OnDepartmentValueChange(ChangeEventArgs<Guid, DepartmentDto> args)
         {
             // Seçilen departmanın Id'si
@@ -99,11 +106,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 await SelectDoctorAsync(selectedDoctor);
             }
         }
+
         private async Task SelectDoctorAsync(DoctorWithNavigationPropertiesDto doctor)
         {
             SelectedDoctor = doctor;
             await Task.CompletedTask;
         }
+
         private async Task SelectDepartmentAsync(DepartmentDto department)
         {
             SelectedDepartment = department;
@@ -132,6 +141,8 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             }
             await Task.CompletedTask;
         }
+        #endregion
+
         private async Task LoadAppointmentRulesAsync()
         {
             var input = new GetAppointmentRulesInput
@@ -152,6 +163,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 Description = a.AppointmentRule?.Description
             }).ToList();
         }
+        #region Lookup Metotları
         private async Task GetDoctorCollectionLookupAsync(string? newValue = null)
         {
             DoctorsCollection = (await AppointmentRulesAppService.GetDoctorLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
@@ -161,6 +173,9 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         {
             DepartmentsCollection = (await AppointmentRulesAppService.GetDepartmentLookupAsync(new LookupRequestDto { Filter = newValue })).Items;
         }
+        #endregion
+
+        #region Create Appointment Rule
         private void OpenAddNewDialog()
         {
             IsAddNewDialogOpen = true;
@@ -180,6 +195,8 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             });
             
         }
+        #endregion
+
         private async Task DeleteAppointmentRule(Guid id)
         {
             await HandleError(async () =>
@@ -192,7 +209,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         }
 
 
-
+        #region Tablo için veri modeli
         public class AppointmentListItem
         {
             public Guid Id { get; set; }
@@ -206,6 +223,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             public Gender? PatientGender { get; set; }
             public string? Description { get; set; }
         }
+        #endregion
 
         #region HandleError
         public async Task HandleError(Func<Task> action)

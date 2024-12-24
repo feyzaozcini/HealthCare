@@ -8,7 +8,6 @@ using System;
 using Volo.Abp;
 using System.Linq;
 using Volo.Abp.Application.Dtos;
-using Pusula.Training.HealthCare.Appointments;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
@@ -26,12 +25,13 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
         private int CurrentPage { get; set; } = 1;
         private string CurrentSorting { get; set; } = string.Empty;
-        private static readonly MultiSelectFieldSettings DoctorDropDownFields = new()
 
+        private static readonly MultiSelectFieldSettings DoctorDropDownFields = new()
         {
-            Text = "Name", // Field to display
-            Value = "Id"   // Field to use as value
+            Text = "Name", 
+            Value = "Id"   
         };
+
         protected override async Task OnInitializedAsync()
         {
             var input = new GetAppointmentTypesInput
@@ -52,14 +52,6 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
             IsDoctorModalOpen = true;
         }
 
-
-        private async Task OpenAddModal()
-        {
-            await LoadDoctors(); // Load doctors
-            NewAppointmentType = new AppointmentTypeCreateDto(); // Initialize new AppointmentType DTO
-            IsAddModalOpen = true; // Open modal
-        }
-
         private async Task LoadDoctors()
         {
             var result = await DoctorsAppService.GetListAsync(new GetDoctorsInput());
@@ -72,6 +64,12 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         }
 
         #region AddAppointmentType
+        private async Task OpenAddModal()
+        {
+            await LoadDoctors(); // Load doctors
+            NewAppointmentType = new AppointmentTypeCreateDto(); // Initialize new AppointmentType DTO
+            IsAddModalOpen = true; // Open modal
+        }
         private void OnModalClose(bool visible)
         {
             IsDoctorModalOpen = visible;

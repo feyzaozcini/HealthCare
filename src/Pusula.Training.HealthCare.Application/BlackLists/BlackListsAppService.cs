@@ -1,24 +1,27 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
-using Pusula.Training.HealthCare.Core;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Core.Rules.BlackLists;
 using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.Patients;
+using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
 
 namespace Pusula.Training.HealthCare.BlackLists
 {
+    [RemoteService(IsEnabled = false)]
+    [Authorize(HealthCarePermissions.BlackLists.Default)]
     public class BlackListsAppService(
         IBlackListRepository blackListRepository,
         BlackListManager blackListManager,
-        IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache,
+        IDistributedCache<BlackListDownloadTokenCacheItem, string> downloadTokenCache,
         IDoctorRepository doctorRepository,
         IPatientRepository patientRepository,
         IBlackListBusinessRules blackListBusinessRules) : HealthCareAppService, IBlackListsAppService
@@ -45,6 +48,8 @@ namespace Pusula.Training.HealthCare.BlackLists
         public virtual async Task<BlackListDto> GetAsync(Guid id) => ObjectMapper.Map<BlackList, BlackListDto>(
                 await blackListRepository.GetAsync(id));
 
+
+        [Authorize(HealthCarePermissions.BlackLists.Create)]
         public virtual async Task<BlackListDto> CreateAsync(BlackListCreateDto input)
         {
             await blackListBusinessRules.DublicateBlackList(input.PatientId, input.DoctorId);
@@ -58,6 +63,7 @@ namespace Pusula.Training.HealthCare.BlackLists
             return ObjectMapper.Map<BlackList, BlackListDto>(blackList);
         }
 
+        [Authorize(HealthCarePermissions.BlackLists.Edit)]
         public virtual async Task<BlackListDto> UpdateAsync(BlackListUpdateDto input)
         {
             return ObjectMapper.Map<BlackList, BlackListDto>(await blackListManager.UpdateAsync(
@@ -69,6 +75,7 @@ namespace Pusula.Training.HealthCare.BlackLists
             ));
         }
 
+        [Authorize(HealthCarePermissions.BlackLists.Delete)]
         public virtual async Task DeleteAsync(Guid id) => await blackListRepository.DeleteAsync(id);
 
         public virtual async Task<PagedResultDto<LookupDto<Guid>>> GetPatientLookupAsync(LookupRequestDto input)
@@ -107,7 +114,7 @@ namespace Pusula.Training.HealthCare.BlackLists
 
             await downloadTokenCache.SetAsync(
                 token,
-                new DownloadTokenCacheItem { Token = token },
+                new BlackListDownloadTokenCacheItem { Token = token },
                 new DistributedCacheEntryOptions
                 {
                     AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)
@@ -118,7 +125,5 @@ namespace Pusula.Training.HealthCare.BlackLists
                 Token = token
             };
         }
-
-        
     }
 }

@@ -1,17 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
-using Pusula.Training.HealthCare.Patients;
+using Pusula.Training.HealthCare.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
-using Volo.Abp.Timing;
 
 namespace Pusula.Training.HealthCare.BlackLists
 {
@@ -84,16 +81,10 @@ namespace Pusula.Training.HealthCare.BlackLists
             Guid id, 
             CancellationToken cancellationToken = default)
         {
-            var dbContext = await GetDbContextAsync();
-
-            return (await GetDbSetAsync()).Where(b => b.Id == id)
-                .Select(blackList => new BlackListWithNavigationProperties
-                {
-                    BlackList = blackList,
-                    Patient = dbContext.Set<Patient>().FirstOrDefault(c => c.Id == blackList.PatientId)!,
-                    Doctor = dbContext.Set<Doctor>().FirstOrDefault(c => c.Id == blackList.DoctorId)!
-                })
-                .FirstOrDefault()!;
+            var query = await GetQueryForNavigationPropertiesAsync();
+            var blackList = await query.FirstOrDefaultAsync(lr => lr.BlackList.Id == id, cancellationToken);
+            HealthCareException.ThrowIf(blackList == null);
+            return blackList!;
         }
 
 
@@ -114,22 +105,24 @@ namespace Pusula.Training.HealthCare.BlackLists
 
 
 
-        protected virtual async Task<IQueryable<BlackListWithNavigationProperties>> GetQueryForNavigationPropertiesAsync() =>
-            from blackList in (await GetDbSetAsync())
-            join patient in (await GetDbContextAsync()).Set<Patient>() on blackList.PatientId equals patient.Id into patients
-            from patient in patients.DefaultIfEmpty()
-            join doctor in (await GetDbContextAsync()).Set<Doctor>()
-            .Include(d => d.User)
-            .Include(d => d.Title)
-            on blackList.DoctorId equals doctor.Id into doctors
-            from doctor in doctors.DefaultIfEmpty()
-            select new BlackListWithNavigationProperties
-            {
-                BlackList = blackList,
-                Patient = patient,
-                Doctor = doctor
-            };
-
+        protected virtual async Task<IQueryable<BlackListWithNavigationProperties>> GetQueryForNavigationPropertiesAsync()
+        {
+            var dbContext = await GetDbContextAsync();
+            var blackList = await GetDbSetAsync();
+            var query = blackList
+                .Include(ar => ar.Doctor)
+                    .ThenInclude(d => d.User)
+                .Include(ar => ar.Doctor)
+                    .ThenInclude(d => d.Title)
+                .Include(ar => ar.Patient)
+                .Select(ar => new BlackListWithNavigationProperties
+                {
+                    BlackList = ar,
+                    Doctor = ar.Doctor,
+                    Patient = ar.Patient
+                });
+            return query;
+        }
 
         protected virtual IQueryable<BlackListWithNavigationProperties> ApplyFilter(
             IQueryable<BlackListWithNavigationProperties> query,

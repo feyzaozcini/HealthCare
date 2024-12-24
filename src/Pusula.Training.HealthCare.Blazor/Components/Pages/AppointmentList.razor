@@ -111,7 +111,7 @@
                             <GridColumns>
                                 <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
                                 <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="200"></GridColumn>
-                                <GridColumn Field="PatientFullName" HeaderText="Patient" Width="200"></GridColumn>
+                                <GridColumn Field="PatientFullName" HeaderText="Patient" Width="150"></GridColumn>
                                 <GridColumn Field="StartDate" HeaderText="Start Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
                                 <GridColumn Field="EndDate" HeaderText="End Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
                                 <GridColumn Field="Status" HeaderText="Status" Width="120">
@@ -135,7 +135,7 @@
                                         </button>
                                     </Template>
                                 </GridColumn>
-                                <GridColumn Field="AppointmentTypeName" HeaderText="Appointment Type" Width="150"></GridColumn>
+                                <GridColumn Field="AppointmentTypeName" HeaderText="Appointment Type" Width="200"></GridColumn>
                             </GridColumns>
                         </SfGrid>
                     </ContentTemplate>
@@ -151,7 +151,7 @@
                             <GridColumns>
                                 <GridColumn Field="DepartmentName" HeaderText="Department" Width="150"></GridColumn>
                                 <GridColumn Field="DoctorFullName" HeaderText="Doctor" Width="200"></GridColumn>
-                                <GridColumn Field="PatientFullName" HeaderText="Patient" Width="200"></GridColumn>
+                                <GridColumn Field="PatientFullName" HeaderText="Patient" Width="150"></GridColumn>
                                 <GridColumn Field="StartDate" HeaderText="Start Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
                                 <GridColumn Field="EndDate" HeaderText="End Date" Format="dd/MM/yyyy HH:mm" Width="150" TextAlign="TextAlign.Center"></GridColumn>
                                 <GridColumn Field="Status" HeaderText="Status" Width="120">
@@ -164,7 +164,6 @@
                                         </span>
                                     </Template>
                                 </GridColumn>
-                                <GridColumn Field="AppointmentTypeName" HeaderText="Appointment Type" Width="150"></GridColumn>
                                 <GridColumn HeaderText="Actions" Width="100">
                                     <Template>
                                         @{
@@ -176,6 +175,7 @@
                                        </button>
                                     </Template> 
                                 </GridColumn>
+                                <GridColumn Field="AppointmentTypeName" HeaderText="Appointment Type" Width="200"></GridColumn>
                             </GridColumns>
                         </SfGrid>
                     </ContentTemplate>
@@ -216,8 +216,6 @@
     </DialogTemplates>
 </SfDialog>
 
-
-
 <style>
     .e-appointment.e-input-group, .e-custom.e-input-group.e-control-wrapper {
         height: 40px;
@@ -228,14 +226,16 @@
         border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
         box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
     }
+
     .e-input-group.e-corner {
-    border-radius: 10px !important;
-    border: 1px solid #f72585 !important;
-    width: 100% !important;
-    padding: 5px;
-    border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
-    box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
-}
+        border-radius: 10px !important;
+        border: 1px solid #f72585 !important;
+        width: 100% !important;
+        padding: 5px;
+        border-color: #f72585 !important; /* Hover durumunda çerçeve rengi */
+        box-shadow: 0px 0px 6px #a3bffa; /* Hafif bir gölge efekti */
+    }
+
     .e-tab .e-tab-header .e-toolbar-item.e-active {
         background: white;
         border: 2px solid #f72585;
@@ -246,6 +246,7 @@
         .e-tab .e-tab-header .e-toolbar-item.e-active .e-tab-icon {
             color: #f72585 !important;
         }
+
     .custom-card {
         border-radius: 10px;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -307,7 +308,7 @@
 
     /* Confirmed - Mavi */
     .status-confirmed,
-    .status-completed{
+    .status-completed {
         color: blue;
         font-weight: bold;
     }
@@ -338,4 +339,5 @@
         color: gray;
         font-weight: bold;
     }
+
 </style>

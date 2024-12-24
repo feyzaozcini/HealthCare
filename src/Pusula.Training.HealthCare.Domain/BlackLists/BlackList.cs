@@ -1,4 +1,6 @@
 ﻿using JetBrains.Annotations;
+using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.Patients;
 using System;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -17,6 +19,8 @@ namespace Pusula.Training.HealthCare.BlackLists
 
         public virtual Guid DoctorId { get; private set; }
 
+        public virtual Patient Patient { get; private set; } = null!;
+        public virtual Doctor Doctor { get; private set; } = null!;
         protected BlackList()
         {
         }

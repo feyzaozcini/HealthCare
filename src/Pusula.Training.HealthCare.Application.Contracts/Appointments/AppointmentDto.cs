@@ -6,7 +6,6 @@ namespace Pusula.Training.HealthCare.Appointments
 {
     public class AppointmentDto : FullAuditedEntityDto<Guid>
     {
-        
         public DateTime StartDate { get; set; }
         
         public DateTime EndDate { get; set; }

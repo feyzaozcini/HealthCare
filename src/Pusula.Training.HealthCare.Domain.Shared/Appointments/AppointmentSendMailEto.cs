@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Events.Distributed;
 
 namespace Pusula.Training.HealthCare.Appointments
 {
+    // veri transfer nesnesi üzerinden randevu bilgilerini mail olarak göndermek için kullanılır
     public class AppointmentSendMailEto : EtoBase
     {
         public string Email { get; set; }

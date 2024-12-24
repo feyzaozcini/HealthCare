@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Pusula.Training.HealthCare.Core;
 
 namespace Pusula.Training.HealthCare.AppointmentRules
 {
-    public class AppointmentRuleDownloadTokenCacheItem
+    public class AppointmentRuleDownloadTokenCacheItem : DownloadTokenCacheItem
     {
-        public string Token { get; set; } = null!;
+
     }
 }

@@ -11,6 +11,7 @@ namespace Pusula.Training.HealthCare.Core.Rules.BlackLists
 {
     public class BlackListBusinessRules(IBlackListRepository blackListRepository) : IBlackListBusinessRules
     {
+        //Hasta ve doktorun engel durumunu kontrol eder, birden fazla eklenmesini engeller
         public virtual async Task DublicateBlackList(Guid patientId, Guid doctorId)
         {
             var isBlackListed = await blackListRepository.AnyAsync(
@@ -24,6 +25,7 @@ namespace Pusula.Training.HealthCare.Core.Rules.BlackLists
             }
         }
 
+        //Randevu için hasta ve doktorun engel durumunu kontrol eder
         public virtual async Task ValidateBlackList(Guid patientId, Guid doctorId)
         {
             var isBlackListed = await blackListRepository.AnyAsync(

@@ -7,19 +7,13 @@ public static class HealthCareDomainErrorCodes
     public const string DeleteMessage = "Silme İşlemi Başarılı";
 
     public const string PatientNotFound = "Hasta bulunamadı.";
-
     public const string PatientCompanyNameExist = "Böyle bir kurum zaten mevcut. Lütfen varolan kurumlardan seçiniz.";
-
     public const string PatientCompanyNameNotFound = "Böyle bir kurum zaten mevcut. Lütfen varolan kurumlardan seçiniz.";
 
     public const string CountryNameExists = "Böyle bir ülke adı bulunmaktadır.";
-
     public const string CountryNotFound = "Böyle bir ülke adı bulunmamaktadır";
-
     public const string CityNotFound = "Böyle bir şehir adı bulunmamaktadır";
-
     public const string DistrictNotFound = "Böyle bir ilçe adı bulunmamaktadır";
-
     public const string VillageNotFound = "Böyle bir köy adı bulunmamaktadır";
   
     //LAB
@@ -37,16 +31,11 @@ public static class HealthCareDomainErrorCodes
     public const string DiagnosisAlreadyExist = "Böyle bir tanı zaten mevcut";
     public const string PainTypeAlreadyExist = "Böyle bir Ağrı tipi zaten mevcut";
 
-    //Appointment
-    public const string DoctorScheduleConflict = "Bu tarih aralığı başka bir randevu ile çakışmaktadır.";
+    //Appointment Modules
+    public const string DoctorScheduleConflict = "Bu tarihte doktorun randevusu mevcuttur.";
     public const string DoctorRules = "Doktor için Yaş ve Cinsiyet Kısıtlmasına Uyulmamaktadır.";
-
-    //AppointmentType
     public const string DoctorAlreadyAssignedToAppointmentType = "Doktor zaten bu randevu tipine atanmış.";
-
     public const string DoctorWorkScheduleConflict = "Doktorun çalışma programı zaten mevcut.";
-
     public const string PatientWasBlockedByDoctor = "Hasta doktor tarafından engellenmiştir.";
-
     public const string DublicateBlackListItem = "Hasta zaten doktor tarafından engellenmiştir.";
 }

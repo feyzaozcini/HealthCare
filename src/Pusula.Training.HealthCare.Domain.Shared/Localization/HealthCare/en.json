@@ -198,7 +198,10 @@
     "Enum:FollowUpType.Rehabilitation": "Rehabilitation",
     "Enum:FollowUpType.Consultation": "Consultation",
     "Enum:FollowUpType.PalliativeTreatment": "Palliative treatment",
-    "Enum:FollowUpType.DailyTreatment": "Daily treatment"
+    "Enum:FollowUpType.DailyTreatment": "Daily treatment",
 
+    "Permission:Blacklists": "Black List",
+    "Permission:DoctorWorkSchedules": "Doctor Work Schedule",
+    "FullName": "Full Name"
   }
 }

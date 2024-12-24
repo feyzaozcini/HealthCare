@@ -9,7 +9,6 @@ using System.Linq;
 using Syncfusion.Blazor.Notifications;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
-using Pusula.Training.HealthCare.AppointmentRules;
 
 namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {

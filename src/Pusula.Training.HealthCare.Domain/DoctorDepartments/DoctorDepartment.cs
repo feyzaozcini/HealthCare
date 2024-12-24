@@ -1,13 +1,7 @@
 ﻿using Pusula.Training.HealthCare.Departments;
 using Pusula.Training.HealthCare.Doctors;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
-using Volo.Abp.Identity;
 
 namespace Pusula.Training.HealthCare.DoctorDepartments
 {

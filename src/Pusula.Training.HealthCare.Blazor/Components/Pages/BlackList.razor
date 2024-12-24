@@ -39,6 +39,7 @@
     </div>
 </div>
 
+<!-- Black List Add Modal -->
 <SfDialog IsModal="true" Width="600px" Visible="@IsAddModalOpen" Header="Add Black List Item" OnClose="() => IsAddModalOpen = false">
 
     <DialogTemplates>
@@ -95,7 +96,7 @@
     </DialogTemplates>
 </SfDialog>
 
-
+<!-- Black List Edit Modal -->
 <SfDialog @bind-Visible="@IsEditModalOpen" Width="400px" Header="Edit Blacklist Status">
     <DialogTemplates>
         <Content>

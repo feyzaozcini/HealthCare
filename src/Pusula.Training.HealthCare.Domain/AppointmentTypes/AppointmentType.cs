@@ -1,7 +1,5 @@
 ﻿using JetBrains.Annotations;
 using Pusula.Training.HealthCare.DoctorAppoinmentTypes;
-using Pusula.Training.HealthCare.DoctorDepartments;
-using Pusula.Training.HealthCare.Patients;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,12 +13,10 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
     {
         [NotNull]
         public string Name { get; private set; } = null!;
-
         [NotNull]
         public int DurationInMinutes { get; private set; } //Doktorın randevu sürelerini tutmak için dakika olarak ekleniyor
 
         public virtual ICollection<DoctorAppoinmentType> DoctorAppointmentTypes { get; set; } 
-
 
 
         protected AppointmentType()
@@ -34,7 +30,6 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
         {
             Id = id;
             SetName(name);
-            DurationInMinutes = durationInMinutes;
             SetDurationInMinutes(durationInMinutes);
             DoctorAppointmentTypes = new Collection<DoctorAppoinmentType>();
         }
@@ -48,7 +43,7 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
 
         public void SetDurationInMinutes(int durationInMinutes) 
         {
-            Check.Range(durationInMinutes, nameof(durationInMinutes), 0, 60);
+            Check.Range(durationInMinutes, nameof(durationInMinutes), 0, 360);
             DurationInMinutes = durationInMinutes;
         }
 
@@ -58,7 +53,6 @@ namespace Pusula.Training.HealthCare.AppointmentTypes
             {
                 return;
             }
-
             DoctorAppointmentTypes.Add(new DoctorAppoinmentType(doctorId, Id));
         }
     }

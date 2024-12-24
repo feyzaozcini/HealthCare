@@ -50,7 +50,7 @@ namespace Pusula.Training.HealthCare.PatientCompanies
             PatientCompany? patientCompany = await patientCompanyRepository.GetAsync(predicate: c => c.Id == id);
             await patientCompanyRepository.DeleteAsync(id);
             PatientCompanyDeleteDto response = ObjectMapper.Map<PatientCompany, PatientCompanyDeleteDto>(patientCompany);
-            response.Message = "Patient Company deleted successfully";
+            response.Message =HealthCareDomainErrorCodes.DeleteMessage;
             return response;
         }
 

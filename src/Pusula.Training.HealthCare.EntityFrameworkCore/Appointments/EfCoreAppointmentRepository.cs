@@ -1,15 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Pusula.Training.HealthCare.Appointments;
-using Pusula.Training.HealthCare.AppointmentTypes;
-using Pusula.Training.HealthCare.Departments;
-using Pusula.Training.HealthCare.Doctors;
 using Pusula.Training.HealthCare.EntityFrameworkCore;
-using Pusula.Training.HealthCare.Patients;
+using Pusula.Training.HealthCare.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Repositories.EntityFrameworkCore;
@@ -107,18 +102,10 @@ namespace Pusula.Training.HealthCare.Appointments
             Guid id, 
             CancellationToken cancellationToken = default)
         {
-            var dbContext = await GetDbContextAsync();
-
-            return (await GetDbSetAsync()).Where(b => b.Id == id)
-                .Select(appointment => new AppointmentWithNavigationProperties
-                {
-                    Appointment = appointment,
-                    Patient = dbContext.Set<Patient>().FirstOrDefault(c => c.Id == appointment.PatientId)!,
-                    Doctor = dbContext.Set<Doctor>().FirstOrDefault(c => c.Id == appointment.DoctorId)!,
-                    Department = dbContext.Set<Department>().FirstOrDefault(c => c.Id == appointment.DepartmentId)!,
-                    AppointmentType = dbContext.Set<AppointmentType>().FirstOrDefault(c => c.Id == appointment.AppointmentTypeId)!
-                })
-                .FirstOrDefault()!;
+            var query = await GetQueryForNavigationPropertiesAsync();
+            var appointment = await query.FirstOrDefaultAsync(lr => lr.Appointment.Id == id, cancellationToken);
+            HealthCareException.ThrowIf(appointment == null);
+            return appointment!;
         }
 
 
@@ -148,29 +135,29 @@ namespace Pusula.Training.HealthCare.Appointments
 
 
 
-        protected virtual async Task<IQueryable<AppointmentWithNavigationProperties>> GetQueryForNavigationPropertiesAsync() =>
-            from appointment in (await GetDbSetAsync())
-            join patient in (await GetDbContextAsync()).Set<Patient>() on appointment.PatientId equals patient.Id into patients
-            from patient in patients.DefaultIfEmpty()
-            join doctor in (await GetDbContextAsync()).Set<Doctor>()
-            .Include(d => d.User)
-            .Include(d => d.Title)
-            on appointment.DoctorId equals doctor.Id into doctors
-            from doctor in doctors.DefaultIfEmpty()
-            join department in (await GetDbContextAsync()).Set<Department>() on appointment.DepartmentId equals department.Id into departments
-            from department in departments.DefaultIfEmpty()
-            join appointmentType in (await GetDbContextAsync()).Set<AppointmentType>() on appointment.AppointmentTypeId equals appointmentType.Id into appointmentTypes
-            from appointmentType in appointmentTypes.DefaultIfEmpty()
-            select new AppointmentWithNavigationProperties
-            {
-                Appointment = appointment,
-                Patient = patient,
-                Doctor = doctor,
-                Department = department,
-                AppointmentType = appointmentType
-            };
-
-
+        protected virtual async Task<IQueryable<AppointmentWithNavigationProperties>> GetQueryForNavigationPropertiesAsync()
+        {
+            var dbContext = await GetDbContextAsync();
+            var blackList = await GetDbSetAsync();
+            var query = blackList
+                .Include(ar => ar.Patient)
+                .Include(ar => ar.Doctor)
+                    .ThenInclude(d => d.User)
+                .Include(ar => ar.Doctor)
+                    .ThenInclude(d => d.Title)
+                .Include(ar => ar.Department)
+                .Include(ar => ar.AppointmentType)
+                .Select(ar => new AppointmentWithNavigationProperties
+                {
+                    Appointment = ar,
+                    Patient = ar.Patient,
+                    Doctor = ar.Doctor,
+                    Department = ar.Department,
+                    AppointmentType = ar.AppointmentType
+                });
+            return query;
+        }
+           
         protected virtual IQueryable<AppointmentWithNavigationProperties> ApplyFilter(
             IQueryable<AppointmentWithNavigationProperties> query,
             string? filterText = null,
