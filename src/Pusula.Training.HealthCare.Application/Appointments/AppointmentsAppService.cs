@@ -154,7 +154,7 @@ namespace Pusula.Training.HealthCare.Appointments
             await blackListBusinessRules.ValidateBlackList(input.PatientId, input.DoctorId);
 
             //Geçmiş zamanlı randevu alınamaz end date, datetime.now'dan büyük olsa bile start date geçmiş olabilir
-            //await appointmentBusinessRules.AppointmentCannotCreatePastTime(input.StartDate);
+            await appointmentBusinessRules.AppointmentCannotCreatePastTime(input.StartDate);
 
             // Doktorun bu appointment type ile ilişkisini kontrol et
             var doctorAppointmentType = appointmentType.DoctorAppointmentTypes
