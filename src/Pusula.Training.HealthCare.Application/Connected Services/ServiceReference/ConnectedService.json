@@ -1,0 +1,20 @@
+{
+  "ExtendedData": {
+    "inputs": [
+      "https://tckimlik.nvi.gov.tr/Service/KPSPublic.asmx?WSDL"
+    ],
+    "collectionTypes": [
+      "System.Array",
+      "System.Collections.Generic.Dictionary`2"
+    ],
+    "messageContract": true,
+    "namespaceMappings": [
+      "*, ServiceReference"
+    ],
+    "references": [
+      "C:\\Users\\nilbi\\Desktop\\Pusula\\Pusula.Training.HealthCare\\src\\Pusula.Training.HealthCare.Application\\bin\\Debug\\net8.0\\Pusula.Training.HealthCare.Application.Contracts.dll"
+    ],
+    "targetFramework": "net8.0",
+    "typeReuseMode": "Specified"
+  }
+}

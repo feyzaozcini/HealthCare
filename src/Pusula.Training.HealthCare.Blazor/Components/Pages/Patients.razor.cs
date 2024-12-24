@@ -633,6 +633,21 @@ public partial class Patients
                 {
                     return;
                 }
+
+                //Mernis doðrulama
+                var isValid = await MernisValidationService.ValidateIdentityAsync(
+                NewPatient.IdentityNumber,
+                NewPatient.FirstName,
+                NewPatient.LastName,
+                NewPatient.BirthDate.Year
+            );
+
+                if (!isValid)
+                {
+                    await ShowToast("Kimlik doðrulama baþarýsýz. Lütfen bilgilerinizi kontrol edin.", false);
+                    return;
+                }
+
                 await PatientsAppService.CreateAsync(NewPatient);
                 await GetPatientsAsync();
                 await CloseCreatePatientModalAsync();
@@ -672,7 +687,7 @@ public partial class Patients
 
         });
     }
-    
+
 
     protected virtual void OnFirstNameChanged(string? firstName)
     {

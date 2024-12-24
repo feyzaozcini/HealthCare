@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Addresses;
+using Pusula.Training.HealthCare.Core.Helpers;
 using Pusula.Training.HealthCare.Core.Rules.Patients;
 using Pusula.Training.HealthCare.Countries;
 using Pusula.Training.HealthCare.PatientCompanies;
 using Pusula.Training.HealthCare.Permissions;
+using Pusula.Training.HealthCare.Services;
 using Pusula.Training.HealthCare.Shared;
 using System;
 using System.Collections.Generic;
@@ -30,15 +32,16 @@ namespace Pusula.Training.HealthCare.Patients
         ICountryRepository countryRepository,
         IAddressRepository addressRepository,
         IPatientCompanyRepository patientCompanyRepository,
+        IMernisValidationService mernisValidationService,
         PatientBusinessRules patientBusinessRules
         ) : HealthCareAppService, IPatientsAppService
     {
 
         public virtual async Task<PagedResultDto<PatientWithNavigationPropertiesDto>> GetListAsync(GetPatientsInput input)
         {
-            var totalCount = await patientRepository.GetCountAsync(input.FilterText, input.FirstName, input.LastName,input.BirthDateMin,input.BirthDateMax,input.IdentityNumber,
-                input.PassportNumber,input.Email,input.MobilePhoneNumber,input.EmergencyPhoneNumber,input.Gender,input.No,input.MotherName,input.FatherName,input.BloodType,
-                input.Type,input.CompanyId, input.Sorting, input.MaxResultCount, input.SkipCount);
+            var totalCount = await patientRepository.GetCountAsync(input.FilterText, input.FirstName, input.LastName, input.BirthDateMin, input.BirthDateMax, input.IdentityNumber,
+                input.PassportNumber, input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.No, input.MotherName, input.FatherName, input.BloodType,
+                input.Type, input.CompanyId, input.Sorting, input.MaxResultCount, input.SkipCount);
 
             var items = await patientRepository.GetListWithNavigationPropertiesAsync(input.FilterText, input.FirstName, input.LastName, input.BirthDateMin, input.BirthDateMax, input.IdentityNumber,
                 input.PassportNumber, input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.No, input.MotherName, input.FatherName, input.BloodType,
@@ -89,7 +92,7 @@ namespace Pusula.Training.HealthCare.Patients
 
             var lookupData = await query.PageBy(input.SkipCount, input.MaxResultCount).ToDynamicListAsync<Country>();
             var totalCount = query.Count();
-            
+
 
             var lookupDtoList = ObjectMapper.Map<List<Country>, List<GetCountryLookupDto<Guid>>>(lookupData);
 
@@ -105,6 +108,18 @@ namespace Pusula.Training.HealthCare.Patients
         {
             await patientBusinessRules.IdentityNumberCannotBeDuplicatedWhenInserted(input.IdentityNumber);
 
+            //Mernis Doðrulama
+            var isIdentityValid = await mernisValidationService.ValidateIdentityAsync(
+                input.IdentityNumber,
+                input.FirstName,
+                input.LastName,
+                input.BirthDate.Year 
+            );
+
+            if (!isIdentityValid)
+            {
+                throw new BusinessException("Kimlik doðrulama baþarýsýz. Lütfen bilgilerinizi kontrol edin.");
+            }
             var patient = await patientManager.CreateAsync(input.CompanyId, input.FirstName, input.LastName, input.BirthDate, input.IdentityNumber, input.PassportNumber,
                 input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.MotherName, input.FatherName, input.BloodType, input.Type
                 );
@@ -134,7 +149,7 @@ namespace Pusula.Training.HealthCare.Patients
         [Authorize(HealthCarePermissions.Patients.Edit)]
         public virtual async Task<PatientDto> UpdateAsync(Guid id, PatientUpdateDto input) => ObjectMapper.Map<Patient, PatientDto>(
                 await patientManager.UpdateAsync(id,
-                    input.CompanyId, input.FirstName, input.LastName, input.BirthDate, input.IdentityNumber, input.PassportNumber, input.Email, 
+                    input.CompanyId, input.FirstName, input.LastName, input.BirthDate, input.IdentityNumber, input.PassportNumber, input.Email,
                     input.MobilePhoneNumber, input.EmergencyPhoneNumber, input.Gender, input.MotherName, input.FatherName, input.BloodType, input.Type
                     ));
 
@@ -157,8 +172,8 @@ namespace Pusula.Training.HealthCare.Patients
 
         [Authorize(HealthCarePermissions.Patients.Delete)]
         public virtual async Task DeleteAllAsync(GetPatientsInput input) => await patientRepository.DeleteAllAsync(input.FilterText, input.FirstName, input.LastName,
-            input.BirthDateMin, input.BirthDateMax, input.IdentityNumber, input.PassportNumber, input.Email, input.MobilePhoneNumber,input.EmergencyPhoneNumber,
-            input.Gender, input.No, input.MotherName,input.FatherName, input.BloodType, input.Type, input.CompanyId);
+            input.BirthDateMin, input.BirthDateMax, input.IdentityNumber, input.PassportNumber, input.Email, input.MobilePhoneNumber, input.EmergencyPhoneNumber,
+            input.Gender, input.No, input.MotherName, input.FatherName, input.BloodType, input.Type, input.CompanyId);
 
         [Authorize(HealthCarePermissions.Patients.Delete)]
         public virtual async Task DeleteByIdsAsync(List<Guid> patientIds) => await patientRepository.DeleteManyAsync(patientIds);
@@ -182,6 +197,6 @@ namespace Pusula.Training.HealthCare.Patients
             };
         }
 
-        
+
     }
 }

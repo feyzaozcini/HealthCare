@@ -12,6 +12,7 @@
 @using Pusula.Training.HealthCare.Localization
 @using Pusula.Training.HealthCare.ProtocolTypes
 @using Pusula.Training.HealthCare.Protocols
+@using Pusula.Training.HealthCare.Services
 @using Pusula.Training.HealthCare.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
@@ -49,6 +50,8 @@
 @inject IDepartmentsAppService DepartmentsAppService
 @inject IDoctorsAppService DoctorsAppService
 @inject INotesAppService NotesAppService
+@inject IMernisValidationService MernisValidationService
+
 
 
 @inject ICountriesAppService countriesAppService
