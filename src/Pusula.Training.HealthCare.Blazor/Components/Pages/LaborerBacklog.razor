@@ -34,7 +34,7 @@
                                 <Template Context="context">
                                     @if (context is LabRequestDto labRequest)
                                     {
-                                        <span>@labRequest.PatientName @labRequest.PatientSurname</span>
+                                        <span>@labRequest.Patient.FirstName @labRequest.Patient.LastName</span>
                                     }
                                 </Template>
                             </GridColumn>
@@ -74,7 +74,7 @@
                                 <Template Context="context">
                                     @if (context is LabRequestDto labRequest)
                                     {
-                                        <span>@labRequest.PatientName @labRequest.PatientSurname</span>
+                                        <span>@labRequest.Patient.FirstName @labRequest.Patient.LastName</span>
                                     }
                                 </Template>
                             </GridColumn>

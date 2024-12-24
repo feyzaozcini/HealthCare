@@ -627,35 +627,16 @@ public partial class Patients
     {
         await HandleError(async () =>
         {
-            try
+
+            if (await NewPatientValidations.ValidateAll() == false)
             {
-                if (await NewPatientValidations.ValidateAll() == false)
-                {
-                    return;
-                }
-
-                //Mernis doðrulama
-                var isValid = await MernisValidationService.ValidateIdentityAsync(
-                NewPatient.IdentityNumber,
-                NewPatient.FirstName,
-                NewPatient.LastName,
-                NewPatient.BirthDate.Year
-            );
-
-                if (!isValid)
-                {
-                    await ShowToast("Kimlik doðrulama baþarýsýz. Lütfen bilgilerinizi kontrol edin.", false);
-                    return;
-                }
-
-                await PatientsAppService.CreateAsync(NewPatient);
-                await GetPatientsAsync();
-                await CloseCreatePatientModalAsync();
+                return;
             }
-            catch (Exception ex)
-            {
 
-            }
+            await PatientsAppService.CreateAsync(NewPatient);
+            await GetPatientsAsync();
+            await CloseCreatePatientModalAsync();
+
             await ShowToast(PatientConsts.PatientSuccessfullyCreated, true);
         });
     }

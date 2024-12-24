@@ -16,17 +16,17 @@ namespace Pusula.Training.HealthCare.TestValueRanges;
 public class TestValueRange : AuditedEntity<Guid>
 {
     [NotNull]
-    public Guid TestGroupItemId { get; set; }
-    public TestGroupItem TestGroupItem { get; set; }
+    public Guid TestGroupItemId { get; private set; }
+    public TestGroupItem TestGroupItem { get; private set; }
 
     [NotNull]
-    public decimal MinValue { get; set; }
+    public decimal MinValue { get; private set; }
 
     [NotNull]
-    public decimal MaxValue { get; set; }
+    public decimal MaxValue { get; private set; }
 
     [NotNull]
-    public TestUnitTypes Unit { get; set; }
+    public TestUnitTypes Unit { get; private set; }
 
     public TestValueRange()
     {

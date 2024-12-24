@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Pusula.Training.HealthCare.Doctors;
+using Pusula.Training.HealthCare.Protocols;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,31 +11,10 @@ namespace Pusula.Training.HealthCare.LabRequests;
 
 public class LabRequestWithNavigationPropertiesDto
 {
+    public ProtocolDto Protocol { get; set; }
+    public DoctorDto Doctor { get; set; }
+    public LabRequestDto LabRequest { get; set; }
     public Guid Id { get; set; }
-    //Protocol
-    [Required]
-    public Guid ProtocolId { get; set; }
-    public string ProtocolType { get; set; }
-    public DateTime? ProtocolStartDate { get; set; }
-    public string? ProtocolEndDate { get; set; }
-
-    //Patient
-
-    //public string PatientName { get; set; }
-    //public string PatientSurname { get; set; }
-    //public int PatientNo { get; set; }
-
-    //Doctor
-    [Required]
-    public Guid DoctorId { get; set; }
-    public string? DoctorName { get; set; }
-    public string? DoctorSurname { get; set; }
-    [Required]
-    public DateTime Date { get; set; }
-    [Required]
-    public RequestStatusEnum Status { get; set; }
-    [StringLength(LabRequestConsts.DescriptionMaxLength)]
-    public string? Description { get; set; }
 
     public LabRequestWithNavigationPropertiesDto()
     {

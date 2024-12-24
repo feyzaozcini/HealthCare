@@ -36,6 +36,7 @@ using static Volo.Abp.Identity.Settings.IdentitySettingNames;
 using Volo.Abp.MultiTenancy;
 using Pusula.Training.HealthCare.UserProfiles;
 using Pusula.Training.HealthCare.Addresses;
+using Pusula.Training.HealthCare.LabRequests;
 
 
 namespace Pusula.Training.HealthCare
@@ -66,7 +67,8 @@ namespace Pusula.Training.HealthCare
         IGuidGenerator guidGenerator,
         DiagnosisGroupDataSeeder diagnosisGroupDataSeeder,
         DiagnosisDataSeeder diagnosisDataSeeder,
-        IPainTypeRepository painTypeRepository) : IDataSeedContributor, ITransientDependency
+        IPainTypeRepository painTypeRepository,
+        ILabRequestRepository labRequestRepository) : IDataSeedContributor, ITransientDependency
     {
         public async Task SeedAsync(DataSeedContext context)
         {
@@ -112,6 +114,9 @@ namespace Pusula.Training.HealthCare
             await SeedPainTypesAsync();
 
             var protocol = await SeedProtocolsAsync(protocolTypes, notes, insurances, patients, departments, doctors);
+
+            var labRequest = await SeedLabRequestsAsync(protocol, doctors);
+
 
         }
 
@@ -2612,7 +2617,55 @@ namespace Pusula.Training.HealthCare
             await doctorRepository.InsertManyAsync(doctors, true);
             return doctors.Select(p => p.Id).ToList();
         }
+        #endregion
 
+        #region LabRequests
+        private async Task<List<Guid>> SeedLabRequestsAsync(List<Guid> protocolKeys, List<Guid> doctorKeys)
+        {
+            if (await labRequestRepository.GetCountAsync() > 0)
+                return new List<Guid>();
+
+            var labRequests = new List<LabRequest>
+            {
+                new LabRequest(
+                guidGenerator.Create(),
+                protocolKeys.ElementAt(0),
+                doctorKeys.ElementAt(0),
+                DateTime.UtcNow,
+                RequestStatusEnum.InProgress,
+                $"Lab request description for protocol."
+            ),
+                new LabRequest(
+                guidGenerator.Create(),
+                protocolKeys.ElementAt(1),
+                doctorKeys.ElementAt(1),
+                DateTime.UtcNow,
+                RequestStatusEnum.InProgress,
+                $"Lab request description for protocol."
+            ), new LabRequest(
+                guidGenerator.Create(),
+                protocolKeys.ElementAt(2),
+                doctorKeys.ElementAt(2),
+                DateTime.UtcNow,
+                RequestStatusEnum.InProgress,
+                $"Lab request description for protocol."
+            ), new LabRequest(
+                guidGenerator.Create(),
+                protocolKeys.ElementAt(3),
+                doctorKeys.ElementAt(3),
+                DateTime.UtcNow,
+                RequestStatusEnum.InProgress,
+                $"Lab request description for protocol."
+            )
+            };
+
+
+
+            await labRequestRepository.InsertManyAsync(labRequests, true);
+
+            return labRequests.Select(p => p.Id).ToList();
+        }
+        #endregion
     }
-    #endregion
 }
+

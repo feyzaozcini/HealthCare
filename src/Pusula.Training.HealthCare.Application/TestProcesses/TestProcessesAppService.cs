@@ -4,16 +4,13 @@ using Pusula.Training.HealthCare.Core;
 using Pusula.Training.HealthCare.Core.Rules.TestProcesses;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
-using Pusula.Training.HealthCare.TestValueRanges;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
-using Volo.Abp.ObjectMapping;
 
 namespace Pusula.Training.HealthCare.TestProcesses;
 
@@ -23,7 +20,7 @@ public class TestProcessesAppService(
     ITestProcessRepository testProcessRepository,
     TestProcessManager testProcessManager,
     ITestProcessBusinessRules testProcessBusinessRules,
-    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache
+    IDistributedCache<TestProcessDownloadTokenCacheItem, string> downloadTokenCache
     ) : HealthCareAppService, ITestProcessesAppService
 {
 
@@ -72,7 +69,7 @@ public class TestProcessesAppService(
 
         await downloadTokenCache.SetAsync(
             token,
-            new DownloadTokenCacheItem { Token = token },
+            new TestProcessDownloadTokenCacheItem { Token = token },
             new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)
@@ -182,8 +179,8 @@ public class TestProcessesAppService(
         .GetListWithNavigationPropertiesAsync();
 
         var testCounts = testProcesses
-            .Where(tp => tp.TestGroupItem.TestGroup != null)
-            .GroupBy(tp => tp.TestGroupItem.TestGroup.Name)
+            .Where(tp => tp.TestGroupItem!.TestGroup != null)
+            .GroupBy(tp => tp.TestGroupItem!.TestGroup.Name)
             .Select(group => new TestGroupCountDto
             {
                 TestName = group.Key,

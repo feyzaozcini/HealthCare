@@ -20,7 +20,7 @@ public class TestGroupItemsAppService(
     ITestGroupItemRepository testGroupItemRepository,
     ITestGroupItemBusinessRules testGroupItemBusinessRules,
     TestGroupItemManager testGroupItemManager,
-    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache,
+    IDistributedCache<TestGroupItemDownloadTokenCacheItem, string> downloadTokenCache,
     IDistributedCache distributedCache)
     : HealthCareAppService, ITestGroupItemsAppService
 {
@@ -69,7 +69,7 @@ public class TestGroupItemsAppService(
 
         await downloadTokenCache.SetAsync(
             token,
-            new DownloadTokenCacheItem { Token = token },
+            new TestGroupItemDownloadTokenCacheItem { Token = token },
             new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)

@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Caching.Distributed;
 using Pusula.Training.HealthCare.Core;
-using Pusula.Training.HealthCare.LabRequests;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Shared;
-using Pusula.Training.HealthCare.TestProcesses;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,7 +17,7 @@ namespace Pusula.Training.HealthCare.TestValueRanges;
 public class TestValueRangesAppService(
     ITestValueRangeRepository testValueRangeRepository,
     TestValueRangeManager testValueRangeManager,
-    IDistributedCache<DownloadTokenCacheItem, string> downloadTokenCache
+    IDistributedCache<TestValueRangeDownloadTokenCacheItem, string> downloadTokenCache
     ) : HealthCareAppService, ITestValueRangesAppService
 {
 
@@ -56,7 +54,7 @@ public class TestValueRangesAppService(
 
         await downloadTokenCache.SetAsync(
             token,
-            new DownloadTokenCacheItem { Token = token },
+            new TestValueRangeDownloadTokenCacheItem { Token = token },
             new DistributedCacheEntryOptions
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30)

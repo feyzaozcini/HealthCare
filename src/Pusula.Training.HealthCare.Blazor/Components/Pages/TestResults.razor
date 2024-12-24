@@ -63,7 +63,7 @@
             <Template Context="item">
                 @if (item is TestProcessWithNavigationPropertiesDto process)
                 {
-                    <span>@($"{process.LabRequest?.PatientName} {process.LabRequest?.PatientSurname}")</span>
+                    <span>@($"{process.LabRequest?.Patient.FirstName} {process.LabRequest?.Patient.LastName}")</span>
                 }
             </Template>
         </GridColumn>

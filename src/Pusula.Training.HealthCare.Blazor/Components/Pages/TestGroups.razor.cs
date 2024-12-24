@@ -23,7 +23,7 @@ public partial class TestGroups
     private GetTestGroupItemsInput? TestGroupItemsFilter { get; set; }
     private GetTestGroupsInput? TestGroupsFilter { get; set; }
 
-    SfGrid<TestGroupItemDto> Grid;
+    SfGrid<TestGroupItemDto>? Grid;
     private TestGroupItemsCreateDto CreateTestGroupItemsDto = new();
     private TestGroupItemsUpdateDto UpdateTestGroupItemsDto = new();
     private TestGroupsCreateDto CreateTestGroupsDto = new();
@@ -38,14 +38,10 @@ public partial class TestGroups
     private Guid? SelectedTestGroupId { get; set; } = null;
     private Guid? SelectedTestGroupItemId;
 
-    //private bool CanCreateTest { get; set; }
-    //private bool CanEditTest { get; set; }
-    //private bool CanDeleteTest { get; set; }
-
     private int PageSize { get; } = LimitedResultRequestDto.DefaultMaxResultCount;
     private int CurrentPage { get; set; } = 1;
     private long TotalCount;
-    SfTextBox TextBoxSearchObj { get; set; }
+    SfTextBox? TextBoxSearchObj { get; set; }
 
     //Modal yönetimi
     private SfDialog? CreateTestGroupItemsDialog;
@@ -366,13 +362,4 @@ public partial class TestGroups
             await TextBoxSearchObj.AddIconAsync("append", "e-icons e-search-icon");
         }
     }
-    //#region Permission
-    ////Yetkilendirme
-    //private async Task SetPermissionsAsync()
-    //{
-    //    CanCreateTest = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.TestGroupItems.Create);
-    //    CanEditTest = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.TestGroupItems.Edit);
-    //    CanDeleteTest = await AuthorizationService.IsGrantedAsync(HealthCarePermissions.TestGroupItems.Delete);
-    //}
-    //#endregion
 }

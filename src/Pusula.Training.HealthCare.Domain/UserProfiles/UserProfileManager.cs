@@ -9,17 +9,8 @@ using Volo.Abp.Identity;
 
 namespace Pusula.Training.HealthCare.UserProfiles;
 
-public class UserProfileManager : DomainService, ITransientDependency
+public class UserProfileManager(UserManager<IdentityUser> userManager, IIdentityRoleRepository identityRoleRepository) : DomainService, IUserProfileManager
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly IIdentityRoleRepository _roleRepository;
-
-    public UserProfileManager(UserManager<IdentityUser> userManager, IIdentityRoleRepository roleRepository)
-    {
-        _userManager = userManager;
-        _roleRepository = roleRepository;
-    }
-
     public async Task<IdentityUser> CreateUserWithPropertiesAsync(
     string userName,
     string name,
@@ -39,14 +30,12 @@ public class UserProfileManager : DomainService, ITransientDependency
         };
 
         // Oluşturduğumuz user nesnesi ile gerçek bir user oluşturma işlemi yapıyoruz.
-        var createUserResult = await _userManager.CreateAsync(user, password);
-
-        // Exception kontrolleri gelecek.
+        var createUserResult = await userManager.CreateAsync(user, password);
 
         // Burada telefon numarasını ayarlıyoruz.
         if (!string.IsNullOrEmpty(phoneNumber))
         {
-            var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, phoneNumber);
+            var setPhoneResult = await userManager.SetPhoneNumberAsync(user, phoneNumber);
             if (!setPhoneResult.Succeeded)
             {
                 throw new BusinessException("SetPhoneNumberFailed")
@@ -56,14 +45,12 @@ public class UserProfileManager : DomainService, ITransientDependency
 
 
         // Burada oluşturulan kullanıcıya bir rol ekliyoruz.
-        var addToRoleResult = await _userManager.AddToRoleAsync(user, role);
+        var addToRoleResult = await userManager.AddToRoleAsync(user, role);
         if (!addToRoleResult.Succeeded)
         {
             throw new BusinessException("AddToRoleFailed")
                 .WithData("Errors", string.Join(", ", addToRoleResult.Errors.Select(e => e.Description)));
         }
-
-       
 
         return user;
     }

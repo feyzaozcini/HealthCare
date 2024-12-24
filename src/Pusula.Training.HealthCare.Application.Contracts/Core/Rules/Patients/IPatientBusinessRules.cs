@@ -1,4 +1,5 @@
 ﻿using Pusula.Training.HealthCare.Patients;
+using Pusula.Training.HealthCare.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,6 @@ namespace Pusula.Training.HealthCare.Core.Rules.Patients
     {
         Task IdentityNumberCannotBeDuplicatedWhenInserted(string identityNumber);
 
-        
+        Task ValidateMernisAsync(IdentityValidationDto identityValidationDto);
     }
 }

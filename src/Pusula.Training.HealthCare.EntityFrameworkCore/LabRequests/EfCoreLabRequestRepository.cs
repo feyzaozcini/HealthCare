@@ -117,6 +117,8 @@ public class EfCoreLabRequestRepository(IDbContextProvider<HealthCareDbContext> 
     {
         var dbSet = await GetDbSetAsync();
         return dbSet
+            .AsNoTracking()
+            .AsSplitQuery()
             .Include(lr => lr.Protocol)
                 .ThenInclude(lr => lr.Patient)
                 .Include(lr => lr.Protocol.Insurance)
