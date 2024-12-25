@@ -16,16 +16,16 @@ namespace Pusula.Training.HealthCare.ControlNotes
         [NotNull]
         public Guid ProtocolId { get; private set; }
 
-        public Protocol Protocol { get; private set; }
+        public Protocol Protocol { get; private set; } = null!;
 
         [NotNull]
         public DateTime NoteDate { get; private set; }
 
 
         [NotNull]
-        public string Note { get; private set; }
+        public string Note { get; private set; } = string.Empty;
 
-        public IdentityUser  User { get; set; }
+        public IdentityUser User { get; set; } = null!;
 
         protected ControlNote() 
         {

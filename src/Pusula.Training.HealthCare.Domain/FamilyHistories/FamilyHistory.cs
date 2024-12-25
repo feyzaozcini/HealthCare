@@ -16,7 +16,7 @@ namespace Pusula.Training.HealthCare.FamilyHistories
         [NotNull]
         public Guid PatientId { get; private set; }
 
-        public Patient Patient { get; private set; }
+        public Patient Patient { get; private set; } = null!;
 
         public string? Mother { get; private set; }
 

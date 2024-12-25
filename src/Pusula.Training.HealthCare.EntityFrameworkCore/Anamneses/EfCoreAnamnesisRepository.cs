@@ -42,10 +42,6 @@ namespace Pusula.Training.HealthCare.Anamneses
             return await query.Page(skipCount, maxResultCount).ToListAsync(cancellationToken);
         }
 
-        public Task<List<AnamnesisWithNavigationProperties>> GetListWithNavigationPropertiesAsync(string? filterText = null, string? complaint = null, DateTime? startDate = null, string? story = null, Guid? protocolId = null, string? sorting = null, int maxResultCount = int.MaxValue, int skipCount = 0, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<AnamnesisWithNavigationProperties> GetWithNavigationPropertiesAsync(Guid id, CancellationToken cancellationToken = default)
         {

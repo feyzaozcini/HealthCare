@@ -130,5 +130,13 @@ namespace Pusula.Training.HealthCare.ExaminationDiagnoses
             return result.Select(x => (x.DiagnosisName, x.Count)).ToList();
         }
 
+        public async Task<List<ExaminationDiagnosis>> GetByDiagnosisIdAsync(Guid diagnosisId)
+        {
+            var dbSet = await GetDbSetAsync(); // ABP'nin sağladığı repository yöntemi
+            return await dbSet
+                .Where(x => x.DiagnosisId == diagnosisId)
+                .ToListAsync();
+        }
+
     }
 }

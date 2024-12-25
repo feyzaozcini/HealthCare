@@ -43,4 +43,5 @@ public static class HealthCareDomainErrorCodes
 
 
     public const string PastTimeAppointmentCannotCreate = "Geçmiş tarihli randevu oluşturulamaz.";
+    public const string ExaminationDiagnosisAlreadyExists = "Hastanin boyle bir tanisi zaten mevcut.";
 }

@@ -548,7 +548,7 @@ public class HealthCareDbContext :
             builder.Entity<Diagnosis>(b =>
             {
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Diagnoses", HealthCareConsts.DbSchema);
-                b.ConfigureByConvention(); // ABP'nin varsayılan kuralları
+                b.ConfigureByConvention();
                 b.Property(x => x.Name).HasColumnName(nameof(Diagnosis.Name)).IsRequired().HasMaxLength(DiagnosisConsts.NameMaxLength);
                 b.Property(x => x.Code).HasColumnName(nameof(Diagnosis.Code)).IsRequired().HasMaxLength(DiagnosisConsts.CodeMaxLength);
                 b.HasOne<DiagnosisGroup>().WithMany().HasForeignKey(x => x.GroupId).OnDelete(DeleteBehavior.Restrict);
@@ -557,7 +557,7 @@ public class HealthCareDbContext :
             builder.Entity<Anamnesis>(b =>
             {
                 b.ToTable(HealthCareConsts.DbTablePrefix + "Anamneses", HealthCareConsts.DbSchema);
-                b.ConfigureByConvention(); // ABP'nin varsayılan kuralları
+                b.ConfigureByConvention(); 
                 b.Property(x => x.Complaint).HasColumnName(nameof(Anamnesis.Complaint)).IsRequired();
                 b.Property(x => x.Story).HasColumnName(nameof(Anamnesis.Story)).IsRequired();
                 b.Property(x => x.StartDate).HasColumnName(nameof(Anamnesis.StartDate)).IsRequired();
@@ -573,7 +573,7 @@ public class HealthCareDbContext :
                 b.Property(x => x.InitialDate).HasColumnName(nameof(ExaminationDiagnosis.InitialDate)).IsRequired();
                 b.Property(x => x.Note).HasColumnName(nameof(ExaminationDiagnosis.Note)).HasMaxLength(ExaminationDiagnosisConsts.NoteMaxLength);
                 b.HasOne<Protocol>().WithMany().HasForeignKey(x => x.ProtocolId).OnDelete(DeleteBehavior.NoAction);
-                b.HasOne<Diagnosis>().WithMany().HasForeignKey(x => x.DiagnosisId).OnDelete(DeleteBehavior.NoAction);
+                b.HasOne<Diagnosis>().WithMany().HasForeignKey(x => x.DiagnosisId).OnDelete(DeleteBehavior.Cascade);
 
             });
 

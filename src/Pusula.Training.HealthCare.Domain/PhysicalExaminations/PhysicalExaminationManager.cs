@@ -48,14 +48,17 @@ namespace Pusula.Training.HealthCare.PhysicalExaminations
         string note)
         {
             var physicalExamination = await physicalExaminationRepository.GetAsync(id); //veya protocol Id de olabilir
-            physicalExamination.Weight = weight;
-            physicalExamination.Height = height;
-            physicalExamination.Temperature= temperature;
-            physicalExamination.Pulse = pulse;
-            physicalExamination.SystolicBP = systolicBP;
-            physicalExamination.DiastolicBP = diastolicBP;
-            physicalExamination.SPO2 = spo2;
-            physicalExamination.Note = note;
+            physicalExamination.SetProtocolId(protocolId);
+            physicalExamination.SetWeight(weight);
+            physicalExamination.SetHeight(height);
+            physicalExamination.SetBMI(bmi);
+            physicalExamination.SetVYA(vya);
+            physicalExamination.SetTemperature(temperature);
+            physicalExamination.SetPulse(pulse);
+            physicalExamination.SetSystolicBP(systolicBP);
+            physicalExamination.SetDiastolicBP(diastolicBP);
+            physicalExamination.SetSPO2(spo2);
+            physicalExamination.SetNote(note);
             return await physicalExaminationRepository.UpdateAsync(physicalExamination);
 
         }

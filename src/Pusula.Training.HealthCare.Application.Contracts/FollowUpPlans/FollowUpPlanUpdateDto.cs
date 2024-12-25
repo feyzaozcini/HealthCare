@@ -16,10 +16,11 @@ namespace Pusula.Training.HealthCare.FollowUpPlans
 
         public string? Note { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Takip tipi alanı zorunludur.")]
+
         public FollowUpType FollowUpType { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Ameliyat planlama durumu secimi yapiniz")]
         public bool IsSurgeryScheduled { get; set; }
     }
 }

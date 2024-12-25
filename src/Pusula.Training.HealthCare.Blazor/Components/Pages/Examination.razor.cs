@@ -31,11 +31,14 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 {
     public partial class Examination
     {
-        [Parameter]
-        public Guid ProtocolId { get; set; }
+        //[Parameter]
+        //public Guid ProtocolId { get; set; }
 
-        [Parameter]
-        public Guid PatientId { get; set; }
+        //[Parameter]
+        //public Guid PatientId { get; set; }
+
+        private Guid ProtocolId => ProtocolStateService.ProtocolId;
+        private Guid PatientId => ProtocolStateService.PatientId;
 
         private PatientDto Patient { get; set; } = new();
 
@@ -118,6 +121,10 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
         #endregion
         protected override async Task OnInitializedAsync()
         {
+            // State üzerinden deðerleri al
+            var protocolId = ProtocolStateService.ProtocolId;
+            var patientId = ProtocolStateService.PatientId;
+
             // Hasta bilgilerini çek
             Patient = await PatientsAppService.GetAsync(PatientId);
             await LoadAnamnesisAsync();
@@ -1070,34 +1077,43 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
                 //Sorting = "InitialDate DESC" // Tarihe göre azalan sýralama
             };
 
-            // API çaðrýsý
+           
             var result = await ExaminationDiagnosisAppService.GetListAsync(input);
 
-            // Gelen veriyi listeye at
+           
             ExaminationDiagnoses = result.Items.ToList();
 
             StateHasChanged(); // Sayfayý güncelle
         }
         private async Task CreateExaminationDiagnosis()
         {
-            var createDto = new ExaminationDiagnosisCreateDto
+            await HandleError(async () =>
             {
-                DiagnosisType = SelectedDiagnosisType,
-                InitialDate = DiagnosisDate ,
-                Note = Description,
-                ProtocolId = ProtocolId,
-                DiagnosisId = SelectedDiagnosisId,
+                if (SelectedDiagnosisId == Guid.Empty)
+                {
+                    await ShowToast("Taný alaný boþ býrakýlamaz.", false); 
+                    return;
+                }
+                var createDto = new ExaminationDiagnosisCreateDto
+                    {
+                    DiagnosisType = SelectedDiagnosisType,
+                    InitialDate = DiagnosisDate ,
+                    Note = Description,
+                    ProtocolId = ProtocolId,
+                    DiagnosisId = SelectedDiagnosisId,
              
-            };
+                    };
 
-            // API çaðrýsý ile yeni kayýt oluþtur
-            var createdExaminationDiagnosis = await ExaminationDiagnosisAppService.CreateAsync(createDto);
+            
+                var createdExaminationDiagnosis = await ExaminationDiagnosisAppService.CreateAsync(createDto);
+                await ShowToast("iþlem baþarýlý", true);
+            });
             await LoadExaminationDiagnosesAsync();
            
             DiagnosisDate = DateTime.Now;
             Description = string.Empty;
             SelectedDiagnosisId = Guid.Empty;
-            //StateHasChanged();
+           
         }
         private void SetDiagnosisType(DiagnosisType type)
         {

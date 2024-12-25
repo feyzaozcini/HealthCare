@@ -24,17 +24,15 @@ namespace Pusula.Training.HealthCare.ExaminationDiagnoses
 
         public virtual async Task<ExaminationDiagnosis> UpdateAsync(Guid id, DiagnosisType diagnosisType, Guid protocolId, DateTime initialDate, Guid diagnosisId, string note)
         {
-
             var examinationDiagnosis = await examinationDiagnosisRepository.GetAsync(id);
 
-            examinationDiagnosis.DiagnosisType = diagnosisType;
-            examinationDiagnosis.ProtocolId = protocolId;
-            examinationDiagnosis.InitialDate = initialDate;
-            examinationDiagnosis.DiagnosisId = diagnosisId;
-            examinationDiagnosis.Note = note;
+            examinationDiagnosis.SetDiagnosisType(diagnosisType);
+            examinationDiagnosis.SetProtocolId(protocolId);
+            examinationDiagnosis.SetInitialDate(initialDate);
+            examinationDiagnosis.SetDiagnosisId(diagnosisId);
+            examinationDiagnosis.SetNote(note);
 
             return await examinationDiagnosisRepository.UpdateAsync(examinationDiagnosis);
-
         }
     }
 }

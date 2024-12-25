@@ -14,7 +14,7 @@ namespace Pusula.Training.HealthCare.PainTypes
     public class PainType : Entity<Guid>, IDeletionAuditedObject
     {
         [NotNull]
-        public string Name { get; set; }
+        public string Name { get; private set; } = string.Empty;
 
         public Guid? DeleterId { get; set; }
 

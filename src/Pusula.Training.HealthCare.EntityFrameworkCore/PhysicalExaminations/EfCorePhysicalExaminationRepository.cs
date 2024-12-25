@@ -17,20 +17,6 @@ namespace Pusula.Training.HealthCare.PhysicalExaminations
     public class EfCorePhysicalExaminationRepository(IDbContextProvider<HealthCareDbContext> dbContextProvider)
     : EfCoreRepository<HealthCareDbContext, PhysicalExamination, Guid>(dbContextProvider), IPhysicalExaminationRepository
     {
-        public Task<long> GetCountAsync(string? filterText = null, decimal? weight = null, decimal? height = null, Guid? protocolId = null, string? sorting = null, int maxResultCount = int.MaxValue, int skipCount = 0, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<PhysicalExamination>> GetListAsync(string? filterText = null, decimal? weight = null, decimal? height = null, Guid? protocolId = null, string? sorting = null, int maxResultCount = int.MaxValue, int skipCount = 0, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<PhysicalExaminationWithNavigationProperties>> GetListWithNavigationPropertiesAsync(string? filterText = null, decimal? weight = null, decimal? height = null, Guid? protocolId = null, string? sorting = null, int maxResultCount = int.MaxValue, int skipCount = 0, CancellationToken cancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<PhysicalExaminationWithNavigationProperties> GetWithNavigationPropertiesAsync(Guid id, CancellationToken cancellationToken = default)
         {

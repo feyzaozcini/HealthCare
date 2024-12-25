@@ -16,7 +16,7 @@ namespace Pusula.Training.HealthCare.FollowUpPlans
         [NotNull]
         public Guid ProtocolId { get; set; }
 
-        public Protocol  Protocol { get; set; }
+        public Protocol Protocol { get; set; } = null!;
 
         public string? Note { get; set; }
 

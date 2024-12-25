@@ -10,23 +10,21 @@ namespace Pusula.Training.HealthCare.PhysicalExaminations
 {
     public class PhysicalExamination :Entity<Guid>
     {
-        // Foreign Key
-        public Guid ProtocolId { get; set; }
+        public Guid ProtocolId { get; private set; }
 
-        // Physical Examination Properties
-        public decimal? Weight { get; set; } // Kilo (kg)
-        public decimal? Height { get; set; } // Boy (cm)
-        public decimal? BMI { get; set; } // Vücut Kitle İndeksi
-        public decimal? VYA { get; set; } // Vücut Yağ Oranı
-        public decimal? Temperature { get; set; } // Ateş (°C)
-        public int? Pulse { get; set; } // Nabız
-        public int? SystolicBP { get; set; } // Sistolik Kan Basıncı
-        public int? DiastolicBP { get; set; } // Diyastolik Kan Basıncı
-        public int? SPO2 { get; set; } // Oksijen Doyumu
+        public decimal? Weight { get; private set; } // Kilo (kg)
+        public decimal? Height { get; private set; } // Boy (cm)
+        public decimal? BMI { get; private set; } // Vücut Kitle İndeksi
+        public decimal? VYA { get; private set; } // Vücut Yağ Oranı
+        public decimal? Temperature { get; private set; } // Ateş (°C)
+        public int? Pulse { get; private set; } // Nabız
+        public int? SystolicBP { get; private set; } // Sistolik Kan Basıncı
+        public int? DiastolicBP { get; private set; } // Diyastolik Kan Basıncı
+        public int? SPO2 { get; private set; } // Oksijen Doyumu
 
-        public string Note { get; set; } // Muayene notu
+        public string Note { get; private set; } = string.Empty;    // Muayene notu
 
-        // Protected Constructor for EF Core
+
         protected PhysicalExamination()
         {
             Note=string.Empty;
@@ -36,16 +34,72 @@ namespace Pusula.Training.HealthCare.PhysicalExaminations
         public PhysicalExamination(Guid id,Guid protocolId,decimal? weight,decimal? height, decimal? bmi,decimal? vya,decimal? temperature,int? pulse,int? systolicBP, int? diastolicBP,int? spo2, string note)
         {
             Id = id;
+            SetProtocolId(protocolId);
+            SetWeight(weight);
+            SetHeight(height);
+            SetBMI(bmi);
+            SetVYA(vya);
+            SetTemperature(temperature);
+            SetPulse(pulse);
+            SetSystolicBP(systolicBP);
+            SetDiastolicBP(diastolicBP);
+            SetSPO2(spo2);
+            SetNote(note);
+        }
+
+        public void SetProtocolId(Guid protocolId)
+        {
+            Check.NotNull(protocolId, nameof(protocolId));
             ProtocolId = protocolId;
+        }
+   
+        public void SetWeight(decimal? weight)
+        {
             Weight = weight;
+        }
+
+        public void SetHeight(decimal? height)
+        {
             Height = height;
+        }
+
+        public void SetBMI(decimal? bmi)
+        {
             BMI = bmi;
+        }
+
+        public void SetVYA(decimal? vya)
+        {
             VYA = vya;
+        }
+
+        public void SetTemperature(decimal? temperature)
+        {
             Temperature = temperature;
+        }
+
+        public void SetPulse(int? pulse)
+        {
             Pulse = pulse;
+        }
+
+        public void SetSystolicBP(int? systolicBP)
+        {
             SystolicBP = systolicBP;
+        }
+
+        public void SetDiastolicBP(int? diastolicBP)
+        {
             DiastolicBP = diastolicBP;
+        }
+
+        public void SetSPO2(int? spo2)
+        {
             SPO2 = spo2;
+        }
+
+        public void SetNote(string note)
+        {
             Note = note;
         }
     }

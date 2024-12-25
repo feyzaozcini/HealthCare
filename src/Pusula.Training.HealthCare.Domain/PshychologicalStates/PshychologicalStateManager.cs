@@ -18,9 +18,9 @@ namespace Pusula.Training.HealthCare.PshychologicalStates
 
             var pshychologicalState = await pshychologicalStateRepository.GetAsync(id);
 
-            pshychologicalState.MentalState = mentalState;
-            pshychologicalState.ProtocolId = protocolId;
-            pshychologicalState.Description = description;
+            pshychologicalState.SetMentalState(mentalState);
+            pshychologicalState.SetProtocolId(protocolId);
+            pshychologicalState.SetDescription(description);
 
             return await pshychologicalStateRepository.UpdateAsync(pshychologicalState);
         }

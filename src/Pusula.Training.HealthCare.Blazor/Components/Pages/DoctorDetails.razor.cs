@@ -111,7 +111,9 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private void NavigateToExamination(Guid protocolId, Guid patientId)
         {
-            NavigationManager.NavigateTo($"/examination/{protocolId}/{patientId}");
+            //NavigationManager.NavigateTo($"/examination/{protocolId}/{patientId}");
+            ProtocolStateService.SetProtocol(protocolId, patientId);
+            NavigationManager.NavigateTo("/examination");
         }
     }
 }

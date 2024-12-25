@@ -14,34 +14,21 @@ namespace Pusula.Training.HealthCare.Diagnoses
     {
         public virtual async Task<Diagnosis> CreateAsync(string name, string code,Guid groupId)
         {
-            Check.NotNullOrWhiteSpace(code, nameof(code));
-            Check.Length(code, nameof(code), DiagnosisConsts.CodeMaxLength, DiagnosisConsts.CodeMinLength);
-
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), DiagnosisConsts.NameMaxLength, DiagnosisConsts.NameMinLength);
-
             var diagnosisGroup = new Diagnosis(Guid.NewGuid(), code, name, groupId);
             return await diagnosisRepository.InsertAsync(diagnosisGroup);
-
         }
 
         public virtual async Task<Diagnosis> UpdateAsync(Guid id, string name, string code,Guid groupId)
         {
-            Check.NotNullOrWhiteSpace(code, nameof(code));
-            Check.Length(code, nameof(code), DiagnosisConsts.CodeMaxLength, DiagnosisConsts.CodeMinLength);
-
-            Check.NotNullOrWhiteSpace(name, nameof(name));
-            Check.Length(name, nameof(name), DiagnosisConsts.NameMaxLength, DiagnosisConsts.NameMinLength);
-
+          
             var diagnosis = await diagnosisRepository.GetAsync(id);
 
-            diagnosis.Name = name;
-            diagnosis.Code = code;
-            diagnosis.GroupId = groupId;
+            diagnosis.SetName(name);
+
+            diagnosis.SetCode(code);
+            diagnosis.SetGroupId(groupId);
 
             return await diagnosisRepository.UpdateAsync(diagnosis);
-
-
 
         }
     }

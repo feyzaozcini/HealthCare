@@ -14,10 +14,12 @@ namespace Pusula.Training.HealthCare.ControlNotes
         [Required]
         public Guid ProtocolId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Note tarihi zorunludur.")]
+
         public DateTime NoteDate { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Not alanı boş bırakılamaz")]
+
         public string Note { get; set; } = null!;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Pusula.Training.HealthCare.Core.Rules.Diagnoses;
+using Pusula.Training.HealthCare.ExaminationDiagnoses;
 using Pusula.Training.HealthCare.Permissions;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,8 @@ namespace Pusula.Training.HealthCare.Diagnoses
     [Authorize(HealthCarePermissions.Diagnosis.Default)]
     public class DiagnosisAppService(IDiagnosisRepository diagnosisRepository,
         DiagnosisManager diagnosisManager,
-        IDiagnosisBusinessRules diagnosisBusinessRules)
+        IDiagnosisBusinessRules diagnosisBusinessRules,
+        IExaminationDiagnosisRepository examinationDiagnosisRepository)
         : HealthCareAppService, IDiagnosisAppService
     {
         public async Task<PagedResultDto<DiagnosisWithNavigationPropertiesDto>> GetListAsync(GetDiagnosisInput input)
@@ -43,7 +45,23 @@ namespace Pusula.Training.HealthCare.Diagnoses
 
 
         [Authorize(HealthCarePermissions.Diagnosis.Delete)]
-        public async Task DeleteAsync(Guid id) => await diagnosisRepository.DeleteAsync(id);
+        //public async Task DeleteAsync(Guid id) => await diagnosisRepository.DeleteAsync(id);
+
+        //tani silindiginda muayenede konulan ilgili tani kayitlari da silinmeli (cascade i son anda duzgun calistiramadigim icin boyle yaptim)
+        public async Task DeleteAsync(Guid id) 
+        {
+            
+            var relatedExaminations = await examinationDiagnosisRepository.GetByDiagnosisIdAsync(id);
+
+            
+            foreach (var exam in relatedExaminations)
+            {
+                await examinationDiagnosisRepository.DeleteAsync(exam.Id);
+            }
+
+          
+            await diagnosisRepository.DeleteAsync(id);
+        }
 
         [Authorize(HealthCarePermissions.Diagnosis.Delete)]
         public async Task DeleteByIdsAsync(List<Guid> diagnosesIds) => await diagnosisRepository.DeleteManyAsync(diagnosesIds);

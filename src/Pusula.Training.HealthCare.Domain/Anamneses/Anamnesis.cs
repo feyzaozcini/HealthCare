@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using Pusula.Training.HealthCare.Protocols;
 using System;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
@@ -9,18 +10,18 @@ namespace Pusula.Training.HealthCare.Anamneses
     {
 
         [NotNull]
-        public string Complaint { get; set; }
+        public string Complaint { get; private set; } = string.Empty;
 
         [NotNull]
-        public DateTime StartDate { get; set; }
+        public DateTime StartDate { get; private set; }
 
         [NotNull]
-        public string Story { get; set; }
+        public string Story { get; private set; } = string.Empty;
 
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get;  set; }
 
         [NotNull]
-        public virtual Guid ProtocolId { get; set; }
+        public virtual Guid ProtocolId { get; private set; }
 
         protected Anamnesis()
         {
@@ -32,18 +33,35 @@ namespace Pusula.Training.HealthCare.Anamneses
 
         public Anamnesis(Guid id, string complaint, DateTime startDate, string story, Guid protocolId)
         {
-
             Id = id;
-            Check.NotNull(complaint, nameof(complaint));
-            Check.NotNull(story, nameof(story));
+            SetComplaint(complaint);
+            SetStartDate(startDate);
+            SetStory(story);
+            SetProtocolId(protocolId);
+        }
 
-
+        public void SetComplaint(string complaint)
+        {
+            Check.NotNullOrWhiteSpace(complaint, nameof(complaint));
             Complaint = complaint;
+        }
+
+        public void SetStartDate(DateTime startDate)
+        {
+            Check.NotNull(startDate, nameof(startDate));
             StartDate = startDate;
+        }
+
+        public void SetStory(string story)
+        {
+            Check.NotNullOrWhiteSpace(story, nameof(story));
             Story = story;
+        }
 
+        public void SetProtocolId(Guid protocolId)
+        {
+            Check.NotNull(protocolId, nameof(protocolId));
             ProtocolId = protocolId;
-
         }
     }
 }
