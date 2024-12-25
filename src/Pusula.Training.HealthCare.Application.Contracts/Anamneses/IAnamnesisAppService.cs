@@ -1,5 +1,4 @@
-﻿using Pusula.Training.HealthCare.Patients;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +10,7 @@ namespace Pusula.Training.HealthCare.Anamneses
 {
     public interface IAnamnesisAppService : IApplicationService
     {
-        //Task<PagedResultDto<AnamnesisWithNavigationPropertiesDto>> GetListAsync(GetPatientsInput input);
-
+       
         Task<AnamnesisWithNavigationPropertiesDto> GetWithNavigationPropertiesAsync(Guid id);
 
         Task<AnamnesisDto> GetAsync(Guid id);

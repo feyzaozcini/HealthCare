@@ -29,49 +29,10 @@
     </div>
 
 
-    <div>
-        <SfButton CssClass="e-primary" Content="Yeni Doktor" @onclick="OpenCreateModal" />
-    </div>
+    
 </div>
 
 
-@* CREATEMODAL Static for now *@
-<SfDialog IsModal="true" Width="400px" @bind-Visible="IsModalVisible" ShowCloseIcon="true" Header="Yeni Doktor">
-    <div>
-        <!-- Statik form -->
-        <div class="mb-3">
-            <label for="name">İsim</label>
-            <SfTextBox Placeholder="İsim" />
-        </div>
-        <div class="mb-3">
-            <label for="surname">Soyisim</label>
-            <SfTextBox Placeholder="Soyisim" />
-        </div>
-        <div class="mb-3">
-            <label for="email">Email</label>
-            <SfTextBox Placeholder="example@mail.com" />
-        </div>
-        <div class="mb-3">
-            <label for="phone">Telefon Numarası</label>
-            <SfMaskedTextBox Mask="000-000-0000" Placeholder="Telefon Numarası" />
-        </div>
-        <div class="mb-3">
-            <label for="gender">Cinsiyet</label>
-            <SfDropDownList TValue="string" TItem="string" DataSource="@Genders" Placeholder="Cinsiyet Seçin" />
-        </div>
-        <div class="mb-3">
-            <label for="tckn">T.C. Kimlik No</label>
-            <SfMaskedTextBox Mask="00000000000" Placeholder="T.C. Kimlik No" />
-        </div>
-        <div class="mb-3">
-            <label for="birthdate">Doğum Tarihi</label>
-            <SfDatePicker Placeholder="Gün.Ay.Yıl" TValue="DateTime?" />
-        </div>
-        <div class="d-flex justify-content-end">
-            <SfButton CssClass="e-primary" Content="Kaydet" />
-        </div>
-    </div>
-</SfDialog>
 
 
 

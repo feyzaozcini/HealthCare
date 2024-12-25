@@ -15,12 +15,12 @@ namespace Pusula.Training.HealthCare.SystemChecks
         [NotNull]
         public Guid ProtocolId { get; private set; }
 
-        public Protocol Protocol { get; private set; }
+        public Protocol Protocol { get; private set; } = null!;
 
         [NotNull]
         public bool? GeneralSystemCheck { get; private set; }
 
-       
+
         public bool? GenitoUrinary { get; private set; }
 
        

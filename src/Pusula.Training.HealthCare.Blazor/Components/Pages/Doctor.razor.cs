@@ -29,7 +29,7 @@ namespace Pusula.Training.HealthCare.Blazor.Components.Pages
 
         private void OpenCreateModal()
         {
-            IsModalVisible = true; // Modal'ý açar
+            IsModalVisible = true; 
         }
 
         private async Task GetDoctorsAsync()

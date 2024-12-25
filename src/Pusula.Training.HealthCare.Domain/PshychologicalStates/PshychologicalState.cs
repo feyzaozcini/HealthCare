@@ -6,10 +6,10 @@ namespace Pusula.Training.HealthCare.PshychologicalStates
 {
     public class PshychologicalState : Entity<Guid>, ISoftDelete
     {
-        public string Description { get; set; }
-        public MentalState MentalState { get; set; }
+        public string Description { get; private set; } = string.Empty;
+        public MentalState MentalState { get; private set; }
 
-        public Guid ProtocolId { get; set; }
+        public Guid ProtocolId { get; private set; }
         public bool IsDeleted { get; set; }
 
         protected PshychologicalState()
@@ -20,9 +20,25 @@ namespace Pusula.Training.HealthCare.PshychologicalStates
         public PshychologicalState(Guid id, MentalState mentalState, Guid protocolId, string description)
         {
             Id = id;
-            MentalState = mentalState;
-            ProtocolId = protocolId;
+            SetMentalState(mentalState);
+            SetProtocolId(protocolId);
+            SetDescription(description);
+        }
+
+        public void SetDescription(string description)
+        {
             Description = description;
+        }
+
+        public void SetMentalState(MentalState mentalState)
+        {
+            MentalState = mentalState;
+        }
+
+        public void SetProtocolId(Guid protocolId)
+        {
+            Check.NotNull(protocolId, nameof(protocolId));
+            ProtocolId = protocolId;
         }
     }
 }

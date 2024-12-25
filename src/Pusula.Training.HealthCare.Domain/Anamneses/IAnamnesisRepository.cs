@@ -15,17 +15,6 @@ namespace Pusula.Training.HealthCare.Anamneses
         Guid id,
         CancellationToken cancellationToken = default);
 
-        Task<List<AnamnesisWithNavigationProperties>> GetListWithNavigationPropertiesAsync(
-          string? filterText = null,
-          string? complaint = null,
-          DateTime? startDate = null,
-          string? story = null,
-          Guid? protocolId = null,
-          string? sorting = null,
-          int maxResultCount = int.MaxValue,
-          int skipCount = 0,
-          CancellationToken cancellationToken = default);
-
 
         Task<List<Anamnesis>> GetListAsync(
          string? filterText = null,

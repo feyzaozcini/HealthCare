@@ -13,27 +13,27 @@ namespace Pusula.Training.HealthCare.PatientHistories
     {
         public Guid PatientId { get; private set; }
 
-        public Patient Patient { get; private set; }
+        public Patient Patient { get; private set; } = null!;
 
-        public string Habit { get; private set; }
+        public string Habit { get; private set; } = string.Empty;
 
-        public string Disease { get; private set; }
+        public string Disease { get; private set; } = string.Empty;
 
-        public string Medicine { get; private set; }
+        public string Medicine { get; private set; } = string.Empty;
 
-        public string Operation { get; private set; }
+        public string Operation { get; private set; } = string.Empty;
 
-        public string Vaccination { get; private set; }
+        public string Vaccination { get; private set; } = string.Empty;
 
-        public string Allergy { get; private set; }
+        public string Allergy { get; private set; } = string.Empty;
 
-        public string SpecialCondition { get; private set; }
+        public string SpecialCondition { get; private set; } = string.Empty;
 
-        public string Device { get; private set; }
+        public string Device { get; private set; } = string.Empty;
 
-        public string Therapy { get; private set; }
+        public string Therapy { get; private set; } = string.Empty;
 
-        public string Job { get; private set; }
+        public string Job { get; private set; } = string.Empty;
 
         public EducationLevel EducationLevel { get; private set; }
 

@@ -9,13 +9,15 @@ namespace Pusula.Training.HealthCare.ExaminationDiagnoses
 {
     public enum DiagnosisType
     {
-        [Display(Name = "DiagnosisType:Definitive")]
+
+        [Display(Name = "Kesin Tani")]
         Definitive = 1,//kesin tani
 
-        [Display(Name = "DiagnosisType:Preliminary")]
+        [Display(Name = "Ön Tanı")]
         Preliminary = 2,//ön tanı
 
-        [Display(Name = "DiagnosisType:Differential")]
+
+        [Display(Name = "Ayirici Tani")]
         Differential = 3 //ayirici
        
     }

@@ -26,16 +26,16 @@ namespace Pusula.Training.HealthCare.FallRisks
         {
             var fallRisk = await fallRiskRepository.GetAsync(id);
 
-            fallRisk.Score = score;
-            fallRisk.ProtocolId = protocolId;
-            fallRisk.Description = description;
-            fallRisk.HasFallHistory = hasFallHistory;
-            fallRisk.UsesMedications = usesMedications;
-            fallRisk.HasAddiction = hasAddiction;
-            fallRisk.HasBalanceDisorder = hasBalanceDisorder;
-            fallRisk.HasVisionImpairment = hasVisionImpairment;
-            fallRisk.MentalState = mentalState;
-            fallRisk.GeneralHealthState = generalHealthState;
+            fallRisk.SetScore(score);
+            fallRisk.SetProtocolId(protocolId);
+            fallRisk.SetDescription(description);
+            fallRisk.SetHasFallHistory(hasFallHistory);
+            fallRisk.SetUsesMedications(usesMedications);
+            fallRisk.SetHasAddiction(hasAddiction);
+            fallRisk.SetHasBalanceDisorder(hasBalanceDisorder);
+            fallRisk.SetHasVisionImpairment(hasVisionImpairment);
+            fallRisk.SetMentalState(mentalState);
+            fallRisk.SetMentalState(mentalState);
 
             return await fallRiskRepository.UpdateAsync(fallRisk);
         }

@@ -15,17 +15,17 @@ namespace Pusula.Training.HealthCare.PainDetails
     public class PainDetail : AuditedEntity<Guid>
     {
         [NotNull]
-        public string Area { get; set; }
+        public string Area { get; set; } = string.Empty;
 
         public Guid ProtocolId { get; set; }
 
-        public Protocol Protocol { get; set; }
+        public Protocol Protocol { get; set; } = null!;
 
         [NotNull]
         public int Score { get; set; }
         public Guid PainTypeId { get; set; }
 
-        public PainType PainType { get; set; }
+        public PainType PainType { get; set; } = null!;
 
         public string? Description { get; set; }
 

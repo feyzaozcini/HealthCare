@@ -1,4 +1,6 @@
-﻿@page "/examination/{protocolId:guid}/{patientId:guid}"
+﻿@* @page "/examination/{protocolId:guid}/{patientId:guid}" *@
+@page "/examination"
+
 @using Pusula.Training.HealthCare.Patients
 @using Pusula.Training.HealthCare.Anamneses
 @using Pusula.Training.HealthCare.FallRisks
@@ -13,11 +15,9 @@
 @using Pusula.Training.HealthCare.FamilyHistories
 @using Pusula.Training.HealthCare.ControlNotes
 @using Pusula.Training.HealthCare.PatientHistories
-
-
+@using Pusula.Training.HealthCare.Blazor.Containers
 @using Volo.Abp.Localization
 @using Pusula.Training.HealthCare.Localization
-
 @using Syncfusion.Blazor.Cards
 @using Syncfusion.Blazor.DataForm
 @using Syncfusion.Blazor.Inputs
@@ -42,11 +42,13 @@
 @inject IControlNotesAppService ControlNotesAppService
 @inject IPshychologicalStatesAppService PsychologicalStateAppService
 @inject IPatientHistoriesAppService PatientHistoriesAppService
+@inject ProtocolStateContainer ProtocolStateService
+@inject NavigationManager NavigationManager
 
 
 
 
-<p>Protocol ID: @ProtocolId Patient ID: @PatientId</p>
+
 
 @*Toast*@
 <SfToast @ref="ToastObj" Width="300px">
@@ -91,6 +93,26 @@
 
 
 
+@* <SfCard CssClass="patient-card">
+    <!-- Avatar Resmi ve Hasta Bilgileri -->
+    <div class="e-card-header">
+        <img src="/images/main/avatar.jpg" class="custom-avatar" alt="Patient Avatar" />
+        <div class="e-card-header-text">
+            <h4>@($"{protocolDto.PatientFirstName} {protocolDto.PatientLastName}")</h4>
+            <p>
+                <strong>Yaş:</strong> @CalculateAge(protocolDto.PatientBirthDate) |
+                <strong>Doğum Tarihi:</strong> @protocolDto.PatientBirthDate.ToString("dd.MM.yyyy")
+            </p>
+        </div>
+    </div>
+    <!-- Hasta Bilgileri -->
+    <div class="e-card-content">
+        <p><strong>Hasta No:</strong> @protocolDto.PatientNo | <strong>Ülke:</strong> TR</p>
+        <p><strong>Bölüm:</strong> @protocolDto.DepartmentName</p>
+        <p><strong>Doktor:</strong> @($"{protocolDto.DoctorTitleName} {protocolDto.DoctorName} {protocolDto.DoctorSurname}")</p>
+    </div>
+</SfCard> *@
+
 <div class="patient-card-container">
     <SfCard CssClass="e-card e-card-horizontal patient-card">
         <div class="e-card-header">
@@ -119,6 +141,9 @@
         </div>
     </SfCard>
 </div>
+
+
+
 
 <!-- #endregion -->
 
@@ -392,19 +417,7 @@
                         <strong>Psikolojik Durum</strong>
                     </Syncfusion.Blazor.Cards.CardHeader>
                     <CardContent>
-              @*           <div class="d-flex align-items-center mb-3">
-                            <div class="btn-group me-3" role="group">
-                                @foreach (var state in Enum.GetValues(typeof(MentalState)))
-                                {
-
-                                        <SfButton CssClass="@GetButtonClass((MentalState)state)"
-                                                  @onclick="() => SetMentalState((MentalState)state)">
-                                        @Localizer[$"Enum:MentalState.{state}"]
-                                        </SfButton>
-                                }
-                            </div>
-                            <SfTextBox @bind-Value="pshychologicalStateDto.Description" Placeholder="Açıklama" CssClass="form-control" Style="width: 100px;" />
-                        </div> *@
+             
                         <div class="d-flex align-items-center mb-3 position-relative">
                             <div class="btn-group me-3 required-label" role="group">
                                  @foreach (var state in Enum.GetValues(typeof(MentalState)))
@@ -672,13 +685,7 @@
 
                             <!-- Butonlar -->
                             <div class="btn-group ms-3" role="group">
-                                @*   @foreach (var type in Enum.GetValues(typeof(DiagnosisType)))
-                                {
-                                <SfButton CssClass="@GetDiagnosisTypeButtonClass((DiagnosisType)type)"
-                                @onclick="() => SetDiagnosisType((DiagnosisType)type)">
-                                @type
-                                </SfButton>
-                                } *@
+                               
 
                                 <div class="btn-group ms-3" role="group">
                                     <SfButton CssClass="@GetDiagnosisTypeButtonClass(DiagnosisType.Definitive)"
@@ -727,7 +734,14 @@
                                         <GridColumn Field="Diagnosis.Code" HeaderText="Kodu" Width="90"></GridColumn>
                                         <GridColumn Field="Diagnosis.Name" HeaderText="Adı" Width="90"></GridColumn>
                                         <GridColumn Field="ExaminationDiagnosis.InitialDate" HeaderText="İlk Tanı Tarihi" Width="100" Format="dd.MM.yyyy"></GridColumn>
-                                        <GridColumn Field="ExaminationDiagnosis.DiagnosisType" HeaderText="Tanı Tipi" Width="100"></GridColumn>
+                                        <GridColumn HeaderText="Tanı Tipi" Width="100">
+                                            <Template>
+                                                @if (context is ExaminationDiagnosisWithNavigationPropertiesDto diagnosis)
+                                                {
+                                                 @Localizer[$"DiagnosisType:{diagnosis.ExaminationDiagnosis.DiagnosisType}"]
+                                                }
+                                            </Template>
+                                        </GridColumn>
                                         <GridColumn Field="ExaminationDiagnosis.Note" HeaderText="Açıklama" Width="100"></GridColumn>
 
                                         <!-- Silme Butonu -->
@@ -1380,6 +1394,18 @@
 
 <style>
 
+    .card-container {
+        margin-bottom: 20px;
+        padding: 10px;
+    }
+
+    .patient-card-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+   
     .required-label {
     position: relative; /* Kırmızı noktanın konumlandırılması için referans */
 }
@@ -1523,12 +1549,7 @@
         padding: 0 4px; /* Kolonlar arasında boşluk azaltıldı */
     }
 
-    .patient-card-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 20px;
-    }
+   
 
     .main-content {
         display: flex;
@@ -1541,9 +1562,6 @@
         width: 48%;
     }
 
-    .card-container {
-        margin-bottom: 20px;
-        padding: 10px;
-    }
 
 </style>
+

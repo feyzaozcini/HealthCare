@@ -60,5 +60,8 @@ namespace Pusula.Training.HealthCare.ExaminationDiagnoses
         int skipCount,
         int maxResultCount,
         CancellationToken cancellationToken = default);
+
+
+        public Task<List<ExaminationDiagnosis>> GetByDiagnosisIdAsync(Guid diagnosisId);
     }
 }

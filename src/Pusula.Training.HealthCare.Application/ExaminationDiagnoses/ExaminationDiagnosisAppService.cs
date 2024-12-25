@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Pusula.Training.HealthCare.Core.Rules.Diagnoses;
+using Pusula.Training.HealthCare.Core.Rules.ExaminationDiagnoses;
 using Pusula.Training.HealthCare.Diagnoses;
 using Pusula.Training.HealthCare.Permissions;
 using Pusula.Training.HealthCare.Protocols;
@@ -20,11 +22,13 @@ namespace Pusula.Training.HealthCare.ExaminationDiagnoses
     [Authorize(HealthCarePermissions.Examinations.Default)]
     public class ExaminationDiagnosisAppService(IExaminationDiagnosisRepository examinationDiagnosisRepository,
         IDiagnosisRepository diagnosisRepository,
+        IExaminationDiagnosisBusinessRules examinationDiagnosisBusinessRules,
         ExaminationDiagnosisManager examinationDiagnosisManager) : HealthCareAppService, IExaminationDiagnosisAppService
     {
         [Authorize(HealthCarePermissions.Examinations.Create)]
         public async Task<ExaminationDiagnosisDto> CreateAsync(ExaminationDiagnosisCreateDto input)
         {
+            await examinationDiagnosisBusinessRules.ExaminationDiagnosisDuplicatedAsync(input.ProtocolId,input.DiagnosisId);
             var examinationDiagnosis = await examinationDiagnosisManager.CreateAsync(input.DiagnosisType,input.ProtocolId,input.InitialDate,input.DiagnosisId,input.Note);
 
             return ObjectMapper.Map<ExaminationDiagnosis, ExaminationDiagnosisDto>(examinationDiagnosis);
