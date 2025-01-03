@@ -143,7 +143,7 @@ namespace Pusula.Training.HealthCare.Appointments
         [Authorize(HealthCarePermissions.Appointments.Create)]
         public virtual async Task<AppointmentDto> CreateAsync(AppointmentCreateDto input)
         {
-            await CheckRulesAsync(input);
+            await appointmentBusinessRules.CheckRulesAsync(input);
             // AppointmentType üzerinden DoctorAppointmentTypes'a eriş
             var appointmentType = await appointmentTypeRepository.GetAsync(input.AppointmentTypeId);
 
@@ -236,26 +236,5 @@ namespace Pusula.Training.HealthCare.Appointments
             };
         }
 
-        public virtual async Task CheckRulesAsync(AppointmentCreateDto input)
-        {
-            var patient = await patientRepository.GetAsync(input.PatientId);
-            var patientAge = DateTime.Now.Year - patient.BirthDate.Year;
-            var patientGender=patient.Gender.ToString();
-
-            //seçilen departman ve doktor için tanımlanmış kuralların getirilmesi(Hepsi gezilmiyor sadece randevu için seçilenler)
-            var departmentRules = await appointmentRuleRepository.GetRulesForDepartmentAsync(input.DepartmentId);
-            var doctorRules = await appointmentRuleRepository.GetRulesForDoctorAsync(input.DoctorId);
-            var allRules = departmentRules.Concat(doctorRules).ToList();
-
-
-            foreach (var rule in allRules.Where(r =>
-              (r.MinAge.HasValue && patientAge < r.MinAge) ||
-              (r.MaxAge.HasValue && patientAge > r.MaxAge) ||
-              (r.Gender.HasValue && patientGender != r.Gender.ToString())))
-            {
-                await appointmentBusinessRules.AppointmentCannotCreate();
-            }
-
-        }
     }
 }
