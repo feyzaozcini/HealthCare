@@ -71,7 +71,7 @@ Bu sayfa randevuları listelemektedir. Öncelikle tüm randevuların bulunduğu 
 
 ![](images/16.JPG)
 
-![](images/17.JPG)
+![](images/17.png)
 
 ## Randevu Raporları
 Bu sayfada randevular için geniş çağlı bir rapolarma mevcuttur. Bir sayfada chartslar kullanılmıştır diğer sayfasında pivot tablo kullanılmıştır.
