@@ -13,7 +13,7 @@ Proje, ekip olarak geliştirdiğimiz bir web uygulamasıdır. Backend tarafında
 ## Giriş Sayfası
 İşlemler Admin üzerinden gerçekleştirilmektedir.
 
-![](images/22.JPG)
+![](images/23.JPG)
 
 ### Anasayfa
 
